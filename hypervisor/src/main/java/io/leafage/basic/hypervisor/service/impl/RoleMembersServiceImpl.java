@@ -79,4 +79,13 @@ public class RoleMembersServiceImpl implements RoleMembersService {
         }).toList();
         return roleMembersRepository.saveAllAndFlush(roleMembers);
     }
+
+    @Override
+    public void removeRelation(Long roleId, Set<String> usernames) {
+        List<RoleMembers> roleMembers = roleMembersRepository.findAllByRoleId(roleId);
+        List<Long> filteredIds = roleMembers.stream()
+                .filter(roleMember -> usernames.contains(roleMember.getUsername()))
+                .map(RoleMembers::getId).toList();
+        roleMembersRepository.deleteAllByIdInBatch(filteredIds);
+    }
 }

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2024-2025.  little3201.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *       https://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -244,22 +244,25 @@ class RoleControllerTest {
 
     @Test
     void relation() throws Exception {
-        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anySet()))
-                .willReturn(List.of(Mockito.mock(RolePrivileges.class)));
+        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet()))
+                .willReturn(Mockito.mock(RolePrivileges.class));
 
         mvc.perform(patch("/roles/{id}/privileges", 1L)
+                        .queryParam("privilegeId", "1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(Set.of(1L))).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(Set.of("test"))).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void relation_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anySet());
+        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet());
 
-        mvc.perform(patch("/roles/{id}/privileges", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(Set.of(1L))).with(csrf().asHeader()))
+        mvc.perform(patch("/roles/{id}/privileges", Mockito.anyLong())
+                        .queryParam("privilegeId", "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(Set.of("test"))).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

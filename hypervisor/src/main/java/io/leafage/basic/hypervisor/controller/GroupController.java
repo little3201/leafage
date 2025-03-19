@@ -72,7 +72,7 @@ public class GroupController {
         try {
             voPage = groupService.retrieve(page, size, sortBy, descending, superiorId, name);
         } catch (Exception e) {
-            logger.info("Retrieve group occurred an error: ", e);
+            logger.info("Retrieve group error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -89,7 +89,7 @@ public class GroupController {
         try {
             treeNodes = groupService.tree();
         } catch (Exception e) {
-            logger.info("Retrieve privilege tree occurred an error: ", e);
+            logger.info("Retrieve privilege tree error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(treeNodes);
@@ -107,7 +107,7 @@ public class GroupController {
         try {
             groupVO = groupService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch group occurred an error: ", e);
+            logger.info("Fetch group error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(groupVO);
@@ -126,7 +126,7 @@ public class GroupController {
         try {
             exists = groupService.exists(name, id);
         } catch (Exception e) {
-            logger.info("Check group exists occurred an error: ", e);
+            logger.info("Check group exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
@@ -144,7 +144,7 @@ public class GroupController {
         try {
             groupVO = groupService.create(dto);
         } catch (Exception e) {
-            logger.error("Create group occurred an error: ", e);
+            logger.error("Create group error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(groupVO);
@@ -163,7 +163,7 @@ public class GroupController {
         try {
             groupVO = groupService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify group occurred an error: ", e);
+            logger.error("Modify group error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(groupVO);
@@ -180,7 +180,7 @@ public class GroupController {
         try {
             groupService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove group occurred an error: ", e);
+            logger.error("Remove group error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();
@@ -198,7 +198,7 @@ public class GroupController {
         try {
             voList = groupMembersService.members(id);
         } catch (Exception e) {
-            logger.error("Retrieve group users occurred an error: ", e);
+            logger.error("Retrieve group users error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);

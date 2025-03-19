@@ -74,7 +74,7 @@ public class PrivilegeController {
         try {
             voPage = privilegeService.retrieve(page, size, sortBy, descending, name);
         } catch (Exception e) {
-            logger.info("Retrieve privilege occurred an error: ", e);
+            logger.info("Retrieve privilege error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -92,7 +92,7 @@ public class PrivilegeController {
         try {
             treeNodes = privilegeService.tree(principal.getName());
         } catch (Exception e) {
-            logger.info("Retrieve privilege tree occurred an error: ", e);
+            logger.info("Retrieve privilege tree error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(treeNodes);
@@ -111,7 +111,7 @@ public class PrivilegeController {
         try {
             voList = privilegeService.subset(superiorId);
         } catch (Exception e) {
-            logger.info("Retrieve privilege subset occurred an error: ", e);
+            logger.info("Retrieve privilege subset error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);
@@ -129,7 +129,7 @@ public class PrivilegeController {
         try {
             vo = privilegeService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch privilege occurred an error: ", e);
+            logger.info("Fetch privilege error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -149,7 +149,7 @@ public class PrivilegeController {
         try {
             vo = privilegeService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify privilege occurred an error: ", e);
+            logger.error("Modify privilege error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(vo);
@@ -168,7 +168,7 @@ public class PrivilegeController {
         try {
             enabled = privilegeService.enable(id);
         } catch (Exception e) {
-            logger.error("Modify privilege occurred an error: ", e);
+            logger.error("Modify privilege error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
@@ -186,7 +186,7 @@ public class PrivilegeController {
         try {
             voList = rolePrivilegesService.roles(id);
         } catch (Exception e) {
-            logger.error("Retrieve privilege roles occurred an error: ", e);
+            logger.error("Retrieve privilege roles error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);

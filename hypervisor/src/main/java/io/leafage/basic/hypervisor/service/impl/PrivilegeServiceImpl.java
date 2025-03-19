@@ -24,13 +24,10 @@ import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
 import io.leafage.basic.hypervisor.service.PrivilegeService;
 import io.leafage.basic.hypervisor.vo.PrivilegeVO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import top.leafage.common.TreeNode;
 import top.leafage.common.servlet.ServletAbstractTreeNodeService;
 
@@ -65,9 +62,7 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
      */
     @Override
     public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
-        Sort sort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC,
-                StringUtils.hasText(sortBy) ? sortBy : "id");
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = pageable(page, size, sortBy, descending);
 
         return privilegeRepository.findAllBySuperiorIdIsNull(pageable)
                 .map(privilege -> {
@@ -83,6 +78,8 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
      */
     @Override
     public List<TreeNode> tree(String username) {
+        Assert.hasText(username, "username must not be empty.");
+
         List<RoleMembers> roleMembers = roleMembersRepository.findAllByUsername(username);
         if (CollectionUtils.isEmpty(roleMembers)) {
             return Collections.emptyList();

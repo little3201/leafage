@@ -78,7 +78,7 @@ public class RoleController {
         try {
             voPage = roleService.retrieve(page, size, sortBy, descending, name);
         } catch (Exception e) {
-            logger.info("Retrieve role occurred an error: ", e);
+            logger.info("Retrieve role error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -97,7 +97,7 @@ public class RoleController {
         try {
             vo = roleService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch role occurred an error: ", e);
+            logger.info("Fetch role error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -116,7 +116,7 @@ public class RoleController {
         try {
             exists = roleService.exists(name, id);
         } catch (Exception e) {
-            logger.info("Check role exists occurred an error: ", e);
+            logger.info("Check role exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
@@ -135,7 +135,7 @@ public class RoleController {
         try {
             vo = roleService.create(dto);
         } catch (Exception e) {
-            logger.error("Create role occurred an error: ", e);
+            logger.error("Create role error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
@@ -155,7 +155,7 @@ public class RoleController {
         try {
             vo = roleService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify role occurred an error: ", e);
+            logger.error("Modify role error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(vo);
@@ -172,7 +172,44 @@ public class RoleController {
         try {
             roleService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove role occurred an error: ", e);
+            logger.error("Remove role error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 保存role-privilege关联
+     *
+     * @param id        role id
+     * @param usernames 账号
+     * @return 操作结果
+     */
+    @PatchMapping("/{id}/members")
+    public ResponseEntity<List<RoleMembers>> relation(@PathVariable Long id, @RequestBody Set<String> usernames) {
+        List<RoleMembers> list;
+        try {
+            list = roleMembersService.relation(id, usernames);
+        } catch (Exception e) {
+            logger.error("Relation role members error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.accepted().body(list);
+    }
+
+    /**
+     * 删除 role-privilege关联
+     *
+     * @param id        role主键
+     * @param usernames username集合
+     * @return 操作结果
+     */
+    @DeleteMapping("/{id}/members")
+    public ResponseEntity<Void> removeRelation(@PathVariable Long id, @RequestParam Set<String> usernames) {
+        try {
+            roleMembersService.removeRelation(id, usernames);
+        } catch (Exception e) {
+            logger.error("Remove relation role members error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();
@@ -190,7 +227,7 @@ public class RoleController {
         try {
             voList = roleMembersService.members(id);
         } catch (Exception e) {
-            logger.error("Retrieve role members occurred an error: ", e);
+            logger.error("Retrieve role members error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);
@@ -208,7 +245,7 @@ public class RoleController {
         try {
             voList = rolePrivilegesService.privileges(id);
         } catch (Exception e) {
-            logger.error("Relation role privileges occurred an error: ", e);
+            logger.error("Retrieve role privileges error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);
@@ -217,20 +254,21 @@ public class RoleController {
     /**
      * 保存role-privilege关联
      *
-     * @param id           role id
-     * @param privilegeIds privilege id集合
+     * @param id          role id
+     * @param privilegeId privilege id
+     * @param actions     操作
      * @return 操作结果
      */
-    @PatchMapping("/{id}/privileges")
-    public ResponseEntity<List<RolePrivileges>> relation(@PathVariable Long id, @RequestBody Set<Long> privilegeIds) {
-        List<RolePrivileges> voList;
+    @PatchMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
+        RolePrivileges rp;
         try {
-            voList = rolePrivilegesService.relation(id, privilegeIds);
+            rp = rolePrivilegesService.relation(id, privilegeId, actions);
         } catch (Exception e) {
-            logger.error("Relation role privileges occurred an error: ", e);
+            logger.error("Relation role privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.accepted().body(voList);
+        return ResponseEntity.accepted().body(rp);
     }
 
     /**
@@ -241,11 +279,11 @@ public class RoleController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/privileges")
-    public ResponseEntity<List<RolePrivileges>> removeRelation(@PathVariable Long id, @RequestParam Set<Long> privileges) {
+    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @RequestParam Set<Long> privileges) {
         try {
             rolePrivilegesService.removeRelation(id, privileges);
         } catch (Exception e) {
-            logger.error("Remove relation role privileges occurred an error: ", e);
+            logger.error("Remove relation role privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

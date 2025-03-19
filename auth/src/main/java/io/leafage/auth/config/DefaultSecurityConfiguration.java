@@ -20,21 +20,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
-import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
@@ -56,32 +49,6 @@ public class DefaultSecurityConfiguration {
         JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
         jdbcUserDetailsManager.setEnableGroups(true);
         return jdbcUserDetailsManager;
-    }
-
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
-        return (context) -> {
-            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-                context.getClaims().claims(claims -> {
-                    // 获取原有的 scope
-                    Collection<?> rawScope = (Collection<?>) claims.get("scope");
-                    Set<String> scope = new HashSet<>();
-                    if (rawScope != null) {
-                        rawScope.forEach(item -> {
-                            if (item instanceof String) {
-                                scope.add((String) item);
-                            }
-                        });
-                    } else {
-                        claims.put("scope", scope); // 如果 scope 不存在，初始化并放回 claims
-                    }
-
-                    // 获取用户的权限，并将权限值添加到 scope 中
-                    Collection<? extends GrantedAuthority> authorities = context.getPrincipal().getAuthorities();
-                    authorities.forEach(grantedAuthority -> scope.add(grantedAuthority.getAuthority()));
-                });
-            }
-        };
     }
 
     @Bean

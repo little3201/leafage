@@ -64,7 +64,7 @@ public class RegionController {
         try {
             voPage = regionService.retrieve(page, size, sortBy, descending, superiorId, name);
         } catch (Exception e) {
-            logger.error("Retrieve region occurred an error: ", e);
+            logger.error("Retrieve region error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -82,7 +82,7 @@ public class RegionController {
         try {
             vo = regionService.fetch(id);
         } catch (Exception e) {
-            logger.error("Fetch region occurred an error: ", e);
+            logger.error("Fetch region error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -101,7 +101,7 @@ public class RegionController {
         try {
             exists = regionService.exists(name, id);
         } catch (Exception e) {
-            logger.info("Check region exists occurred an error: ", e);
+            logger.info("Check region exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
@@ -119,7 +119,7 @@ public class RegionController {
         try {
             vo = regionService.create(dto);
         } catch (Exception e) {
-            logger.error("Create region occurred an error: ", e);
+            logger.error("Create region error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
@@ -138,7 +138,7 @@ public class RegionController {
         try {
             regionVO = regionService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify region occurred an error: ", e);
+            logger.error("Modify region error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(regionVO);
@@ -155,7 +155,7 @@ public class RegionController {
         try {
             regionService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove region occurred an error: ", e);
+            logger.error("Remove region error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

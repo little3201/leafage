@@ -63,7 +63,7 @@ public class TagController {
         try {
             voPage = tagService.retrieve(page, size, sortBy, descending);
         } catch (Exception e) {
-            logger.error("Retrieve posts occurred an error: ", e);
+            logger.error("Retrieve posts error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -81,7 +81,7 @@ public class TagController {
         try {
             categoryVO = tagService.fetch(id);
         } catch (Exception e) {
-            logger.error("Fetch posts occurred an error: ", e);
+            logger.error("Fetch posts error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(categoryVO);
@@ -100,7 +100,7 @@ public class TagController {
         try {
             exists = tagService.exists(name, id);
         } catch (Exception e) {
-            logger.info("Check file exists occurred an error: ", e);
+            logger.info("Check file exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
@@ -118,7 +118,7 @@ public class TagController {
         try {
             categoryVO = tagService.create(dto);
         } catch (Exception e) {
-            logger.error("Save tag occurred an error: ", e);
+            logger.error("Save tag error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryVO);
@@ -137,7 +137,7 @@ public class TagController {
         try {
             categoryVO = tagService.modify(id, categoryDTO);
         } catch (Exception e) {
-            logger.error("Modify tag occurred an error: ", e);
+            logger.error("Modify tag error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(categoryVO);
@@ -154,7 +154,7 @@ public class TagController {
         try {
             tagService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove tag occurred an error: ", e);
+            logger.error("Remove tag error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

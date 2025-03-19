@@ -46,11 +46,12 @@ public interface RolePrivilegesService {
     /**
      * 保存role-privilege关系
      *
-     * @param roleId       role主键
-     * @param privilegeIds privilegeId集合
+     * @param roleId      role主键
+     * @param privilegeId privilege主键
+     * @param actions     操作
      * @return 结果集
      */
-    List<RolePrivileges> relation(Long roleId, Set<Long> privilegeIds);
+    RolePrivileges relation(Long roleId, Long privilegeId, Set<String> actions);
 
     /**
      * 保存role-privilege关系

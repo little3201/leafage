@@ -63,7 +63,7 @@ public class PostController {
         try {
             voPage = postsService.retrieve(page, size, sortBy, descending);
         } catch (Exception e) {
-            logger.error("Retrieve posts occurred an error: ", e);
+            logger.error("Retrieve posts error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -81,7 +81,7 @@ public class PostController {
         try {
             vo = postsService.fetch(id);
         } catch (Exception e) {
-            logger.error("Fetch posts occurred an error: ", e);
+            logger.error("Fetch posts error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -100,7 +100,7 @@ public class PostController {
         try {
             exists = postsService.exists(title, id);
         } catch (Exception e) {
-            logger.info("Check posts exists occurred an error: ", e);
+            logger.info("Check posts exists error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok(exists);
@@ -118,7 +118,7 @@ public class PostController {
         try {
             vo = postsService.create(dto);
         } catch (Exception e) {
-            logger.error("Save posts occurred an error: ", e);
+            logger.error("Save posts error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
@@ -137,7 +137,7 @@ public class PostController {
         try {
             vo = postsService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify posts occurred an error: ", e);
+            logger.error("Modify posts error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(vo);
@@ -154,7 +154,7 @@ public class PostController {
         try {
             postsService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove posts occurred an error: ", e);
+            logger.error("Remove posts error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

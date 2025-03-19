@@ -63,7 +63,7 @@ public class AuditLogController {
         try {
             voPage = auditLogService.retrieve(page, size, sortBy, descending, url);
         } catch (Exception e) {
-            logger.error("Retrieve record occurred an error: ", e);
+            logger.error("Retrieve record error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -81,7 +81,7 @@ public class AuditLogController {
         try {
             vo = auditLogService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch audit log occurred an error: ", e);
+            logger.info("Fetch audit log error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -98,7 +98,7 @@ public class AuditLogController {
         try {
             auditLogService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove audit log occurred an error: ", e);
+            logger.error("Remove audit log error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

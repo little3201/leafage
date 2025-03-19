@@ -16,9 +16,11 @@
 package io.leafage.basic.hypervisor.service.impl;
 
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
+import io.leafage.basic.hypervisor.repository.GroupMembersRepository;
+import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
+import io.leafage.basic.hypervisor.repository.RoleMembersRepository;
 import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -33,15 +35,23 @@ import java.util.Set;
 @Service
 public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
+    private final GroupMembersRepository groupMembersRepository;
     private final RolePrivilegesRepository rolePrivilegesRepository;
+    private final RoleMembersRepository roleMembersRepository;
+    private final PrivilegeRepository privilegeRepository;
 
     /**
      * <p>Constructor for RolePrivilegesServiceImpl.</p>
      *
      * @param rolePrivilegesRepository a {@link RolePrivilegesRepository} object
      */
-    public RolePrivilegesServiceImpl(RolePrivilegesRepository rolePrivilegesRepository) {
+    public RolePrivilegesServiceImpl(GroupMembersRepository groupMembersRepository,
+                                     RolePrivilegesRepository rolePrivilegesRepository,
+                                     RoleMembersRepository roleMembersRepository, PrivilegeRepository privilegeRepository) {
+        this.groupMembersRepository = groupMembersRepository;
         this.rolePrivilegesRepository = rolePrivilegesRepository;
+        this.roleMembersRepository = roleMembersRepository;
+        this.privilegeRepository = privilegeRepository;
     }
 
     /**
@@ -68,24 +78,29 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      * {@inheritDoc}
      */
     @Override
-    public List<RolePrivileges> relation(Long roleId, Set<Long> privilegeIds) {
+    public RolePrivileges relation(Long roleId, Long privilegeId, Set<String> actions) {
         Assert.notNull(roleId, "roleId must not be null.");
-        Assert.notEmpty(privilegeIds, "privilegeIds must not be empty.");
+        Assert.notNull(privilegeId, "privilegeId must not be null.");
 
-        List<RolePrivileges> rolePrivileges = privilegeIds.stream().map(privilegeId -> {
-            RolePrivileges rolePrivilege = new RolePrivileges();
-            rolePrivilege.setRoleId(roleId);
-            rolePrivilege.setPrivilegeId(privilegeId);
+        // 优化 Optional 的使用，减少嵌套
+        return privilegeRepository.findById(privilegeId)
+                .map(privilege -> {
+                    RolePrivileges rolePrivilege = new RolePrivileges();
+                    rolePrivilege.setRoleId(roleId);
+                    rolePrivilege.setPrivilegeId(privilegeId);
+                    rolePrivilege.setActions(actions);
 
-            return rolePrivilege;
-        }).toList();
-        return rolePrivilegesRepository.saveAllAndFlush(rolePrivileges);
+                    // 保存并立即刷新
+                    return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
+                })
+                .orElse(null);
     }
 
     @Override
     public void removeRelation(Long roleId, Set<Long> privilegeIds) {
         List<RolePrivileges> rolePrivileges = rolePrivilegesRepository.findAllByRoleId(roleId);
-        List<Long> filteredIds = rolePrivileges.stream().map(RolePrivileges::getId)
+        List<Long> filteredIds = rolePrivileges.stream()
+                .map(RolePrivileges::getId)
                 .filter(privilegeIds::contains).toList();
         rolePrivilegesRepository.deleteAllByIdInBatch(filteredIds);
     }

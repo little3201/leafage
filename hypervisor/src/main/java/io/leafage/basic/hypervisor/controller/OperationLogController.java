@@ -62,7 +62,7 @@ public class OperationLogController {
         try {
             voPage = operationLogService.retrieve(page, size, sortBy, descending, name);
         } catch (Exception e) {
-            logger.error("Retrieve record occurred an error: ", e);
+            logger.error("Retrieve record error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -80,7 +80,7 @@ public class OperationLogController {
         try {
             vo = operationLogService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch access log occurred an error: ", e);
+            logger.info("Fetch access log error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -97,7 +97,7 @@ public class OperationLogController {
         try {
             operationLogService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove operation log occurred an error: ", e);
+            logger.error("Remove operation log error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

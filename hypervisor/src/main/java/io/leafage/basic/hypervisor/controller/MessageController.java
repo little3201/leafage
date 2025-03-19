@@ -64,7 +64,7 @@ public class MessageController {
         try {
             voPage = messageService.retrieve(page, size, sortBy, descending, name);
         } catch (Exception e) {
-            logger.info("Retrieve message occurred an error: ", e);
+            logger.info("Retrieve message error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -82,7 +82,7 @@ public class MessageController {
         try {
             vo = messageService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch message occurred an error: ", e);
+            logger.info("Fetch message error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -100,7 +100,7 @@ public class MessageController {
         try {
             vo = messageService.create(dto);
         } catch (Exception e) {
-            logger.info("Create message occurred an error: ", e);
+            logger.info("Create message error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);

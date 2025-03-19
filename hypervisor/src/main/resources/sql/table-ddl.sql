@@ -172,41 +172,7 @@ COMMENT
 -- Create unique index
 CREATE UNIQUE INDEX ix_auth_username ON authorities (username, authority);
 
--- Drop table if exists roles
-DROP TABLE IF EXISTS roles;
 
--- Table structure roles
-CREATE TABLE roles
-(
-    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name               varchar(50) NOT NULL,
-    description        varchar(255),
-    enabled            boolean     NOT NULL DEFAULT true,
-    created_by         varchar(50),
-    created_date       timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_modified_by   varchar(50),
-    last_modified_date timestamp
-);
-
--- Add comment to the table and columns
-COMMENT
-    ON TABLE roles IS '角色表';
-COMMENT
-    ON COLUMN roles.id IS '主键';
-COMMENT
-    ON COLUMN roles.name IS '名称';
-COMMENT
-    ON COLUMN roles.description IS '描述';
-COMMENT
-    ON COLUMN roles.enabled IS '是否启用';
-COMMENT
-    ON COLUMN roles.created_by IS '创建者';
-COMMENT
-    ON COLUMN roles.created_date IS '创建时间';
-COMMENT
-    ON COLUMN roles.last_modified_by IS '最后修改者';
-COMMENT
-    ON COLUMN roles.last_modified_date IS '最后修改时间';
 
 -- Drop table if exists group_members
 DROP TABLE IF EXISTS group_members;
@@ -254,6 +220,44 @@ COMMENT
     ON COLUMN group_authorities.authority IS '权限';
 
 
+-- Drop table if exists roles
+DROP TABLE IF EXISTS roles;
+
+-- Table structure roles
+CREATE TABLE roles
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name               varchar(50) NOT NULL,
+    description        varchar(255),
+    enabled            boolean     NOT NULL DEFAULT true,
+    created_by         varchar(50),
+    created_date       timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE roles IS '角色表';
+COMMENT
+    ON COLUMN roles.id IS '主键';
+COMMENT
+    ON COLUMN roles.name IS '名称';
+COMMENT
+    ON COLUMN roles.description IS '描述';
+COMMENT
+    ON COLUMN roles.enabled IS '是否启用';
+COMMENT
+    ON COLUMN roles.created_by IS '创建者';
+COMMENT
+    ON COLUMN roles.created_date IS '创建时间';
+COMMENT
+    ON COLUMN roles.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN roles.last_modified_date IS '最后修改时间';
+
+
+
 -- Drop table if exists group_roles
 DROP TABLE IF EXISTS group_roles;
 
@@ -278,29 +282,6 @@ COMMENT
     ON COLUMN group_roles.role_id IS '角色ID';
 
 
--- Drop table if exists persistent_logins
-DROP TABLE IF EXISTS persistent_logins;
-
--- Table structure persistent_logins
-CREATE TABLE persistent_logins
-(
-    series    varchar(64) primary key,
-    username  varchar(50) not null,
-    token     varchar(64) not null,
-    last_used timestamp   not null
-);
-
--- Add comment to the table and columns
-COMMENT
-    ON TABLE persistent_logins IS '持久化登录表';
-COMMENT
-    ON COLUMN persistent_logins.username IS '用户名';
-COMMENT
-    ON COLUMN persistent_logins.series IS '系列';
-COMMENT
-    ON COLUMN persistent_logins.token IS '令牌';
-COMMENT
-    ON COLUMN persistent_logins.last_used IS '最后使用时间';
 
 -- Drop table if exists role_members
 DROP TABLE IF EXISTS role_members;
@@ -427,6 +408,8 @@ COMMENT
 COMMENT
     ON COLUMN role_privileges.privilege_id IS '权限ID';
 
+
+
 -- Drop table if exists dictionaries
 DROP TABLE IF EXISTS dictionaries;
 
@@ -510,6 +493,31 @@ COMMENT
     ON COLUMN messages.last_modified_by IS '最后修改者';
 COMMENT
     ON COLUMN messages.last_modified_date IS '最后修改时间';
+
+
+-- Drop table if exists persistent_logins
+DROP TABLE IF EXISTS persistent_logins;
+
+-- Table structure persistent_logins
+CREATE TABLE persistent_logins
+(
+    series    varchar(64) primary key,
+    username  varchar(50) not null,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE persistent_logins IS '持久化登录表';
+COMMENT
+    ON COLUMN persistent_logins.username IS '用户名';
+COMMENT
+    ON COLUMN persistent_logins.series IS '系列';
+COMMENT
+    ON COLUMN persistent_logins.token IS '令牌';
+COMMENT
+    ON COLUMN persistent_logins.last_used IS '最后使用时间';
 
 
 -- Drop table if exists access_logs

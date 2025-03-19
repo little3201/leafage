@@ -51,4 +51,12 @@ public interface RoleMembersService {
      * @return 结果集
      */
     List<RoleMembers> relation(Long roleId, Set<String> users);
+
+    /**
+     * 保存role-members关系
+     *
+     * @param roleId    role主键
+     * @param usernames username集合
+     */
+    void removeRelation(Long roleId, Set<String> usernames);
 }

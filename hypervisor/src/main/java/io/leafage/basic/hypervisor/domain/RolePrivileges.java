@@ -16,6 +16,8 @@ package io.leafage.basic.hypervisor.domain;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 /**
  * model class for role privileges.
  *
@@ -42,6 +44,13 @@ public class RolePrivileges {
     @Column(name = "privilege_id", nullable = false)
     private Long privilegeId;
 
+    /**
+     * 操作
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "role_privilege_actions", joinColumns = @JoinColumn(name = "role_privilege_id"))
+    @Column(name = "action")
+    private Set<String> actions;
 
     /**
      * <p>Getter for the field <code>id</code>.</p>
@@ -95,5 +104,13 @@ public class RolePrivileges {
      */
     public void setPrivilegeId(Long privilegeId) {
         this.privilegeId = privilegeId;
+    }
+
+    public Set<String> getActions() {
+        return actions;
+    }
+
+    public void setActions(Set<String> actions) {
+        this.actions = actions;
     }
 }

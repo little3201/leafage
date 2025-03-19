@@ -65,7 +65,7 @@ public class FileController {
         try {
             voPage = fileRecordService.retrieve(page, size, sortBy, descending, name);
         } catch (Exception e) {
-            logger.error("Retrieve file occurred an error: ", e);
+            logger.error("Retrieve file error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -83,7 +83,7 @@ public class FileController {
         try {
             vo = fileRecordService.fetch(id);
         } catch (Exception e) {
-            logger.error("Fetch file occurred an error: ", e);
+            logger.error("Fetch file error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -102,7 +102,7 @@ public class FileController {
         try {
             exists = fileRecordService.exists(name, id);
         } catch (Exception e) {
-            logger.info("Check file exists occurred an error: ", e);
+            logger.info("Check file exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
@@ -120,7 +120,7 @@ public class FileController {
         try {
             vo = fileRecordService.create(dto);
         } catch (Exception e) {
-            logger.error("Create file occurred an error: ", e);
+            logger.error("Create file error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
@@ -137,7 +137,7 @@ public class FileController {
         try {
             fileRecordService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove file occurred an error: ", e);
+            logger.error("Remove file error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

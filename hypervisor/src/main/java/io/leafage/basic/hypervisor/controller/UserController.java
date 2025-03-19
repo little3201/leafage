@@ -68,7 +68,7 @@ public class UserController {
         try {
             voPage = userService.retrieve(page, size, sortBy, descending, username);
         } catch (Exception e) {
-            logger.info("Retrieve user occurred an error: ", e);
+            logger.info("Retrieve user error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -87,7 +87,7 @@ public class UserController {
         try {
             vo = userService.fetch(id);
         } catch (Exception e) {
-            logger.info("Fetch user occurred an error: ", e);
+            logger.info("Fetch user error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -106,24 +106,25 @@ public class UserController {
         try {
             exists = userService.exists(username, id);
         } catch (Exception e) {
-            logger.info("Check user exists occurred an error: ", e);
+            logger.info("Check user exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
     }
 
     /**
-     * 查询信息
+     * 查询当前用户
      *
+     * @param principal 当前用户
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
     @GetMapping("/me")
-    public ResponseEntity<UserVO> me(Principal principal) {
+    public ResponseEntity<UserVO> fetchMe(Principal principal) {
         UserVO vo;
         try {
             vo = userService.findByUsername(principal.getName());
         } catch (Exception e) {
-            logger.info("Fetch user occurred an error: ", e);
+            logger.info("Fetch me error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -141,7 +142,7 @@ public class UserController {
         try {
             vo = userService.create(dto);
         } catch (Exception e) {
-            logger.error("Create user occurred an error: ", e);
+            logger.error("Create user error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
@@ -161,7 +162,7 @@ public class UserController {
         try {
             vo = userService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify user occurred an error: ", e);
+            logger.error("Modify user error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(vo);

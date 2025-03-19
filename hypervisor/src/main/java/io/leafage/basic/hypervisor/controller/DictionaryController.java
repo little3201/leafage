@@ -66,7 +66,7 @@ public class DictionaryController {
         try {
             voPage = dictionaryService.retrieve(page, size, sortBy, descending, name);
         } catch (Exception e) {
-            logger.error("Retrieve dictionary occurred an error: ", e);
+            logger.error("Retrieve dictionary error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -84,7 +84,7 @@ public class DictionaryController {
         try {
             voList = dictionaryService.subset(id);
         } catch (Exception e) {
-            logger.info("Retrieve dictionary subset occurred an error: ", e);
+            logger.info("Retrieve dictionary subset error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);
@@ -102,7 +102,7 @@ public class DictionaryController {
         try {
             vo = dictionaryService.fetch(id);
         } catch (Exception e) {
-            logger.error("Fetch dictionary occurred an error: ", e);
+            logger.error("Fetch dictionary error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -122,7 +122,7 @@ public class DictionaryController {
         try {
             exists = dictionaryService.exists(superiorId, name, id);
         } catch (Exception e) {
-            logger.info("Check dictionary exists occurred an error: ", e);
+            logger.info("Check dictionary exists error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exists);
@@ -140,7 +140,7 @@ public class DictionaryController {
         try {
             vo = dictionaryService.create(dto);
         } catch (Exception e) {
-            logger.error("Create dictionary occurred an error: ", e);
+            logger.error("Create dictionary error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
@@ -159,7 +159,7 @@ public class DictionaryController {
         try {
             vo = dictionaryService.modify(id, dto);
         } catch (Exception e) {
-            logger.error("Modify dictionary occurred an error: ", e);
+            logger.error("Modify dictionary error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(vo);
@@ -176,7 +176,7 @@ public class DictionaryController {
         try {
             dictionaryService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove dictionary occurred an error: ", e);
+            logger.error("Remove dictionary error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

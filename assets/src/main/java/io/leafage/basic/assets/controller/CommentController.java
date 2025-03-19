@@ -66,7 +66,7 @@ public class CommentController {
         try {
             voPage = commentService.retrieve(page, size, sortBy, descending);
         } catch (Exception e) {
-            logger.error("Retrieve comment occurred an error: ", e);
+            logger.error("Retrieve comment error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voPage);
@@ -84,7 +84,7 @@ public class CommentController {
         try {
             voList = commentService.relation(id);
         } catch (Exception e) {
-            logger.error("Retrieve comment by posts occurred an error: ", e);
+            logger.error("Retrieve comment by posts error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);
@@ -103,7 +103,7 @@ public class CommentController {
         try {
             voList = commentService.replies(id);
         } catch (Exception e) {
-            logger.error("Retrieve comment replies occurred an error: ", e);
+            logger.error("Retrieve comment replies error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voList);
@@ -121,7 +121,7 @@ public class CommentController {
         try {
             vo = commentService.create(dto);
         } catch (Exception e) {
-            logger.error("Create comment occurred an error: ", e);
+            logger.error("Create comment error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
