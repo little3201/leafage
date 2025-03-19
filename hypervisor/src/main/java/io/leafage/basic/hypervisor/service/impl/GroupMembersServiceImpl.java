@@ -79,4 +79,13 @@ public class GroupMembersServiceImpl implements GroupMembersService {
         }).toList();
         return groupMembersRepository.saveAllAndFlush(groupMembers);
     }
+
+    @Override
+    public void removeRelation(Long groupId, Set<String> usernames) {
+        List<GroupMembers> groupMembers = groupMembersRepository.findAllByGroupId(groupId);
+        List<Long> filteredIds = groupMembers.stream()
+                .filter(roleMember -> usernames.contains(roleMember.getUsername()))
+                .map(GroupMembers::getId).toList();
+        groupMembersRepository.deleteAllByIdInBatch(filteredIds);
+    }
 }

@@ -51,4 +51,12 @@ public interface GroupMembersService {
      * @return 结果集
      */
     List<GroupMembers> relation(Long groupId, Set<String> users);
+
+    /**
+     * 移除group-members关系
+     *
+     * @param roleId    role主键
+     * @param usernames username集合
+     */
+    void removeRelation(Long roleId, Set<String> usernames);
 }

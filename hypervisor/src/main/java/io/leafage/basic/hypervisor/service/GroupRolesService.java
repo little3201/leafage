@@ -44,11 +44,19 @@ public interface GroupRolesService {
     List<GroupRoles> groups(Long roleId);
 
     /**
-     * 保存group-members
+     * 保存group-roles
      *
      * @param groupId group主键
      * @param users   user集合
      * @return 结果集
      */
     List<GroupRoles> relation(Long groupId, Set<String> users);
+
+    /**
+     * 移除group-roles关系
+     *
+     * @param roleId  role主键
+     * @param roleIds role id集合
+     */
+    void removeRelation(Long roleId, Set<Long> roleIds);
 }

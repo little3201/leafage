@@ -54,7 +54,7 @@ public interface RolePrivilegesService {
     RolePrivileges relation(Long roleId, Long privilegeId, Set<String> actions);
 
     /**
-     * 保存role-privilege关系
+     * 移除role-privilege关系
      *
      * @param roleId       role主键
      * @param privilegeIds privilegeId集合

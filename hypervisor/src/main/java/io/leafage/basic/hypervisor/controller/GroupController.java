@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import top.leafage.common.TreeNode;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * group controller.
@@ -181,6 +182,43 @@ public class GroupController {
             groupService.remove(id);
         } catch (Exception e) {
             logger.error("Remove group error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 保存group-privilege关联
+     *
+     * @param id        group id
+     * @param usernames 账号
+     * @return 操作结果
+     */
+    @PatchMapping("/{id}/members")
+    public ResponseEntity<List<GroupMembers>> relation(@PathVariable Long id, @RequestBody Set<String> usernames) {
+        List<GroupMembers> list;
+        try {
+            list = groupMembersService.relation(id, usernames);
+        } catch (Exception e) {
+            logger.error("Relation group members error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.accepted().body(list);
+    }
+
+    /**
+     * 删除 group-privilege关联
+     *
+     * @param id        group主键
+     * @param usernames username集合
+     * @return 操作结果
+     */
+    @DeleteMapping("/{id}/members")
+    public ResponseEntity<Void> removeRelation(@PathVariable Long id, @RequestParam Set<String> usernames) {
+        try {
+            groupMembersService.removeRelation(id, usernames);
+        } catch (Exception e) {
+            logger.error("Remove relation group members error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();
