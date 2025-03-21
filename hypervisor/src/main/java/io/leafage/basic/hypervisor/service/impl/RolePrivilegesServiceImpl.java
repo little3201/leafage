@@ -15,15 +15,17 @@
 
 package io.leafage.basic.hypervisor.service.impl;
 
+import io.leafage.basic.hypervisor.domain.Privilege;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
-import io.leafage.basic.hypervisor.repository.GroupMembersRepository;
-import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
-import io.leafage.basic.hypervisor.repository.RoleMembersRepository;
-import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
+import io.leafage.basic.hypervisor.repository.*;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Set;
 
@@ -35,23 +37,27 @@ import java.util.Set;
 @Service
 public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
-    private final GroupMembersRepository groupMembersRepository;
     private final RolePrivilegesRepository rolePrivilegesRepository;
-    private final RoleMembersRepository roleMembersRepository;
+    private final GroupRolesRepository groupRolesRepository;
+    private final GroupRepository groupRepository;
     private final PrivilegeRepository privilegeRepository;
+    private final DataSource dataSource;
 
     /**
      * <p>Constructor for RolePrivilegesServiceImpl.</p>
      *
      * @param rolePrivilegesRepository a {@link RolePrivilegesRepository} object
      */
-    public RolePrivilegesServiceImpl(GroupMembersRepository groupMembersRepository,
-                                     RolePrivilegesRepository rolePrivilegesRepository,
-                                     RoleMembersRepository roleMembersRepository, PrivilegeRepository privilegeRepository) {
-        this.groupMembersRepository = groupMembersRepository;
+    public RolePrivilegesServiceImpl(RolePrivilegesRepository rolePrivilegesRepository,
+                                     GroupRolesRepository groupRolesRepository, GroupRepository groupRepository,
+                                     GroupMembersRepository groupMembersRepository,
+                                     RoleMembersRepository roleMembersRepository,
+                                     PrivilegeRepository privilegeRepository, DataSource dataSource) {
         this.rolePrivilegesRepository = rolePrivilegesRepository;
-        this.roleMembersRepository = roleMembersRepository;
+        this.groupRolesRepository = groupRolesRepository;
+        this.groupRepository = groupRepository;
         this.privilegeRepository = privilegeRepository;
+        this.dataSource = dataSource;
     }
 
     /**
@@ -90,6 +96,8 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
                     rolePrivilege.setPrivilegeId(privilegeId);
                     rolePrivilege.setActions(actions);
 
+                    addGroupAuthority(roleId, privilege, actions);
+
                     // 保存并立即刷新
                     return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
                 })
@@ -97,11 +105,45 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
     }
 
     @Override
-    public void removeRelation(Long roleId, Set<Long> privilegeIds) {
-        List<RolePrivileges> rolePrivileges = rolePrivilegesRepository.findAllByRoleId(roleId);
-        List<Long> filteredIds = rolePrivileges.stream()
-                .map(RolePrivileges::getId)
-                .filter(privilegeIds::contains).toList();
-        rolePrivilegesRepository.deleteAllByIdInBatch(filteredIds);
+    public void removeRelation(Long roleId, Long privilegeId, Set<String> actions) {
+        rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, privilegeId).ifPresent(rolePrivilege -> {
+            // actions为空，删除菜单
+            if (CollectionUtils.isEmpty(actions) || rolePrivilege.getActions().containsAll(actions)) {
+                rolePrivilegesRepository.deleteById(rolePrivilege.getId());
+            }
+            privilegeRepository.findById(privilegeId).ifPresent(privilege ->
+                    removeGroupAuthority(roleId, privilege, actions));
+        });
     }
+
+    private void addGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
+        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
+        groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
+                groupRepository.findById(groupRole.getGroupId()).ifPresent(group -> {
+                    // 菜单授权read
+                    userDetailsManager.addGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":read"));
+                    // 授权actions
+                    if (!CollectionUtils.isEmpty(actions)) {
+                        actions.forEach(action ->
+                                userDetailsManager.addGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":" + action)));
+                    }
+                })
+        );
+    }
+
+    private void removeGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
+        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
+        groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
+                groupRepository.findById(groupRole.getGroupId()).ifPresent(group -> {
+                    // 移除授权actions
+                    if (CollectionUtils.isEmpty(actions)) {
+                        userDetailsManager.removeGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":read"));
+                    } else {
+                        actions.forEach(action ->
+                                userDetailsManager.removeGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":" + action)));
+                    }
+                })
+        );
+    }
+
 }

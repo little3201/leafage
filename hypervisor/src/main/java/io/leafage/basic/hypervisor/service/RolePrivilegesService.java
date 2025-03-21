@@ -56,8 +56,9 @@ public interface RolePrivilegesService {
     /**
      * 移除role-privilege关系
      *
-     * @param roleId       role主键
-     * @param privilegeIds privilegeId集合
+     * @param roleId      role主键
+     * @param privilegeId privilege主键
+     * @param actions     操作
      */
-    void removeRelation(Long roleId, Set<Long> privilegeIds);
+    void removeRelation(Long roleId, Long privilegeId, Set<String> actions);
 }

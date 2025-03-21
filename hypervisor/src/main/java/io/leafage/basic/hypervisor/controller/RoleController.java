@@ -260,7 +260,7 @@ public class RoleController {
      * @return 操作结果
      */
     @PatchMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
+    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId, @RequestParam(required = false) Set<String> actions) {
         RolePrivileges rp;
         try {
             rp = rolePrivilegesService.relation(id, privilegeId, actions);
@@ -274,14 +274,15 @@ public class RoleController {
     /**
      * 删除 role-privilege关联
      *
-     * @param id         role主键
-     * @param privileges privilege信息
+     * @param id          role主键
+     * @param privilegeId privilege主键
+     * @param actions     操作
      * @return 操作结果
      */
-    @DeleteMapping("/{id}/privileges")
-    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @RequestParam Set<Long> privileges) {
+    @DeleteMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody(required = false) Set<String> actions) {
         try {
-            rolePrivilegesService.removeRelation(id, privileges);
+            rolePrivilegesService.removeRelation(id, privilegeId, actions);
         } catch (Exception e) {
             logger.error("Remove relation role privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
