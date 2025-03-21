@@ -28,7 +28,7 @@ import top.leafage.common.servlet.audit.AuditMetadata;
 @Table(name = "groups")
 public class Group extends AuditMetadata {
 
-    @Column(name = "group_name", nullable = false, length = 50)
+    @Column(name = "group_name", nullable = false, unique = true)
     private String name;
 
     private Long superiorId;

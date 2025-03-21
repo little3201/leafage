@@ -52,12 +52,12 @@ DROP TABLE IF EXISTS groups;
 CREATE TABLE groups
 (
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    group_name         varchar(50) NOT NULL,
+    group_name         varchar(50) UNIQUE NOT NULL,
     superior_id        bigint,
     description        varchar(255),
-    enabled            boolean     NOT NULL DEFAULT true,
+    enabled            boolean            NOT NULL DEFAULT true,
     created_by         varchar(50),
-    created_date       timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_date       timestamp          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_by   varchar(50),
     last_modified_date timestamp
 );
@@ -173,7 +173,6 @@ COMMENT
 CREATE UNIQUE INDEX ix_auth_username ON authorities (username, authority);
 
 
-
 -- Drop table if exists group_members
 DROP TABLE IF EXISTS group_members;
 
@@ -227,11 +226,11 @@ DROP TABLE IF EXISTS roles;
 CREATE TABLE roles
 (
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name               varchar(50) NOT NULL,
+    name               varchar(50) UNIQUE NOT NULL,
     description        varchar(255),
-    enabled            boolean     NOT NULL DEFAULT true,
+    enabled            boolean            NOT NULL DEFAULT true,
     created_by         varchar(50),
-    created_date       timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_date       timestamp          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_by   varchar(50),
     last_modified_date timestamp
 );
@@ -257,7 +256,6 @@ COMMENT
     ON COLUMN roles.last_modified_date IS '最后修改时间';
 
 
-
 -- Drop table if exists group_roles
 DROP TABLE IF EXISTS group_roles;
 
@@ -280,7 +278,6 @@ COMMENT
     ON COLUMN group_roles.group_id IS '用户组ID';
 COMMENT
     ON COLUMN group_roles.role_id IS '角色ID';
-
 
 
 -- Drop table if exists role_members
@@ -314,16 +311,16 @@ CREATE TABLE privileges
 (
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     superior_id        bigint,
-    name               varchar(50) NOT NULL,
+    name               varchar(50) UNIQUE NOT NULL,
     path               varchar(127),
     redirect           varchar(255),
     component          varchar(255),
     icon               varchar(127),
     actions            text[],
     description        varchar(255),
-    enabled            boolean     NOT NULL DEFAULT true,
+    enabled            boolean            NOT NULL DEFAULT true,
     created_by         varchar(50),
-    created_date       timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_date       timestamp          NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_by   varchar(50),
     last_modified_date timestamp
 );
@@ -409,7 +406,6 @@ COMMENT
     ON COLUMN role_privileges.privilege_id IS '权限ID';
 
 
-
 -- Drop table if exists dictionaries
 DROP TABLE IF EXISTS dictionaries;
 
@@ -458,7 +454,7 @@ CREATE TABLE messages
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     title              varchar(255) NOT NULL,
     content            varchar(1000),
-    is_read            boolean      NOT NULL DEFAULT false,
+    unread             boolean      NOT NULL DEFAULT true,
     receiver           varchar(50)  NOT NULL,
     description        varchar(255),
     enabled            boolean      NOT NULL DEFAULT true,
@@ -478,7 +474,7 @@ COMMENT
 COMMENT
     ON COLUMN messages.content IS '内容';
 COMMENT
-    ON COLUMN messages.is_read IS '是否已读';
+    ON COLUMN messages.unread IS '是否未读';
 COMMENT
     ON COLUMN messages.receiver IS '接收者';
 COMMENT

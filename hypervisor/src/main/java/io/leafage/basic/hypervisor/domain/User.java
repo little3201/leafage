@@ -31,28 +31,26 @@ import java.time.Instant;
 @Table(name = "users")
 public class User extends AuditMetadata {
 
-    @Column(name = "username", nullable = false, unique = true, length = 50)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "given_name", length = 50)
+    @Column(name = "given_name")
     private String givenName;
 
-    @Column(name = "family_name", length = 50)
+    @Column(name = "family_name")
     private String familyName;
 
-    @Column(name = "middle_name", length = 50)
+    @Column(name = "middle_name")
     private String middleName;
 
-    @Column(name = "password", nullable = false, length = 100)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "email", length = 50)
     private String email;
 
-    @Column(name = "phone_number", length = 20)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "avatar", length = 100)
     private String avatar;
 
     @Column(name = "account_expires_at")

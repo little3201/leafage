@@ -40,10 +40,9 @@ public class Message extends AuditMetadata {
     private String content;
 
     /**
-     * 是否已读
+     * 是否未读
      */
-    @Column(name = "read", nullable = false)
-    private boolean read;
+    private boolean unread = true;
 
     /**
      * 接收人
@@ -93,17 +92,17 @@ public class Message extends AuditMetadata {
      *
      * @return a boolean
      */
-    public boolean isRead() {
-        return read;
+    public boolean isUnread() {
+        return unread;
     }
 
     /**
-     * <p>Setter for the field <code>read</code>.</p>
+     * <p>Setter for the field <code>unread</code>.</p>
      *
-     * @param read a boolean
+     * @param unread a boolean
      */
-    public void setRead(boolean read) {
-        this.read = read;
+    public void setUnread(boolean unread) {
+        this.unread = unread;
     }
 
     /**

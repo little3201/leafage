@@ -29,7 +29,7 @@ import top.leafage.common.servlet.audit.AuditMetadata;
 public class Role extends AuditMetadata {
 
 
-    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     /**
