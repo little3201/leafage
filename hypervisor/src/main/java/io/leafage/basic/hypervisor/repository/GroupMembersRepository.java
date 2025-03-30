@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import io.leafage.basic.hypervisor.domain.GroupMembers;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * group members repository
@@ -30,14 +29,6 @@ import reactor.core.publisher.Mono;
  */
 @Repository
 public interface GroupMembersRepository extends R2dbcRepository<GroupMembers, Long> {
-
-    /**
-     * 统计关联member
-     *
-     * @param groupId 组ID
-     * @return result
-     */
-    Mono<Long> countByGroupId(Long groupId);
 
     /**
      * 根据group查member

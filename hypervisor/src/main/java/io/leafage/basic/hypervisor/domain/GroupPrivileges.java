@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,13 +21,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Set;
+
 /**
- * model class for group roles
+ * model class for group privileges
  *
  * @author wq li
  */
-@Table(name = "group_roles")
-public class GroupRoles {
+@Table(name = "group_privileges")
+public class GroupPrivileges {
 
     /**
      * 主键
@@ -40,10 +42,12 @@ public class GroupRoles {
     @Column(value = "group_id")
     private Long groupId;
     /**
-     * role主键
+     * privilege主键
      */
-    @Column(value = "role_id")
-    private Long roleId;
+    @Column(value = "privilege_id")
+    private Long privilegeId;
+
+    private Set<String> actions;
 
     /**
      * <p>Getter for the field <code>id</code>.</p>
@@ -82,20 +86,28 @@ public class GroupRoles {
     }
 
     /**
-     * <p>Getter for the field <code>roleId</code>.</p>
+     * <p>Getter for the field <code>privilegeId</code>.</p>
      *
      * @return a {@link java.lang.Long} object
      */
-    public Long getRoleId() {
-        return roleId;
+    public Long getPrivilegeId() {
+        return privilegeId;
     }
 
     /**
-     * <p>Setter for the field <code>roleId</code>.</p>
+     * <p>Setter for the field <code>privilegeId</code>.</p>
      *
-     * @param roleId a {@link java.lang.Long} object
+     * @param privilegeId a {@link java.lang.Long} object
      */
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setPrivilegeId(Long privilegeId) {
+        this.privilegeId = privilegeId;
+    }
+
+    public Set<String> getActions() {
+        return actions;
+    }
+
+    public void setActions(Set<String> actions) {
+        this.actions = actions;
     }
 }

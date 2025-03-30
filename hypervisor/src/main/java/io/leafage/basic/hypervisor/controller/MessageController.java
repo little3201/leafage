@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class MessageController {
     /**
      * <p>Constructor for MessageController.</p>
      *
-     * @param messageService a {@link io.leafage.basic.hypervisor.service.MessageService} object
+     * @param messageService a {@link MessageService} object
      */
     public MessageController(MessageService messageService) {
         this.messageService = messageService;

@@ -56,8 +56,8 @@ class UserServiceImplTest {
     void setUp() {
         userDTO = new UserDTO();
         userDTO.setUsername("test");
-        userDTO.setFirstname("john");
-        userDTO.setLastname("steven");
+        userDTO.setFamilyName("john");
+        userDTO.setGivenName("steven");
         userDTO.setCredentialsExpiresAt(Instant.now());
     }
 

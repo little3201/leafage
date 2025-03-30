@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@
 package io.leafage.basic.hypervisor.controller;
 
 import io.leafage.basic.hypervisor.domain.GroupMembers;
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import io.leafage.basic.hypervisor.dto.GroupDTO;
 import io.leafage.basic.hypervisor.service.GroupMembersService;
+import io.leafage.basic.hypervisor.service.GroupPrivilegesService;
 import io.leafage.basic.hypervisor.service.GroupService;
 import io.leafage.basic.hypervisor.vo.GroupVO;
 import jakarta.validation.Valid;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * group controller
@@ -48,16 +51,19 @@ public class GroupController {
 
     private final GroupMembersService groupMembersService;
     private final GroupService groupService;
+    private final GroupPrivilegesService groupPrivilegesService;
 
     /**
      * <p>Constructor for GroupController.</p>
      *
-     * @param groupMembersService a {@link io.leafage.basic.hypervisor.service.GroupMembersService} object
-     * @param groupService        a {@link io.leafage.basic.hypervisor.service.GroupService} object
+     * @param groupMembersService    a {@link GroupMembersService} object
+     * @param groupService           a {@link GroupService} object
+     * @param groupPrivilegesService a {@link GroupPrivilegesService} object
      */
-    public GroupController(GroupMembersService groupMembersService, GroupService groupService) {
+    public GroupController(GroupMembersService groupMembersService, GroupService groupService, GroupPrivilegesService groupPrivilegesService) {
         this.groupMembersService = groupMembersService;
         this.groupService = groupService;
+        this.groupPrivilegesService = groupPrivilegesService;
     }
 
     /**
@@ -189,4 +195,21 @@ public class GroupController {
         return ResponseEntity.ok(listMono);
     }
 
+    /**
+     * 关联权限
+     *
+     * @param id 组id
+     * @return 查询到的数据集，异常时返回204状态码
+     */
+    @PatchMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<Mono<GroupPrivileges>> relation(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
+        Mono<GroupPrivileges> mono;
+        try {
+            mono = groupPrivilegesService.relation(id, privilegeId, actions);
+        } catch (Exception e) {
+            logger.error("Relation group privileges occurred an error: ", e);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(mono);
+    }
 }

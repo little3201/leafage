@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ class GroupServiceImplTest {
     void setUp() {
         groupDTO = new GroupDTO();
         groupDTO.setName("test");
-        groupDTO.setPrincipal("Test");
     }
 
     @Test

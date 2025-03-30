@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@
 package io.leafage.basic.hypervisor.controller;
 
 import io.leafage.basic.hypervisor.domain.GroupMembers;
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import io.leafage.basic.hypervisor.dto.GroupDTO;
 import io.leafage.basic.hypervisor.service.GroupMembersService;
+import io.leafage.basic.hypervisor.service.GroupPrivilegesService;
 import io.leafage.basic.hypervisor.service.GroupService;
 import io.leafage.basic.hypervisor.vo.GroupVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +63,9 @@ class GroupControllerTest {
     private GroupMembersService groupMembersService;
 
     @MockitoBean
+    private GroupPrivilegesService groupPrivilegesService;
+
+    @MockitoBean
     private GroupService groupService;
 
     private GroupDTO groupDTO;
@@ -71,11 +76,9 @@ class GroupControllerTest {
     void setUp() {
         groupVO = new GroupVO(1L, true, Instant.now());
         groupVO.setName("test");
-        groupVO.setPrincipal("test");
 
         groupDTO = new GroupDTO();
         groupDTO.setName("test");
-        groupDTO.setPrincipal("Test");
         groupDTO.setDescription("group");
 
         groupMembers = new GroupMembers();
@@ -210,5 +213,16 @@ class GroupControllerTest {
 
         webTestClient.get().uri("/groups/{id}/members", 1L).exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    void relation() {
+        given(this.groupPrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet()))
+                .willReturn(Mono.just(Mockito.mock(GroupPrivileges.class)));
+
+        webTestClient.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 2L)
+                .bodyValue(Mockito.anySet())
+                .exchange()
+                .expectStatus().isOk();
     }
 }

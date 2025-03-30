@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,41 +17,32 @@
 
 package io.leafage.basic.hypervisor.repository;
 
-import io.leafage.basic.hypervisor.domain.GroupRoles;
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
- * group roles repository
+ * group privileges repository
  *
  * @author wq li
  */
 @Repository
-public interface GroupRolesRepository extends R2dbcRepository<GroupRoles, Long> {
+public interface GroupPrivilegesRepository extends R2dbcRepository<GroupPrivileges, Long> {
 
     /**
-     * 统计关联role
-     *
-     * @param groupId 组ID
-     * @return result
-     */
-    Mono<Long> countByGroupId(Long groupId);
-
-    /**
-     * 根据group查role
+     * 根据group查
      *
      * @param groupId group主键
      * @return 关联数据集
      */
-    Flux<GroupRoles> findByGroupId(Long groupId);
+    Flux<GroupPrivileges> findByGroupId(Long groupId);
 
     /**
-     * 根据role查group
+     * 根据privilege查
      *
-     * @param roleId user
+     * @param privilegeId privilege主键
      * @return 关联数据集
      */
-    Flux<GroupRoles> findByRoleId(Long roleId);
+    Flux<GroupPrivileges> findByPrivilegeId(Long privilegeId);
 }

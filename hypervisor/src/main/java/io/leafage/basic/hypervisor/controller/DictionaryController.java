@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class DictionaryController {
     /**
      * <p>Constructor for DictionaryController.</p>
      *
-     * @param dictionaryService a {@link io.leafage.basic.hypervisor.service.DictionaryService} object
+     * @param dictionaryService a {@link DictionaryService} object
      */
     public DictionaryController(DictionaryService dictionaryService) {
         this.dictionaryService = dictionaryService;

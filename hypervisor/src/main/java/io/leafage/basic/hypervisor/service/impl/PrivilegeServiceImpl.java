@@ -19,6 +19,8 @@ package io.leafage.basic.hypervisor.service.impl;
 
 import io.leafage.basic.hypervisor.domain.Privilege;
 import io.leafage.basic.hypervisor.dto.PrivilegeDTO;
+import io.leafage.basic.hypervisor.repository.GroupMembersRepository;
+import io.leafage.basic.hypervisor.repository.GroupPrivilegesRepository;
 import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
 import io.leafage.basic.hypervisor.service.PrivilegeService;
 import io.leafage.basic.hypervisor.vo.PrivilegeVO;
@@ -32,6 +34,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
 import top.leafage.common.reactive.ReactiveAbstractTreeNodeService;
+import top.leafage.common.reactive.audit.ReactiveAuditMetadata;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,14 +50,18 @@ import java.util.Set;
 public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privilege> implements PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
+    private final GroupPrivilegesRepository groupPrivilegesRepository;
+    private final GroupMembersRepository groupMembersRepository;
 
     /**
      * <p>Constructor for PrivilegeServiceImpl.</p>
      *
      * @param privilegeRepository a {@link PrivilegeRepository} object
      */
-    public PrivilegeServiceImpl(PrivilegeRepository privilegeRepository) {
+    public PrivilegeServiceImpl(PrivilegeRepository privilegeRepository, GroupPrivilegesRepository groupPrivilegesRepository, GroupMembersRepository groupMembersRepository) {
         this.privilegeRepository = privilegeRepository;
+        this.groupPrivilegesRepository = groupPrivilegesRepository;
+        this.groupMembersRepository = groupMembersRepository;
     }
 
     /**
@@ -82,7 +89,11 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
     public Mono<List<TreeNode>> tree(String username) {
         Assert.hasText(username, "username must not be empty.");
 
-        Flux<Privilege> privilegeFlux = privilegeRepository.findAll();
+        Flux<Privilege> privilegeFlux = groupMembersRepository.findByUsername(username)
+                .flatMap(groupMember -> groupPrivilegesRepository.findByGroupId(groupMember.getGroupId())
+                        .flatMap(groupPrivilege -> addSuperior(groupPrivilege.getPrivilegeId(), new HashSet<>())))
+                .distinct(Privilege::getId);
+
         return this.convertTree(privilegeFlux);
     }
 
@@ -146,6 +157,19 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
                 .map(privilege -> convert(dto, privilege))
                 .flatMap(privilegeRepository::save)
                 .map(p -> convertToVO(p, PrivilegeVO.class));
+    }
+
+    private Flux<Privilege> addSuperior(Long privilegeId, Set<Long> visited) {
+        return privilegeRepository.findById(privilegeId)
+                .filter(ReactiveAuditMetadata::isEnabled)
+                .flatMapMany(privilege -> {
+                    if (privilege.getSuperiorId() == null || !visited.contains(privilege.getId())) {
+                        return Flux.just(privilege);
+                    }
+                    return addSuperior(privilege.getSuperiorId(), visited)
+                            .concatWithValues(privilege)
+                            .distinct(Privilege::getId);
+                });
     }
 
     /**

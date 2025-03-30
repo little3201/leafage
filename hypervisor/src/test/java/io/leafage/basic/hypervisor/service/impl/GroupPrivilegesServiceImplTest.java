@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 
 package io.leafage.basic.hypervisor.service.impl;
 
-import io.leafage.basic.hypervisor.domain.GroupRoles;
-import io.leafage.basic.hypervisor.repository.GroupRolesRepository;
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
+import io.leafage.basic.hypervisor.domain.Privilege;
+import io.leafage.basic.hypervisor.repository.GroupPrivilegesRepository;
+import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,43 +31,46 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.Set;
-
 import static org.mockito.BDDMockito.given;
 
 /**
- * group roles service test
+ * group privileges service test
  *
  * @author wq li
  **/
 @ExtendWith(MockitoExtension.class)
-class GroupRolesServiceImplTest {
+class GroupPrivilegesServiceImplTest {
 
     @Mock
-    private GroupRolesRepository groupRolesRepository;
+    private PrivilegeRepository privilegeRepository;
+
+    @Mock
+    private GroupPrivilegesRepository groupPrivilegesRepository;
 
     @InjectMocks
-    private GroupRolesServiceImpl groupRolesService;
+    private GroupPrivilegesServiceImpl groupRolesService;
 
     @Test
-    void roles() {
-        given(this.groupRolesRepository.findByGroupId(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(GroupRoles.class)));
+    void privileges() {
+        given(this.groupPrivilegesRepository.findByGroupId(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(GroupPrivileges.class)));
 
-        StepVerifier.create(groupRolesService.roles(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(groupRolesService.privileges(Mockito.anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void groups() {
-        given(this.groupRolesRepository.findByRoleId(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(GroupRoles.class)));
+        given(this.groupPrivilegesRepository.findByPrivilegeId(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(GroupPrivileges.class)));
 
         StepVerifier.create(groupRolesService.groups(Mockito.anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void relation() {
-        given(this.groupRolesRepository.save(Mockito.any(GroupRoles.class))).willReturn(Mono.just(Mockito.mock(GroupRoles.class)));
+        given(privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
 
-        StepVerifier.create(groupRolesService.relation(Mockito.anyLong(), Set.of(1L)))
+        given(this.groupPrivilegesRepository.save(Mockito.any(GroupPrivileges.class))).willReturn(Mono.just(Mockito.mock(GroupPrivileges.class)));
+
+        StepVerifier.create(groupRolesService.relation(1L, 2L, Mockito.anySet()))
                 .expectNextCount(1).verifyComplete();
     }
 }

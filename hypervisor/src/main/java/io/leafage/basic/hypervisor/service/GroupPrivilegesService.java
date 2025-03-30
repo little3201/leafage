@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
 
 package io.leafage.basic.hypervisor.service;
 
-import io.leafage.basic.hypervisor.domain.GroupRoles;
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * group roles service
+ * group privileges service
  *
  * @author wq li
  */
-public interface GroupRolesService {
+public interface GroupPrivilegesService {
 
     /**
      * 查询关联user
@@ -36,22 +36,23 @@ public interface GroupRolesService {
      * @param groupId group主键
      * @return 数据集
      */
-    Mono<List<GroupRoles>> roles(Long groupId);
+    Mono<List<GroupPrivileges>> privileges(Long groupId);
 
     /**
      * 查询关联group
      *
-     * @param roleId role主键
+     * @param privilegeId privilege主键
      * @return 数据集
      */
-    Mono<List<GroupRoles>> groups(Long roleId);
+    Mono<List<GroupPrivileges>> groups(Long privilegeId);
 
     /**
-     * group-user关系
+     * group-privileges关系
      *
-     * @param groupId group 主键
-     * @param roleIds roleId集合
-     * @return 是否成功： true - 是， false - 否
+     * @param groupId     group 主键
+     * @param privilegeId privilege 主键
+     * @param actions     按钮
+     * @return 数据集
      */
-    Mono<Boolean> relation(Long groupId, Set<Long> roleIds);
+    Mono<GroupPrivileges> relation(Long groupId, Long privilegeId, Set<String> actions);
 }

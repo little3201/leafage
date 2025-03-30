@@ -66,7 +66,6 @@ class PrivilegeControllerTest {
     void setUp() {
         privilegeDTO = new PrivilegeDTO();
         privilegeDTO.setName("test");
-        privilegeDTO.setType('M');
         privilegeDTO.setIcon("add");
         privilegeDTO.setSuperiorId(1L);
         privilegeDTO.setDescription("privilege");
@@ -75,7 +74,6 @@ class PrivilegeControllerTest {
         privilegeVO.setName("test");
         privilegeVO.setIcon("add");
         privilegeVO.setPath("/test");
-        privilegeVO.setType('M');
     }
 
     @Test

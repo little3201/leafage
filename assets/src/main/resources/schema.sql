@@ -8,7 +8,7 @@ create table categories
     id                 bigserial    not null primary key,
     name               varchar(127) not null UNIQUE,
     description        varchar(255),
-    is_enabled         boolean      not null default true,
+    enabled boolean not null default true,
     created_by         varchar(32)  not null,
     created_date       timestamp    not null default CURRENT_TIMESTAMP,
     last_modified_by   varchar(32)  not null,
@@ -29,7 +29,7 @@ CREATE TABLE posts
     tags               varchar[],
     cover              varchar(127),
     category_id        bigint       not null,
-    is_enabled         boolean      not null default true,
+    enabled boolean not null default true,
     created_by         varchar(32)  not null,
     created_date       timestamp    not null default CURRENT_TIMESTAMP,
     last_modified_by   varchar(32)  not null,
@@ -66,7 +66,7 @@ CREATE UNIQUE INDEX idx_unique_post_id ON post_content (post_id);
 drop table if exists comments;
 
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.

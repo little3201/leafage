@@ -49,7 +49,7 @@ public class UserController {
     /**
      * <p>Constructor for UserController.</p>
      *
-     * @param userService a {@link io.leafage.basic.hypervisor.service.UserService} object
+     * @param userService a {@link UserService} object
      */
     public UserController(UserService userService) {
         this.userService = userService;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -61,16 +61,17 @@ class UserControllerTest {
         userDTO = new UserDTO();
         userDTO.setUsername("test");
         userDTO.setAvatar("avatar.jpg");
-        userDTO.setFirstname("john");
-        userDTO.setLastname("steven");
+        userDTO.setGivenName("john");
+        userDTO.setFamilyName("steven");
         userDTO.setAccountExpiresAt(Instant.now());
         userDTO.setCredentialsExpiresAt(Instant.now());
 
         userVO = new UserVO(1L, true, Instant.now());
         userVO.setUsername("test");
         userVO.setAccountExpiresAt(Instant.now());
-        userVO.setFirstname("john");
-        userVO.setLastname("steven");
+        userVO.setGivenName("john");
+        userVO.setMiddleName("steven");
+        userVO.setFamilyName("steven");
     }
 
     @Test

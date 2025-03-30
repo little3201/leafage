@@ -42,12 +42,10 @@ public abstract class PrivilegeBO {
      */
     @NotBlank(message = "icon must not be empty.")
     private String icon;
-
     /**
      * 路径
      */
     private String path;
-
     /**
      * redirect
      */
@@ -56,7 +54,9 @@ public abstract class PrivilegeBO {
      * component
      */
     private String component;
-
+    /**
+     * 操作
+     */
     private Set<String> actions;
     /**
      * 描述

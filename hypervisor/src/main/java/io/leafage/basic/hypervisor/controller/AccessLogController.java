@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2024 little3201.
+ *  Copyright 2018-2025 little3201.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class AccessLogController {
     /**
      * <p>Constructor for AccessLogController.</p>
      *
-     * @param accessLogService a {@link io.leafage.basic.hypervisor.service.AccessLogService} object
+     * @param accessLogService a {@link AccessLogService} object
      */
     public AccessLogController(AccessLogService accessLogService) {
         this.accessLogService = accessLogService;
