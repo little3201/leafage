@@ -260,7 +260,8 @@ public class RoleController {
      * @return 操作结果
      */
     @PatchMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId, @RequestParam(required = false) Set<String> actions) {
+    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                        @RequestParam(required = false) Set<String> actions) {
         RolePrivileges rp;
         try {
             rp = rolePrivilegesService.relation(id, privilegeId, actions);
@@ -280,7 +281,8 @@ public class RoleController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
+    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                    @RequestParam(required = false) Set<String> actions) {
         try {
             rolePrivilegesService.removeRelation(id, privilegeId, actions);
         } catch (Exception e) {
