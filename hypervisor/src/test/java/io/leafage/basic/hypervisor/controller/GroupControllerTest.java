@@ -42,6 +42,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -220,8 +221,8 @@ class GroupControllerTest {
         given(this.groupPrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet()))
                 .willReturn(Mono.just(Mockito.mock(GroupPrivileges.class)));
 
-        webTestClient.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 2L)
-                .bodyValue(Mockito.anySet())
+        webTestClient.mutateWith(csrf()).patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 2L)
+                .bodyValue(Set.of("test"))
                 .exchange()
                 .expectStatus().isOk();
     }
