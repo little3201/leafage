@@ -17,7 +17,9 @@
 
 package io.leafage.basic.hypervisor.service.impl;
 
+import io.leafage.basic.hypervisor.domain.GroupAuthorities;
 import io.leafage.basic.hypervisor.domain.GroupPrivileges;
+import io.leafage.basic.hypervisor.repository.GroupAuthoritiesRepository;
 import io.leafage.basic.hypervisor.repository.GroupPrivilegesRepository;
 import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
 import io.leafage.basic.hypervisor.service.GroupPrivilegesService;
@@ -27,6 +29,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * group privileges service impl
@@ -38,15 +42,17 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
     private final GroupPrivilegesRepository groupPrivilegesRepository;
     private final PrivilegeRepository privilegeRepository;
+    private final GroupAuthoritiesRepository groupAuthoritiesRepository;
 
     /**
      * <p>Constructor for GroupPrivilegesServiceImpl.</p>
      *
      * @param groupPrivilegesRepository a {@link GroupPrivilegesRepository} object
      */
-    public GroupPrivilegesServiceImpl(GroupPrivilegesRepository groupPrivilegesRepository, PrivilegeRepository privilegeRepository) {
+    public GroupPrivilegesServiceImpl(GroupPrivilegesRepository groupPrivilegesRepository, PrivilegeRepository privilegeRepository, GroupAuthoritiesRepository groupAuthoritiesRepository) {
         this.groupPrivilegesRepository = groupPrivilegesRepository;
         this.privilegeRepository = privilegeRepository;
+        this.groupAuthoritiesRepository = groupAuthoritiesRepository;
     }
 
     /**
@@ -74,16 +80,28 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
      */
     @Override
     public Mono<GroupPrivileges> relation(Long groupId, Long privilegeId, Set<String> actions) {
-        Assert.notNull(groupId, "groupId must not be empty.");
-        Assert.notNull(privilegeId, "privilegeId must not be empty.");
+        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notNull(privilegeId, "privilegeId must not be null.");
 
         return privilegeRepository.findById(privilegeId)
-                .map(privilege -> {
+                .flatMap(privilege -> {
+                    // 创建 GroupPrivileges 对象
                     GroupPrivileges groupPrivileges = new GroupPrivileges();
                     groupPrivileges.setGroupId(groupId);
                     groupPrivileges.setPrivilegeId(privilegeId);
                     groupPrivileges.setActions(actions);
-                    return groupPrivileges;
-                }).flatMap(groupPrivilegesRepository::save);
+
+                    // 生成 GroupAuthorities 列表，添加 "read" 权限
+                    List<GroupAuthorities> groupAuthoritiesList = Stream.concat(Stream.of("read"), actions.stream())
+                            .map(action -> {
+                                GroupAuthorities authority = new GroupAuthorities();
+                                authority.setGroupId(groupId);
+                                authority.setAuthority(privilege.getName() + ":" + action);
+                                return authority;
+                            }).collect(Collectors.toList());
+
+                    return groupAuthoritiesRepository.saveAll(groupAuthoritiesList)
+                            .then(groupPrivilegesRepository.save(groupPrivileges));
+                });
     }
 }

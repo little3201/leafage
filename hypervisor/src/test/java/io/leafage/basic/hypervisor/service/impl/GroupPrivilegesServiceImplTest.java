@@ -17,8 +17,10 @@
 
 package io.leafage.basic.hypervisor.service.impl;
 
+import io.leafage.basic.hypervisor.domain.GroupAuthorities;
 import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import io.leafage.basic.hypervisor.domain.Privilege;
+import io.leafage.basic.hypervisor.repository.GroupAuthoritiesRepository;
 import io.leafage.basic.hypervisor.repository.GroupPrivilegesRepository;
 import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,9 @@ class GroupPrivilegesServiceImplTest {
     @Mock
     private GroupPrivilegesRepository groupPrivilegesRepository;
 
+    @Mock
+    private GroupAuthoritiesRepository groupAuthoritiesRepository;
+
     @InjectMocks
     private GroupPrivilegesServiceImpl groupRolesService;
 
@@ -66,7 +71,9 @@ class GroupPrivilegesServiceImplTest {
 
     @Test
     void relation() {
-        given(privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+
+        given(this.groupAuthoritiesRepository.saveAll(Mockito.anyList())).willReturn(Flux.just(Mockito.mock(GroupAuthorities.class)));
 
         given(this.groupPrivilegesRepository.save(Mockito.any(GroupPrivileges.class))).willReturn(Mono.just(Mockito.mock(GroupPrivileges.class)));
 

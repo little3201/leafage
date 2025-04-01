@@ -57,7 +57,9 @@ public class Privilege extends ReactiveAuditMetadata {
      * component
      */
     private String component;
-
+    /**
+     * actions
+     */
     private Set<String> actions;
     /**
      * 描述

@@ -21,15 +21,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.Set;
-
 /**
- * model class for group privileges
+ * model class for group authorities
  *
  * @author wq li
  */
-@Table(name = "group_privileges")
-public class GroupPrivileges {
+@Table(name = "group_authorities")
+public class GroupAuthorities {
 
     /**
      * 主键
@@ -42,19 +40,14 @@ public class GroupPrivileges {
     @Column(value = "group_id")
     private Long groupId;
     /**
-     * privilege主键
+     * authority
      */
-    @Column(value = "privilege_id")
-    private Long privilegeId;
-    /**
-     * actions
-     */
-    private Set<String> actions;
+    private String authority;
 
     /**
      * <p>Getter for the field <code>id</code>.</p>
      *
-     * @return a {@link java.lang.Long} object
+     * @return a {@link Long} object
      */
     public Long getId() {
         return id;
@@ -63,7 +56,7 @@ public class GroupPrivileges {
     /**
      * <p>Setter for the field <code>id</code>.</p>
      *
-     * @param id a {@link java.lang.Long} object
+     * @param id a {@link Long} object
      */
     public void setId(Long id) {
         this.id = id;
@@ -72,7 +65,7 @@ public class GroupPrivileges {
     /**
      * <p>Getter for the field <code>groupId</code>.</p>
      *
-     * @return a {@link java.lang.Long} object
+     * @return a {@link Long} object
      */
     public Long getGroupId() {
         return groupId;
@@ -81,35 +74,28 @@ public class GroupPrivileges {
     /**
      * <p>Setter for the field <code>groupId</code>.</p>
      *
-     * @param groupId a {@link java.lang.Long} object
+     * @param groupId a {@link Long} object
      */
     public void setGroupId(Long groupId) {
         this.groupId = groupId;
     }
 
     /**
-     * <p>Getter for the field <code>privilegeId</code>.</p>
+     * <p>Getter for the field <code>authority</code>.</p>
      *
-     * @return a {@link java.lang.Long} object
+     * @return a {@link String} object
      */
-    public Long getPrivilegeId() {
-        return privilegeId;
+    public String getAuthority() {
+        return authority;
     }
 
     /**
-     * <p>Setter for the field <code>privilegeId</code>.</p>
+     * <p>Setter for the field <code>authority</code>.</p>
      *
-     * @param privilegeId a {@link java.lang.Long} object
+     * @param authority a {@link String} object
      */
-    public void setPrivilegeId(Long privilegeId) {
-        this.privilegeId = privilegeId;
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 
-    public Set<String> getActions() {
-        return actions;
-    }
-
-    public void setActions(Set<String> actions) {
-        this.actions = actions;
-    }
 }
