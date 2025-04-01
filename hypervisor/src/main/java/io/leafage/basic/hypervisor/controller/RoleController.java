@@ -280,7 +280,7 @@ public class RoleController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody(required = false) Set<String> actions) {
+    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
         try {
             rolePrivilegesService.removeRelation(id, privilegeId, actions);
         } catch (Exception e) {

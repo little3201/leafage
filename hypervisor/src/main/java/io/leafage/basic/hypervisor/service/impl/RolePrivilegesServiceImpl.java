@@ -118,16 +118,13 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
     private void addGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
         JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
+        // 添加 read
+        actions.add("read");
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
-                groupRepository.findById(groupRole.getGroupId()).ifPresent(group -> {
-                    // 菜单授权read
-                    userDetailsManager.addGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":read"));
-                    // 授权actions
-                    if (!CollectionUtils.isEmpty(actions)) {
-                        actions.forEach(action ->
-                                userDetailsManager.addGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":" + action)));
-                    }
-                })
+                groupRepository.findById(groupRole.getGroupId()).ifPresent(group ->
+                        actions.forEach(action -> userDetailsManager.addGroupAuthority(group.getName(),
+                                new SimpleGrantedAuthority(privilege.getName() + ":" + action)))
+                )
         );
     }
 
