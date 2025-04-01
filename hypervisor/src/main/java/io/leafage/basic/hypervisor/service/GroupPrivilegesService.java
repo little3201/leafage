@@ -47,7 +47,7 @@ public interface GroupPrivilegesService {
     Mono<List<GroupPrivileges>> groups(Long privilegeId);
 
     /**
-     * group-privileges关系
+     * group-privileges关联
      *
      * @param groupId     group 主键
      * @param privilegeId privilege 主键
@@ -55,4 +55,14 @@ public interface GroupPrivilegesService {
      * @return 数据集
      */
     Mono<GroupPrivileges> relation(Long groupId, Long privilegeId, Set<String> actions);
+
+    /**
+     * 移除group-privileges关系
+     *
+     * @param groupId     group 主键
+     * @param privilegeId privilege 主键
+     * @param actions     按钮
+     * @return 数据集
+     */
+    Mono<Void> removeRelation(Long groupId, Long privilegeId, Set<String> actions);
 }

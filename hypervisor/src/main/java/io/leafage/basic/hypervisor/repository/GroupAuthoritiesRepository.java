@@ -20,7 +20,7 @@ package io.leafage.basic.hypervisor.repository;
 import io.leafage.basic.hypervisor.domain.GroupAuthorities;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * group authorities repository
@@ -31,11 +31,11 @@ import reactor.core.publisher.Flux;
 public interface GroupAuthoritiesRepository extends R2dbcRepository<GroupAuthorities, Long> {
 
     /**
-     * 根据group查member
+     * 根据group删除
      *
-     * @param groupId group主键
-     * @return 关联数据集
+     * @param groupId   group 主键
+     * @param authority 权限
      */
-    Flux<GroupAuthorities> findByGroupId(Long groupId);
+    Mono<Void> deleteByGroupIdAndAuthority(Long groupId, String authority);
 
 }

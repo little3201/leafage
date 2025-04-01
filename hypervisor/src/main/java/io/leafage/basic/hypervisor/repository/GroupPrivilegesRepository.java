@@ -21,6 +21,7 @@ import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * group privileges repository
@@ -37,6 +38,15 @@ public interface GroupPrivilegesRepository extends R2dbcRepository<GroupPrivileg
      * @return 关联数据集
      */
     Flux<GroupPrivileges> findByGroupId(Long groupId);
+
+    /**
+     * 根据group和privilege查
+     *
+     * @param groupId     group主键
+     * @param privilegeId privilege主键
+     * @return 关联数据集
+     */
+    Mono<GroupPrivileges> findByGroupIdAndPrivilegeId(Long groupId, Long privilegeId);
 
     /**
      * 根据privilege查

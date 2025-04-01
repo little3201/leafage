@@ -212,4 +212,22 @@ public class GroupController {
         }
         return ResponseEntity.ok(mono);
     }
+
+    /**
+     * 关联权限
+     *
+     * @param id 组id
+     * @return 查询到的数据集，异常时返回204状态码
+     */
+    @DeleteMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<Mono<Void>> removeRelation(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
+        Mono<Void> voidMono;
+        try {
+            voidMono = groupPrivilegesService.removeRelation(id, privilegeId, actions);
+        } catch (Exception e) {
+            logger.error("Remove group privileges occurred an error: ", e);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(voidMono);
+    }
 }

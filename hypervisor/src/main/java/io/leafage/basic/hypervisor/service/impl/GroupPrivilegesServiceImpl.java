@@ -25,6 +25,7 @@ import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
 import io.leafage.basic.hypervisor.service.GroupPrivilegesService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -102,6 +103,24 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
                     return groupAuthoritiesRepository.saveAll(groupAuthoritiesList)
                             .then(groupPrivilegesRepository.save(groupPrivileges));
+                });
+    }
+
+    @Override
+    public Mono<Void> removeRelation(Long groupId, Long privilegeId, Set<String> actions) {
+        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notNull(privilegeId, "privilegeId must not be null.");
+
+        return groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId)
+                .flatMap(groupPrivileges -> {
+                    // 删除 GroupAuthorities
+                    if (CollectionUtils.isEmpty(actions) || groupPrivileges.getActions().containsAll(actions)) {
+                        return groupPrivilegesRepository.deleteById(groupPrivileges.getId());
+                    }
+                    return privilegeRepository.findById(privilegeId).map(privilege -> actions.stream().map(action ->
+                                    groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupId, privilege.getName() + ":" + action)))
+                            .then(groupPrivilegesRepository.delete(groupPrivileges));
+
                 });
     }
 }
