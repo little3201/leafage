@@ -19,16 +19,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Login controller.
+ * default controller.
  *
  * @author wq li
  */
 @Controller
-public class LoginController {
+public class DefaultController {
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    @GetMapping("/")
+    public String root() {
+        return "redirect:http://127.0.0.1:5173";
     }
 
 }
