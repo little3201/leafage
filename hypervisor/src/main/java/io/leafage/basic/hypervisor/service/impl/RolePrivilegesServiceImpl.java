@@ -17,7 +17,10 @@ package io.leafage.basic.hypervisor.service.impl;
 
 import io.leafage.basic.hypervisor.domain.Privilege;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
-import io.leafage.basic.hypervisor.repository.*;
+import io.leafage.basic.hypervisor.repository.GroupRepository;
+import io.leafage.basic.hypervisor.repository.GroupRolesRepository;
+import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
+import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -26,6 +29,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,8 +54,6 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      */
     public RolePrivilegesServiceImpl(RolePrivilegesRepository rolePrivilegesRepository,
                                      GroupRolesRepository groupRolesRepository, GroupRepository groupRepository,
-                                     GroupMembersRepository groupMembersRepository,
-                                     RoleMembersRepository roleMembersRepository,
                                      PrivilegeRepository privilegeRepository, DataSource dataSource) {
         this.rolePrivilegesRepository = rolePrivilegesRepository;
         this.groupRolesRepository = groupRolesRepository;
@@ -91,13 +93,9 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         // 优化 Optional 的使用，减少嵌套
         return privilegeRepository.findById(privilegeId)
                 .map(privilege -> {
-                    RolePrivileges rolePrivilege = new RolePrivileges();
-                    rolePrivilege.setRoleId(roleId);
-                    rolePrivilege.setPrivilegeId(privilegeId);
-                    rolePrivilege.setActions(actions);
+                    RolePrivileges rolePrivilege = privileges(roleId, privilegeId, actions);
 
-                    addGroupAuthority(roleId, privilege, actions);
-
+                    addGroupAuthority(roleId, privilege, rolePrivilege.getActions());
                     // 保存并立即刷新
                     return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
                 })
@@ -116,10 +114,24 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         });
     }
 
+    private RolePrivileges privileges(Long roleId, Long privilegeId, Set<String> actions) {
+        // actions添加read
+        Set<String> effectiveActions = new HashSet<>();
+        if (!CollectionUtils.isEmpty(actions)) {
+            effectiveActions.addAll(actions);
+        }
+        effectiveActions.add("read");
+
+        RolePrivileges rolePrivileges = new RolePrivileges();
+        rolePrivileges.setRoleId(roleId);
+        rolePrivileges.setPrivilegeId(privilegeId);
+        rolePrivileges.setActions(effectiveActions);
+        return rolePrivileges;
+    }
+
     private void addGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
         JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
-        // 添加 read
-        actions.add("read");
+
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
                 groupRepository.findById(groupRole.getGroupId()).ifPresent(group ->
                         actions.forEach(action -> userDetailsManager.addGroupAuthority(group.getName(),
