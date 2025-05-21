@@ -91,6 +91,7 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
             for (RolePrivileges rolePrivilege : rolePrivileges) {
                 privilegeRepository.findById(rolePrivilege.getPrivilegeId()).ifPresent(privilege -> {
                     if (privilege.isEnabled() && !privilegeMap.containsKey(privilege.getId())) {
+                        privilege.setActions(rolePrivilege.getActions());
                         privilegeMap.put(privilege.getId(), privilege);
                         // 处理没有勾选父级的数据（递归查找父级数据）
                         addSuperior(privilege, privilegeMap);

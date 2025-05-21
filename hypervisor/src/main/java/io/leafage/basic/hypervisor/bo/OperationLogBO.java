@@ -15,6 +15,8 @@
 
 package io.leafage.basic.hypervisor.bo;
 
+import java.net.InetAddress;
+
 /**
  * bo class for operation log
  *
@@ -25,7 +27,7 @@ public abstract class OperationLogBO {
     /**
      * IP地址
      */
-    private String ip;
+    private InetAddress ip;
 
     /**
      * 地理位置
@@ -81,7 +83,7 @@ public abstract class OperationLogBO {
      *
      * @return a {@link String} object
      */
-    public String getIp() {
+    public InetAddress getIp() {
         return ip;
     }
 
@@ -90,7 +92,7 @@ public abstract class OperationLogBO {
      *
      * @param ip a {@link String} object
      */
-    public void setIp(String ip) {
+    public void setIp(InetAddress ip) {
         this.ip = ip;
     }
 
