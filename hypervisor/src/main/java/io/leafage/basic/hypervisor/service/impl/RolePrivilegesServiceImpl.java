@@ -19,7 +19,10 @@ import io.leafage.basic.hypervisor.domain.GroupAuthorities;
 import io.leafage.basic.hypervisor.domain.Privilege;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
 import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
-import io.leafage.basic.hypervisor.repository.*;
+import io.leafage.basic.hypervisor.repository.GroupAuthoritiesRepository;
+import io.leafage.basic.hypervisor.repository.GroupRolesRepository;
+import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
+import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -39,7 +42,6 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
     private final RolePrivilegesRepository rolePrivilegesRepository;
     private final GroupRolesRepository groupRolesRepository;
-    private final GroupRepository groupRepository;
     private final PrivilegeRepository privilegeRepository;
     private final GroupAuthoritiesRepository groupAuthoritiesRepository;
 
@@ -48,12 +50,10 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      *
      * @param rolePrivilegesRepository a {@link RolePrivilegesRepository} object
      */
-    public RolePrivilegesServiceImpl(RolePrivilegesRepository rolePrivilegesRepository,
-                                     GroupRolesRepository groupRolesRepository, GroupRepository groupRepository,
+    public RolePrivilegesServiceImpl(RolePrivilegesRepository rolePrivilegesRepository, GroupRolesRepository groupRolesRepository,
                                      PrivilegeRepository privilegeRepository, GroupAuthoritiesRepository groupAuthoritiesRepository) {
         this.rolePrivilegesRepository = rolePrivilegesRepository;
         this.groupRolesRepository = groupRolesRepository;
-        this.groupRepository = groupRepository;
         this.privilegeRepository = privilegeRepository;
         this.groupAuthoritiesRepository = groupAuthoritiesRepository;
     }
@@ -125,24 +125,21 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
     private void addGroupAuthority(Long roleId, String privilegeName, Set<String> actions) {
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
-                groupRepository.findById(groupRole.getGroupId()).ifPresent(group ->
-                        actions.forEach(action ->
-                                groupAuthoritiesRepository.save(new GroupAuthorities(group.getId(), privilegeName + ":" + action)))
-                )
+                actions.forEach(action ->
+                        groupAuthoritiesRepository.save(new GroupAuthorities(groupRole.getGroupId(), privilegeName + ":" + action)))
         );
     }
 
     private void removeGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
-        groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
-                groupRepository.findById(groupRole.getGroupId()).ifPresent(group -> {
+        groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole -> {
                     // 移除授权actions
                     if (CollectionUtils.isEmpty(actions)) {
-                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(group.getId(), privilege.getName() + ":read");
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":read");
                     } else {
                         actions.forEach(action ->
-                                groupAuthoritiesRepository.deleteByGroupIdAndAuthority(group.getId(), privilege.getName() + ":" + action));
+                                groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":" + action));
                     }
-                })
+                }
         );
     }
 

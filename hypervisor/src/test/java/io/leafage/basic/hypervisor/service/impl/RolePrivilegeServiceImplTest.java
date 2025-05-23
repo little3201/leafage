@@ -17,7 +17,10 @@ package io.leafage.basic.hypervisor.service.impl;
 
 import io.leafage.basic.hypervisor.domain.*;
 import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
-import io.leafage.basic.hypervisor.repository.*;
+import io.leafage.basic.hypervisor.repository.GroupAuthoritiesRepository;
+import io.leafage.basic.hypervisor.repository.GroupRolesRepository;
+import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
+import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,9 +54,6 @@ class RolePrivilegeServiceImplTest {
 
     @Mock
     private GroupRolesRepository groupRolesRepository;
-
-    @Mock
-    private GroupRepository groupRepository;
 
     @Mock
     private GroupAuthoritiesRepository groupAuthoritiesRepository;
@@ -108,10 +108,8 @@ class RolePrivilegeServiceImplTest {
 
         given(this.groupRolesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(groupRoles));
 
-        given(this.groupRepository.findById(Mockito.anyLong())).willReturn(Optional.of(group));
-
         given(this.groupAuthoritiesRepository.save(Mockito.any())).willReturn(Mockito.mock(GroupAuthorities.class));
-        
+
         List<RolePrivileges> relations = rolePrivilegesService.relation(1L, List.of(authorizePrivilegesDTO));
 
         verify(this.rolePrivilegesRepository, times(1)).saveAndFlush(Mockito.any(RolePrivileges.class));
