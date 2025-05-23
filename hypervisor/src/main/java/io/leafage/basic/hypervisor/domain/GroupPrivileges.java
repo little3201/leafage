@@ -27,7 +27,6 @@ import java.util.Set;
 @Table(name = "group_privileges")
 public class GroupPrivileges {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,6 +50,16 @@ public class GroupPrivileges {
     @CollectionTable(name = "group_privilege_actions", joinColumns = @JoinColumn(name = "group_privilege_id"))
     @Column(name = "action")
     private Set<String> actions;
+
+    public GroupPrivileges() {
+
+    }
+
+    public GroupPrivileges(Long groupId, Long privilegeId, Set<String> actions) {
+        this.groupId = groupId;
+        this.privilegeId = privilegeId;
+        this.actions = actions;
+    }
 
 
     public Long getId() {

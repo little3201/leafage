@@ -116,11 +116,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         }
         effectiveActions.add("read");
 
-        RolePrivileges rolePrivileges = new RolePrivileges();
-        rolePrivileges.setRoleId(roleId);
-        rolePrivileges.setPrivilegeId(privilegeId);
-        rolePrivileges.setActions(effectiveActions);
-        return rolePrivileges;
+        return new RolePrivileges(roleId, privilegeId, effectiveActions);
     }
 
     private void addGroupAuthority(Long roleId, String privilegeName, Set<String> actions) {
