@@ -43,56 +43,26 @@ public class Authorities {
     private String authority;
 
 
-    /**
-     * <p>Getter for the field <code>id</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
     public Long getId() {
         return id;
     }
 
-    /**
-     * <p>Setter for the field <code>id</code>.</p>
-     *
-     * @param id a {@link Long} object
-     */
     public void setId(Long id) {
         this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>username</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * <p>Setter for the field <code>username</code>.</p>
-     *
-     * @param username a {@link String} object
-     */
     public void setUsername(String username) {
         this.username = username;
     }
 
-    /**
-     * <p>Getter for the field <code>authority</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getAuthority() {
         return authority;
     }
 
-    /**
-     * <p>Setter for the field <code>authority</code>.</p>
-     *
-     * @param authority a {@link String} object
-     */
     public void setAuthority(String authority) {
         this.authority = authority;
     }
