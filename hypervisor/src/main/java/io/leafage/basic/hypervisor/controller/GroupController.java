@@ -15,8 +15,11 @@
 package io.leafage.basic.hypervisor.controller;
 
 import io.leafage.basic.hypervisor.domain.GroupMembers;
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
+import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.basic.hypervisor.dto.GroupDTO;
 import io.leafage.basic.hypervisor.service.GroupMembersService;
+import io.leafage.basic.hypervisor.service.GroupPrivilegesService;
 import io.leafage.basic.hypervisor.service.GroupService;
 import io.leafage.basic.hypervisor.vo.GroupVO;
 import jakarta.validation.Valid;
@@ -43,18 +46,20 @@ public class GroupController {
 
     private final Logger logger = LoggerFactory.getLogger(GroupController.class);
 
-    private final GroupMembersService groupMembersService;
     private final GroupService groupService;
+    private final GroupMembersService groupMembersService;
+    private final GroupPrivilegesService groupPrivilegesService;
 
     /**
      * <p>Constructor for GroupController.</p>
      *
-     * @param groupMembersService a {@link io.leafage.basic.hypervisor.service.GroupMembersService} object
-     * @param groupService        a {@link io.leafage.basic.hypervisor.service.GroupService} object
+     * @param groupMembersService a {@link GroupMembersService} object
+     * @param groupService        a {@link GroupService} object
      */
-    public GroupController(GroupMembersService groupMembersService, GroupService groupService) {
-        this.groupMembersService = groupMembersService;
+    public GroupController(GroupService groupService, GroupMembersService groupMembersService, GroupPrivilegesService groupPrivilegesService) {
         this.groupService = groupService;
+        this.groupMembersService = groupMembersService;
+        this.groupPrivilegesService = groupPrivilegesService;
     }
 
     /**
@@ -189,6 +194,25 @@ public class GroupController {
     }
 
     /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_groups:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = groupService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
      * 保存group-privilege关联
      *
      * @param id        group id
@@ -244,22 +268,40 @@ public class GroupController {
     }
 
     /**
-     * Enable a record when enabled is false or disable when enabled is ture.
+     * 查询role-privilege关联
      *
-     * @param id The record ID.
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @param id role代码
+     * @return 操作结果
      */
-    @PreAuthorize("hasAuthority('SCOPE_groups:enable')")
-    @PatchMapping("/{id}")
-    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
-        boolean enabled;
+    @GetMapping("/{id}/privileges")
+    public ResponseEntity<List<GroupPrivileges>> privileges(@PathVariable Long id) {
+        List<GroupPrivileges> voList;
         try {
-            enabled = groupService.enable(id);
+            voList = groupPrivilegesService.privileges(id);
         } catch (Exception e) {
-            logger.error("Toggle enabled error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            logger.error("Retrieve role privileges error: ", e);
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.accepted().body(enabled);
+        return ResponseEntity.ok(voList);
+    }
+
+    /**
+     * 保存role-privilege关联
+     *
+     * @param id      role id
+     * @param dtoList dto list
+     * @return 操作结果
+     */
+    @PatchMapping("/{id}/privileges")
+    public ResponseEntity<List<GroupPrivileges>> authorization(@PathVariable Long id, @RequestBody List<AuthorizePrivilegesDTO> dtoList) {
+        List<GroupPrivileges> list;
+        try {
+            list = groupPrivilegesService.relation(id, dtoList);
+        } catch (Exception e) {
+            logger.error("Relation group privileges error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.accepted().body(list);
     }
 
 }

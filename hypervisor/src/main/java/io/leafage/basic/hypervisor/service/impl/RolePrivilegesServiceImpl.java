@@ -17,6 +17,7 @@ package io.leafage.basic.hypervisor.service.impl;
 
 import io.leafage.basic.hypervisor.domain.Privilege;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
+import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.basic.hypervisor.repository.GroupRepository;
 import io.leafage.basic.hypervisor.repository.GroupRolesRepository;
 import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
@@ -86,20 +87,18 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      * {@inheritDoc}
      */
     @Override
-    public RolePrivileges relation(Long roleId, Long privilegeId, Set<String> actions) {
+    public List<RolePrivileges> relation(Long roleId, List<AuthorizePrivilegesDTO> dtoList) {
         Assert.notNull(roleId, "roleId must not be null.");
-        Assert.notNull(privilegeId, "privilegeId must not be null.");
 
         // 优化 Optional 的使用，减少嵌套
-        return privilegeRepository.findById(privilegeId)
-                .map(privilege -> {
-                    RolePrivileges rolePrivilege = privileges(roleId, privilegeId, actions);
+        return dtoList.stream().map(dto -> {
+            RolePrivileges rolePrivilege = privileges(roleId, dto.getPrivilegeId(), dto.getActions());
 
-                    addGroupAuthority(roleId, privilege, rolePrivilege.getActions());
-                    // 保存并立即刷新
-                    return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
-                })
-                .orElse(null);
+            privilegeRepository.findById(dto.getPrivilegeId()).ifPresent(privilege ->
+                    addGroupAuthority(roleId, privilege.getName(), dto.getActions()));
+            // 保存并立即刷新
+            return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
+        }).toList();
     }
 
     @Override
@@ -129,13 +128,13 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         return rolePrivileges;
     }
 
-    private void addGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
+    private void addGroupAuthority(Long roleId, String privilegeName, Set<String> actions) {
         JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
 
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
                 groupRepository.findById(groupRole.getGroupId()).ifPresent(group ->
                         actions.forEach(action -> userDetailsManager.addGroupAuthority(group.getName(),
-                                new SimpleGrantedAuthority(privilege.getName() + ":" + action)))
+                                new SimpleGrantedAuthority(privilegeName + ":" + action)))
                 )
         );
     }

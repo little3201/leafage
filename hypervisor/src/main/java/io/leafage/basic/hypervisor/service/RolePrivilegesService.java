@@ -16,6 +16,7 @@
 package io.leafage.basic.hypervisor.service;
 
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
+import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -46,12 +47,11 @@ public interface RolePrivilegesService {
     /**
      * 保存role-privilege关系
      *
-     * @param roleId      role主键
-     * @param privilegeId privilege主键
-     * @param actions     操作
+     * @param roleId  role主键
+     * @param dtoList dto list
      * @return 结果集
      */
-    RolePrivileges relation(Long roleId, Long privilegeId, Set<String> actions);
+    List<RolePrivileges> relation(Long roleId, List<AuthorizePrivilegesDTO> dtoList);
 
     /**
      * 移除role-privilege关系

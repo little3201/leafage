@@ -16,6 +16,7 @@ package io.leafage.basic.hypervisor.controller;
 
 import io.leafage.basic.hypervisor.domain.RoleMembers;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
+import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.basic.hypervisor.dto.RoleDTO;
 import io.leafage.basic.hypervisor.service.RoleMembersService;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
@@ -275,22 +276,20 @@ public class RoleController {
     /**
      * 保存role-privilege关联
      *
-     * @param id          role id
-     * @param privilegeId privilege id
-     * @param actions     操作
+     * @param id      role id
+     * @param dtoList dto list
      * @return 操作结果
      */
-    @PatchMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId,
-                                                        @RequestParam(required = false) Set<String> actions) {
-        RolePrivileges rp;
+    @PatchMapping("/{id}/privileges")
+    public ResponseEntity<List<RolePrivileges>> authorization(@PathVariable Long id, @RequestBody List<AuthorizePrivilegesDTO> dtoList) {
+        List<RolePrivileges> list;
         try {
-            rp = rolePrivilegesService.relation(id, privilegeId, actions);
+            list = rolePrivilegesService.relation(id, dtoList);
         } catch (Exception e) {
             logger.error("Relation role privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.accepted().body(rp);
+        return ResponseEntity.accepted().body(list);
     }
 
     /**
