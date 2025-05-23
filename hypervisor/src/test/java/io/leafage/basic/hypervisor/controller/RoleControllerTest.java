@@ -17,6 +17,7 @@ package io.leafage.basic.hypervisor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
+import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.basic.hypervisor.dto.RoleDTO;
 import io.leafage.basic.hypervisor.service.RoleMembersService;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
@@ -39,7 +40,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -244,25 +244,25 @@ class RoleControllerTest {
 
     @Test
     void relation() throws Exception {
-        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet()))
-                .willReturn(Mockito.mock(RolePrivileges.class));
+        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anyList()))
+                .willReturn(List.of(Mockito.mock(RolePrivileges.class)));
 
         mvc.perform(patch("/roles/{id}/privileges", 1L)
                         .queryParam("privilegeId", "1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(Set.of("test"))).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(List.of(Mockito.mock(AuthorizePrivilegesDTO.class)))).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void relation_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet());
+        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anyList());
 
-        mvc.perform(patch("/roles/{id}/privileges", Mockito.anyLong())
+        mvc.perform(patch("/roles/{id}/privileges", "1")
                         .queryParam("privilegeId", "1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(Set.of("test"))).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(List.of(Mockito.mock(AuthorizePrivilegesDTO.class)))).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

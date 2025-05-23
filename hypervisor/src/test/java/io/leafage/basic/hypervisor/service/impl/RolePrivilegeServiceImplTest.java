@@ -15,9 +15,11 @@
 
 package io.leafage.basic.hypervisor.service.impl;
 
-import io.leafage.basic.hypervisor.domain.RolePrivileges;
-import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
+import io.leafage.basic.hypervisor.domain.*;
+import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
+import io.leafage.basic.hypervisor.repository.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +28,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
@@ -41,10 +44,47 @@ import static org.mockito.Mockito.verify;
 class RolePrivilegeServiceImplTest {
 
     @Mock
+    private PrivilegeRepository privilegeRepository;
+
+    @Mock
     private RolePrivilegesRepository rolePrivilegesRepository;
+
+    @Mock
+    private GroupRolesRepository groupRolesRepository;
+
+    @Mock
+    private GroupRepository groupRepository;
+
+    @Mock
+    private GroupAuthoritiesRepository groupAuthoritiesRepository;
 
     @InjectMocks
     private RolePrivilegesServiceImpl rolePrivilegesService;
+
+    private AuthorizePrivilegesDTO authorizePrivilegesDTO;
+    private Group group;
+    private GroupRoles groupRoles;
+    private Privilege privilege;
+
+    @BeforeEach
+    void setUp() {
+        authorizePrivilegesDTO = new AuthorizePrivilegesDTO();
+        authorizePrivilegesDTO.setPrivilegeId(1L);
+        authorizePrivilegesDTO.setActions(Set.of("create"));
+
+        group = new Group();
+        group.setId(1L);
+        group.setName("group1");
+        group.setDescription("description");
+
+        groupRoles = new GroupRoles();
+        groupRoles.setGroupId(1L);
+        groupRoles.setRoleId(2L);
+
+        privilege = new Privilege();
+        privilege.setId(1L);
+        privilege.setName("name");
+    }
 
     @Test
     void privileges() {
@@ -64,11 +104,18 @@ class RolePrivilegeServiceImplTest {
 
     @Test
     void relation() {
-        given(this.rolePrivilegesRepository.saveAllAndFlush(Mockito.anyCollection())).willReturn(Mockito.anyList());
+        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(privilege));
 
-        RolePrivileges relation = rolePrivilegesService.relation(1L, 1L, Set.of("test"));
+        given(this.groupRolesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(groupRoles));
 
-        verify(this.rolePrivilegesRepository, times(1)).saveAllAndFlush(Mockito.anyList());
-        Assertions.assertNotNull(relation);
+        given(this.groupRepository.findById(Mockito.anyLong())).willReturn(Optional.of(group));
+
+        given(this.groupAuthoritiesRepository.save(Mockito.any())).willReturn(Mockito.mock(GroupAuthorities.class));
+        
+        List<RolePrivileges> relations = rolePrivilegesService.relation(1L, List.of(authorizePrivilegesDTO));
+
+        verify(this.rolePrivilegesRepository, times(1)).saveAndFlush(Mockito.any(RolePrivileges.class));
+        Assertions.assertNotNull(relations);
+        Assertions.assertFalse(relations.isEmpty());
     }
 }

@@ -174,22 +174,4 @@ class PrivilegeControllerTest {
                 .andReturn();
     }
 
-    @Test
-    void roles() throws Exception {
-        given(this.rolePrivilegesService.roles(Mockito.anyLong())).willReturn(Mockito.anyList());
-
-        mvc.perform(get("/privileges/{id}/roles", 1L))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void roles_error() throws Exception {
-        given(this.rolePrivilegesService.roles(Mockito.anyLong())).willThrow(new RuntimeException());
-
-        mvc.perform(get("/privileges/{id}/roles", Mockito.anyLong()))
-                .andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
 }

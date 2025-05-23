@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2024-2025.  little3201.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *       https://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.List;
 
@@ -60,9 +62,9 @@ class OperationLogControllerTest {
     private OperationLogVO vo;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
         vo = new OperationLogVO(1L, true, Instant.now());
-        vo.setIp("12.1.3.2");
+        vo.setIp(InetAddress.getByName("127.0.0.1"));
         vo.setLocation("test");
         vo.setBrowser("Chrome");
         vo.setDeviceType("PC");

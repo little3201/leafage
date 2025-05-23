@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2024-2025.  little3201.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *       https://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -170,8 +170,7 @@ class DictionaryControllerTest {
     void exists() throws Exception {
         given(this.dictionaryService.exists(Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong())).willReturn(true);
 
-        mvc.perform(get("/dictionaries/exists")
-                        .queryParam("superiorId", "1")
+        mvc.perform(get("/dictionaries/{superiorId}/exists", "1")
                         .queryParam("name", "test"))
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
@@ -181,8 +180,7 @@ class DictionaryControllerTest {
     void exist_error() throws Exception {
         given(this.dictionaryService.exists(Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/dictionaries/exists")
-                        .queryParam("superiorId", "1")
+        mvc.perform(get("/dictionaries/{superiorId}/exists", "1")
                         .queryParam("name", "test")
                         .queryParam("id", "2"))
                 .andExpect(status().isNoContent())
@@ -193,7 +191,7 @@ class DictionaryControllerTest {
     void lower_error() throws Exception {
         given(this.dictionaryService.subset(Mockito.anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/dictionaries/{id}/subset", Mockito.anyLong()))
+        mvc.perform(get("/dictionaries/{id}/subset", "1"))
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }

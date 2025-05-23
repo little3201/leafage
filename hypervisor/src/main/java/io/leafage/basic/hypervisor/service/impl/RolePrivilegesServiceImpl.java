@@ -15,21 +15,16 @@
 
 package io.leafage.basic.hypervisor.service.impl;
 
+import io.leafage.basic.hypervisor.domain.GroupAuthorities;
 import io.leafage.basic.hypervisor.domain.Privilege;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
 import io.leafage.basic.hypervisor.dto.AuthorizePrivilegesDTO;
-import io.leafage.basic.hypervisor.repository.GroupRepository;
-import io.leafage.basic.hypervisor.repository.GroupRolesRepository;
-import io.leafage.basic.hypervisor.repository.PrivilegeRepository;
-import io.leafage.basic.hypervisor.repository.RolePrivilegesRepository;
+import io.leafage.basic.hypervisor.repository.*;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import javax.sql.DataSource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +41,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
     private final GroupRolesRepository groupRolesRepository;
     private final GroupRepository groupRepository;
     private final PrivilegeRepository privilegeRepository;
-    private final DataSource dataSource;
+    private final GroupAuthoritiesRepository groupAuthoritiesRepository;
 
     /**
      * <p>Constructor for RolePrivilegesServiceImpl.</p>
@@ -55,12 +50,12 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      */
     public RolePrivilegesServiceImpl(RolePrivilegesRepository rolePrivilegesRepository,
                                      GroupRolesRepository groupRolesRepository, GroupRepository groupRepository,
-                                     PrivilegeRepository privilegeRepository, DataSource dataSource) {
+                                     PrivilegeRepository privilegeRepository, GroupAuthoritiesRepository groupAuthoritiesRepository) {
         this.rolePrivilegesRepository = rolePrivilegesRepository;
         this.groupRolesRepository = groupRolesRepository;
         this.groupRepository = groupRepository;
         this.privilegeRepository = privilegeRepository;
-        this.dataSource = dataSource;
+        this.groupAuthoritiesRepository = groupAuthoritiesRepository;
     }
 
     /**
@@ -129,26 +124,23 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
     }
 
     private void addGroupAuthority(Long roleId, String privilegeName, Set<String> actions) {
-        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
-
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
                 groupRepository.findById(groupRole.getGroupId()).ifPresent(group ->
-                        actions.forEach(action -> userDetailsManager.addGroupAuthority(group.getName(),
-                                new SimpleGrantedAuthority(privilegeName + ":" + action)))
+                        actions.forEach(action ->
+                                groupAuthoritiesRepository.save(new GroupAuthorities(group.getId(), privilegeName + ":" + action)))
                 )
         );
     }
 
     private void removeGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
-        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
                 groupRepository.findById(groupRole.getGroupId()).ifPresent(group -> {
                     // 移除授权actions
                     if (CollectionUtils.isEmpty(actions)) {
-                        userDetailsManager.removeGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":read"));
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(group.getId(), privilege.getName() + ":read");
                     } else {
                         actions.forEach(action ->
-                                userDetailsManager.removeGroupAuthority(group.getName(), new SimpleGrantedAuthority(privilege.getName() + ":" + action)));
+                                groupAuthoritiesRepository.deleteByGroupIdAndAuthority(group.getId(), privilege.getName() + ":" + action));
                     }
                 })
         );
