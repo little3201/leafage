@@ -20,6 +20,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * role repository.
@@ -50,9 +51,10 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
      * Toggles the enabled status of a record by its ID.
      *
      * @param id The ID of the record.
-     * @return true if the update was successful, false otherwise.
+     * @return result.
      */
+    @Transactional
     @Modifying
     @Query("UPDATE Role t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
-    boolean updateEnabledById(Long id);
+    int updateEnabledById(Long id);
 }

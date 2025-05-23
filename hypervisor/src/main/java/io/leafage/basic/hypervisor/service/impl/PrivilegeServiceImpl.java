@@ -132,7 +132,7 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
 
     @Override
     public boolean enable(Long id) {
-        return privilegeRepository.updateEnabledById(id);
+        return privilegeRepository.updateEnabledById(id) > 0;
     }
 
     /**

@@ -100,6 +100,7 @@ public class UserController {
      * @param id       主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String username, Long id) {
         boolean exists;
@@ -136,6 +137,7 @@ public class UserController {
      * @param dto 要修改的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:create')")
     @PostMapping
     public ResponseEntity<UserVO> create(@RequestBody @Valid UserDTO dto) {
         UserVO vo;
@@ -155,6 +157,7 @@ public class UserController {
      * @param dto 要修改的数据
      * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<UserVO> modify(@PathVariable Long id,
                                          @RequestBody @Valid UserDTO dto) {
@@ -166,6 +169,25 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(vo);
+    }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = userService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
     }
 
 }

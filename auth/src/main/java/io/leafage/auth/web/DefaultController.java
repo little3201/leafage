@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class DefaultController {
 
-    @GetMapping("/")
-    public String root() {
-        return "redirect:http://127.0.0.1:5173";
-    }
+//    @GetMapping("/")
+//    public String root() {
+//        return "redirect:http://127.0.0.1:5173";
+//    }
 
 }

@@ -14,26 +14,43 @@
  */
 package io.leafage.basic.hypervisor.repository;
 
-import io.leafage.basic.hypervisor.domain.GroupRoles;
+import io.leafage.basic.hypervisor.domain.UserPrivileges;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * group members repository.
+ * user privileges repository.
  *
  * @author wq li
  */
 @Repository
-public interface GroupRolesRepository extends JpaRepository<GroupRoles, Long> {
+public interface UserPrivilegesRepository extends JpaRepository<UserPrivileges, Long> {
 
     /**
-     * 根据role查group
+     * 根据username查privilege
      *
-     * @param roleId role主键
+     * @param username 账号
      * @return 关联数据集
      */
-    List<GroupRoles> findAllByRoleId(Long roleId);
+    List<UserPrivileges> findAllByUsername(String username);
+
+    /**
+     * 根据user查privilege
+     *
+     * @param username privilege主键
+     * @return 关联数据集
+     */
+    Optional<UserPrivileges> findByUsernameAndPrivilegeId(String username, Long privilegeId);
+
+    /**
+     * 根据privilege查user
+     *
+     * @param privilegeId privilege主键
+     * @return 关联数据集
+     */
+    List<UserPrivileges> findAllByPrivilegeId(Long privilegeId);
 
 }

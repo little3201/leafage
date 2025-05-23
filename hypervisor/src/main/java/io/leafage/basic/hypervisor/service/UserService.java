@@ -45,4 +45,12 @@ public interface UserService extends ServletBasicService<UserDTO, UserVO> {
      * @return Record
      */
     UserVO findByUsername(String username);
+
+    /**
+     * Update accountNonLocked.
+     *
+     * @param id 主键
+     * @return result.
+     */
+    boolean unlock(Long id);
 }

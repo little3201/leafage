@@ -88,7 +88,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean enable(Long id) {
-        return userRepository.updateEnabledById(id);
+        return userRepository.updateEnabledById(id) > 0;
+    }
+
+    @Override
+    public boolean unlock(Long id) {
+        return userRepository.updateAccountNonLockedById(id) > 0;
     }
 
     /**

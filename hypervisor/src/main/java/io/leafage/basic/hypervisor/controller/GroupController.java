@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import top.leafage.common.TreeNode;
 
@@ -241,4 +242,24 @@ public class GroupController {
         }
         return ResponseEntity.ok(voList);
     }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_groups:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = groupService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
+    }
+
 }

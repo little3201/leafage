@@ -110,6 +110,7 @@ public class RoleController {
      * @param id   主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exists;
@@ -128,7 +129,7 @@ public class RoleController {
      * @param dto 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:write')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:create')")
     @PostMapping
     public ResponseEntity<RoleVO> create(@RequestBody @Valid RoleDTO dto) {
         RoleVO vo;
@@ -148,7 +149,7 @@ public class RoleController {
      * @param dto 要修改的数据
      * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:write')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<RoleVO> modify(@PathVariable Long id, @RequestBody @Valid RoleDTO dto) {
         RoleVO vo;
@@ -167,6 +168,7 @@ public class RoleController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {
@@ -176,6 +178,25 @@ public class RoleController {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_roles:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = roleService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
     }
 
     /**

@@ -81,7 +81,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public boolean enable(Long id) {
-        return roleRepository.updateEnabledById(id);
+        return roleRepository.updateEnabledById(id) > 0;
     }
 
     @Override

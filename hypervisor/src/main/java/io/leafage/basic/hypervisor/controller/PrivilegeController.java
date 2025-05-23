@@ -14,10 +14,14 @@
  */
 package io.leafage.basic.hypervisor.controller;
 
+import io.leafage.basic.hypervisor.domain.GroupPrivileges;
 import io.leafage.basic.hypervisor.domain.RolePrivileges;
+import io.leafage.basic.hypervisor.domain.UserPrivileges;
 import io.leafage.basic.hypervisor.dto.PrivilegeDTO;
+import io.leafage.basic.hypervisor.service.GroupPrivilegesService;
 import io.leafage.basic.hypervisor.service.PrivilegeService;
 import io.leafage.basic.hypervisor.service.RolePrivilegesService;
+import io.leafage.basic.hypervisor.service.UserPrivilegesService;
 import io.leafage.basic.hypervisor.vo.PrivilegeVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -45,6 +49,8 @@ public class PrivilegeController {
 
     private final PrivilegeService privilegeService;
     private final RolePrivilegesService rolePrivilegesService;
+    private final GroupPrivilegesService groupPrivilegesService;
+    private final UserPrivilegesService userPrivilegesService;
 
     /**
      * <p>Constructor for PrivilegeController.</p>
@@ -52,9 +58,11 @@ public class PrivilegeController {
      * @param privilegeService      a {@link io.leafage.basic.hypervisor.service.PrivilegeService} object
      * @param rolePrivilegesService a {@link io.leafage.basic.hypervisor.service.RolePrivilegesService} object
      */
-    public PrivilegeController(PrivilegeService privilegeService, RolePrivilegesService rolePrivilegesService) {
+    public PrivilegeController(PrivilegeService privilegeService, RolePrivilegesService rolePrivilegesService, GroupPrivilegesService groupPrivilegesService, UserPrivilegesService userPrivilegesService) {
         this.privilegeService = privilegeService;
         this.rolePrivilegesService = rolePrivilegesService;
+        this.groupPrivilegesService = groupPrivilegesService;
+        this.userPrivilegesService = userPrivilegesService;
     }
 
     /**
@@ -123,6 +131,7 @@ public class PrivilegeController {
      * @param id 主键
      * @return 查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
     @GetMapping("/{id}")
     public ResponseEntity<PrivilegeVO> fetch(@PathVariable Long id) {
         PrivilegeVO vo;
@@ -142,7 +151,7 @@ public class PrivilegeController {
      * @param dto 要添加的数据
      * @return 编辑后的信息，否则返回417状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:write')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
         PrivilegeVO vo;
@@ -161,7 +170,7 @@ public class PrivilegeController {
      * @param id 主键
      * @return 编辑后的信息，否则返回417状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:write')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
         boolean enabled;
@@ -180,6 +189,7 @@ public class PrivilegeController {
      * @param id 主键
      * @return 查询到的数据集，异常时返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:authorize')")
     @GetMapping("/{id}/roles")
     public ResponseEntity<List<RolePrivileges>> roles(@PathVariable Long id) {
         List<RolePrivileges> voList;
@@ -192,5 +202,41 @@ public class PrivilegeController {
         return ResponseEntity.ok(voList);
     }
 
+    /**
+     * 查询关联role
+     *
+     * @param id 主键
+     * @return 查询到的数据集，异常时返回204状态码
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:authorize')")
+    @GetMapping("/{id}/groups")
+    public ResponseEntity<List<GroupPrivileges>> groups(@PathVariable Long id) {
+        List<GroupPrivileges> voList;
+        try {
+            voList = groupPrivilegesService.groups(id);
+        } catch (Exception e) {
+            logger.error("Retrieve privilege groups error: ", e);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(voList);
+    }
 
+    /**
+     * 查询关联role
+     *
+     * @param id 主键
+     * @return 查询到的数据集，异常时返回204状态码
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:authorize')")
+    @GetMapping("/{id}/users")
+    public ResponseEntity<List<UserPrivileges>> users(@PathVariable Long id) {
+        List<UserPrivileges> voList;
+        try {
+            voList = userPrivilegesService.users(id);
+        } catch (Exception e) {
+            logger.error("Retrieve privilege users error: ", e);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(voList);
+    }
 }

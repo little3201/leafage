@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -116,8 +117,8 @@ public class DictionaryController {
      * @param id         主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam Long superiorId, @RequestParam String name, Long id) {
+    @GetMapping("/{superiorId}/exists")
+    public ResponseEntity<Boolean> exists(@PathVariable Long superiorId, @RequestParam String name, Long id) {
         boolean exists;
         try {
             exists = dictionaryService.exists(superiorId, name, id);
@@ -181,4 +182,24 @@ public class DictionaryController {
         }
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_dictionaries:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = dictionaryService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
+    }
+
 }

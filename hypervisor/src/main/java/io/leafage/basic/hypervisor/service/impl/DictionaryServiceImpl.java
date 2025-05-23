@@ -84,7 +84,7 @@ public class DictionaryServiceImpl extends ServletAbstractTreeNodeService<Dictio
 
     @Override
     public boolean enable(Long id) {
-        return dictionaryRepository.updateEnabledById(id);
+        return dictionaryRepository.updateEnabledById(id) > 0;
     }
 
     /**

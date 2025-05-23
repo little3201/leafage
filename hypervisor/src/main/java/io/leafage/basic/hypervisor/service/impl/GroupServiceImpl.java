@@ -60,9 +60,7 @@ public class GroupServiceImpl extends ServletAbstractTreeNodeService<Group> impl
 
         Specification<Group> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (superiorId == null) {
-                predicates.add(cb.isNull(root.get("superiorId")));
-            } else {
+            if (superiorId != null) {
                 predicates.add(cb.equal(root.get("superiorId"), superiorId));
             }
             if (StringUtils.hasText(name)) {
@@ -96,7 +94,7 @@ public class GroupServiceImpl extends ServletAbstractTreeNodeService<Group> impl
 
     @Override
     public boolean enable(Long id) {
-        return groupRepository.updateEnabledById(id);
+        return groupRepository.updateEnabledById(id) > 0;
     }
 
     @Override
