@@ -76,8 +76,8 @@ public class AuthorizationServerConfiguration {
                 .authorizeHttpRequests(authorize ->
                         authorize.anyRequest().authenticated()
                 )
-                // Redirect to the /login page when not authenticated from the authorization endpoint
-                // NOTE: DefaultSecurityConfig is configured with formLogin.loginPage("/login")
+                // Redirect to the login page when not authenticated from the
+                // authorization endpoint
                 .exceptionHandling(exceptions -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
