@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/audit-logs")
 public class AuditLogController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(AuditLogController.class);
 
     private final AuditLogService auditLogService;
@@ -57,7 +57,7 @@ public class AuditLogController {
      */
     @GetMapping
     public ResponseEntity<Page<AuditLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                      String sortBy, boolean descending, String url) {
+                                                     String sortBy, boolean descending, String url) {
         Page<AuditLogVO> voPage;
         try {
             voPage = auditLogService.retrieve(page, size, sortBy, descending, url);

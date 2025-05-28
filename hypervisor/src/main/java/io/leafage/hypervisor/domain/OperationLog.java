@@ -22,7 +22,6 @@ import jakarta.persistence.Table;
 import top.leafage.common.servlet.audit.AuditMetadata;
 
 import java.net.InetAddress;
-import java.time.Instant;
 
 /**
  * model class for operation log.

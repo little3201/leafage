@@ -15,7 +15,6 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.basic.hypervisor.domain.*;
 import io.leafage.hypervisor.domain.*;
 import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.repository.GroupAuthoritiesRepository;

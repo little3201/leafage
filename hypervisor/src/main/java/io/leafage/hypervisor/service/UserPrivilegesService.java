@@ -46,7 +46,7 @@ public interface UserPrivilegesService {
     /**
      * 保存user-privilege关系
      *
-     * @param username 账号
+     * @param username    账号
      * @param privilegeId privilege主键
      * @param actions     操作
      * @return 结果集
@@ -56,7 +56,7 @@ public interface UserPrivilegesService {
     /**
      * 移除user-privilege关系
      *
-     * @param username 账号
+     * @param username    账号
      * @param privilegeId privilege主键
      * @param actions     操作
      */

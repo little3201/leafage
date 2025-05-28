@@ -16,7 +16,6 @@
 package io.leafage.hypervisor.bo;
 
 import java.net.InetAddress;
-import java.time.Instant;
 
 /**
  * bo class for audit log
@@ -42,7 +41,6 @@ public abstract class AuditLogBO {
     private Integer statusCode;
 
     private Long operatedTimes;
-
 
 
     public String getOperator() {
