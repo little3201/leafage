@@ -24,13 +24,13 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>io.leafage.basic</groupId>
-    <artifactId>leafage-basic</artifactId>
+    <groupId>io.leafage</groupId>
+    <artifactId>leafage</artifactId>
     <version>0.1.0</version>
     <packaging>pom</packaging>
 
-    <name>leafage-basic</name>
-    <description>basic module of leafage</description>
+    <name>leafage</name>
+    <description>parent module of leafage</description>
 
     <properties>
         <sonar.projectKey>little3201_leafage-basic</sonar.projectKey>
