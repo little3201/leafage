@@ -21,13 +21,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.ReactiveAuditorAware;
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import reactor.core.publisher.Mono;
-
-import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 /**
  * <p>AuditConfiguration class.</p>
@@ -35,7 +32,6 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
  * @author wq li
  */
 @Configuration
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 @EnableR2dbcAuditing
 public class AuditConfiguration {
 

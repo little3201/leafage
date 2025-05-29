@@ -92,7 +92,7 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
         Flux<Privilege> privilegeFlux = groupMembersRepository.findByUsername(username)
                 .flatMap(groupMember -> groupPrivilegesRepository.findByGroupId(groupMember.getGroupId())
                         .flatMap(groupPrivilege -> addSuperior(groupPrivilege.getPrivilegeId(), new HashSet<>())))
-                .distinct(Privilege::getId);
+                .distinct(Privilege::getId); // 统一去重
 
         return this.buildTree(privilegeFlux);
     }
@@ -160,15 +160,18 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
     }
 
     private Flux<Privilege> addSuperior(Long privilegeId, Set<Long> visited) {
+        if (!visited.add(privilegeId)) {
+            return Flux.empty(); // 已访问，防止死循环
+        }
+
         return privilegeRepository.findById(privilegeId)
                 .filter(ReactiveAuditMetadata::isEnabled)
                 .flatMapMany(privilege -> {
-                    if (privilege.getSuperiorId() == null || !visited.contains(privilege.getId())) {
+                    if (privilege.getSuperiorId() == null) {
                         return Flux.just(privilege);
                     }
                     return addSuperior(privilege.getSuperiorId(), visited)
-                            .concatWithValues(privilege)
-                            .distinct(Privilege::getId);
+                            .concatWithValues(privilege); // 先上级，再自己
                 });
     }
 
