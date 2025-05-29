@@ -19,12 +19,7 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.vo.GroupVO;
-import org.springframework.data.domain.Page;
-import reactor.core.publisher.Mono;
-import top.leafage.common.TreeNode;
 import top.leafage.common.reactive.ReactiveBasicService;
-
-import java.util.List;
 
 /**
  * group service
@@ -33,15 +28,4 @@ import java.util.List;
  */
 public interface GroupService extends ReactiveBasicService<GroupDTO, GroupVO> {
 
-
-    /**
-     * 分页查询
-     *
-     * @param page 页码
-     * @param size 大小
-     * @return 结果集
-     */
-    Mono<Page<GroupVO>> retrieve(int page, int size, String sortBy, boolean descending);
-
-    Mono<List<TreeNode>> tree();
 }

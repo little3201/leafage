@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -56,18 +57,16 @@ public class MessageController {
     /**
      * 分页查询
      *
-     * @param page     页码
-     * @param size     大小
-     * @param receiver 接收者
+     * @param page 页码
+     * @param size 大小
      * @return 查询的数据集，异常时返回204状态码
      */
     @GetMapping
     public ResponseEntity<Mono<Page<MessageVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                          @RequestParam String receiver, String sortBy,
-                                                          boolean descending) {
+                                                          String sortBy, boolean descending, Authentication authentication) {
         Mono<Page<MessageVO>> pageMono;
         try {
-            pageMono = messageService.retrieve(page, size, sortBy, descending, receiver);
+            pageMono = messageService.retrieve(page, size, sortBy, descending, authentication.getName());
         } catch (Exception e) {
             logger.error("Retrieve messages occurred an error: ", e);
             return ResponseEntity.noContent().build();

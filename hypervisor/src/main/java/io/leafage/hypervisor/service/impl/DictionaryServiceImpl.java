@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.reactive.ReactiveAbstractTreeNodeService;
 
 import java.util.NoSuchElementException;
 
@@ -39,7 +38,7 @@ import java.util.NoSuchElementException;
  * @author wq li
  */
 @Service
-public class DictionaryServiceImpl extends ReactiveAbstractTreeNodeService<Dictionary> implements DictionaryService {
+public class DictionaryServiceImpl implements DictionaryService {
 
     private final DictionaryRepository dictionaryRepository;
 
@@ -56,7 +55,7 @@ public class DictionaryServiceImpl extends ReactiveAbstractTreeNodeService<Dicti
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<DictionaryVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<DictionaryVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return dictionaryRepository.findAllBy(pageable)

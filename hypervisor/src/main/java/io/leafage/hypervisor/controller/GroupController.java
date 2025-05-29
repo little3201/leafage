@@ -75,10 +75,10 @@ public class GroupController {
      */
     @GetMapping
     public ResponseEntity<Mono<Page<GroupVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                        String sortBy, boolean descending) {
+                                                        String sortBy, boolean descending, String filters) {
         Mono<Page<GroupVO>> pageMono;
         try {
-            pageMono = groupService.retrieve(page, size, sortBy, descending);
+            pageMono = groupService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve groups occurred an error: ", e);
             return ResponseEntity.noContent().build();

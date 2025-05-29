@@ -19,7 +19,6 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.UserDTO;
 import io.leafage.hypervisor.vo.UserVO;
-import org.springframework.data.domain.Page;
 import reactor.core.publisher.Mono;
 import top.leafage.common.reactive.ReactiveBasicService;
 
@@ -29,15 +28,6 @@ import top.leafage.common.reactive.ReactiveBasicService;
  * @author wq li
  */
 public interface UserService extends ReactiveBasicService<UserDTO, UserVO> {
-
-    /**
-     * 分页查询
-     *
-     * @param page 页码
-     * @param size 大小
-     * @return 结果集
-     */
-    Mono<Page<UserVO>> retrieve(int page, int size, String sortBy, boolean descending);
 
     /**
      * 根据用户名查询

@@ -62,10 +62,10 @@ public class AccessLogController {
      */
     @GetMapping
     public ResponseEntity<Mono<Page<AccessLogVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                            String sortBy, boolean descending) {
+                                                            String sortBy, boolean descending, String filters) {
         Mono<Page<AccessLogVO>> pageMono;
         try {
-            pageMono = accessLogService.retrieve(page, size, sortBy, descending);
+            pageMono = accessLogService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve access logs occurred an error: ", e);
             return ResponseEntity.noContent().build();

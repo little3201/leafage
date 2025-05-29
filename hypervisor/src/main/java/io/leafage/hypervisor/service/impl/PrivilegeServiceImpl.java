@@ -47,7 +47,7 @@ import java.util.Set;
  * @author wq li
  */
 @Service
-public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privilege> implements PrivilegeService {
+public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privilege, Long> implements PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
@@ -68,7 +68,7 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<PrivilegeVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<PrivilegeVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return privilegeRepository.findAllBySuperiorIdIsNull(pageable)
@@ -86,7 +86,7 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
      * {@inheritDoc}
      */
     @Override
-    public Mono<List<TreeNode>> tree(String username) {
+    public Mono<List<TreeNode<Long>>> tree(String username) {
         Assert.hasText(username, "username must not be empty.");
 
         Flux<Privilege> privilegeFlux = groupMembersRepository.findByUsername(username)
@@ -94,7 +94,7 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
                         .flatMap(groupPrivilege -> addSuperior(groupPrivilege.getPrivilegeId(), new HashSet<>())))
                 .distinct(Privilege::getId);
 
-        return this.convertTree(privilegeFlux);
+        return this.buildTree(privilegeFlux);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
      * @param privileges privilege集合
      * @return TreeNode of Flux
      */
-    private Mono<List<TreeNode>> convertTree(Flux<Privilege> privileges) {
+    private Mono<List<TreeNode<Long>>> buildTree(Flux<Privilege> privileges) {
         Set<String> meta = new HashSet<>();
         meta.add("path");
         meta.add("redirect");

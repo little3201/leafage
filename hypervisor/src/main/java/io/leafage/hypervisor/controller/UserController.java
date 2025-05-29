@@ -64,10 +64,10 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<Mono<Page<UserVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending) {
+                                                       String sortBy, boolean descending, String filters) {
         Mono<Page<UserVO>> pageMono;
         try {
-            pageMono = userService.retrieve(page, size, sortBy, descending);
+            pageMono = userService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve users occurred an error: ", e);
             return ResponseEntity.noContent().build();

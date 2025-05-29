@@ -29,7 +29,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.TreeNode;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -57,7 +56,7 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<GroupVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<GroupVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return groupRepository.findAllBy(pageable)
@@ -76,11 +75,6 @@ public class GroupServiceImpl implements GroupService {
             flux = groupRepository.findAllById(ids);
         }
         return flux.map(g -> convertToVO(g, GroupVO.class));
-    }
-
-    @Override
-    public Mono<List<TreeNode>> tree() {
-        return null;
     }
 
     /**

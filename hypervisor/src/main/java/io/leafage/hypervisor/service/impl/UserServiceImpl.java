@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<UserVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<UserVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return userRepository.findAllBy(pageable)

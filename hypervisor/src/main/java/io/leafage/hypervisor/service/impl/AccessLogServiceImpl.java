@@ -49,7 +49,7 @@ public class AccessLogServiceImpl implements AccessLogService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<AccessLogVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<AccessLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return accessLogRepository.findAllBy(pageable)

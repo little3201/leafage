@@ -19,8 +19,6 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.vo.MessageVO;
-import org.springframework.data.domain.Page;
-import reactor.core.publisher.Mono;
 import top.leafage.common.reactive.ReactiveBasicService;
 
 /**
@@ -30,12 +28,4 @@ import top.leafage.common.reactive.ReactiveBasicService;
  */
 public interface MessageService extends ReactiveBasicService<MessageDTO, MessageVO> {
 
-    /**
-     * 分页查询
-     *
-     * @param page 页码
-     * @param size 大小
-     * @return 结果集
-     */
-    Mono<Page<MessageVO>> retrieve(int page, int size, String sortBy, boolean descending, String receiver);
 }

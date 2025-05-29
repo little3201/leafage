@@ -67,10 +67,10 @@ public class PrivilegeController {
      */
     @GetMapping
     public ResponseEntity<Mono<Page<PrivilegeVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                            String sortBy, boolean descending) {
+                                                            String sortBy, boolean descending, String filters) {
         Mono<Page<PrivilegeVO>> pageMono;
         try {
-            pageMono = privilegeService.retrieve(page, size, sortBy, descending);
+            pageMono = privilegeService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve privilege occurred an error: ", e);
             return ResponseEntity.noContent().build();
@@ -84,8 +84,8 @@ public class PrivilegeController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/tree")
-    public ResponseEntity<Mono<List<TreeNode>>> tree(Principal principal) {
-        Mono<List<TreeNode>> authorities;
+    public ResponseEntity<Mono<List<TreeNode<Long>>>> tree(Principal principal) {
+        Mono<List<TreeNode<Long>>> authorities;
         try {
             authorities = privilegeService.tree(principal.getName());
         } catch (Exception e) {

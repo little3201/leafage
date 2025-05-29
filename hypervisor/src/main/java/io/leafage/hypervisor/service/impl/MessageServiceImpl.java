@@ -17,11 +17,9 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.Group;
 import io.leafage.hypervisor.domain.Message;
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.repository.MessageRepository;
-import io.leafage.hypervisor.repository.UserRepository;
 import io.leafage.hypervisor.service.MessageService;
 import io.leafage.hypervisor.vo.MessageVO;
 import org.springframework.data.domain.Page;
@@ -30,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
-import top.leafage.common.reactive.ReactiveAbstractTreeNodeService;
 
 import java.util.NoSuchElementException;
 
@@ -40,7 +37,7 @@ import java.util.NoSuchElementException;
  * @author wq li
  */
 @Service
-public class MessageServiceImpl extends ReactiveAbstractTreeNodeService<Group> implements MessageService {
+public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
 
@@ -49,7 +46,7 @@ public class MessageServiceImpl extends ReactiveAbstractTreeNodeService<Group> i
      *
      * @param messageRepository a {@link MessageRepository} object
      */
-    public MessageServiceImpl(MessageRepository messageRepository, UserRepository userRepository) {
+    public MessageServiceImpl(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
