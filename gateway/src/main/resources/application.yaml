@@ -1,0 +1,17 @@
+server:
+  port: 8760
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gateway
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
