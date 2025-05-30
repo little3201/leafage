@@ -25,7 +25,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.TreeNode;
+import top.leafage.common.poi.ExcelReader;
 
 import java.security.Principal;
 import java.util.List;
@@ -82,8 +84,8 @@ public class PrivilegeController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
     @GetMapping("/tree")
-    public ResponseEntity<List<TreeNode>> tree(Principal principal) {
-        List<TreeNode> treeNodes;
+    public ResponseEntity<List<TreeNode<Long>>> tree(Principal principal) {
+        List<TreeNode<Long>> treeNodes;
         try {
             treeNodes = privilegeService.tree(principal.getName());
         } catch (Exception e) {
@@ -168,6 +170,25 @@ public class PrivilegeController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_privileges:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<PrivilegeVO>> importFromFile(MultipartFile file) {
+        List<PrivilegeVO> voList;
+        try {
+            List<PrivilegeDTO> dtoList = ExcelReader.read(file.getInputStream(), PrivilegeDTO.class);
+            voList = privilegeService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import privilege error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
 }

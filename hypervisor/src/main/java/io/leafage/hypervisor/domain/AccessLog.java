@@ -18,7 +18,9 @@ package io.leafage.hypervisor.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import top.leafage.common.servlet.audit.AuditMetadata;
 
 import java.net.InetAddress;
@@ -29,6 +31,7 @@ import java.net.InetAddress;
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "access_logs")
 public class AccessLog extends AuditMetadata {
 

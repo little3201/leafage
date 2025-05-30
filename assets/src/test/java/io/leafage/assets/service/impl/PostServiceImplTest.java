@@ -64,7 +64,7 @@ class PostServiceImplTest {
     private TagPostsRepository tagPostsRepository;
 
     @InjectMocks
-    private PostsServiceImpl postsService;
+    private PostServiceImpl postsService;
 
     private PostDTO dto;
 

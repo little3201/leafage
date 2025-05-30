@@ -30,7 +30,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.TreeNode;
+import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
@@ -69,15 +71,15 @@ public class GroupController {
      * @param size       大小
      * @param sortBy     排序字段
      * @param descending 排序方向
-     * @param superiorId superior id
+     * @param filters    filters
      * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
      */
     @GetMapping
     public ResponseEntity<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                  String sortBy, boolean descending, Long superiorId, String name) {
+                                                  String sortBy, boolean descending, String filters) {
         Page<GroupVO> voPage;
         try {
-            voPage = groupService.retrieve(page, size, sortBy, descending, superiorId, name);
+            voPage = groupService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve group error: ", e);
             return ResponseEntity.noContent().build();
@@ -91,8 +93,8 @@ public class GroupController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/tree")
-    public ResponseEntity<List<TreeNode>> tree() {
-        List<TreeNode> treeNodes;
+    public ResponseEntity<List<TreeNode<Long>>> tree() {
+        List<TreeNode<Long>> treeNodes;
         try {
             treeNodes = groupService.tree();
         } catch (Exception e) {
@@ -210,6 +212,25 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_groups:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) {
+        List<GroupVO> voList;
+        try {
+            List<GroupDTO> dtoList = ExcelReader.read(file.getInputStream(), GroupDTO.class);
+            voList = groupService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import groups error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
     /**

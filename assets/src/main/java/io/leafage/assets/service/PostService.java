@@ -24,7 +24,7 @@ import top.leafage.common.servlet.ServletBasicService;
  *
  * @author wq li
  */
-public interface PostsService extends ServletBasicService<PostDTO, PostVO> {
+public interface PostService extends ServletBasicService<PostDTO, PostVO> {
 
     Page<PostVO> retrieve(int page, int size, String sortBy, boolean descending);
 }

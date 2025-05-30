@@ -20,6 +20,8 @@ import io.leafage.assets.repository.FileRecordRepository;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
 import jakarta.persistence.criteria.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +30,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +44,8 @@ import java.util.List;
  */
 @Service
 public class FileRecordServiceImpl implements FileRecordService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileRecordServiceImpl.class);
 
     private final FileRecordRepository fileRecordRepository;
 
@@ -64,15 +72,38 @@ public class FileRecordServiceImpl implements FileRecordService {
     @Override
     public boolean exists(String name, Long id) {
         Assert.hasText(name, "name must not be empty.");
-        if (id == null) {
-            return fileRecordRepository.existsByName(name);
-        }
-        return fileRecordRepository.existsByNameAndIdNot(name, id);
+
+        return fileRecordRepository.existsByName(name);
     }
 
     @Override
     public FileRecordVO upload(MultipartFile file) {
-        return null;
+        FileRecord fileRecord = new FileRecord();
+        fileRecord.setName(file.getName());
+        fileRecord.setType(file.getContentType());
+        fileRecord.setSize(file.getSize());
+        fileRecord = fileRecordRepository.save(fileRecord);
+        return convertToVO(fileRecord, FileRecordVO.class);
     }
 
+    @Override
+    public String download(Long id, OutputStream outputStream) {
+        Assert.notNull(id, "id must not be null.");
+
+        return fileRecordRepository.findById(id).map(fileRecord -> {
+            File file = new File(fileRecord.getPath());
+            try {
+                Files.copy(file.toPath(), outputStream);
+                outputStream.close();
+            } catch (IOException e) {
+                logger.error("Failed to process template: {}", fileRecord.getName(), e);
+            }
+            return fileRecord.getName();
+        }).orElseThrow(() -> new RuntimeException("File not found"));
+    }
+
+    @Override
+    public void remove(Long id) {
+        fileRecordRepository.deleteById(id);
+    }
 }

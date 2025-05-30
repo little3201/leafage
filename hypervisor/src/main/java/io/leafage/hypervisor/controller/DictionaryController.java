@@ -26,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 
@@ -200,6 +202,25 @@ public class DictionaryController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_dictionaries:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<DictionaryVO>> importFromFile(MultipartFile file) {
+        List<DictionaryVO> voList;
+        try {
+            List<DictionaryDTO> dtoList = ExcelReader.read(file.getInputStream(), DictionaryDTO.class);
+            voList = dictionaryService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import dictionary error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
 }

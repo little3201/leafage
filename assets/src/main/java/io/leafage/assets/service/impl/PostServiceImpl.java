@@ -23,7 +23,7 @@ import io.leafage.assets.repository.PostContentRepository;
 import io.leafage.assets.repository.PostRepository;
 import io.leafage.assets.repository.TagPostsRepository;
 import io.leafage.assets.repository.TagRepository;
-import io.leafage.assets.service.PostsService;
+import io.leafage.assets.service.PostService;
 import io.leafage.assets.vo.PostVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * @author wq li
  */
 @Service
-public class PostsServiceImpl implements PostsService {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final PostContentRepository postContentRepository;
@@ -60,8 +60,8 @@ public class PostsServiceImpl implements PostsService {
      * @param tagRepository         a {@link TagRepository} object
      * @param tagPostsRepository    a {@link TagPostsRepository} object
      */
-    public PostsServiceImpl(PostRepository postRepository, PostContentRepository postContentRepository,
-                            TagRepository tagRepository, TagPostsRepository tagPostsRepository) {
+    public PostServiceImpl(PostRepository postRepository, PostContentRepository postContentRepository,
+                           TagRepository tagRepository, TagPostsRepository tagPostsRepository) {
         this.postRepository = postRepository;
         this.postContentRepository = postContentRepository;
         this.tagRepository = tagRepository;

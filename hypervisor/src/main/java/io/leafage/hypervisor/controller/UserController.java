@@ -25,8 +25,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * user controller.
@@ -188,6 +191,25 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_users:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<UserVO>> importFromFile(MultipartFile file) {
+        List<UserVO> voList;
+        try {
+            List<UserDTO> dtoList = ExcelReader.read(file.getInputStream(), UserDTO.class);
+            voList = userService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import user error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
 }

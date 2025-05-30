@@ -17,10 +17,12 @@ package io.leafage.hypervisor.controller;
 import io.leafage.hypervisor.domain.RoleMembers;
 import io.leafage.hypervisor.domain.RolePrivileges;
 import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
+import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.service.RoleMembersService;
 import io.leafage.hypervisor.service.RolePrivilegesService;
 import io.leafage.hypervisor.service.RoleService;
+import io.leafage.hypervisor.vo.PrivilegeVO;
 import io.leafage.hypervisor.vo.RoleVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
@@ -198,6 +202,25 @@ public class RoleController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_roles:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<RoleVO>> importFromFile(MultipartFile file) {
+        List<RoleVO> voList;
+        try {
+            List<RoleDTO> dtoList = ExcelReader.read(file.getInputStream(), RoleDTO.class);
+            voList = roleService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import role error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
     /**

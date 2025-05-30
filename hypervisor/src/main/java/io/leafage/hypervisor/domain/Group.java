@@ -16,7 +16,9 @@ package io.leafage.hypervisor.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import top.leafage.common.servlet.audit.AuditMetadata;
 
 /**
@@ -25,6 +27,7 @@ import top.leafage.common.servlet.audit.AuditMetadata;
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "groups")
 public class Group extends AuditMetadata {
 
@@ -36,56 +39,26 @@ public class Group extends AuditMetadata {
     private String description;
 
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
     public Long getSuperiorId() {
         return superiorId;
     }
 
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
     public void setSuperiorId(Long superiorId) {
         this.superiorId = superiorId;
     }
 
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
     public void setDescription(String description) {
         this.description = description;
     }

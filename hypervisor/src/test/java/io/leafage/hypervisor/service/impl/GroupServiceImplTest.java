@@ -71,7 +71,7 @@ class GroupServiceImplTest {
         given(this.groupRepository.findAll(ArgumentMatchers.<Specification<Group>>any(),
                 Mockito.any(Pageable.class))).willReturn(page);
 
-        Page<GroupVO> voPage = groupService.retrieve(0, 2, "id", true, 2L, "test");
+        Page<GroupVO> voPage = groupService.retrieve(0, 2, "id", true, "filter_superiorId:=:2L,filter_name:like:test");
         Assertions.assertNotNull(voPage.getContent());
     }
 
@@ -79,7 +79,7 @@ class GroupServiceImplTest {
     void tree() {
         given(this.groupRepository.findAll()).willReturn(Arrays.asList(Mockito.mock(Group.class), Mockito.mock(Group.class)));
 
-        List<TreeNode> nodes = groupService.tree();
+        List<TreeNode<Long>> nodes = groupService.tree();
         Assertions.assertNotNull(nodes);
     }
 

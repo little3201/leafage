@@ -15,6 +15,7 @@
 package io.leafage.hypervisor.domain;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import top.leafage.common.servlet.audit.AuditMetadata;
 
 import java.util.Set;
@@ -25,6 +26,7 @@ import java.util.Set;
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "privileges")
 public class Privilege extends AuditMetadata {
 

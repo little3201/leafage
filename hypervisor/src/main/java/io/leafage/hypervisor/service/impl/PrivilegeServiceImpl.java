@@ -39,7 +39,7 @@ import java.util.*;
  * @author wq li
  */
 @Service
-public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privilege> implements PrivilegeService {
+public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privilege, Long> implements PrivilegeService {
 
     public final RoleMembersRepository roleMembersRepository;
     public final RolePrivilegesRepository rolePrivilegesRepository;
@@ -77,7 +77,7 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
      * {@inheritDoc}
      */
     @Override
-    public List<TreeNode> tree(String username) {
+    public List<TreeNode<Long>> tree(String username) {
         Assert.hasText(username, "username must not be empty.");
 
         List<RoleMembers> roleMembers = roleMembersRepository.findAllByUsername(username);
@@ -101,7 +101,13 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
         }
 
         List<Privilege> privileges = new ArrayList<>(privilegeMap.values());
-        return this.convertTree(privileges);
+        Set<String> meta = new HashSet<>();
+        meta.add("path");
+        meta.add("redirect");
+        meta.add("component");
+        meta.add("icon");
+        meta.add("actions");
+        return convertToTree(privileges, meta);
     }
 
     /**
@@ -160,25 +166,6 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
                 }
             });
         }
-    }
-
-    /**
-     * 转换为TreeNode
-     *
-     * @param privileges 集合数据
-     * @return 树集合
-     */
-    private List<TreeNode> convertTree(List<Privilege> privileges) {
-        if (CollectionUtils.isEmpty(privileges)) {
-            return Collections.emptyList();
-        }
-        Set<String> meta = new HashSet<>();
-        meta.add("path");
-        meta.add("redirect");
-        meta.add("component");
-        meta.add("icon");
-        meta.add("actions");
-        return convertToTree(privileges, meta);
     }
 
 }

@@ -15,16 +15,19 @@
 
 package io.leafage.assets.controller;
 
-import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
-import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.OutputStream;
 
 /**
  * file controller.
@@ -58,6 +61,7 @@ public class FileController {
      * @param descending 排序方向
      * @return 查询的数据集，异常时返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
     @GetMapping
     public ResponseEntity<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                        String sortBy, boolean descending, String name) {
@@ -77,6 +81,7 @@ public class FileController {
      * @param id 业务id
      * @return 查询的数据，异常时返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
     @GetMapping("/{id}")
     public ResponseEntity<FileRecordVO> fetch(@PathVariable Long id) {
         FileRecordVO vo;
@@ -90,40 +95,47 @@ public class FileController {
     }
 
     /**
-     * 是否存在
-     *
-     * @param name 名称
-     * @param id   主键
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
-        boolean exists;
-        try {
-            exists = fileRecordService.exists(name, id);
-        } catch (Exception e) {
-            logger.info("Check file exists error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 添加信息
      *
-     * @param dto 要添加的数据
+     * @param file 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
     @PostMapping
-    public ResponseEntity<FileRecordVO> create(@RequestBody @Valid FileRecordDTO dto) {
+    public ResponseEntity<FileRecordVO> upload(MultipartFile file) {
         FileRecordVO vo;
         try {
-            vo = fileRecordService.create(dto);
+            boolean existed = fileRecordService.exists(file.getName(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            vo = fileRecordService.upload(file);
         } catch (Exception e) {
-            logger.error("Create file error: ", e);
+            logger.error("Upload file error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
+    }
+
+    /**
+     * 根据 id 查询
+     *
+     * @param id 业务id
+     * @return 查询的数据，异常时返回204状态码
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
+    @GetMapping("/{id}")
+    public ResponseEntity<Void> download(@PathVariable Long id, HttpServletResponse response) {
+        // 设置响应头
+        response.setContentType("application/octet-stream");
+        try (OutputStream os = response.getOutputStream()) {
+            String fileName = fileRecordService.download(id, os);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName + "\"");
+        } catch (Exception e) {
+            logger.error("Generate error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     /**
