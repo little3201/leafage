@@ -124,7 +124,7 @@ public class FileController {
      * @return 查询的数据，异常时返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/download")
     public ResponseEntity<Void> download(@PathVariable Long id, HttpServletResponse response) {
         // 设置响应头
         response.setContentType("application/octet-stream");
