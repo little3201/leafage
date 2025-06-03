@@ -58,7 +58,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Mono<Page<DictionaryVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return dictionaryRepository.findAllBy(pageable)
+        return dictionaryRepository.findAllBySuperiorIdIsNull(pageable)
                 .map(d -> convertToVO(d, DictionaryVO.class))
                 .collectList()
                 .zipWith(dictionaryRepository.count())

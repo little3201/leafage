@@ -73,7 +73,7 @@ public class MessageServiceImpl implements MessageService {
 
         return messageRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .doOnNext(message -> message.setRead(Boolean.TRUE))
+                .doOnNext(message -> message.setUnread(Boolean.TRUE))
                 .flatMap(messageRepository::save)
                 .map(m -> convertToVO(m, MessageVO.class));
     }

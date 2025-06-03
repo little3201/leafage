@@ -17,7 +17,6 @@
 
 package io.leafage.hypervisor.domain;
 
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import top.leafage.common.reactive.audit.ReactiveAuditMetadata;
 
@@ -40,8 +39,7 @@ public class Message extends ReactiveAuditMetadata {
     /**
      * 是否已读
      */
-    @Column(value = "is_read")
-    private boolean read;
+    private boolean unread;
     /**
      * 接收人
      */
@@ -89,17 +87,17 @@ public class Message extends ReactiveAuditMetadata {
      *
      * @return a boolean
      */
-    public boolean isRead() {
-        return read;
+    public boolean isUnread() {
+        return unread;
     }
 
     /**
      * <p>Setter for the field <code>read</code>.</p>
      *
-     * @param read a boolean
+     * @param unread a boolean
      */
-    public void setRead(boolean read) {
-        this.read = read;
+    public void setUnread(boolean unread) {
+        this.unread = unread;
     }
 
     /**

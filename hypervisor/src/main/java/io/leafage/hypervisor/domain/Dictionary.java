@@ -32,7 +32,6 @@ public class Dictionary extends ReactiveAuditMetadata {
     /**
      * 名称
      */
-    @Column(value = "name")
     private String name;
 
     /**
