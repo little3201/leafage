@@ -682,14 +682,13 @@ CREATE TABLE "public"."users"
     "account_non_locked"     bool,
     "account_expires_at"     timestamp(6),
     "credentials_expires_at" timestamp(6),
-    "created_by"             varchar(64),
-    "created_date"           timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "last_modified_by"       varchar(64),
-    "last_modified_date"     timestamp(6),
     "given_name"             varchar(64),
     "family_name"            varchar(64),
     "middle_name"            varchar(64),
-    "phone_number"           varchar(20)
+    "created_by"             varchar(64),
+    "created_date"           timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_modified_by"       varchar(64),
+    "last_modified_date"     timestamp(6)
 )
 ;
 COMMENT
@@ -711,6 +710,12 @@ ON COLUMN "public"."users"."account_expires_at" IS '失效时间';
 COMMENT
 ON COLUMN "public"."users"."credentials_expires_at" IS '密码失效时间';
 COMMENT
+ON COLUMN "public"."users"."given_name" IS '名字';
+COMMENT
+ON COLUMN "public"."users"."family_name" IS '姓';
+COMMENT
+ON COLUMN "public"."users"."middle_name" IS '中间名';
+COMMENT
 ON COLUMN "public"."users"."created_by" IS '创建者';
 COMMENT
 ON COLUMN "public"."users"."created_date" IS '创建时间';
@@ -718,14 +723,6 @@ COMMENT
 ON COLUMN "public"."users"."last_modified_by" IS '最后修改者';
 COMMENT
 ON COLUMN "public"."users"."last_modified_date" IS '最后修改时间';
-COMMENT
-ON COLUMN "public"."users"."given_name" IS '名字';
-COMMENT
-ON COLUMN "public"."users"."family_name" IS '姓';
-COMMENT
-ON COLUMN "public"."users"."middle_name" IS '中间名';
-COMMENT
-ON COLUMN "public"."users"."phone_number" IS '电话号码';
 COMMENT
 ON TABLE "public"."users" IS '用户表';
 

@@ -61,7 +61,7 @@ public class FileController {
      * @param descending 排序方向
      * @return 查询的数据集，异常时返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:read')")
     @GetMapping
     public ResponseEntity<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                        String sortBy, boolean descending, String name) {
@@ -81,7 +81,7 @@ public class FileController {
      * @param id 业务id
      * @return 查询的数据，异常时返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:read')")
     @GetMapping("/{id}")
     public ResponseEntity<FileRecordVO> fetch(@PathVariable Long id) {
         FileRecordVO vo;
@@ -100,7 +100,7 @@ public class FileController {
      * @param file 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
     public ResponseEntity<FileRecordVO> upload(MultipartFile file) {
         FileRecordVO vo;
@@ -123,7 +123,7 @@ public class FileController {
      * @param id 业务id
      * @return 查询的数据，异常时返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")
     public ResponseEntity<Void> download(@PathVariable Long id, HttpServletResponse response) {
         // 设置响应头
@@ -144,6 +144,7 @@ public class FileController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {

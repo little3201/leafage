@@ -51,9 +51,6 @@ public class User extends AuditMetadata {
 
     private String email;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
     private String avatar;
 
     @Column(name = "account_expires_at")
@@ -141,14 +138,6 @@ public class User extends AuditMetadata {
      */
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     /**

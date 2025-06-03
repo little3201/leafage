@@ -15,7 +15,6 @@
 
 package io.leafage.hypervisor.bo;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -25,8 +24,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 public abstract class GroupBO {
 
-    @NotBlank(message = "name must not be empty.")
-    @Column(name = "group_name", nullable = false, unique = true)
+    @NotBlank
     private String name;
 
     private Long superiorId;

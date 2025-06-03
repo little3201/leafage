@@ -29,8 +29,8 @@ import java.util.Set;
 public abstract class PrivilegeBO {
 
 
-    @NotBlank(message = "name must not be empty.")
-    @Size(max = 32, message = "name max length is 32.")
+    @NotBlank
+    @Size(max = 32)
     private String name;
 
     private String path;

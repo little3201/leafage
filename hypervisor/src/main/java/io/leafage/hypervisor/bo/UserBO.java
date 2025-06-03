@@ -26,7 +26,7 @@ import java.time.Instant;
  */
 public abstract class UserBO {
 
-    @NotBlank(message = "username is empty.")
+    @NotBlank
     private String username;
 
     private String givenName;
@@ -36,8 +36,6 @@ public abstract class UserBO {
     private String middleName;
 
     private String email;
-
-    private String phoneNumber;
 
     private String avatar;
 
@@ -106,14 +104,6 @@ public abstract class UserBO {
      */
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     /**
