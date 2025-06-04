@@ -15,6 +15,7 @@
 
 package io.leafage.hypervisor.bo;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
@@ -29,12 +30,15 @@ public abstract class UserBO {
     @NotBlank
     private String username;
 
+    @NotBlank
     private String givenName;
 
+    @NotBlank
     private String familyName;
 
     private String middleName;
 
+    @Email
     private String email;
 
     private String avatar;

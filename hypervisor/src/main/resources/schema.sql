@@ -61,7 +61,6 @@ DROP TABLE IF EXISTS "public"."audit_logs";
 CREATE TABLE "public"."audit_logs"
 (
     "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    "operator"           varchar(255) NOT NULL,
     "operation"          varchar(50)  NOT NULL,
     "resource"           varchar(50)  NOT NULL,
     "old_value"          text,
@@ -79,8 +78,6 @@ CREATE TABLE "public"."audit_logs"
 ;
 COMMENT
 ON COLUMN "public"."audit_logs"."id" IS '主键，自增';
-COMMENT
-ON COLUMN "public"."audit_logs"."operator" IS '操作者';
 COMMENT
 ON COLUMN "public"."audit_logs"."operation" IS '操作类型';
 COMMENT

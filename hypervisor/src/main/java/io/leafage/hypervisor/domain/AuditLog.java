@@ -35,8 +35,6 @@ import java.net.InetAddress;
 @Table(name = "audit_logs")
 public class AuditLog extends AuditMetadata {
 
-    private String operator;
-
     private String operation;
 
     private String resource;
@@ -58,14 +56,6 @@ public class AuditLog extends AuditMetadata {
     @Column(name = "operated_times")
     private Long operatedTimes;
 
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
 
     public String getOperation() {
         return operation;

@@ -15,6 +15,8 @@
 
 package io.leafage.hypervisor.bo;
 
+import java.net.InetAddress;
+
 /**
  * bo class for access log
  *
@@ -30,7 +32,7 @@ public abstract class AccessLogBO {
 
     private String body;
 
-    private String ip;
+    private InetAddress ip;
 
     private String location;
 
@@ -73,11 +75,11 @@ public abstract class AccessLogBO {
         this.body = body;
     }
 
-    public String getIp() {
+    public InetAddress getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public void setIp(InetAddress ip) {
         this.ip = ip;
     }
 

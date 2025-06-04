@@ -24,8 +24,6 @@ import java.net.InetAddress;
  */
 public abstract class AuditLogBO {
 
-    private String operator;
-
     private String operation;
 
     private String resource;
@@ -42,14 +40,6 @@ public abstract class AuditLogBO {
 
     private Long operatedTimes;
 
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
 
     public String getOperation() {
         return operation;
