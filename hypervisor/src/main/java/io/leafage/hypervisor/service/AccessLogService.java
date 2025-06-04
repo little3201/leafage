@@ -26,4 +26,8 @@ import top.leafage.common.servlet.ServletBasicService;
  */
 public interface AccessLogService extends ServletBasicService<AccessLogDTO, AccessLogVO> {
 
+    /**
+     * 清空日志
+     */
+    void clear();
 }

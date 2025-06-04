@@ -74,6 +74,7 @@ public class GroupController {
      * @param filters    filters
      * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
     @GetMapping
     public ResponseEntity<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                   String sortBy, boolean descending, String filters) {
@@ -92,6 +93,7 @@ public class GroupController {
      *
      * @return 查询到的数据，否则返回空
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
     @GetMapping("/tree")
     public ResponseEntity<List<TreeNode<Long>>> tree() {
         List<TreeNode<Long>> treeNodes;
@@ -110,6 +112,7 @@ public class GroupController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
     @GetMapping("/{id}")
     public ResponseEntity<GroupVO> fetch(@PathVariable Long id) {
         GroupVO groupVO;
@@ -129,6 +132,7 @@ public class GroupController {
      * @param id   主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exists;
@@ -147,6 +151,7 @@ public class GroupController {
      * @param dto 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:create')")
     @PostMapping
     public ResponseEntity<GroupVO> create(@Valid @RequestBody GroupDTO dto) {
         GroupVO groupVO;
@@ -166,6 +171,7 @@ public class GroupController {
      * @param dto 要修改的数据
      * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<GroupVO> modify(@PathVariable Long id, @RequestBody GroupDTO dto) {
         GroupVO groupVO;
@@ -184,6 +190,7 @@ public class GroupController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {
@@ -201,7 +208,7 @@ public class GroupController {
      * @param id The record ID.
      * @return 200 status code if successful, or 417 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_groups:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
         boolean enabled;
@@ -219,7 +226,7 @@ public class GroupController {
      *
      * @return 200 status code if successful, or 417 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_groups:import')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:import')")
     @PostMapping("/import")
     public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) {
         List<GroupVO> voList;

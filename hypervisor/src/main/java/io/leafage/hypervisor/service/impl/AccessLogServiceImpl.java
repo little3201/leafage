@@ -97,4 +97,8 @@ public class AccessLogServiceImpl implements AccessLogService {
         accessLogRepository.deleteById(id);
     }
 
+    @Override
+    public void clear() {
+        accessLogRepository.deleteAll();
+    }
 }

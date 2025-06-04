@@ -107,4 +107,20 @@ public class AccessLogController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 清空信息
+     *
+     * @return 如果删除成功，返回200状态码，否则返回417状态码
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_access_logs:clear')")
+    @DeleteMapping
+    public ResponseEntity<Void> clear() {
+        try {
+            accessLogService.clear();
+        } catch (Exception e) {
+            logger.error("Clear access log error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
 }

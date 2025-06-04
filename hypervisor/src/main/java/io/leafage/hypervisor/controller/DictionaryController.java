@@ -62,6 +62,7 @@ public class DictionaryController {
      * @param descending 排序方向
      * @return 查询的数据集，异常时返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
     @GetMapping
     public ResponseEntity<Page<DictionaryVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                        String sortBy, boolean descending, String name) {
@@ -81,6 +82,7 @@ public class DictionaryController {
      * @param id a {@link Long} object
      * @return 查询到的数据，否则返回空
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
     @GetMapping("/{id}/subset")
     public ResponseEntity<List<DictionaryVO>> subset(@PathVariable Long id) {
         List<DictionaryVO> voList;
@@ -99,6 +101,7 @@ public class DictionaryController {
      * @param id 业务id
      * @return 查询的数据，异常时返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
     @GetMapping("/{id}")
     public ResponseEntity<DictionaryVO> fetch(@PathVariable Long id) {
         DictionaryVO vo;
@@ -119,6 +122,7 @@ public class DictionaryController {
      * @param id         主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
     @GetMapping("/{superiorId}/exists")
     public ResponseEntity<Boolean> exists(@PathVariable Long superiorId, @RequestParam String name, Long id) {
         boolean exists;
@@ -137,6 +141,7 @@ public class DictionaryController {
      * @param dto 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:create')")
     @PostMapping
     public ResponseEntity<DictionaryVO> create(@Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
@@ -156,6 +161,7 @@ public class DictionaryController {
      * @param id  a {@link Long} object
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<DictionaryVO> modify(@PathVariable Long id, @Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
@@ -174,6 +180,7 @@ public class DictionaryController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {
@@ -191,7 +198,7 @@ public class DictionaryController {
      * @param id The record ID.
      * @return 200 status code if successful, or 417 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_dictionaries:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
         boolean enabled;
@@ -209,7 +216,7 @@ public class DictionaryController {
      *
      * @return 200 status code if successful, or 417 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_dictionaries:import')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:import')")
     @PostMapping("/import")
     public ResponseEntity<List<DictionaryVO>> importFromFile(MultipartFile file) {
         List<DictionaryVO> voList;

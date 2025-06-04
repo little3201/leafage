@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -55,6 +56,7 @@ public class AuditLogController {
      * @param descending 排序方向
      * @return 查询到数据集，异常时返回204
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs:read')")
     @GetMapping
     public ResponseEntity<Page<AuditLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                      String sortBy, boolean descending, String url) {
@@ -74,6 +76,7 @@ public class AuditLogController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs:read')")
     @GetMapping("/{id}")
     public ResponseEntity<AuditLogVO> fetch(@PathVariable Long id) {
         AuditLogVO vo;
@@ -92,6 +95,7 @@ public class AuditLogController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {

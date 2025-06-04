@@ -95,4 +95,8 @@ public class OperationLogServiceImpl implements OperationLogService {
         operationLogRepository.deleteById(id);
     }
 
+    @Override
+    public void clear() {
+        operationLogRepository.deleteAll();
+    }
 }
