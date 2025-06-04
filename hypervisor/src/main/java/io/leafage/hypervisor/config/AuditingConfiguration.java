@@ -41,7 +41,7 @@ public class AuditingConfiguration {
     /**
      * <p>auditorProvider.</p>
      *
-     * @return a {@link org.springframework.data.domain.AuditorAware} object
+     * @return a {@link AuditorAware} object
      */
     @Bean
     public AuditorAware<String> auditorProvider() {

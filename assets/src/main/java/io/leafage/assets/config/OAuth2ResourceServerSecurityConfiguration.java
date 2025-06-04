@@ -36,8 +36,8 @@ public class OAuth2ResourceServerSecurityConfiguration {
     /**
      * <p>securityFilterChain.</p>
      *
-     * @param http a {@link org.springframework.security.config.annotation.web.builders.HttpSecurity} object
-     * @return a {@link org.springframework.security.web.SecurityFilterChain} object
+     * @param http a {@link HttpSecurity} object
+     * @return a {@link SecurityFilterChain} object
      * @throws java.lang.Exception if any.
      */
     @Bean
