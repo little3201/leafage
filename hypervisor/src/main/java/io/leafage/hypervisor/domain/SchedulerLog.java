@@ -15,10 +15,7 @@
 
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import top.leafage.common.servlet.audit.AuditMetadata;
 
@@ -45,6 +42,7 @@ public class SchedulerLog extends AuditMetadata {
     @Column(name = "next_execute_time")
     private Instant nextExecuteTime;
 
+    @Enumerated(EnumType.STRING)
     private ScheduleStatus status;
 
     private String record;
