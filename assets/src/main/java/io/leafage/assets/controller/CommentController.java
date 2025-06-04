@@ -116,7 +116,7 @@ public class CommentController {
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping
-    public ResponseEntity<CommentVO> create(@RequestBody @Valid CommentDTO dto) {
+    public ResponseEntity<CommentVO> create(@Valid @RequestBody CommentDTO dto) {
         CommentVO vo;
         try {
             vo = commentService.create(dto);

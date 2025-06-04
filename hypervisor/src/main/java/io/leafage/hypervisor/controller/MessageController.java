@@ -95,7 +95,7 @@ public class MessageController {
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public ResponseEntity<MessageVO> create(@RequestBody @Valid MessageDTO dto) {
+    public ResponseEntity<MessageVO> create(@Valid @RequestBody MessageDTO dto) {
         MessageVO vo;
         try {
             vo = messageService.create(dto);

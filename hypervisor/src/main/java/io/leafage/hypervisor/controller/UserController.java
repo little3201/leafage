@@ -142,7 +142,7 @@ public class UserController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:create')")
     @PostMapping
-    public ResponseEntity<UserVO> create(@RequestBody @Valid UserDTO dto) {
+    public ResponseEntity<UserVO> create(@Valid @RequestBody UserDTO dto) {
         UserVO vo;
         try {
             vo = userService.create(dto);
@@ -163,7 +163,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<UserVO> modify(@PathVariable Long id,
-                                         @RequestBody @Valid UserDTO dto) {
+                                         @Valid @RequestBody UserDTO dto) {
         UserVO vo;
         try {
             vo = userService.modify(id, dto);

@@ -113,7 +113,7 @@ public class TagController {
      * @return tag信息
      */
     @PostMapping
-    public ResponseEntity<TagVO> create(@RequestBody @Valid TagDTO dto) {
+    public ResponseEntity<TagVO> create(@Valid @RequestBody TagDTO dto) {
         TagVO categoryVO;
         try {
             categoryVO = tagService.create(dto);
@@ -132,7 +132,7 @@ public class TagController {
      * @return 修改后的tag信息
      */
     @PutMapping("/{id}")
-    public ResponseEntity<TagVO> modify(@PathVariable Long id, @RequestBody @Valid TagDTO categoryDTO) {
+    public ResponseEntity<TagVO> modify(@PathVariable Long id, @Valid @RequestBody TagDTO categoryDTO) {
         TagVO categoryVO;
         try {
             categoryVO = tagService.modify(id, categoryDTO);

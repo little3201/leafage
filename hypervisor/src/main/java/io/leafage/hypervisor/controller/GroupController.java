@@ -148,7 +148,7 @@ public class GroupController {
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public ResponseEntity<GroupVO> create(@RequestBody @Valid GroupDTO dto) {
+    public ResponseEntity<GroupVO> create(@Valid @RequestBody GroupDTO dto) {
         GroupVO groupVO;
         try {
             groupVO = groupService.create(dto);

@@ -142,7 +142,7 @@ public class PrivilegeController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
+    public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @Valid @RequestBody PrivilegeDTO dto) {
         PrivilegeVO vo;
         try {
             vo = privilegeService.modify(id, dto);

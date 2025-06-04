@@ -17,12 +17,10 @@ package io.leafage.hypervisor.controller;
 import io.leafage.hypervisor.domain.RoleMembers;
 import io.leafage.hypervisor.domain.RolePrivileges;
 import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
-import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.service.RoleMembersService;
 import io.leafage.hypervisor.service.RolePrivilegesService;
 import io.leafage.hypervisor.service.RoleService;
-import io.leafage.hypervisor.vo.PrivilegeVO;
 import io.leafage.hypervisor.vo.RoleVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -136,7 +134,7 @@ public class RoleController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:create')")
     @PostMapping
-    public ResponseEntity<RoleVO> create(@RequestBody @Valid RoleDTO dto) {
+    public ResponseEntity<RoleVO> create(@Valid @RequestBody RoleDTO dto) {
         RoleVO vo;
         try {
             vo = roleService.create(dto);
@@ -156,7 +154,7 @@ public class RoleController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<RoleVO> modify(@PathVariable Long id, @RequestBody @Valid RoleDTO dto) {
+    public ResponseEntity<RoleVO> modify(@PathVariable Long id, @Valid @RequestBody RoleDTO dto) {
         RoleVO vo;
         try {
             vo = roleService.modify(id, dto);

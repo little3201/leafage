@@ -119,7 +119,7 @@ public class RegionController {
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public ResponseEntity<RegionVO> create(@RequestBody @Valid RegionDTO dto) {
+    public ResponseEntity<RegionVO> create(@Valid @RequestBody RegionDTO dto) {
         RegionVO vo;
         try {
             vo = regionService.create(dto);

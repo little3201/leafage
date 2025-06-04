@@ -121,7 +121,7 @@ public class PostController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:create')")
     @PostMapping
-    public ResponseEntity<PostVO> create(@RequestBody @Valid PostDTO dto) {
+    public ResponseEntity<PostVO> create(@Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
             vo = postService.create(dto);
@@ -141,7 +141,7 @@ public class PostController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO dto) {
+    public ResponseEntity<PostVO> modify(@PathVariable Long id, @Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
             vo = postService.modify(id, dto);

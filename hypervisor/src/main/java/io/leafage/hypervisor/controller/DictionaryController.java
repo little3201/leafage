@@ -138,7 +138,7 @@ public class DictionaryController {
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public ResponseEntity<DictionaryVO> create(@RequestBody @Valid DictionaryDTO dto) {
+    public ResponseEntity<DictionaryVO> create(@Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
         try {
             vo = dictionaryService.create(dto);
@@ -157,7 +157,7 @@ public class DictionaryController {
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public ResponseEntity<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
+    public ResponseEntity<DictionaryVO> modify(@PathVariable Long id, @Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
         try {
             vo = dictionaryService.modify(id, dto);
