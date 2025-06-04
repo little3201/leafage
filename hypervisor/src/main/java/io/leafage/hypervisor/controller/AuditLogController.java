@@ -56,7 +56,7 @@ public class AuditLogController {
      * @param descending 排序方向
      * @return 查询到数据集，异常时返回204
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs')")
     @GetMapping
     public ResponseEntity<Page<AuditLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                      String sortBy, boolean descending, String url) {
@@ -76,7 +76,7 @@ public class AuditLogController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs')")
     @GetMapping("/{id}")
     public ResponseEntity<AuditLogVO> fetch(@PathVariable Long id) {
         AuditLogVO vo;

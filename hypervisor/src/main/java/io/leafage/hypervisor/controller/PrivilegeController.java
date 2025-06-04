@@ -63,7 +63,7 @@ public class PrivilegeController {
      * @param descending 排序方向
      * @return 查询到的数据，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping
     public ResponseEntity<Page<PrivilegeVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                       String sortBy, boolean descending, String name) {
@@ -82,7 +82,6 @@ public class PrivilegeController {
      *
      * @return 查询到的数据，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
     @GetMapping("/tree")
     public ResponseEntity<List<TreeNode<Long>>> tree(Principal principal) {
         List<TreeNode<Long>> treeNodes;
@@ -101,7 +100,7 @@ public class PrivilegeController {
      * @param superiorId 主键
      * @return 查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping("/{superiorId}/subset")
     public ResponseEntity<List<PrivilegeVO>> subset(@PathVariable Long superiorId) {
         List<PrivilegeVO> voList;
@@ -120,7 +119,7 @@ public class PrivilegeController {
      * @param id 主键
      * @return 查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping("/{id}")
     public ResponseEntity<PrivilegeVO> fetch(@PathVariable Long id) {
         PrivilegeVO vo;

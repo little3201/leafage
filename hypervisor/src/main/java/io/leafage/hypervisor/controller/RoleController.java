@@ -73,7 +73,7 @@ public class RoleController {
      * @param descending 排序方向
      * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping
     public ResponseEntity<Page<RoleVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                  String sortBy, boolean descending, String name) {
@@ -93,7 +93,7 @@ public class RoleController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping("/{id}")
     public ResponseEntity<RoleVO> fetch(@PathVariable Long id) {
         RoleVO vo;
@@ -113,7 +113,7 @@ public class RoleController {
      * @param id   主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exists;

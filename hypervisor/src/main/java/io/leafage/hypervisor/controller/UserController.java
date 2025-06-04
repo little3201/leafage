@@ -63,7 +63,7 @@ public class UserController {
      * @param username   username
      * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping
     public ResponseEntity<Page<UserVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                  String sortBy, boolean descending, String username) {
@@ -83,7 +83,7 @@ public class UserController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping("/{id}")
     public ResponseEntity<UserVO> fetch(@PathVariable Long id) {
         UserVO vo;
@@ -103,7 +103,7 @@ public class UserController {
      * @param id       主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String username, Long id) {
         boolean exists;

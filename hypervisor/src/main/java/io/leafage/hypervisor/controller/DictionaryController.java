@@ -62,7 +62,7 @@ public class DictionaryController {
      * @param descending 排序方向
      * @return 查询的数据集，异常时返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping
     public ResponseEntity<Page<DictionaryVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                        String sortBy, boolean descending, String name) {
@@ -82,7 +82,7 @@ public class DictionaryController {
      * @param id a {@link Long} object
      * @return 查询到的数据，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{id}/subset")
     public ResponseEntity<List<DictionaryVO>> subset(@PathVariable Long id) {
         List<DictionaryVO> voList;
@@ -101,7 +101,7 @@ public class DictionaryController {
      * @param id 业务id
      * @return 查询的数据，异常时返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{id}")
     public ResponseEntity<DictionaryVO> fetch(@PathVariable Long id) {
         DictionaryVO vo;
@@ -122,7 +122,7 @@ public class DictionaryController {
      * @param id         主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{superiorId}/exists")
     public ResponseEntity<Boolean> exists(@PathVariable Long superiorId, @RequestParam String name, Long id) {
         boolean exists;

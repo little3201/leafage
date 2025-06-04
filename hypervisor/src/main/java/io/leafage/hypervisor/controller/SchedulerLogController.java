@@ -43,7 +43,7 @@ public class SchedulerLogController {
      * @param filters    The filters.
      * @return A paginated list of records, or 204 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:read')")
+    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs')")
     @GetMapping
     public ResponseEntity<Page<SchedulerLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                          String sortBy, boolean descending, String filters) {
@@ -63,7 +63,7 @@ public class SchedulerLogController {
      * @param id The record ID.
      * @return The record data, or 204 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:read')")
+    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs')")
     @GetMapping("/{id}")
     public ResponseEntity<SchedulerLogVO> fetch(@PathVariable Long id) {
         SchedulerLogVO vo;
@@ -83,7 +83,7 @@ public class SchedulerLogController {
      * @param id   The record ID.
      * @return True if the record exists, or 204 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:read')")
+    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exist;

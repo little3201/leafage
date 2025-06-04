@@ -74,7 +74,7 @@ public class GroupController {
      * @param filters    filters
      * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping
     public ResponseEntity<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                   String sortBy, boolean descending, String filters) {
@@ -93,7 +93,7 @@ public class GroupController {
      *
      * @return 查询到的数据，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/tree")
     public ResponseEntity<List<TreeNode<Long>>> tree() {
         List<TreeNode<Long>> treeNodes;
@@ -112,7 +112,7 @@ public class GroupController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/{id}")
     public ResponseEntity<GroupVO> fetch(@PathVariable Long id) {
         GroupVO groupVO;
@@ -132,7 +132,7 @@ public class GroupController {
      * @param id   主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exists;

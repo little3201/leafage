@@ -61,7 +61,7 @@ public class PostController {
      * @param descending a boolean
      * @return 分页结果集
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
     @GetMapping
     public ResponseEntity<Page<PostVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                  String sortBy, boolean descending) {
@@ -81,7 +81,7 @@ public class PostController {
      * @param id 主键
      * @return 帖子信息，不包括内容
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
     @GetMapping("/{id}")
     public ResponseEntity<PostVO> fetch(@PathVariable Long id) {
         PostVO vo;
