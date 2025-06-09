@@ -19,16 +19,11 @@ import io.leafage.hypervisor.dto.UserDTO;
 import io.leafage.hypervisor.repository.UserRepository;
 import io.leafage.hypervisor.service.UserService;
 import io.leafage.hypervisor.vo.UserVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * user service impl.
@@ -53,16 +48,12 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public Page<UserVO> retrieve(int page, int size, String sortBy, boolean descending, String username) {
+    public Page<UserVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<User> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(username)) {
-                predicates.add(cb.like(root.get("username"), "%" + username + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<User> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
+
         return userRepository.findAll(spec, pageable)
                 .map(user -> convertToVO(user, UserVO.class));
     }

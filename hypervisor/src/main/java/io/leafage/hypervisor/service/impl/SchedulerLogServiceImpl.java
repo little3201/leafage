@@ -60,7 +60,7 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
 
     @Override
     public boolean exists(String name, Long id) {
-        Assert.hasText(name, "name must not be null.");
+        Assert.hasText(name, "name must not be empty.");
         if (id == null) {
             return schedulerLogRepository.existsByName(name);
         }

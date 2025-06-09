@@ -61,10 +61,10 @@ public class CommentController {
      */
     @GetMapping
     public ResponseEntity<Page<CommentVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                    String sortBy, boolean descending) {
+                                                    String sortBy, boolean descending, String filters) {
         Page<CommentVO> voPage;
         try {
-            voPage = commentService.retrieve(page, size, sortBy, descending);
+            voPage = commentService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve comment error: ", e);
             return ResponseEntity.noContent().build();

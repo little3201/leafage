@@ -47,14 +47,16 @@ public class OperationLogController {
         this.operationLogService = operationLogService;
     }
 
+
     /**
-     * 查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 查询到数据集，异常时返回204
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_operation_logs')")
     @GetMapping

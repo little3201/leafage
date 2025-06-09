@@ -20,15 +20,12 @@ import io.leafage.hypervisor.dto.DictionaryDTO;
 import io.leafage.hypervisor.repository.DictionaryRepository;
 import io.leafage.hypervisor.service.DictionaryService;
 import io.leafage.hypervisor.vo.DictionaryVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,17 +51,11 @@ public class DictionaryServiceImpl implements DictionaryService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DictionaryVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
+    public Page<DictionaryVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Dictionary> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.isNull(root.get("superiorId")));
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Dictionary> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
 
         return dictionaryRepository.findAll(spec, pageable)
                 .map(dictionary -> convertToVO(dictionary, DictionaryVO.class));

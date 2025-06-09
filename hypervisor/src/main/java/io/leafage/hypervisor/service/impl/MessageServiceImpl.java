@@ -54,16 +54,11 @@ public class MessageServiceImpl implements MessageService {
      * {@inheritDoc}
      */
     @Override
-    public Page<MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String title) {
+    public Page<MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Message> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(title)) {
-                predicates.add(cb.like(root.get("title"), "%" + title + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Message> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
 
         return messageRepository.findAll(spec, pageable)
                 .map(message -> convertToVO(message, MessageVO.class));

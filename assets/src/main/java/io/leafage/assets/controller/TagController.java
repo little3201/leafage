@@ -58,10 +58,10 @@ public class TagController {
      */
     @GetMapping
     public ResponseEntity<Page<TagVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                String sortBy, boolean descending) {
+                                                String sortBy, boolean descending, String filters) {
         Page<TagVO> voPage;
         try {
-            voPage = tagService.retrieve(page, size, sortBy, descending);
+            voPage = tagService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve posts error: ", e);
             return ResponseEntity.noContent().build();

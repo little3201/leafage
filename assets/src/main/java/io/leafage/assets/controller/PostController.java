@@ -64,10 +64,10 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
     @GetMapping
     public ResponseEntity<Page<PostVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                 String sortBy, boolean descending) {
+                                                 String sortBy, boolean descending, String filters) {
         Page<PostVO> voPage;
         try {
-            voPage = postService.retrieve(page, size, sortBy, descending);
+            voPage = postService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve posts error: ", e);
             return ResponseEntity.noContent().build();

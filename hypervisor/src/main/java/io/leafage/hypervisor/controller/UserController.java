@@ -53,23 +53,24 @@ public class UserController {
         this.userService = userService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @param username   username
-     * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping
     public ResponseEntity<Page<UserVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                 String sortBy, boolean descending, String username) {
+                                                 String sortBy, boolean descending, String filters) {
         Page<UserVO> voPage;
         try {
-            voPage = userService.retrieve(page, size, sortBy, descending, username);
+            voPage = userService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve user error: ", e);
             return ResponseEntity.noContent().build();

@@ -64,10 +64,10 @@ public class RegionController {
      */
     @GetMapping
     public ResponseEntity<Page<RegionVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                   String sortBy, boolean descending, Long superiorId, String name) {
+                                                   String sortBy, boolean descending, String filters) {
         Page<RegionVO> voPage;
         try {
-            voPage = regionService.retrieve(page, size, sortBy, descending, superiorId, name);
+            voPage = regionService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve region error: ", e);
             return ResponseEntity.noContent().build();

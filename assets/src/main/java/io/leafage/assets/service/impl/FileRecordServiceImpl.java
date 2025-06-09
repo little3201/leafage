@@ -19,7 +19,6 @@ import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.repository.FileRecordRepository;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
-import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -27,15 +26,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * file service impl.
@@ -54,19 +50,23 @@ public class FileRecordServiceImpl implements FileRecordService {
     }
 
     @Override
-    public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
+    public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<FileRecord> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<FileRecord> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
 
         return fileRecordRepository.findAll(spec, pageable)
                 .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class));
+    }
+
+    @Override
+    public FileRecordVO fetch(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return fileRecordRepository.findById(id)
+                .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class))
+                .orElse(null);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class FileRecordServiceImpl implements FileRecordService {
     public FileRecordVO upload(MultipartFile file) {
         FileRecord fileRecord = new FileRecord();
         fileRecord.setName(file.getName());
-        fileRecord.setType(file.getContentType());
+        fileRecord.setMimeType(file.getContentType());
         fileRecord.setSize(file.getSize());
         fileRecord = fileRecordRepository.save(fileRecord);
         return convertToVO(fileRecord, FileRecordVO.class);

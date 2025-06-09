@@ -47,22 +47,24 @@ public class AccessLogController {
         this.accessLogService = accessLogService;
     }
 
+
     /**
-     * 查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 查询到数据集，异常时返回204
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_access_logs')")
     @GetMapping
     public ResponseEntity<Page<AccessLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                      String sortBy, boolean descending, String url) {
+                                                      String sortBy, boolean descending, String filters) {
         Page<AccessLogVO> voPage;
         try {
-            voPage = accessLogService.retrieve(page, size, sortBy, descending, url);
+            voPage = accessLogService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve record error: ", e);
             return ResponseEntity.noContent().build();

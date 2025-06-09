@@ -34,7 +34,8 @@ public class FileRecord extends AuditMetadata {
 
     private String path;
 
-    private String type;
+    @Column(name = "mime_type")
+    private String mimeType;
 
     private float size;
 
@@ -54,12 +55,12 @@ public class FileRecord extends AuditMetadata {
         this.path = path;
     }
 
-    public String getType() {
-        return type;
+    public String getMimeType() {
+        return mimeType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setMimeType(String type) {
+        this.mimeType = type;
     }
 
     public float getSize() {

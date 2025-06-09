@@ -31,7 +31,7 @@ public abstract class FileRecordBO {
     private String path;
 
     @NotBlank
-    private String type;
+    private String mimeType;
 
     private float size;
 
@@ -52,12 +52,12 @@ public abstract class FileRecordBO {
         this.path = path;
     }
 
-    public String getType() {
-        return type;
+    public String getMimeType() {
+        return mimeType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
     public float getSize() {

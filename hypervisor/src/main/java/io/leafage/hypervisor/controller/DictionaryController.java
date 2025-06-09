@@ -53,22 +53,24 @@ public class DictionaryController {
         this.dictionaryService = dictionaryService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 查询的数据集，异常时返回204状态码
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping
     public ResponseEntity<Page<DictionaryVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending, String name) {
+                                                       String sortBy, boolean descending, String filters) {
         Page<DictionaryVO> voPage;
         try {
-            voPage = dictionaryService.retrieve(page, size, sortBy, descending, name);
+            voPage = dictionaryService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve dictionary error: ", e);
             return ResponseEntity.noContent().build();

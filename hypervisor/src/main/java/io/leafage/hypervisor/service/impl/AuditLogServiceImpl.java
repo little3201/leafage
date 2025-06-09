@@ -55,16 +55,11 @@ public class AuditLogServiceImpl implements AuditLogService {
      * {@inheritDoc}
      */
     @Override
-    public Page<AuditLogVO> retrieve(int page, int size, String sortBy, boolean descending, String operation) {
+    public Page<AuditLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<AuditLog> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(operation)) {
-                predicates.add(cb.like(root.get("operation"), "%" + operation + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<AuditLog> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
 
         return auditLogRepository.findAll(spec, pageable)
                 .map(auditLog -> convertToVO(auditLog, AuditLogVO.class));

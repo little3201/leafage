@@ -17,7 +17,6 @@ package io.leafage.assets.service;
 
 import io.leafage.assets.dto.RegionDTO;
 import io.leafage.assets.vo.RegionVO;
-import org.springframework.data.domain.Page;
 import top.leafage.common.servlet.ServletBasicService;
 
 /**
@@ -26,16 +25,5 @@ import top.leafage.common.servlet.ServletBasicService;
  * @author wq li
  */
 public interface RegionService extends ServletBasicService<RegionDTO, RegionVO> {
-
-    /**
-     * 分页查询
-     *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序
-     * @param descending 顺序
-     * @return 查询结果
-     */
-    Page<RegionVO> retrieve(int page, int size, String sortBy, boolean descending, Long superiorId, String name);
 
 }

@@ -55,16 +55,11 @@ public class AccessLogServiceImpl implements AccessLogService {
      * {@inheritDoc}
      */
     @Override
-    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String url) {
+    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<AccessLog> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(url)) {
-                predicates.add(cb.like(root.get("url"), "%" + url + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<AccessLog> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
 
         return accessLogRepository.findAll(spec, pageable)
                 .map(accessLog -> convertToVO(accessLog, AccessLogVO.class));

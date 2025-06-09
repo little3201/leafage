@@ -21,6 +21,7 @@ import io.leafage.hypervisor.service.GroupService;
 import io.leafage.hypervisor.vo.GroupVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.TreeNode;
@@ -54,7 +55,10 @@ public class GroupServiceImpl extends ServletAbstractTreeNodeService<Group, Long
     public Page<GroupVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return groupRepository.findAll(pageable).map(group -> convertToVO(group, GroupVO.class));
+        Specification<Group> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
+
+        return groupRepository.findAll(spec, pageable).map(group -> convertToVO(group, GroupVO.class));
     }
 
     /**

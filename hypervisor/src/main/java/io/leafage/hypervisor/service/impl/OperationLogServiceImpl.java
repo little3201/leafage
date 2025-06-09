@@ -20,16 +20,11 @@ import io.leafage.hypervisor.dto.OperationLogDTO;
 import io.leafage.hypervisor.repository.OperationLogRepository;
 import io.leafage.hypervisor.service.OperationLogService;
 import io.leafage.hypervisor.vo.OperationLogVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * operation log service impl.
@@ -54,16 +49,11 @@ public class OperationLogServiceImpl implements OperationLogService {
      * {@inheritDoc}
      */
     @Override
-    public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String operation) {
+    public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<OperationLog> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(operation)) {
-                predicates.add(cb.like(root.get("operation"), "%" + operation + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<OperationLog> spec = (root, query, cb) ->
+                buildJpaPredicate(filters, cb, root).orElse(null);
 
         return operationLogRepository.findAll(spec, pageable)
                 .map(operationLog -> convertToVO(operationLog, OperationLogVO.class));

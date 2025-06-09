@@ -64,10 +64,10 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping
     public ResponseEntity<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending, String name) {
+                                                       String sortBy, boolean descending, String filters) {
         Page<FileRecordVO> voPage;
         try {
-            voPage = fileRecordService.retrieve(page, size, sortBy, descending, name);
+            voPage = fileRecordService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve file error: ", e);
             return ResponseEntity.noContent().build();

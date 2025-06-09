@@ -61,7 +61,7 @@ public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privile
      * {@inheritDoc}
      */
     @Override
-    public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
+    public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return privilegeRepository.findAllBySuperiorIdIsNull(pageable)

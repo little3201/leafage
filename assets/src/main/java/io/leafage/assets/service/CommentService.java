@@ -17,7 +17,6 @@ package io.leafage.assets.service;
 
 import io.leafage.assets.dto.CommentDTO;
 import io.leafage.assets.vo.CommentVO;
-import org.springframework.data.domain.Page;
 import top.leafage.common.servlet.ServletBasicService;
 
 import java.util.List;
@@ -28,8 +27,6 @@ import java.util.List;
  * @author wq li
  */
 public interface CommentService extends ServletBasicService<CommentDTO, CommentVO> {
-
-    Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending);
 
     /**
      * 根据posts查询

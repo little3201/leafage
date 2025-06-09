@@ -54,22 +54,24 @@ public class PrivilegeController {
         this.privilegeService = privilegeService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 查询到的数据，否则返回空
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping
     public ResponseEntity<Page<PrivilegeVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                      String sortBy, boolean descending, String name) {
+                                                      String sortBy, boolean descending, String filters) {
         Page<PrivilegeVO> voPage;
         try {
-            voPage = privilegeService.retrieve(page, size, sortBy, descending, name);
+            voPage = privilegeService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve privilege error: ", e);
             return ResponseEntity.noContent().build();
