@@ -27,7 +27,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,12 +65,11 @@ class TagServiceImplTest {
 
     @Test
     void retrieve() {
-        Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Tag> page = new PageImpl<>(List.of(Mockito.mock(Tag.class)), pageable, 2L);
+        Page<Tag> page = new PageImpl<>(List.of(Mockito.mock(Tag.class)));
         given(tagRepository.findAll(Mockito.any(PageRequest.class))).willReturn(page);
 
         given(tagPostsRepository.countByTagId(Mockito.anyLong())).willReturn(Mockito.anyLong());
-        Page<TagVO> voPage = tagService.retrieve(0, 2, "id", true);
+        Page<TagVO> voPage = tagService.retrieve(0, 2, "id", true, "");
 
         Assertions.assertNotNull(voPage.getContent());
     }
@@ -104,8 +105,6 @@ class TagServiceImplTest {
     void create() {
         given(tagRepository.saveAndFlush(Mockito.any(Tag.class))).willReturn(Mockito.mock(Tag.class));
 
-        given(tagPostsRepository.countByTagId(Mockito.anyLong())).willReturn(2L);
-
         TagVO categoryVO = tagService.create(Mockito.mock(TagDTO.class));
 
         verify(tagRepository, times(1)).saveAndFlush(Mockito.any(Tag.class));
@@ -117,8 +116,6 @@ class TagServiceImplTest {
         given(tagRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Tag.class)));
 
         given(tagRepository.save(Mockito.any(Tag.class))).willReturn(Mockito.mock(Tag.class));
-
-        given(tagPostsRepository.countByTagId(Mockito.anyLong())).willReturn(Mockito.anyLong());
 
         TagVO categoryVO = tagService.modify(1L, dto);
 

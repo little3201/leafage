@@ -82,7 +82,7 @@ class TagControllerTest {
         Page<TagVO> page = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean())).willReturn(page);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
 
         mvc.perform(get("/tags").queryParam("page", "0")
                         .queryParam("size", "2").queryParam("sortBy", "id"))
@@ -92,10 +92,14 @@ class TagControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean())).willThrow(new RuntimeException());
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/tags").queryParam("page", "0")
-                        .queryParam("size", "2").queryParam("sortBy", "id"))
+        mvc.perform(get("/tags")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }

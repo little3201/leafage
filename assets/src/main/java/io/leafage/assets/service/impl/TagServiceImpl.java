@@ -52,8 +52,9 @@ public class TagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
-    public Page<TagVO> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Page<TagVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+
         return tagRepository.findAll(pageable).map(tag -> {
             TagVO vo = convertToVO(tag, TagVO.class);
             long count = tagPostsRepository.countByTagId(tag.getId());

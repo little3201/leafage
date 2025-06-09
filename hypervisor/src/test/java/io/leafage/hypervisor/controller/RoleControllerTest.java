@@ -96,8 +96,11 @@ class RoleControllerTest {
         given(this.roleService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
 
-        mvc.perform(get("/roles").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/roles")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())
@@ -109,8 +112,11 @@ class RoleControllerTest {
         given(this.roleService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/roles").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/roles")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true"))
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();

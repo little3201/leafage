@@ -71,7 +71,7 @@ class RegionServiceImplTest {
 
         given(this.regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(), Mockito.any(Pageable.class))).willReturn(page);
 
-        Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, null, "test");
+        Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
         Assertions.assertNotNull(voPage.getContent());
     }
 

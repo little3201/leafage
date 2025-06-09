@@ -90,11 +90,15 @@ class RegionControllerTest {
 
         // 使用 eq() 准确匹配参数
         given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.isNull(), Mockito.anyString())).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         // 调用接口并验证结果
-        mvc.perform(get("/regions").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/regions")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())

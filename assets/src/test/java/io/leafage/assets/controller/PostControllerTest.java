@@ -70,16 +70,17 @@ class PostControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new PostVO(1L, true, Instant.now());
-        vo.setTitle(dto.getTitle());
-        vo.setTags(dto.getTags());
-
         // 构造请求对象
         dto = new PostDTO();
         dto.setTitle("test");
         dto.setTags(Set.of("Code"));
         dto.setTags(Collections.singleton("java"));
         dto.setContent("content");
+
+        vo = new PostVO(1L, true, Instant.now());
+        vo.setTitle(dto.getTitle());
+        vo.setTags(dto.getTags());
+
     }
 
     @Test
@@ -87,10 +88,11 @@ class PostControllerTest {
         Page<PostVO> page = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean())).willReturn(page);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
 
-        mvc.perform(get("/posts").queryParam("page", "0")
-                        .queryParam("size", "2").queryParam("sortBy", "id"))
+        mvc.perform(get("/posts")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print()).andReturn();
@@ -99,10 +101,14 @@ class PostControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean())).willThrow(new RuntimeException());
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/posts").queryParam("page", "0")
-                        .queryParam("size", "2").queryParam("sortBy", "id"))
+        mvc.perform(get("/posts")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }

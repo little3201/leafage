@@ -31,6 +31,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.List;
 
@@ -60,9 +62,9 @@ class AccessLogControllerTest {
     private AccessLogVO vo;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
         vo = new AccessLogVO(1L, true, Instant.now());
-        vo.setIp("12.1.3.2");
+        vo.setIp(InetAddress.getByName("12.1.3.2"));
         vo.setLocation("test");
         vo.setHttpMethod("POST");
         vo.setResponseTimes(232L);

@@ -16,6 +16,7 @@ package io.leafage.assets.repository;
 
 import io.leafage.assets.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Repository;
  * @author wq li
  */
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
 
     /**
      * 是否已存在

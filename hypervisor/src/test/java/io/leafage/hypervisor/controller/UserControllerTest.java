@@ -69,14 +69,16 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        dto = new UserDTO();
+        dto.setUsername("test");
+        dto.setFamilyName("John");
+        dto.setGivenName("Mark");
+        dto.setAccountNonLocked(true);
+        dto.setAvatar("steven.jpg");
+
         vo = new UserVO(1L, true, Instant.now());
         vo.setUsername("test");
         vo.setEmail("john@test.com");
-
-        dto = new UserDTO();
-        dto.setUsername("test");
-        dto.setAccountNonLocked(true);
-        dto.setAvatar("steven.jpg");
     }
 
     @Test
@@ -86,8 +88,11 @@ class UserControllerTest {
         given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
 
-        mvc.perform(get("/users").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("username", "test"))
+        mvc.perform(get("/users")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())

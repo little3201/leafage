@@ -95,7 +95,7 @@ class GroupControllerTest {
         Page<GroupVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyLong(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         mvc.perform(get("/groups").queryParam("page", "0").queryParam("size", "2")
                         .queryParam("sortBy", "id").queryParam("superiorId", "1")
@@ -108,7 +108,7 @@ class GroupControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"), Mockito.anyBoolean(),
-                Mockito.anyLong(), Mockito.anyString())).willThrow(new RuntimeException());
+                Mockito.anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/groups").queryParam("page", "0").queryParam("size", "2")
                         .queryParam("sortBy", "id").queryParam("superiorId", "1")

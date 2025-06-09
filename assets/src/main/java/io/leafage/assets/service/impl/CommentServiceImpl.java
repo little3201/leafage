@@ -52,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
      * {@inheritDoc}
      */
     @Override
-    public Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         return commentRepository.findAll(pageable).map(comment -> {
             CommentVO vo = convertToVO(comment, CommentVO.class);
