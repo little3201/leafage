@@ -84,7 +84,8 @@ class FileControllerTest {
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("descending", "true"))
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
@@ -94,10 +95,12 @@ class FileControllerTest {
         given(fileRecordService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/files").queryParam("page", "0")
+        mvc.perform(get("/files")
+                        .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("descending", "true"))
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }

@@ -102,7 +102,8 @@ class CommentControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
-                        .queryParam("filters", "test:eq:a"))
+                        .queryParam("filters", "test:eq:a")
+                )
                 .andExpect(status().isNoContent()).andDo(print()).andReturn();
     }
 
