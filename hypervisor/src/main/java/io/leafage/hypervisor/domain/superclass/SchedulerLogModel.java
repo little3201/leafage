@@ -39,7 +39,7 @@ public class SchedulerLogModel {
     @Column(name = "next_execute_time")
     private Instant nextExecuteTime;
 
-    private String record;
+    private String description;
 
 
     public String getName() {
@@ -74,11 +74,11 @@ public class SchedulerLogModel {
         this.nextExecuteTime = nextExecuteTime;
     }
 
-    public String getRecord() {
-        return record;
+    public String getDescription() {
+        return description;
     }
 
-    public void setRecord(String record) {
-        this.record = record;
+    public void setDescription(String record) {
+        this.description = record;
     }
 }
