@@ -83,7 +83,6 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
         if (!CollectionUtils.isEmpty(actions)) {
             effectiveActions.addAll(actions);
         }
-        effectiveActions.add("read");
 
         return new GroupPrivileges(groupId, privilegeId, effectiveActions);
     }

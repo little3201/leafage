@@ -34,7 +34,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -70,7 +69,8 @@ class RegionControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new RegionVO(1L, true, Instant.now());
+        vo = new RegionVO();
+        vo.setId(1L);
         vo.setName("test");
         vo.setAreaCode("23234");
         vo.setPostalCode(1212);
@@ -90,11 +90,15 @@ class RegionControllerTest {
 
         // 使用 eq() 准确匹配参数
         given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.isNull(), Mockito.anyString())).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         // 调用接口并验证结果
-        mvc.perform(get("/regions").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/regions")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())

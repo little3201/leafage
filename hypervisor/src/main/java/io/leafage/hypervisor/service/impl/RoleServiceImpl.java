@@ -19,16 +19,11 @@ import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.repository.RoleRepository;
 import io.leafage.hypervisor.service.RoleService;
 import io.leafage.hypervisor.vo.RoleVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import top.leafage.common.DomainConverter;
 
 /**
  * role service impl.
@@ -36,7 +31,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl extends DomainConverter implements RoleService {
 
     private final RoleRepository roleRepository;
 
@@ -53,18 +48,10 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public Page<RoleVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
+    public Page<RoleVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Role> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return roleRepository.findAll(spec, pageable)
+        return roleRepository.findAll(pageable)
                 .map(role -> convertToVO(role, RoleVO.class));
     }
 

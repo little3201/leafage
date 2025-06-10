@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -87,7 +86,10 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
         // 优化 Optional 的使用，减少嵌套
         return dtoList.stream().map(dto -> {
-            RolePrivileges rolePrivilege = privileges(roleId, dto.getPrivilegeId(), dto.getActions());
+            RolePrivileges rolePrivilege = new RolePrivileges(roleId, dto.getPrivilegeId(), dto.getActions());
+            // 如果已存在，更新
+            rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, dto.getPrivilegeId())
+                    .ifPresent(r -> rolePrivilege.setId(r.getId()));
 
             privilegeRepository.findById(dto.getPrivilegeId()).ifPresent(privilege ->
                     addGroupAuthority(roleId, privilege.getName(), dto.getActions()));
@@ -108,29 +110,19 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         });
     }
 
-    private RolePrivileges privileges(Long roleId, Long privilegeId, Set<String> actions) {
-        // actions添加read
-        Set<String> effectiveActions = new HashSet<>();
-        if (!CollectionUtils.isEmpty(actions)) {
-            effectiveActions.addAll(actions);
-        }
-        effectiveActions.add("read");
-
-        return new RolePrivileges(roleId, privilegeId, effectiveActions);
-    }
-
     private void addGroupAuthority(Long roleId, String privilegeName, Set<String> actions) {
-        groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole ->
-                actions.forEach(action ->
-                        groupAuthoritiesRepository.save(new GroupAuthorities(groupRole.getGroupId(), privilegeName + ":" + action)))
-        );
+        List<GroupAuthorities> groupAuthorities = groupRolesRepository.findAllByRoleId(roleId).stream().flatMap(groupRole ->
+                        actions.stream().map(action ->
+                                new GroupAuthorities(groupRole.getGroupId(), privilegeName + ":" + action)))
+                .toList();
+        groupAuthoritiesRepository.saveAll(groupAuthorities);
     }
 
     private void removeGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole -> {
                     // 移除授权actions
                     if (CollectionUtils.isEmpty(actions)) {
-                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":read");
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName());
                     } else {
                         actions.forEach(action ->
                                 groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":" + action));

@@ -34,7 +34,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,7 +70,8 @@ class DictionaryControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new DictionaryVO(1L, true, Instant.now());
+        vo = new DictionaryVO();
+        vo.setId(1L);
         vo.setName("gender");
         vo.setDescription("description");
 
@@ -88,8 +88,12 @@ class DictionaryControllerTest {
         given(this.dictionaryService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
-        mvc.perform(get("/dictionaries").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/dictionaries")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())
@@ -101,8 +105,12 @@ class DictionaryControllerTest {
         given(this.dictionaryService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willThrow(new RuntimeException());
 
-        mvc.perform(get("/dictionaries").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/dictionaries")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();

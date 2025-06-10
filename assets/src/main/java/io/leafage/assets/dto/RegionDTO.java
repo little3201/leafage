@@ -15,35 +15,13 @@
 
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.RegionBO;
+import io.leafage.assets.domain.superclass.RegionModel;
 
 /**
  * dto class for region.
  *
  * @author wq li
  */
-public class RegionDTO extends RegionBO {
+public class RegionDTO extends RegionModel {
 
-    /**
-     * superior
-     */
-    private Long superiorId;
-
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
-    public Long getSuperiorId() {
-        return superiorId;
-    }
-
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
-    public void setSuperiorId(Long superiorId) {
-        this.superiorId = superiorId;
-    }
 }

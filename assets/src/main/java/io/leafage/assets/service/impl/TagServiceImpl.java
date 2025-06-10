@@ -16,7 +16,6 @@ package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Tag;
 import io.leafage.assets.dto.TagDTO;
-import io.leafage.assets.repository.TagPostsRepository;
 import io.leafage.assets.repository.TagRepository;
 import io.leafage.assets.service.TagService;
 import io.leafage.assets.vo.TagVO;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 /**
  * tag service impl.
@@ -32,34 +32,27 @@ import org.springframework.util.Assert;
  * @author wq li
  */
 @Service
-public class TagServiceImpl implements TagService {
+public class TagServiceImpl extends DomainConverter implements TagService {
 
     private final TagRepository tagRepository;
-    private final TagPostsRepository tagPostsRepository;
 
     /**
      * <p>Constructor for TagServiceImpl.</p>
      *
-     * @param tagRepository      a {@link TagRepository} object
-     * @param tagPostsRepository a {@link TagPostsRepository} object
+     * @param tagRepository a {@link TagRepository} object
      */
-    public TagServiceImpl(TagRepository tagRepository, TagPostsRepository tagPostsRepository) {
+    public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
-        this.tagPostsRepository = tagPostsRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<TagVO> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Page<TagVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
-        return tagRepository.findAll(pageable).map(tag -> {
-            TagVO vo = convertToVO(tag, TagVO.class);
-            long count = tagPostsRepository.countByTagId(tag.getId());
-            vo.setCount(count);
-            return vo;
-        });
+
+        return tagRepository.findAll(pageable).map(tag -> convertToVO(tag, TagVO.class));
     }
 
     /**

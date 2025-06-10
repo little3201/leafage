@@ -15,13 +15,15 @@
 package io.leafage.hypervisor.domain;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * model class for group roles.
+ * entity class for group roles.
  *
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "group_roles")
 public class GroupRoles {
 

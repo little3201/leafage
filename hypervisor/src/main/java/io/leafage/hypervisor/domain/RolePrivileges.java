@@ -19,7 +19,7 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 /**
- * model class for role privileges.
+ * entity class for role privileges.
  *
  * @author wq li
  */

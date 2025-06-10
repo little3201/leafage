@@ -15,7 +15,7 @@
 package io.leafage.assets.controller;
 
 import io.leafage.assets.dto.PostDTO;
-import io.leafage.assets.service.PostsService;
+import io.leafage.assets.service.PostService;
 import io.leafage.assets.vo.PostVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -23,7 +23,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
+
+import java.util.List;
 
 /**
  * posts controller.
@@ -36,15 +41,15 @@ public class PostController {
 
     private final Logger logger = LoggerFactory.getLogger(PostController.class);
 
-    private final PostsService postsService;
+    private final PostService postService;
 
     /**
      * <p>Constructor for PostController.</p>
      *
-     * @param postsService a {@link PostsService} object
+     * @param postService a {@link PostService} object
      */
-    public PostController(PostsService postsService) {
-        this.postsService = postsService;
+    public PostController(PostService postService) {
+        this.postService = postService;
     }
 
     /**
@@ -56,12 +61,13 @@ public class PostController {
      * @param descending a boolean
      * @return 分页结果集
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
     @GetMapping
     public ResponseEntity<Page<PostVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                 String sortBy, boolean descending) {
+                                                 String sortBy, boolean descending, String filters) {
         Page<PostVO> voPage;
         try {
-            voPage = postsService.retrieve(page, size, sortBy, descending);
+            voPage = postService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve posts error: ", e);
             return ResponseEntity.noContent().build();
@@ -75,11 +81,12 @@ public class PostController {
      * @param id 主键
      * @return 帖子信息，不包括内容
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
     @GetMapping("/{id}")
     public ResponseEntity<PostVO> fetch(@PathVariable Long id) {
         PostVO vo;
         try {
-            vo = postsService.fetch(id);
+            vo = postService.fetch(id);
         } catch (Exception e) {
             logger.error("Fetch posts error: ", e);
             return ResponseEntity.noContent().build();
@@ -98,7 +105,7 @@ public class PostController {
     public ResponseEntity<Boolean> exists(@RequestParam String title, Long id) {
         boolean exists;
         try {
-            exists = postsService.exists(title, id);
+            exists = postService.exists(title, id);
         } catch (Exception e) {
             logger.info("Check posts exists error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -112,11 +119,12 @@ public class PostController {
      * @param dto 文章内容
      * @return 帖子信息
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:create')")
     @PostMapping
-    public ResponseEntity<PostVO> create(@RequestBody @Valid PostDTO dto) {
+    public ResponseEntity<PostVO> create(@Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
-            vo = postsService.create(dto);
+            vo = postService.create(dto);
         } catch (Exception e) {
             logger.error("Save posts error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -131,11 +139,12 @@ public class PostController {
      * @param dto 帖子信息
      * @return 修改后的帖子信息
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO dto) {
+    public ResponseEntity<PostVO> modify(@PathVariable Long id, @Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
-            vo = postsService.modify(id, dto);
+            vo = postService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify posts error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -149,14 +158,54 @@ public class PostController {
      * @param id 主键
      * @return 删除结果
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {
-            postsService.remove(id);
+            postService.remove(id);
         } catch (Exception e) {
             logger.error("Remove posts error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = postService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_posts:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<PostVO>> importFromFile(MultipartFile file) {
+        List<PostVO> voList;
+        try {
+            List<PostDTO> dtoList = ExcelReader.read(file.getInputStream(), PostDTO.class);
+            voList = postService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import post error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
+    }
+
 }

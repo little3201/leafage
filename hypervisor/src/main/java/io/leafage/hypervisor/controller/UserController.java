@@ -25,8 +25,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * user controller.
@@ -50,23 +53,24 @@ public class UserController {
         this.userService = userService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @param username   username
-     * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping
     public ResponseEntity<Page<UserVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                 String sortBy, boolean descending, String username) {
+                                                 String sortBy, boolean descending, String filters) {
         Page<UserVO> voPage;
         try {
-            voPage = userService.retrieve(page, size, sortBy, descending, username);
+            voPage = userService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve user error: ", e);
             return ResponseEntity.noContent().build();
@@ -80,7 +84,7 @@ public class UserController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping("/{id}")
     public ResponseEntity<UserVO> fetch(@PathVariable Long id) {
         UserVO vo;
@@ -100,7 +104,7 @@ public class UserController {
      * @param id       主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String username, Long id) {
         boolean exists;
@@ -139,7 +143,7 @@ public class UserController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:create')")
     @PostMapping
-    public ResponseEntity<UserVO> create(@RequestBody @Valid UserDTO dto) {
+    public ResponseEntity<UserVO> create(@Valid @RequestBody UserDTO dto) {
         UserVO vo;
         try {
             vo = userService.create(dto);
@@ -160,7 +164,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<UserVO> modify(@PathVariable Long id,
-                                         @RequestBody @Valid UserDTO dto) {
+                                         @Valid @RequestBody UserDTO dto) {
         UserVO vo;
         try {
             vo = userService.modify(id, dto);
@@ -188,6 +192,25 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_users:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<UserVO>> importFromFile(MultipartFile file) {
+        List<UserVO> voList;
+        try {
+            List<UserDTO> dtoList = ExcelReader.read(file.getInputStream(), UserDTO.class);
+            voList = userService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import user error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
 }

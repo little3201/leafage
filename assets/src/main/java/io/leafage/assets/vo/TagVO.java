@@ -14,52 +14,24 @@
  */
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.TagBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.assets.domain.superclass.TagModel;
 
 /**
  * vo class for tag.
  *
  * @author wq li
  */
-public class TagVO extends TagBO implements ReadonlyMetadata {
+public class TagVO extends TagModel {
 
-    private final Long id;
+    private Long id;
 
-    private final boolean enabled;
 
-    private final Instant lastModifiedDate;
-
-    private long count;
-
-    public TagVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
-    }
-
-    public long getCount() {
-        return count;
-    }
-
-    public void setCount(long count) {
-        this.count = count;
-    }
 }

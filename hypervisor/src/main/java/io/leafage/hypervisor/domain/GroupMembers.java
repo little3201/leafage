@@ -17,7 +17,7 @@ package io.leafage.hypervisor.domain;
 import jakarta.persistence.*;
 
 /**
- * model class for group members.
+ * entity class for group members.
  *
  * @author wq li
  */

@@ -15,111 +15,45 @@
 
 package io.leafage.assets.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import io.leafage.assets.domain.superclass.CommentModel;
+import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for comment.
+ * entity class for comment.
  *
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "comments")
-public class Comment extends AuditMetadata {
+public class Comment extends CommentModel {
 
     /**
-     * 帖子ID
+     * Primary key.
      */
-    @Column(name = "post_id", nullable = false)
-    private Long postId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    /**
-     * 位置
-     */
-    private String location;
-
-    /**
-     * 内容
-     */
-    private String content;
-
-    /**
-     * 回复人
-     */
-    private Long replier;
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
 
 
-    /**
-     * <p>Getter for the field <code>postId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
-    public Long getPostId() {
-        return postId;
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>postId</code>.</p>
-     *
-     * @param postId a {@link Long} object
-     */
-    public void setPostId(Long postId) {
-        this.postId = postId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>location</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getLocation() {
-        return location;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>location</code>.</p>
-     *
-     * @param location a {@link String} object
-     */
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    /**
-     * <p>Getter for the field <code>content</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * <p>Setter for the field <code>content</code>.</p>
-     *
-     * @param content a {@link String} object
-     */
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    /**
-     * <p>Getter for the field <code>replier</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
-    public Long getReplier() {
-        return replier;
-    }
-
-    /**
-     * <p>Setter for the field <code>replier</code>.</p>
-     *
-     * @param replier a {@link Long} object
-     */
-    public void setReplier(Long replier) {
-        this.replier = replier;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
 }

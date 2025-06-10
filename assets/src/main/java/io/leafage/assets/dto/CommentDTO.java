@@ -15,13 +15,13 @@
 
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.CommentBO;
+import io.leafage.assets.domain.superclass.CommentModel;
 
 /**
  * dto class for comment.
  *
  * @author wq li
  */
-public class CommentDTO extends CommentBO {
+public class CommentDTO extends CommentModel {
 
 }

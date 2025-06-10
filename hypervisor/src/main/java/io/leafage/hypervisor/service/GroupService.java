@@ -16,36 +16,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.vo.GroupVO;
-import org.springframework.data.domain.Page;
-import top.leafage.common.TreeNode;
-import top.leafage.common.servlet.ServletBasicService;
-
-import java.util.List;
+import top.leafage.common.jdbc.JdbcTreeService;
 
 /**
  * group service.
  *
  * @author wq li
  */
-public interface GroupService extends ServletBasicService<GroupDTO, GroupVO> {
-
-    /**
-     * Retrieves a paginated list of records.
-     *
-     * @param page       The page number (zero-based).
-     * @param size       The number of records per page.
-     * @param sortBy     The field to sort by. If null, records are unsorted.
-     * @param descending Whether sorting should be in descending order.
-     * @return A paginated list of records.
-     * @since 0.3.0
-     */
-    Page<GroupVO> retrieve(int page, int size, String sortBy, boolean descending, Long superiorId, String name);
-
-    /**
-     * 获取树结构数据
-     *
-     * @return 树结构数据集
-     */
-    List<TreeNode> tree();
+public interface GroupService extends JdbcTreeService<GroupDTO, GroupVO, Long> {
 
 }

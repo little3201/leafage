@@ -19,17 +19,13 @@ import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.repository.GroupRepository;
 import io.leafage.hypervisor.service.GroupService;
 import io.leafage.hypervisor.vo.GroupVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import top.leafage.common.TreeNode;
-import top.leafage.common.servlet.ServletAbstractTreeNodeService;
+import top.leafage.common.jdbc.JdbcTreeAndDomainConverter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +34,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class GroupServiceImpl extends ServletAbstractTreeNodeService<Group> implements GroupService {
+public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> implements GroupService {
 
     private final GroupRepository groupRepository;
 
@@ -55,28 +51,17 @@ public class GroupServiceImpl extends ServletAbstractTreeNodeService<Group> impl
      * {@inheritDoc}
      */
     @Override
-    public Page<GroupVO> retrieve(int page, int size, String sortBy, boolean descending, Long superiorId, String name) {
+    public Page<GroupVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Group> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (superiorId != null) {
-                predicates.add(cb.equal(root.get("superiorId"), superiorId));
-            }
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return groupRepository.findAll(spec, pageable).map(group -> convertToVO(group, GroupVO.class));
+        return groupRepository.findAll(pageable).map(group -> convertToVO(group, GroupVO.class));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<TreeNode> tree() {
+    public List<TreeNode<Long>> tree() {
         List<Group> groups = groupRepository.findAll();
         return convertToTree(groups);
     }

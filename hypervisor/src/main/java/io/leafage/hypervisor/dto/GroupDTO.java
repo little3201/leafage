@@ -14,12 +14,12 @@
  */
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.GroupBO;
+import io.leafage.hypervisor.domain.superclass.GroupModel;
 
 /**
  * dto class for group.
  *
  * @author wq li
  */
-public class GroupDTO extends GroupBO {
+public class GroupDTO extends GroupModel {
 }

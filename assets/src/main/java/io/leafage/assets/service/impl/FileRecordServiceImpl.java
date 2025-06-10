@@ -19,17 +19,19 @@ import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.repository.FileRecordRepository;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
-import jakarta.persistence.criteria.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.DomainConverter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 
 /**
  * file service impl.
@@ -37,7 +39,9 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class FileRecordServiceImpl implements FileRecordService {
+public class FileRecordServiceImpl extends DomainConverter implements FileRecordService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileRecordServiceImpl.class);
 
     private final FileRecordRepository fileRecordRepository;
 
@@ -46,33 +50,57 @@ public class FileRecordServiceImpl implements FileRecordService {
     }
 
     @Override
-    public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
+    public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<FileRecord> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return fileRecordRepository.findAll(spec, pageable)
+        return fileRecordRepository.findAll(pageable)
                 .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class));
+    }
+
+    @Override
+    public FileRecordVO fetch(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return fileRecordRepository.findById(id)
+                .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class))
+                .orElse(null);
     }
 
     @Override
     public boolean exists(String name, Long id) {
         Assert.hasText(name, "name must not be empty.");
-        if (id == null) {
-            return fileRecordRepository.existsByName(name);
-        }
-        return fileRecordRepository.existsByNameAndIdNot(name, id);
+
+        return fileRecordRepository.existsByName(name);
     }
 
     @Override
     public FileRecordVO upload(MultipartFile file) {
-        return null;
+        FileRecord fileRecord = new FileRecord();
+        fileRecord.setName(file.getName());
+        fileRecord.setMimeType(file.getContentType());
+        fileRecord.setSize(file.getSize());
+        fileRecord = fileRecordRepository.save(fileRecord);
+        return convertToVO(fileRecord, FileRecordVO.class);
     }
 
+    @Override
+    public String download(Long id, OutputStream outputStream) {
+        Assert.notNull(id, "id must not be null.");
+
+        return fileRecordRepository.findById(id).map(fileRecord -> {
+            File file = new File(fileRecord.getPath());
+            try {
+                Files.copy(file.toPath(), outputStream);
+                outputStream.close();
+            } catch (IOException e) {
+                logger.error("Failed to process template: {}", fileRecord.getName(), e);
+            }
+            return fileRecord.getName();
+        }).orElseThrow(() -> new RuntimeException("File not found"));
+    }
+
+    @Override
+    public void remove(Long id) {
+        fileRecordRepository.deleteById(id);
+    }
 }

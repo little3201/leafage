@@ -26,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 
@@ -51,21 +53,24 @@ public class DictionaryController {
         this.dictionaryService = dictionaryService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 查询的数据集，异常时返回204状态码
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping
     public ResponseEntity<Page<DictionaryVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending, String name) {
+                                                       String sortBy, boolean descending, String filters) {
         Page<DictionaryVO> voPage;
         try {
-            voPage = dictionaryService.retrieve(page, size, sortBy, descending, name);
+            voPage = dictionaryService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve dictionary error: ", e);
             return ResponseEntity.noContent().build();
@@ -79,6 +84,7 @@ public class DictionaryController {
      * @param id a {@link Long} object
      * @return 查询到的数据，否则返回空
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{id}/subset")
     public ResponseEntity<List<DictionaryVO>> subset(@PathVariable Long id) {
         List<DictionaryVO> voList;
@@ -97,6 +103,7 @@ public class DictionaryController {
      * @param id 业务id
      * @return 查询的数据，异常时返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{id}")
     public ResponseEntity<DictionaryVO> fetch(@PathVariable Long id) {
         DictionaryVO vo;
@@ -117,6 +124,7 @@ public class DictionaryController {
      * @param id         主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{superiorId}/exists")
     public ResponseEntity<Boolean> exists(@PathVariable Long superiorId, @RequestParam String name, Long id) {
         boolean exists;
@@ -135,8 +143,9 @@ public class DictionaryController {
      * @param dto 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:create')")
     @PostMapping
-    public ResponseEntity<DictionaryVO> create(@RequestBody @Valid DictionaryDTO dto) {
+    public ResponseEntity<DictionaryVO> create(@Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
         try {
             vo = dictionaryService.create(dto);
@@ -154,8 +163,9 @@ public class DictionaryController {
      * @param id  a {@link Long} object
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
+    public ResponseEntity<DictionaryVO> modify(@PathVariable Long id, @Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
         try {
             vo = dictionaryService.modify(id, dto);
@@ -172,6 +182,7 @@ public class DictionaryController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {
@@ -189,7 +200,7 @@ public class DictionaryController {
      * @param id The record ID.
      * @return 200 status code if successful, or 417 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_dictionaries:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
         boolean enabled;
@@ -200,6 +211,25 @@ public class DictionaryController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<DictionaryVO>> importFromFile(MultipartFile file) {
+        List<DictionaryVO> voList;
+        try {
+            List<DictionaryDTO> dtoList = ExcelReader.read(file.getInputStream(), DictionaryDTO.class);
+            voList = dictionaryService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import dictionary error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
 }

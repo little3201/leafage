@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends DomainConverter implements CommentService {
 
     private final CommentRepository commentRepository;
 
@@ -52,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
      * {@inheritDoc}
      */
     @Override
-    public Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         return commentRepository.findAll(pageable).map(comment -> {
             CommentVO vo = convertToVO(comment, CommentVO.class);

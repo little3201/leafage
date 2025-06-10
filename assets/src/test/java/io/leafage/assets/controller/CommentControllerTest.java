@@ -34,7 +34,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -72,7 +71,8 @@ class CommentControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new CommentVO(1L, true, Instant.now());
+        vo = new CommentVO();
+        vo.setId(1L);
         vo.setContent("content");
         vo.setPostId(1L);
 
@@ -86,19 +86,24 @@ class CommentControllerTest {
     void retrieve() throws Exception {
         Page<CommentVO> page = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
-        given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"), Mockito.anyBoolean())).willReturn(page);
+        given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"), Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
 
-        mvc.perform(get("/comments").queryParam("page", "0").queryParam("size", "2"))
+        mvc.perform(get("/comments")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2"))
                 .andExpect(status().isOk()).andDo(print()).andReturn();
     }
 
     @Test
     void retrieve_error() throws Exception {
-        given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willThrow(new NoSuchElementException());
+        given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString())).willThrow(new NoSuchElementException());
 
         mvc.perform(get("/comments").queryParam("page", "0")
-                        .queryParam("size", "2").queryParam("sortBy", "id")
-                        .queryParam("descending", "true"))
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                        .queryParam("filters", "test:eq:a")
+                )
                 .andExpect(status().isNoContent()).andDo(print()).andReturn();
     }
 

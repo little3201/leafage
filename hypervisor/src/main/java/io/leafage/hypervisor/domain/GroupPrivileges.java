@@ -19,7 +19,7 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 /**
- * model class for group privileges.
+ * entity class for group privileges.
  *
  * @author wq li
  */

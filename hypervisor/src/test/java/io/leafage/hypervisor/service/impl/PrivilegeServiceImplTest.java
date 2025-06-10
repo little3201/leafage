@@ -104,7 +104,7 @@ class PrivilegeServiceImplTest {
 
         given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(Privilege.class)));
 
-        List<TreeNode> nodes = privilegeService.tree("test");
+        List<TreeNode<Long>> nodes = privilegeService.tree("test");
         Assertions.assertNotNull(nodes);
     }
 

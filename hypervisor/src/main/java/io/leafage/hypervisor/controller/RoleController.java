@@ -30,6 +30,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
@@ -62,22 +64,24 @@ public class RoleController {
         this.rolePrivilegesService = rolePrivilegesService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping
     public ResponseEntity<Page<RoleVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                 String sortBy, boolean descending, String name) {
+                                                 String sortBy, boolean descending, String filters) {
         Page<RoleVO> voPage;
         try {
-            voPage = roleService.retrieve(page, size, sortBy, descending, name);
+            voPage = roleService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve role error: ", e);
             return ResponseEntity.noContent().build();
@@ -91,7 +95,7 @@ public class RoleController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping("/{id}")
     public ResponseEntity<RoleVO> fetch(@PathVariable Long id) {
         RoleVO vo;
@@ -111,7 +115,7 @@ public class RoleController {
      * @param id   主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exists;
@@ -132,7 +136,7 @@ public class RoleController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:create')")
     @PostMapping
-    public ResponseEntity<RoleVO> create(@RequestBody @Valid RoleDTO dto) {
+    public ResponseEntity<RoleVO> create(@Valid @RequestBody RoleDTO dto) {
         RoleVO vo;
         try {
             vo = roleService.create(dto);
@@ -152,7 +156,7 @@ public class RoleController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<RoleVO> modify(@PathVariable Long id, @RequestBody @Valid RoleDTO dto) {
+    public ResponseEntity<RoleVO> modify(@PathVariable Long id, @Valid @RequestBody RoleDTO dto) {
         RoleVO vo;
         try {
             vo = roleService.modify(id, dto);
@@ -198,6 +202,25 @@ public class RoleController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_roles:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<RoleVO>> importFromFile(MultipartFile file) {
+        List<RoleVO> voList;
+        try {
+            List<RoleDTO> dtoList = ExcelReader.read(file.getInputStream(), RoleDTO.class);
+            voList = roleService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import role error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
     /**

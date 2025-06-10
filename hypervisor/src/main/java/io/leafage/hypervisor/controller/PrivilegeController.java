@@ -25,7 +25,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.TreeNode;
+import top.leafage.common.poi.ExcelReader;
 
 import java.security.Principal;
 import java.util.List;
@@ -52,22 +54,24 @@ public class PrivilegeController {
         this.privilegeService = privilegeService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @return 查询到的数据，否则返回空
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping
     public ResponseEntity<Page<PrivilegeVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                      String sortBy, boolean descending, String name) {
+                                                      String sortBy, boolean descending, String filters) {
         Page<PrivilegeVO> voPage;
         try {
-            voPage = privilegeService.retrieve(page, size, sortBy, descending, name);
+            voPage = privilegeService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve privilege error: ", e);
             return ResponseEntity.noContent().build();
@@ -80,10 +84,9 @@ public class PrivilegeController {
      *
      * @return 查询到的数据，否则返回空
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
     @GetMapping("/tree")
-    public ResponseEntity<List<TreeNode>> tree(Principal principal) {
-        List<TreeNode> treeNodes;
+    public ResponseEntity<List<TreeNode<Long>>> tree(Principal principal) {
+        List<TreeNode<Long>> treeNodes;
         try {
             treeNodes = privilegeService.tree(principal.getName());
         } catch (Exception e) {
@@ -99,7 +102,7 @@ public class PrivilegeController {
      * @param superiorId 主键
      * @return 查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping("/{superiorId}/subset")
     public ResponseEntity<List<PrivilegeVO>> subset(@PathVariable Long superiorId) {
         List<PrivilegeVO> voList;
@@ -118,7 +121,7 @@ public class PrivilegeController {
      * @param id 主键
      * @return 查询到的信息，否则返回204状态码
      */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:read')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping("/{id}")
     public ResponseEntity<PrivilegeVO> fetch(@PathVariable Long id) {
         PrivilegeVO vo;
@@ -140,7 +143,7 @@ public class PrivilegeController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:modify')")
     @PutMapping("/{id}")
-    public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
+    public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @Valid @RequestBody PrivilegeDTO dto) {
         PrivilegeVO vo;
         try {
             vo = privilegeService.modify(id, dto);
@@ -168,6 +171,25 @@ public class PrivilegeController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_privileges:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<PrivilegeVO>> importFromFile(MultipartFile file) {
+        List<PrivilegeVO> voList;
+        try {
+            List<PrivilegeDTO> dtoList = ExcelReader.read(file.getInputStream(), PrivilegeDTO.class);
+            voList = privilegeService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import privilege error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
 }

@@ -15,13 +15,13 @@
 
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.MessageBO;
+import io.leafage.hypervisor.domain.superclass.MessageModel;
 
 /**
  * dto class for message.
  *
  * @author wq li
  */
-public class MessageDTO extends MessageBO {
+public class MessageDTO extends MessageModel {
 
 }

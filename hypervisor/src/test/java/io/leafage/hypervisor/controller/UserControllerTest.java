@@ -33,7 +33,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -69,14 +68,16 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new UserVO(1L, true, Instant.now());
-        vo.setUsername("test");
-        vo.setEmail("john@test.com");
-
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setAccountNonLocked(true);
+        dto.setFamilyName("John");
+        dto.setGivenName("Mark");
         dto.setAvatar("steven.jpg");
+
+        vo = new UserVO();
+        vo.setId(1L);
+        vo.setUsername("test");
+        vo.setEmail("john@test.com");
     }
 
     @Test
@@ -86,8 +87,12 @@ class UserControllerTest {
         given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
 
-        mvc.perform(get("/users").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("username", "test"))
+        mvc.perform(get("/users")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())

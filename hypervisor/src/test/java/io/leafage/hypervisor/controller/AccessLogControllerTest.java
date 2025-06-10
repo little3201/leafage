@@ -31,6 +31,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.List;
 
@@ -60,9 +62,10 @@ class AccessLogControllerTest {
     private AccessLogVO vo;
 
     @BeforeEach
-    void setUp() {
-        vo = new AccessLogVO(1L, true, Instant.now());
-        vo.setIp("12.1.3.2");
+    void setUp() throws UnknownHostException {
+        vo = new AccessLogVO();
+        vo.setId(1L);
+        vo.setIp(InetAddress.getByName("12.1.3.2"));
         vo.setLocation("test");
         vo.setHttpMethod("POST");
         vo.setResponseTimes(232L);
@@ -79,8 +82,12 @@ class AccessLogControllerTest {
         given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
 
-        mvc.perform(get("/access-logs").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("url", "test"))
+        mvc.perform(get("/access-logs")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())

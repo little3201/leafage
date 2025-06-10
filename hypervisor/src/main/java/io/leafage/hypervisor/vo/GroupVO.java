@@ -14,44 +14,23 @@
  */
 package io.leafage.hypervisor.vo;
 
-import io.leafage.hypervisor.bo.GroupBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.hypervisor.domain.superclass.GroupModel;
 
 /**
  * vo class for group.
  *
  * @author wq li
  */
-public class GroupVO extends GroupBO implements ReadonlyMetadata {
+public class GroupVO extends GroupModel {
 
-    private final Long id;
-
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
-
-    public GroupVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
+    private Long id;
 
 
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
-    }
-
 }

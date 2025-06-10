@@ -14,13 +14,13 @@
  */
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.UserBO;
+import io.leafage.hypervisor.domain.superclass.UserModel;
 
 /**
  * dto class for user.
  *
  * @author wq li
  */
-public class UserDTO extends UserBO {
+public class UserDTO extends UserModel {
 
 }

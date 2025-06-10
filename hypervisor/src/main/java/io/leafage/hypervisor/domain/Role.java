@@ -14,64 +14,45 @@
  */
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import io.leafage.hypervisor.domain.superclass.RoleModel;
+import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for role.
+ * entity class for role.
  *
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "roles")
-public class Role extends AuditMetadata {
-
-
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+public class Role extends RoleModel {
 
     /**
-     * 描述
+     * Primary key.
      */
-    private String description;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
 
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getName() {
-        return name;
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getDescription() {
-        return description;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
-
 }

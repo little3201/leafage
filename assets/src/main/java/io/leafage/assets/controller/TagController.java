@@ -58,10 +58,10 @@ public class TagController {
      */
     @GetMapping
     public ResponseEntity<Page<TagVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                String sortBy, boolean descending) {
+                                                String sortBy, boolean descending, String filters) {
         Page<TagVO> voPage;
         try {
-            voPage = tagService.retrieve(page, size, sortBy, descending);
+            voPage = tagService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve posts error: ", e);
             return ResponseEntity.noContent().build();
@@ -113,7 +113,7 @@ public class TagController {
      * @return tag信息
      */
     @PostMapping
-    public ResponseEntity<TagVO> create(@RequestBody @Valid TagDTO dto) {
+    public ResponseEntity<TagVO> create(@Valid @RequestBody TagDTO dto) {
         TagVO categoryVO;
         try {
             categoryVO = tagService.create(dto);
@@ -132,7 +132,7 @@ public class TagController {
      * @return 修改后的tag信息
      */
     @PutMapping("/{id}")
-    public ResponseEntity<TagVO> modify(@PathVariable Long id, @RequestBody @Valid TagDTO categoryDTO) {
+    public ResponseEntity<TagVO> modify(@PathVariable Long id, @Valid @RequestBody TagDTO categoryDTO) {
         TagVO categoryVO;
         try {
             categoryVO = tagService.modify(id, categoryDTO);

@@ -17,26 +17,15 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.OperationLogDTO;
 import io.leafage.hypervisor.vo.OperationLogVO;
-import org.springframework.data.domain.Page;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * operation log service.
  *
  * @author wq li
  */
-public interface OperationLogService extends ServletBasicService<OperationLogDTO, OperationLogVO> {
+public interface OperationLogService extends JdbcCrudService<OperationLogDTO, OperationLogVO> {
 
-    /**
-     * Retrieves a paginated list of records.
-     *
-     * @param page       The page number (zero-based).
-     * @param size       The number of records per page.
-     * @param sortBy     The field to sort by. If null, records are unsorted.
-     * @param descending Whether sorting should be in descending order.
-     * @return A paginated list of records.
-     * @since 0.3.0
-     */
-    Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String name);
+    void clear();
 
 }

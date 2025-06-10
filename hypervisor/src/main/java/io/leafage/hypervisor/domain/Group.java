@@ -14,79 +14,45 @@
  */
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import io.leafage.hypervisor.domain.superclass.GroupModel;
+import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for group.
+ * entity class for group.
  *
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "groups")
-public class Group extends AuditMetadata {
-
-    @Column(name = "group_name", nullable = false, unique = true)
-    private String name;
-
-    private Long superiorId;
-
-    private String description;
-
+public class Group extends GroupModel {
 
     /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
+     * Primary key.
      */
-    public String getName() {
-        return name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
+
+
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
-    public Long getSuperiorId() {
-        return superiorId;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
-    public void setSuperiorId(Long superiorId) {
-        this.superiorId = superiorId;
-    }
-
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
 }

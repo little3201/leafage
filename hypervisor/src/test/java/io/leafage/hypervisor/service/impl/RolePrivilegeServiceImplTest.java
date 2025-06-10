@@ -15,7 +15,10 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.*;
+import io.leafage.hypervisor.domain.Group;
+import io.leafage.hypervisor.domain.GroupRoles;
+import io.leafage.hypervisor.domain.Privilege;
+import io.leafage.hypervisor.domain.RolePrivileges;
 import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.repository.GroupAuthoritiesRepository;
 import io.leafage.hypervisor.repository.GroupRolesRepository;
@@ -107,8 +110,6 @@ class RolePrivilegeServiceImplTest {
         given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(privilege));
 
         given(this.groupRolesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(groupRoles));
-
-        given(this.groupAuthoritiesRepository.save(Mockito.any())).willReturn(Mockito.mock(GroupAuthorities.class));
 
         List<RolePrivileges> relations = rolePrivilegesService.relation(1L, List.of(authorizePrivilegesDTO));
 

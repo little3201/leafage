@@ -19,14 +19,13 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 /**
- * model class for user privileges.
+ * entity class for user privileges.
  *
  * @author wq li
  */
 @Entity
 @Table(name = "user_privileges")
 public class UserPrivileges {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

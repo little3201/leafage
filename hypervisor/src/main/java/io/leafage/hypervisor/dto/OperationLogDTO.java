@@ -15,13 +15,13 @@
 
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.OperationLogBO;
+import io.leafage.hypervisor.domain.superclass.OperationLogModel;
 
 /**
  * dto class for operation log.
  *
  * @author wq li
  */
-public class OperationLogDTO extends OperationLogBO {
+public class OperationLogDTO extends OperationLogModel {
 
 }

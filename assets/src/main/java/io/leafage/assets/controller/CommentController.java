@@ -61,10 +61,10 @@ public class CommentController {
      */
     @GetMapping
     public ResponseEntity<Page<CommentVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                    String sortBy, boolean descending) {
+                                                    String sortBy, boolean descending, String filters) {
         Page<CommentVO> voPage;
         try {
-            voPage = commentService.retrieve(page, size, sortBy, descending);
+            voPage = commentService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve comment error: ", e);
             return ResponseEntity.noContent().build();
@@ -116,7 +116,7 @@ public class CommentController {
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping
-    public ResponseEntity<CommentVO> create(@RequestBody @Valid CommentDTO dto) {
+    public ResponseEntity<CommentVO> create(@Valid @RequestBody CommentDTO dto) {
         CommentVO vo;
         try {
             vo = commentService.create(dto);

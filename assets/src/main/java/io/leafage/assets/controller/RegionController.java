@@ -24,7 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.poi.ExcelReader;
+
+import java.util.List;
 
 /**
  * region controller.
@@ -59,10 +64,10 @@ public class RegionController {
      */
     @GetMapping
     public ResponseEntity<Page<RegionVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                   String sortBy, boolean descending, Long superiorId, String name) {
+                                                   String sortBy, boolean descending, String filters) {
         Page<RegionVO> voPage;
         try {
-            voPage = regionService.retrieve(page, size, sortBy, descending, superiorId, name);
+            voPage = regionService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve region error: ", e);
             return ResponseEntity.noContent().build();
@@ -114,7 +119,7 @@ public class RegionController {
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public ResponseEntity<RegionVO> create(@RequestBody @Valid RegionDTO dto) {
+    public ResponseEntity<RegionVO> create(@Valid @RequestBody RegionDTO dto) {
         RegionVO vo;
         try {
             vo = regionService.create(dto);
@@ -160,4 +165,43 @@ public class RegionController {
         }
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_regions:enable')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Boolean> enable(@PathVariable Long id) {
+        boolean enabled;
+        try {
+            enabled = regionService.enable(id);
+        } catch (Exception e) {
+            logger.error("Toggle enabled error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_regions:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<RegionVO>> importFromFile(MultipartFile file) {
+        List<RegionVO> voList;
+        try {
+            List<RegionDTO> dtoList = ExcelReader.read(file.getInputStream(), RegionDTO.class);
+            voList = regionService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import region error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
+    }
+
 }

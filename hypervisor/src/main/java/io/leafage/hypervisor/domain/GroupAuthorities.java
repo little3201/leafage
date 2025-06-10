@@ -18,7 +18,7 @@ package io.leafage.hypervisor.domain;
 import jakarta.persistence.*;
 
 /**
- * model class for group roles.
+ * entity class for group roles.
  *
  * @author wq li
  */

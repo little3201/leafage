@@ -63,7 +63,8 @@ class OperationLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new OperationLogVO(1L, true, Instant.now());
+        vo = new OperationLogVO();
+        vo.setId(1L);
         vo.setIp(InetAddress.getByName("127.0.0.1"));
         vo.setLocation("test");
         vo.setBrowser("Chrome");
@@ -85,8 +86,12 @@ class OperationLogControllerTest {
         given(this.operationLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
 
-        mvc.perform(get("/operation-logs").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/operation-logs")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print())
@@ -98,8 +103,12 @@ class OperationLogControllerTest {
         given(this.operationLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/operation-logs").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("name", "test"))
+        mvc.perform(get("/operation-logs")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();

@@ -14,13 +14,13 @@
  */
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.TagBO;
+import io.leafage.assets.domain.superclass.TagModel;
 
 /**
  * dto class for tag.
  *
  * @author wq li
  */
-public class TagDTO extends TagBO {
+public class TagDTO extends TagModel {
 
 }

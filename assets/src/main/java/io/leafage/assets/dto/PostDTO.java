@@ -14,12 +14,28 @@
  */
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.PostBO;
+import io.leafage.assets.domain.superclass.PostModel;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * dto class for posts.
  *
  * @author wq li
  */
-public class PostDTO extends PostBO {
+public class PostDTO extends PostModel {
+
+    /**
+     * 内容
+     */
+    @NotBlank
+    private String content;
+
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

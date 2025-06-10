@@ -30,7 +30,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.TreeNode;
+import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
@@ -62,22 +64,24 @@ public class GroupController {
         this.groupPrivilegesService = groupPrivilegesService;
     }
 
+
     /**
-     * 分页查询
+     * Retrieves a paginated list of records.
      *
-     * @param page       页码
-     * @param size       大小
-     * @param sortBy     排序字段
-     * @param descending 排序方向
-     * @param superiorId superior id
-     * @return 如果查询到数据，返回查询到的分页后的信息列表，否则返回空
+     * @param page       The page number.
+     * @param size       The number of records per page.
+     * @param sortBy     The field to sort by.
+     * @param descending Whether sorting should be in descending order.
+     * @param filters    The filters.
+     * @return A paginated list of records, or 204 status code if an error occurs.
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping
     public ResponseEntity<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                  String sortBy, boolean descending, Long superiorId, String name) {
+                                                  String sortBy, boolean descending, String filters) {
         Page<GroupVO> voPage;
         try {
-            voPage = groupService.retrieve(page, size, sortBy, descending, superiorId, name);
+            voPage = groupService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve group error: ", e);
             return ResponseEntity.noContent().build();
@@ -90,9 +94,10 @@ public class GroupController {
      *
      * @return 查询到的数据，否则返回空
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/tree")
-    public ResponseEntity<List<TreeNode>> tree() {
-        List<TreeNode> treeNodes;
+    public ResponseEntity<List<TreeNode<Long>>> tree() {
+        List<TreeNode<Long>> treeNodes;
         try {
             treeNodes = groupService.tree();
         } catch (Exception e) {
@@ -108,6 +113,7 @@ public class GroupController {
      * @param id 主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/{id}")
     public ResponseEntity<GroupVO> fetch(@PathVariable Long id) {
         GroupVO groupVO;
@@ -127,6 +133,7 @@ public class GroupController {
      * @param id   主键
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/exists")
     public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
         boolean exists;
@@ -145,8 +152,9 @@ public class GroupController {
      * @param dto 要添加的数据
      * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:create')")
     @PostMapping
-    public ResponseEntity<GroupVO> create(@RequestBody @Valid GroupDTO dto) {
+    public ResponseEntity<GroupVO> create(@Valid @RequestBody GroupDTO dto) {
         GroupVO groupVO;
         try {
             groupVO = groupService.create(dto);
@@ -164,6 +172,7 @@ public class GroupController {
      * @param dto 要修改的数据
      * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<GroupVO> modify(@PathVariable Long id, @RequestBody GroupDTO dto) {
         GroupVO groupVO;
@@ -182,6 +191,7 @@ public class GroupController {
      * @param id 主键
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
         try {
@@ -199,7 +209,7 @@ public class GroupController {
      * @param id The record ID.
      * @return 200 status code if successful, or 417 status code if an error occurs.
      */
-    @PreAuthorize("hasAuthority('SCOPE_groups:enable')")
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
         boolean enabled;
@@ -210,6 +220,25 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(enabled);
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:import')")
+    @PostMapping("/import")
+    public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) {
+        List<GroupVO> voList;
+        try {
+            List<GroupDTO> dtoList = ExcelReader.read(file.getInputStream(), GroupDTO.class);
+            voList = groupService.createAll(dtoList);
+        } catch (Exception e) {
+            logger.error("Import groups error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().body(voList);
     }
 
     /**

@@ -16,7 +16,6 @@
 package io.leafage.assets.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,13 +27,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -66,16 +65,12 @@ class FileControllerTest {
 
     private FileRecordVO vo;
 
-    private FileRecordDTO dto;
-
     @BeforeEach
     void setUp() {
-        vo = new FileRecordVO(1L, true, Instant.now());
+        vo = new FileRecordVO();
+        vo.setId(1L);
         vo.setName("test");
         vo.setSize(21232);
-
-        dto = new FileRecordDTO();
-        dto.setName("test");
     }
 
     @Test
@@ -85,10 +80,12 @@ class FileControllerTest {
         given(fileRecordService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
 
-        mvc.perform(get("/files").queryParam("page", "0")
+        mvc.perform(get("/files")
+                        .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("name", "test"))
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
@@ -98,10 +95,12 @@ class FileControllerTest {
         given(fileRecordService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/files").queryParam("page", "0")
+        mvc.perform(get("/files")
+                        .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("name", "test"))
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
@@ -123,44 +122,25 @@ class FileControllerTest {
     }
 
     @Test
-    void exists() throws Exception {
-        given(this.fileRecordService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
+    void upload() throws Exception {
+        given(fileRecordService.exists(Mockito.anyString(), Mockito.any())).willReturn(false);
+        given(fileRecordService.upload(Mockito.any(MultipartFile.class))).willReturn(vo);
 
-        mvc.perform(get("/files/exists")
-                        .queryParam("name", "text")
-                        .queryParam("id", "1"))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exist_error() throws Exception {
-        given(this.fileRecordService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
-
-        mvc.perform(get("/files/exists", "test")
-                        .queryParam("name", "text")
-                        .queryParam("id", "1"))
-                .andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void create() throws Exception {
-        given(fileRecordService.create(Mockito.any(FileRecordDTO.class))).willReturn(vo);
-
-        mvc.perform(post("/files").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
+        mvc.perform(multipart("/files").file(file).with(csrf().asHeader()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("test"))
                 .andDo(print()).andReturn();
     }
 
     @Test
-    void create_error() throws Exception {
-        given(fileRecordService.create(Mockito.any(FileRecordDTO.class))).willThrow(new RuntimeException());
+    void upload_error() throws Exception {
+        given(fileRecordService.exists(Mockito.anyString(), Mockito.any())).willReturn(false);
 
-        mvc.perform(post("/files").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+        given(fileRecordService.upload(Mockito.any(MultipartFile.class))).willThrow(new RuntimeException());
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
+        mvc.perform(multipart("/files").file(file).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

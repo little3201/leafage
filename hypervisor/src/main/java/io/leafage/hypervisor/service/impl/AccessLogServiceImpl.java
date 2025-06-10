@@ -20,17 +20,12 @@ import io.leafage.hypervisor.dto.AccessLogDTO;
 import io.leafage.hypervisor.repository.AccessLogRepository;
 import io.leafage.hypervisor.service.AccessLogService;
 import io.leafage.hypervisor.vo.AccessLogVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import top.leafage.common.DomainConverter;
 
 /**
  * access log service impl.
@@ -38,7 +33,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class AccessLogServiceImpl implements AccessLogService {
+public class AccessLogServiceImpl extends DomainConverter implements AccessLogService {
 
     private final AccessLogRepository accessLogRepository;
 
@@ -55,18 +50,10 @@ public class AccessLogServiceImpl implements AccessLogService {
      * {@inheritDoc}
      */
     @Override
-    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String url) {
+    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<AccessLog> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.hasText(url)) {
-                predicates.add(cb.like(root.get("url"), "%" + url + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return accessLogRepository.findAll(spec, pageable)
+        return accessLogRepository.findAll(pageable)
                 .map(accessLog -> convertToVO(accessLog, AccessLogVO.class));
     }
 
@@ -97,4 +84,8 @@ public class AccessLogServiceImpl implements AccessLogService {
         accessLogRepository.deleteById(id);
     }
 
+    @Override
+    public void clear() {
+        accessLogRepository.deleteAll();
+    }
 }

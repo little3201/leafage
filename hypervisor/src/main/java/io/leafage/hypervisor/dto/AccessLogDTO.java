@@ -15,13 +15,13 @@
 
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.AccessLogBO;
+import io.leafage.hypervisor.domain.superclass.AccessLogModel;
 
 /**
  * dto class for access log.
  *
  * @author wq li
  */
-public class AccessLogDTO extends AccessLogBO {
+public class AccessLogDTO extends AccessLogModel {
 
 }

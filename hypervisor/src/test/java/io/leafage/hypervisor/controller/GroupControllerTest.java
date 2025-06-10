@@ -81,7 +81,8 @@ class GroupControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new GroupVO(1L, true, Instant.now());
+        vo = new GroupVO();
+        vo.setId(1L);
         vo.setName("test");
 
         dto = new GroupDTO();
@@ -95,11 +96,14 @@ class GroupControllerTest {
         Page<GroupVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyLong(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
-        mvc.perform(get("/groups").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("superiorId", "1")
-                        .queryParam("name", "test"))
+        mvc.perform(get("/groups")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print()).andReturn();
@@ -108,11 +112,14 @@ class GroupControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"), Mockito.anyBoolean(),
-                Mockito.anyLong(), Mockito.anyString())).willThrow(new RuntimeException());
+                Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/groups").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("superiorId", "1")
-                        .queryParam("name", "test"))
+        mvc.perform(get("/groups")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "true")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();

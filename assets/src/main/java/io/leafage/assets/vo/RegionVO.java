@@ -15,43 +15,22 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.RegionBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.assets.domain.superclass.RegionModel;
 
 /**
  * vo class for region.
  *
  * @author wq li
  */
-public class RegionVO extends RegionBO implements ReadonlyMetadata {
+public class RegionVO extends RegionModel {
 
-    private final Long id;
+    private Long id;
 
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
-
-    public RegionVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
-    }
-
 }

@@ -15,13 +15,13 @@
 
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.AuditLogBO;
+import io.leafage.hypervisor.domain.superclass.AuditLogModel;
 
 /**
  * dto class for audit log.
  *
  * @author wq li
  */
-public class AuditLogDTO extends AuditLogBO {
+public class AuditLogDTO extends AuditLogModel {
 
 }

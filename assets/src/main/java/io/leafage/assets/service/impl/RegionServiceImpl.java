@@ -20,17 +20,12 @@ import io.leafage.assets.dto.RegionDTO;
 import io.leafage.assets.repository.RegionRepository;
 import io.leafage.assets.service.RegionService;
 import io.leafage.assets.vo.RegionVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import top.leafage.common.DomainConverter;
 
 /**
  * region service impl.
@@ -38,7 +33,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class RegionServiceImpl implements RegionService {
+public class RegionServiceImpl extends DomainConverter implements RegionService {
 
     private final RegionRepository regionRepository;
 
@@ -55,23 +50,11 @@ public class RegionServiceImpl implements RegionService {
      * {@inheritDoc}
      */
     @Override
-    public Page<RegionVO> retrieve(int page, int size, String sortBy, boolean descending, Long superiorId, String name) {
+    public Page<RegionVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Region> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (superiorId == null) {
-                predicates.add(cb.isNull(root.get("superiorId")));
-            } else {
-                predicates.add(cb.equal(root.get("superiorId"), superiorId));
-            }
-            if (StringUtils.hasText(name)) {
-                predicates.add(cb.like(root.get("name"), "%" + name + "%"));
-            }
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return regionRepository.findAll(spec, pageable).map(region -> convertToVO(region, RegionVO.class));
+        return regionRepository.findAll(pageable)
+                .map(region -> convertToVO(region, RegionVO.class));
     }
 
     /**

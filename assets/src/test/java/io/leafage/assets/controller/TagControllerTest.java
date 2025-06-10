@@ -34,7 +34,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -70,7 +69,8 @@ class TagControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new TagVO(1L, true, Instant.now());
+        vo = new TagVO();
+        vo.setId(1L);
         vo.setName("test");
 
         dto = new TagDTO();
@@ -82,7 +82,7 @@ class TagControllerTest {
         Page<TagVO> page = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean())).willReturn(page);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
 
         mvc.perform(get("/tags").queryParam("page", "0")
                         .queryParam("size", "2").queryParam("sortBy", "id"))
@@ -92,10 +92,14 @@ class TagControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean())).willThrow(new RuntimeException());
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/tags").queryParam("page", "0")
-                        .queryParam("size", "2").queryParam("sortBy", "id"))
+        mvc.perform(get("/tags")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }

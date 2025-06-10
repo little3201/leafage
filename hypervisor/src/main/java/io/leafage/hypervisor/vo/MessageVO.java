@@ -15,44 +15,23 @@
 
 package io.leafage.hypervisor.vo;
 
-import io.leafage.hypervisor.bo.MessageBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.hypervisor.domain.superclass.MessageModel;
 
 /**
  * vo class for message.
  *
  * @author wq li
  */
-public class MessageVO extends MessageBO implements ReadonlyMetadata {
+public class MessageVO extends MessageModel {
 
-    private final Long id;
-
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
-
-    public MessageVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
+    private Long id;
 
 
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
-    }
-
 }
