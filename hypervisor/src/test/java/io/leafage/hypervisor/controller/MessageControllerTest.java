@@ -71,7 +71,8 @@ class MessageControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new MessageVO(1L, true, Instant.now());
+        vo = new MessageVO();
+        vo.setId(1L);
         vo.setTitle("test");
         vo.setReceiver("23234");
         vo.setContent("content");

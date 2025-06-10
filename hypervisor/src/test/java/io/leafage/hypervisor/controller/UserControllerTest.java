@@ -33,7 +33,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,10 +72,10 @@ class UserControllerTest {
         dto.setUsername("test");
         dto.setFamilyName("John");
         dto.setGivenName("Mark");
-        dto.setAccountNonLocked(true);
         dto.setAvatar("steven.jpg");
 
-        vo = new UserVO(1L, true, Instant.now());
+        vo = new UserVO();
+        vo.setId(1L);
         vo.setUsername("test");
         vo.setEmail("john@test.com");
     }

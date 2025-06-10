@@ -1,10 +1,7 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.SchedulerLog;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -33,14 +30,4 @@ public interface SchedulerLogRepository extends JpaRepository<SchedulerLog, Long
      */
     boolean existsByNameAndIdNot(String name, Long id);
 
-    /**
-     * Toggles the enabled status of a record by its ID.
-     *
-     * @param id The ID of the record.
-     * @return 1 if the update was successful, 0 otherwise.
-     */
-    @Transactional
-    @Modifying
-    @Query("UPDATE SchedulerLog t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
-    int updateEnabledById(Long id);
 }

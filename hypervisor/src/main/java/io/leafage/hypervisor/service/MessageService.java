@@ -17,13 +17,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.vo.MessageVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * message service.
  *
  * @author wq li
  */
-public interface MessageService extends ServletBasicService<MessageDTO, MessageVO> {
+public interface MessageService extends JdbcCrudService<MessageDTO, MessageVO> {
 
 }

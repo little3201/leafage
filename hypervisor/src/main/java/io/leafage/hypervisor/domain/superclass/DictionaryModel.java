@@ -13,76 +13,61 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.hypervisor.domain.superclass;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * bo class for group
+ * superclass class for dictionary
  *
  * @author wq li
  */
-public abstract class GroupBO {
+@MappedSuperclass
+public abstract class DictionaryModel {
 
     @NotBlank
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Column(name = "superior_id")
     private Long superiorId;
 
     private String description;
 
+    private boolean enabled = true;
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+
     public String getName() {
         return name;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
     public Long getSuperiorId() {
         return superiorId;
     }
 
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
     public void setSuperiorId(Long superiorId) {
         this.superiorId = superiorId;
     }
 
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -13,140 +13,91 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.hypervisor.domain.superclass;
 
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
 /**
- * bo class for privilege
+ * superclass class for privilege
  *
  * @author wq li
  */
-public abstract class PrivilegeBO {
-
+@MappedSuperclass
+public abstract class PrivilegeModel {
 
     @NotBlank
-    @Size(max = 32)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Column(name = "superior_id")
+    private Long superiorId;
     private String path;
 
-    /**
-     * 跳转路径
-     */
     private String redirect;
 
-    /**
-     * 组件路径
-     */
     private String component;
 
-    /**
-     * 图标
-     */
-    @NotBlank(message = "icon must not be empty.")
+    @NotBlank
     private String icon;
 
-    /**
-     * 操作
-     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "privilege_actions", joinColumns = @JoinColumn(name = "privilege_id"))
+    @Column(name = "action")
     private Set<String> actions;
 
-    /**
-     * 描述
-     */
     private String description;
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+    private boolean enabled = true;
+
+
     public String getName() {
         return name;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * <p>Getter for the field <code>path</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+    public Long getSuperiorId() {
+        return superiorId;
+    }
+
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
+    }
+
     public String getPath() {
         return path;
     }
 
-    /**
-     * <p>Setter for the field <code>path</code>.</p>
-     *
-     * @param path a {@link String} object
-     */
     public void setPath(String path) {
         this.path = path;
     }
 
-    /**
-     * <p>Getter for the field <code>redirect</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getRedirect() {
         return redirect;
     }
 
-    /**
-     * <p>Setter for the field <code>redirect</code>.</p>
-     *
-     * @param redirect a {@link String} object
-     */
     public void setRedirect(String redirect) {
         this.redirect = redirect;
     }
 
-    /**
-     * <p>Getter for the field <code>component</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getComponent() {
         return component;
     }
 
-    /**
-     * <p>Setter for the field <code>component</code>.</p>
-     *
-     * @param component a {@link String} object
-     */
     public void setComponent(String component) {
         this.component = component;
     }
 
-    /**
-     * <p>Getter for the field <code>icon</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getIcon() {
         return icon;
     }
 
-    /**
-     * <p>Setter for the field <code>icon</code>.</p>
-     *
-     * @param icon a {@link String} object
-     */
     public void setIcon(String icon) {
         this.icon = icon;
     }
@@ -159,21 +110,19 @@ public abstract class PrivilegeBO {
         this.actions = actions;
     }
 
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

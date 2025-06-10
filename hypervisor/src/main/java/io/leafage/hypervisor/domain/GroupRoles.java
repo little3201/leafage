@@ -18,7 +18,7 @@ import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
- * model class for group roles.
+ * entity class for group roles.
  *
  * @author wq li
  */

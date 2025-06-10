@@ -18,7 +18,7 @@ package io.leafage.assets.service;
 import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.vo.FileRecordVO;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 import java.io.OutputStream;
 
@@ -27,7 +27,7 @@ import java.io.OutputStream;
  *
  * @author wq li
  */
-public interface FileRecordService extends ServletBasicService<FileRecordDTO, FileRecordVO> {
+public interface FileRecordService extends JdbcCrudService<FileRecordDTO, FileRecordVO> {
 
     /**
      * 上传

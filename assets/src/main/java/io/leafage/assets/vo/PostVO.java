@@ -14,43 +14,33 @@
  */
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.PostBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.assets.domain.superclass.PostModel;
 
 /**
  * vo class for posts.
  *
  * @author wq li
  */
-public class PostVO extends PostBO implements ReadonlyMetadata {
+public class PostVO extends PostModel {
 
-    private final Long id;
+    private Long id;
 
-    private final boolean enabled;
+    private String content;
 
-    private final Instant lastModifiedDate;
 
-    public PostVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
+    public String getContent() {
+        return content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

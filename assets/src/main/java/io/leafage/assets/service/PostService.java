@@ -16,13 +16,13 @@ package io.leafage.assets.service;
 
 import io.leafage.assets.dto.PostDTO;
 import io.leafage.assets.vo.PostVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * posts service.
  *
  * @author wq li
  */
-public interface PostService extends ServletBasicService<PostDTO, PostVO> {
+public interface PostService extends JdbcCrudService<PostDTO, PostVO> {
 
 }

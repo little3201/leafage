@@ -15,14 +15,14 @@
 
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.DictionaryBO;
+import io.leafage.hypervisor.domain.superclass.DictionaryModel;
 
 /**
  * dto class for dictionary.
  *
  * @author wq li
  */
-public class DictionaryDTO extends DictionaryBO {
+public class DictionaryDTO extends DictionaryModel {
 
     /**
      * superior

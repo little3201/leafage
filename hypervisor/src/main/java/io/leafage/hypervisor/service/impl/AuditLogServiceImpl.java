@@ -20,17 +20,12 @@ import io.leafage.hypervisor.dto.AuditLogDTO;
 import io.leafage.hypervisor.repository.AuditLogRepository;
 import io.leafage.hypervisor.service.AuditLogService;
 import io.leafage.hypervisor.vo.AuditLogVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import top.leafage.common.DomainConverter;
 
 /**
  * audit log service impl.
@@ -38,7 +33,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class AuditLogServiceImpl implements AuditLogService {
+public class AuditLogServiceImpl extends DomainConverter implements AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
@@ -58,10 +53,7 @@ public class AuditLogServiceImpl implements AuditLogService {
     public Page<AuditLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<AuditLog> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return auditLogRepository.findAll(spec, pageable)
+        return auditLogRepository.findAll(pageable)
                 .map(auditLog -> convertToVO(auditLog, AuditLogVO.class));
     }
 

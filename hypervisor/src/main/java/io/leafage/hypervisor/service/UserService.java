@@ -16,14 +16,14 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.UserDTO;
 import io.leafage.hypervisor.vo.UserVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * user service.
  *
  * @author wq li
  */
-public interface UserService extends ServletBasicService<UserDTO, UserVO> {
+public interface UserService extends JdbcCrudService<UserDTO, UserVO> {
 
     /**
      * Fetch user

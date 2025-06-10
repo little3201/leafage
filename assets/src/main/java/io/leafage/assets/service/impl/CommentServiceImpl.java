@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends DomainConverter implements CommentService {
 
     private final CommentRepository commentRepository;
 

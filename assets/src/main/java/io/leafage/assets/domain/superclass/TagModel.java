@@ -13,36 +13,30 @@
  * limitations under the License.
  */
 
-package io.leafage.assets.bo;
+package io.leafage.assets.domain.superclass;
 
 
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * bo class for tag
+ * superclass class for tag
  *
  * @author wq li
  */
-public abstract class TagBO {
+@MappedSuperclass
+public abstract class TagModel {
 
-
-    @NotBlank(message = "tag name is empty.")
+    @NotBlank
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+
     public String getName() {
         return name;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
     public void setName(String name) {
         this.name = name;
     }

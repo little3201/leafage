@@ -13,31 +13,40 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.hypervisor.domain.superclass;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import java.net.InetAddress;
 
 /**
- * bo class for audit log
+ * superclass class for audit log
  *
  * @author wq li
  */
-public abstract class AuditLogBO {
+@MappedSuperclass
+public abstract class AuditLogModel {
 
     private String operation;
 
     private String resource;
 
+    @Column(name = "old_value")
     private String oldValue;
 
+    @Column(name = "new_value")
     private String newValue;
 
     private InetAddress ip;
 
+    @Column(name = "location", length = 50)
     private String location;
 
+    @Column(name = "status_code")
     private Integer statusCode;
 
+    @Column(name = "operated_times")
     private Long operatedTimes;
 
 

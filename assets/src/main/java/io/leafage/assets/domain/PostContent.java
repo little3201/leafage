@@ -14,19 +14,23 @@
  */
 package io.leafage.assets.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import jakarta.persistence.*;
 
 /**
- * model class for posts content.
+ * entity class for posts content.
  *
  * @author wq li
  */
 @Entity
 @Table(name = "post_content")
-public class PostContent extends AuditMetadata {
+public class PostContent {
+
+    /**
+     * Primary key.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * 帖子ID
@@ -39,38 +43,27 @@ public class PostContent extends AuditMetadata {
      */
     private String content;
 
-    /**
-     * <p>Getter for the field <code>postId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Long getPostId() {
         return postId;
     }
 
-    /**
-     * <p>Setter for the field <code>postId</code>.</p>
-     *
-     * @param postId a {@link Long} object
-     */
     public void setPostId(Long postId) {
         this.postId = postId;
     }
 
-    /**
-     * <p>Getter for the field <code>content</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getContent() {
         return content;
     }
 
-    /**
-     * <p>Setter for the field <code>content</code>.</p>
-     *
-     * @param content a {@link String} object
-     */
     public void setContent(String content) {
         this.content = content;
     }

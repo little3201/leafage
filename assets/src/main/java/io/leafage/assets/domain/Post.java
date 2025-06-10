@@ -14,86 +14,45 @@
  */
 package io.leafage.assets.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import io.leafage.assets.domain.superclass.PostModel;
+import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for posts.
+ * entity class for posts.
  *
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "posts")
-public class Post extends AuditMetadata {
+public class Post extends PostModel {
 
     /**
-     * 标题
+     * Primary key.
      */
-    @Column(name = "title", nullable = false, unique = true)
-    private String title;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    /**
-     * 概述
-     */
-    private String excerpt;
-
-
-    private boolean enabled = true;
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
 
 
-    /**
-     * <p>Getter for the field <code>title</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getTitle() {
-        return title;
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>title</code>.</p>
-     *
-     * @param title a {@link String} object
-     */
-    public void setTitle(String title) {
-        this.title = title;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>excerpt</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getExcerpt() {
-        return excerpt;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>excerpt</code>.</p>
-     *
-     * @param excerpt a {@link String} object
-     */
-    public void setExcerpt(String excerpt) {
-        this.excerpt = excerpt;
-    }
-
-    /**
-     * <p>isEnabled.</p>
-     *
-     * @return a boolean
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * <p>Setter for the field <code>enabled</code>.</p>
-     *
-     * @param enabled a boolean
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
 }

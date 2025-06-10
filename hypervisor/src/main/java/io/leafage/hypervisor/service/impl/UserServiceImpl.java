@@ -21,9 +21,9 @@ import io.leafage.hypervisor.service.UserService;
 import io.leafage.hypervisor.vo.UserVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 /**
  * user service impl.
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * @author wq li
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends DomainConverter implements UserService {
 
     private final UserRepository userRepository;
 
@@ -51,10 +51,7 @@ public class UserServiceImpl implements UserService {
     public Page<UserVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<User> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return userRepository.findAll(spec, pageable)
+        return userRepository.findAll(pageable)
                 .map(user -> convertToVO(user, UserVO.class));
     }
 

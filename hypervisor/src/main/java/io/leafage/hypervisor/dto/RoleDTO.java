@@ -14,13 +14,13 @@
  */
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.RoleBO;
+import io.leafage.hypervisor.domain.superclass.RoleModel;
 
 /**
  * dto class for role.
  *
  * @author wq li
  */
-public class RoleDTO extends RoleBO {
+public class RoleDTO extends RoleModel {
 
 }

@@ -13,57 +13,53 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.hypervisor.domain.superclass;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import java.time.Instant;
 
 /**
- * bo class for User
+ * superclass class for User
  *
  * @author wq li
  */
-public abstract class UserBO {
+@MappedSuperclass
+public abstract class UserModel {
 
-    @NotBlank
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @NotBlank
+    @Column(name = "given_name")
     private String givenName;
 
-    @NotBlank
+    @Column(name = "family_name")
     private String familyName;
 
+    @Column(name = "middle_name")
     private String middleName;
 
-    @Email
+    @Column(name = "password", nullable = false)
+    private String password;
+
     private String email;
 
     private String avatar;
 
+    @Column(name = "account_expires_at")
     private Instant accountExpiresAt;
 
-    private boolean accountNonLocked;
-
+    @Column(name = "credentials_expires_at")
     private Instant credentialsExpiresAt;
 
+    private boolean enabled = true;
 
-    /**
-     * <p>Getter for the field <code>username</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+
     public String getUsername() {
         return username;
     }
 
-    /**
-     * <p>Setter for the field <code>username</code>.</p>
-     *
-     * @param username a {@link String} object
-     */
     public void setUsername(String username) {
         this.username = username;
     }
@@ -92,93 +88,51 @@ public abstract class UserBO {
         this.middleName = middleName;
     }
 
-    /**
-     * <p>Getter for the field <code>email</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    /**
-     * <p>Setter for the field <code>email</code>.</p>
-     *
-     * @param email a {@link String} object
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * <p>Getter for the field <code>avatar</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getAvatar() {
         return avatar;
     }
 
-    /**
-     * <p>Setter for the field <code>avatar</code>.</p>
-     *
-     * @param avatar a {@link String} object
-     */
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
 
-    /**
-     * <p>Getter for the field <code>accountExpiresAt</code>.</p>
-     *
-     * @return a {@link java.time.Instant} object
-     */
     public Instant getAccountExpiresAt() {
         return accountExpiresAt;
     }
 
-    /**
-     * <p>Setter for the field <code>accountExpiresAt</code>.</p>
-     *
-     * @param accountExpiresAt a {@link java.time.Instant} object
-     */
     public void setAccountExpiresAt(Instant accountExpiresAt) {
         this.accountExpiresAt = accountExpiresAt;
     }
 
-    /**
-     * <p>isAccountNonLocked.</p>
-     *
-     * @return a boolean
-     */
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-
-    /**
-     * <p>Setter for the field <code>accountNonLocked</code>.</p>
-     *
-     * @param accountNonLocked a boolean
-     */
-    public void setAccountNonLocked(boolean accountNonLocked) {
-        this.accountNonLocked = accountNonLocked;
-    }
-
-    /**
-     * <p>Getter for the field <code>credentialsExpiresAt</code>.</p>
-     *
-     * @return a {@link java.time.Instant} object
-     */
     public Instant getCredentialsExpiresAt() {
         return credentialsExpiresAt;
     }
 
-    /**
-     * <p>Setter for the field <code>credentialsExpiresAt</code>.</p>
-     *
-     * @param credentialsExpiresAt a {@link java.time.Instant} object
-     */
     public void setCredentialsExpiresAt(Instant credentialsExpiresAt) {
         this.credentialsExpiresAt = credentialsExpiresAt;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

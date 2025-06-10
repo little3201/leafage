@@ -34,7 +34,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -72,7 +71,8 @@ class CommentControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new CommentVO(1L, true, Instant.now());
+        vo = new CommentVO();
+        vo.setId(1L);
         vo.setContent("content");
         vo.setPostId(1L);
 

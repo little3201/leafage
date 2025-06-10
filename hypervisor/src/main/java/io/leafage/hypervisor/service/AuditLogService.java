@@ -17,13 +17,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.AuditLogDTO;
 import io.leafage.hypervisor.vo.AuditLogVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * audit log service.
  *
  * @author wq li
  */
-public interface AuditLogService extends ServletBasicService<AuditLogDTO, AuditLogVO> {
+public interface AuditLogService extends JdbcCrudService<AuditLogDTO, AuditLogVO> {
 
 }

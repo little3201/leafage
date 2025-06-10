@@ -15,114 +15,56 @@
 
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import io.leafage.hypervisor.domain.superclass.MessageModel;
+import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for message.
+ * entity class for message.
  *
  * @author wq li
  */
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "messages")
-public class Message extends AuditMetadata {
-
-
-    @Column(name = "title", nullable = false)
-    private String title;
+public class Message extends MessageModel {
 
     /**
-     * 内容
+     * Primary key.
      */
-    @Column(name = "content", length = 1000)
-    private String content;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    /**
-     * 是否未读
-     */
     private boolean unread = true;
 
-    /**
-     * 接收人
-     */
-    @Column(name = "receiver", nullable = false, length = 50)
-    private String receiver;
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
 
 
-    /**
-     * <p>Getter for the field <code>title</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getTitle() {
-        return title;
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>title</code>.</p>
-     *
-     * @param title a {@link String} object
-     */
-    public void setTitle(String title) {
-        this.title = title;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>content</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * <p>Setter for the field <code>content</code>.</p>
-     *
-     * @param content a {@link String} object
-     */
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    /**
-     * <p>isRead.</p>
-     *
-     * @return a boolean
-     */
     public boolean isUnread() {
         return unread;
     }
 
-    /**
-     * <p>Setter for the field <code>unread</code>.</p>
-     *
-     * @param unread a boolean
-     */
     public void setUnread(boolean unread) {
         this.unread = unread;
     }
 
-    /**
-     * <p>Getter for the field <code>receiver</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getReceiver() {
-        return receiver;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>receiver</code>.</p>
-     *
-     * @param receiver a {@link String} object
-     */
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
+
 }

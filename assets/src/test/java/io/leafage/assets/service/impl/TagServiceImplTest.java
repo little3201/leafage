@@ -16,7 +16,6 @@ package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Tag;
 import io.leafage.assets.dto.TagDTO;
-import io.leafage.assets.repository.TagPostsRepository;
 import io.leafage.assets.repository.TagRepository;
 import io.leafage.assets.vo.TagVO;
 import org.junit.jupiter.api.Assertions;
@@ -49,9 +48,6 @@ class TagServiceImplTest {
     @Mock
     private TagRepository tagRepository;
 
-    @Mock
-    private TagPostsRepository tagPostsRepository;
-
     @InjectMocks
     private TagServiceImpl tagService;
 
@@ -68,7 +64,6 @@ class TagServiceImplTest {
         Page<Tag> page = new PageImpl<>(List.of(Mockito.mock(Tag.class)));
         given(tagRepository.findAll(Mockito.any(PageRequest.class))).willReturn(page);
 
-        given(tagPostsRepository.countByTagId(Mockito.anyLong())).willReturn(Mockito.anyLong());
         Page<TagVO> voPage = tagService.retrieve(0, 2, "id", true, "");
 
         Assertions.assertNotNull(voPage.getContent());

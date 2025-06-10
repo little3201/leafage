@@ -15,43 +15,22 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.FileRecordBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.assets.domain.superclass.FileRecordModel;
 
 /**
  * vo class for file record.
  *
  * @author wq li
  */
-public class FileRecordVO extends FileRecordBO implements ReadonlyMetadata {
+public class FileRecordVO extends FileRecordModel {
 
-    private final Long id;
+    private Long id;
 
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
-
-    public FileRecordVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
-    }
-
 }

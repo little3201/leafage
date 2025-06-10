@@ -4,3 +4,9 @@ spring:
     username: postgres
     password: zx110119
     driver-class-name: org.postgresql.Driver
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG

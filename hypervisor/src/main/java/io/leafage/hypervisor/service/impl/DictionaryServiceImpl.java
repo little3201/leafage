@@ -22,9 +22,9 @@ import io.leafage.hypervisor.service.DictionaryService;
 import io.leafage.hypervisor.vo.DictionaryVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class DictionaryServiceImpl implements DictionaryService {
+public class DictionaryServiceImpl extends DomainConverter implements DictionaryService {
 
     private final DictionaryRepository dictionaryRepository;
 
@@ -54,10 +54,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     public Page<DictionaryVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Dictionary> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return dictionaryRepository.findAll(spec, pageable)
+        return dictionaryRepository.findAllBySuperiorIdIsNull(pageable)
                 .map(dictionary -> convertToVO(dictionary, DictionaryVO.class));
     }
 

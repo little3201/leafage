@@ -35,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import top.leafage.common.TreeNode;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +103,12 @@ class PrivilegeServiceImplTest {
 
         given(this.rolePrivilegesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(Collections.singletonList(Mockito.mock(RolePrivileges.class)));
 
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(Privilege.class)));
+        Privilege privilegeMock = Mockito.mock(Privilege.class);
+        JdbcAuditMetadata auditMetadataMock = Mockito.mock(JdbcAuditMetadata.class);
+        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(privilegeMock));
+
+        given(privilegeMock.getAuditMetadata()).willReturn(auditMetadataMock);
+        given(auditMetadataMock.isEnabled()).willReturn(true);
 
         List<TreeNode<Long>> nodes = privilegeService.tree("test");
         Assertions.assertNotNull(nodes);

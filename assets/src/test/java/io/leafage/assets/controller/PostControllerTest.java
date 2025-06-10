@@ -33,7 +33,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +76,9 @@ class PostControllerTest {
         dto.setTags(Collections.singleton("java"));
         dto.setContent("content");
 
-        vo = new PostVO(1L, true, Instant.now());
+        vo = new PostVO();
+        vo.setId(1L);
+        vo.setExcerpt("excerpt");
         vo.setTitle(dto.getTitle());
         vo.setTags(dto.getTags());
 

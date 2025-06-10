@@ -17,13 +17,13 @@ package io.leafage.assets.service;
 
 import io.leafage.assets.dto.RegionDTO;
 import io.leafage.assets.vo.RegionVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * region service.
  *
  * @author wq li
  */
-public interface RegionService extends ServletBasicService<RegionDTO, RegionVO> {
+public interface RegionService extends JdbcCrudService<RegionDTO, RegionVO> {
 
 }

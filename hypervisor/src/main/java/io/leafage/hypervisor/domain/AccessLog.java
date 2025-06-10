@@ -16,120 +16,45 @@
 package io.leafage.hypervisor.domain;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import io.leafage.hypervisor.domain.superclass.AccessLogModel;
+import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.servlet.audit.AuditMetadata;
-
-import java.net.InetAddress;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for access log.
+ * entity class for access log.
  *
  * @author wq li
  */
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "access_logs")
-public class AccessLog extends AuditMetadata {
+public class AccessLog extends AccessLogModel {
 
-    private String url;
+    /**
+     * Primary key.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "http_method", length = 10)
-    private String httpMethod;
-
-    private InetAddress ip;
-
-    @Column(name = "location", length = 50)
-    private String location;
-
-    private String params;
-
-    private String body;
-
-    @Column(name = "status_code")
-    private Integer statusCode;
-
-    @Column(name = "response_times")
-    private Long responseTimes;
-
-    @Column(name = "response_message")
-    private String responseMessage;
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
 
 
-    public String getUrl() {
-        return url;
+    public Long getId() {
+        return id;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getHttpMethod() {
-        return httpMethod;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    public void setHttpMethod(String method) {
-        this.httpMethod = method;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
-
-    public InetAddress getIp() {
-        return ip;
-    }
-
-    public void setIp(InetAddress ip) {
-        this.ip = ip;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getParams() {
-        return params;
-    }
-
-    public void setParams(String params) {
-        this.params = params;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public Integer getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(Integer responseCode) {
-        this.statusCode = responseCode;
-    }
-
-    public Long getResponseTimes() {
-        return responseTimes;
-    }
-
-    public void setResponseTimes(Long responseTimes) {
-        this.responseTimes = responseTimes;
-    }
-
-    public String getResponseMessage() {
-        return responseMessage;
-    }
-
-    public void setResponseMessage(String responseMessage) {
-        this.responseMessage = responseMessage;
-    }
-
-
 }

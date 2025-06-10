@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -20,7 +21,7 @@ import java.util.stream.StreamSupport;
  * @author wq li
  */
 @Service
-public class SchedulerLogServiceImpl implements SchedulerLogService {
+public class SchedulerLogServiceImpl extends DomainConverter implements SchedulerLogService {
 
     private final SchedulerLogRepository schedulerLogRepository;
 
@@ -33,29 +34,24 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return schedulerLogRepository.findAll(pageable)
-                .map(this::convertVoStatus);
+                .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class));
     }
 
     @Override
     public List<SchedulerLogVO> retrieve(List<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return schedulerLogRepository.findAll().stream()
-                    .map(this::convertVoStatus).toList();
+                    .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class)).toList();
         } else {
             return schedulerLogRepository.findAllById(ids).stream()
-                    .map(this::convertVoStatus).toList();
+                    .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class)).toList();
         }
     }
 
     @Override
     public SchedulerLogVO fetch(Long id) {
         return schedulerLogRepository.findById(id)
-                .map(this::convertVoStatus).orElse(null);
-    }
-
-    @Override
-    public boolean enable(Long id) {
-        return schedulerLogRepository.updateEnabledById(id) > 0;
+                .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class)).orElse(null);
     }
 
     @Override
@@ -71,14 +67,14 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
     public SchedulerLogVO create(SchedulerLogDTO dto) {
         SchedulerLog schedulerLog = convertToDomain(dto, SchedulerLog.class);
         schedulerLogRepository.save(schedulerLog);
-        return convertVoStatus(schedulerLog);
+        return convertToVO(schedulerLog, SchedulerLogVO.class);
     }
 
     @Override
     public List<SchedulerLogVO> createAll(Iterable<SchedulerLogDTO> iterable) {
         List<SchedulerLog> list = StreamSupport.stream(iterable.spliterator(), false).map(dto -> convertToDomain(dto, SchedulerLog.class)).toList();
         return schedulerLogRepository.saveAll(list).stream()
-                .map(this::convertVoStatus).toList();
+                .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class)).toList();
     }
 
     @Override
@@ -89,7 +85,7 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
                 .map(existing -> {
                     SchedulerLog schedulerLog = convert(dto, existing);
                     schedulerLog = schedulerLogRepository.save(schedulerLog);
-                    return convertVoStatus(schedulerLog);
+                    return convertToVO(schedulerLog, SchedulerLogVO.class);
                 }).orElseThrow();
     }
 
@@ -100,9 +96,4 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
         schedulerLogRepository.deleteById(id);
     }
 
-    private SchedulerLogVO convertVoStatus(SchedulerLog schedulerLog) {
-        SchedulerLogVO vo = convertToVO(schedulerLog, SchedulerLogVO.class);
-        vo.setStatus(schedulerLog.getStatus().name());
-        return vo;
-    }
 }

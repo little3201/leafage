@@ -16,13 +16,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.vo.RoleVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * role service.
  *
  * @author wq li
  */
-public interface RoleService extends ServletBasicService<RoleDTO, RoleVO> {
+public interface RoleService extends JdbcCrudService<RoleDTO, RoleVO> {
 
 }

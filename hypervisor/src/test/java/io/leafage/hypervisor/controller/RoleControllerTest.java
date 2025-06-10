@@ -81,7 +81,8 @@ class RoleControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new RoleVO(1L, true, Instant.now());
+        vo = new RoleVO();
+        vo.setId(1L);
         vo.setName("test");
         vo.setDescription("description");
 

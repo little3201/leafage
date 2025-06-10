@@ -23,9 +23,9 @@ import io.leafage.assets.vo.RegionVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 /**
  * region service impl.
@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  * @author wq li
  */
 @Service
-public class RegionServiceImpl implements RegionService {
+public class RegionServiceImpl extends DomainConverter implements RegionService {
 
     private final RegionRepository regionRepository;
 
@@ -53,10 +53,8 @@ public class RegionServiceImpl implements RegionService {
     public Page<RegionVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Region> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return regionRepository.findAll(spec, pageable).map(region -> convertToVO(region, RegionVO.class));
+        return regionRepository.findAll(pageable)
+                .map(region -> convertToVO(region, RegionVO.class));
     }
 
     /**

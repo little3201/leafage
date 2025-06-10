@@ -16,23 +16,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.vo.GroupVO;
-import top.leafage.common.TreeNode;
-import top.leafage.common.servlet.ServletBasicService;
-
-import java.util.List;
+import top.leafage.common.jdbc.JdbcTreeService;
 
 /**
  * group service.
  *
  * @author wq li
  */
-public interface GroupService extends ServletBasicService<GroupDTO, GroupVO> {
-
-    /**
-     * 获取树结构数据
-     *
-     * @return 树结构数据集
-     */
-    List<TreeNode<Long>> tree();
+public interface GroupService extends JdbcTreeService<GroupDTO, GroupVO, Long> {
 
 }

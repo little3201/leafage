@@ -17,7 +17,7 @@ package io.leafage.assets.service;
 
 import io.leafage.assets.dto.CommentDTO;
 import io.leafage.assets.vo.CommentVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author wq li
  */
-public interface CommentService extends ServletBasicService<CommentDTO, CommentVO> {
+public interface CommentService extends JdbcCrudService<CommentDTO, CommentVO> {
 
     /**
      * 根据posts查询

@@ -63,7 +63,8 @@ class AccessLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new AccessLogVO(1L, true, Instant.now());
+        vo = new AccessLogVO();
+        vo.setId(1L);
         vo.setIp(InetAddress.getByName("12.1.3.2"));
         vo.setLocation("test");
         vo.setHttpMethod("POST");

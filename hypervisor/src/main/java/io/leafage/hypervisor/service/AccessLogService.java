@@ -17,14 +17,14 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.AccessLogDTO;
 import io.leafage.hypervisor.vo.AccessLogVO;
-import top.leafage.common.servlet.ServletBasicService;
+import top.leafage.common.jdbc.JdbcCrudService;
 
 /**
  * access log service.
  *
  * @author wq li
  */
-public interface AccessLogService extends ServletBasicService<AccessLogDTO, AccessLogVO> {
+public interface AccessLogService extends JdbcCrudService<AccessLogDTO, AccessLogVO> {
 
     /**
      * 清空日志

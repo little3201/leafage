@@ -13,47 +13,47 @@
  * limitations under the License.
  */
 
-package io.leafage.exploiter.bo;
+package io.leafage.assets.domain.superclass;
 
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * bo class for template.
+ * superclass class for comment
  *
  * @author wq li
  */
-public class MasterPlateBO {
+@MappedSuperclass
+public abstract class CommentModel {
 
+    /**
+     * 帖子
+     */
+    @NotNull
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
+
+    /**
+     * 内容
+     */
     @NotBlank
-    private String name;
-
-    @NotBlank
-    private String suffix;
-
     private String content;
 
-    @NotNull
-    private String type;
+    /**
+     * 回复者
+     */
+    private Long replier;
 
-    @NotBlank
-    private String version;
 
-
-    public String getName() {
-        return name;
+    public Long getPostId() {
+        return postId;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
+    public void setPostId(Long postId) {
+        this.postId = postId;
     }
 
     public String getContent() {
@@ -64,19 +64,11 @@ public class MasterPlateBO {
         this.content = content;
     }
 
-    public String getType() {
-        return type;
+    public Long getReplier() {
+        return replier;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
+    public void setReplier(Long replier) {
+        this.replier = replier;
     }
 }

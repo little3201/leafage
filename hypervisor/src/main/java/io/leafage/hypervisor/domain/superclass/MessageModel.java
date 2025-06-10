@@ -13,58 +13,50 @@
  * limitations under the License.
  */
 
-package io.leafage.assets.bo;
+package io.leafage.hypervisor.domain.superclass;
 
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * bo class for file record.
+ * dto class for Notification
  *
  * @author wq li
  */
-public abstract class FileRecordBO {
+@MappedSuperclass
+public abstract class MessageModel {
 
     @NotBlank
-    private String name;
+    private String title;
 
     @NotBlank
-    private String path;
+    private String content;
 
     @NotBlank
-    private String mimeType;
-
-    private float size;
+    private String receiver;
 
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getPath() {
-        return path;
+    public String getContent() {
+        return content;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getMimeType() {
-        return mimeType;
+    public String getReceiver() {
+        return receiver;
     }
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public float getSize() {
-        return size;
-    }
-
-    public void setSize(float size) {
-        this.size = size;
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 }

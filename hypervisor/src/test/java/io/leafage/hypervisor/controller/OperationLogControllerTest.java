@@ -63,7 +63,8 @@ class OperationLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new OperationLogVO(1L, true, Instant.now());
+        vo = new OperationLogVO();
+        vo.setId(1L);
         vo.setIp(InetAddress.getByName("127.0.0.1"));
         vo.setLocation("test");
         vo.setBrowser("Chrome");

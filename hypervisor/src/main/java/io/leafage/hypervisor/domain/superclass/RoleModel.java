@@ -13,29 +13,27 @@
  * limitations under the License.
  */
 
-package io.leafage.exploiter.bo;
+package io.leafage.hypervisor.domain.superclass;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * dto class for script.
+ * superclass class for role
  *
  * @author wq li
  */
-public class ScriptBO {
+@MappedSuperclass
+public abstract class RoleModel {
 
     @NotBlank
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @NotBlank
-    private String type;
+    private String description;
 
-    private String icon;
-
-    @NotBlank
-    private String version;
-
-    private String content;
+    private boolean enabled = true;
 
 
     public String getName() {
@@ -46,35 +44,19 @@ public class ScriptBO {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
+    public String getDescription() {
+        return description;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getIcon() {
-        return icon;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
+import top.leafage.common.DomainConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,7 @@ import java.nio.file.Files;
  * @author wq li
  */
 @Service
-public class FileRecordServiceImpl implements FileRecordService {
+public class FileRecordServiceImpl extends DomainConverter implements FileRecordService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileRecordServiceImpl.class);
 
@@ -53,10 +53,7 @@ public class FileRecordServiceImpl implements FileRecordService {
     public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<FileRecord> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return fileRecordRepository.findAll(spec, pageable)
+        return fileRecordRepository.findAll(pageable)
                 .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class));
     }
 

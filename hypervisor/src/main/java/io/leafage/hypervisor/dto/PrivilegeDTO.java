@@ -14,36 +14,13 @@
  */
 package io.leafage.hypervisor.dto;
 
-import io.leafage.hypervisor.bo.PrivilegeBO;
+import io.leafage.hypervisor.domain.superclass.PrivilegeModel;
 
 /**
  * dto class for privilege.
  *
  * @author wq li
  */
-public class PrivilegeDTO extends PrivilegeBO {
-
-    /**
-     * 上级
-     */
-    private Long superiorId;
-
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
-    public Long getSuperiorId() {
-        return superiorId;
-    }
-
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
-    public void setSuperiorId(Long superiorId) {
-        this.superiorId = superiorId;
-    }
+public class PrivilegeDTO extends PrivilegeModel {
 
 }

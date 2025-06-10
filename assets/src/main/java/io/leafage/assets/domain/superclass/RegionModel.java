@@ -13,22 +13,41 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.assets.domain.superclass;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * bo class for dictionary
+ * region superclass
  *
  * @author wq li
  */
-public abstract class DictionaryBO {
-
+@MappedSuperclass
+public abstract class RegionModel {
 
     @NotBlank
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    /**
+     * 上级
+     */
+    @Column(name = "superior_id")
     private Long superiorId;
+
+    /**
+     * 区号
+     */
+    @Column(name = "area_code", length = 4)
+    private String areaCode;
+
+    /**
+     * 邮编
+     */
+    @Column(name = "postal_code", length = 6)
+    private Integer postalCode;
 
     /**
      * 描述
@@ -36,56 +55,42 @@ public abstract class DictionaryBO {
     private String description;
 
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
     public Long getSuperiorId() {
         return superiorId;
     }
 
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
     public void setSuperiorId(Long superiorId) {
         this.superiorId = superiorId;
     }
 
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
+
+    public Integer getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(Integer postalCode) {
+        this.postalCode = postalCode;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
     public void setDescription(String description) {
         this.description = description;
     }

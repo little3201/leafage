@@ -13,69 +13,48 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.hypervisor.domain.superclass;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import java.net.InetAddress;
 
 /**
- * bo class for operation log
+ * superclass class for operation log
  *
  * @author wq li
  */
-public abstract class OperationLogBO {
-
-    /**
-     * IP地址
-     */
-    private InetAddress ip;
-
-    /**
-     * 地理位置
-     */
-    private String location;
-
-    /**
-     * 用户代理信息
-     */
-    private String userAgent;
-
-    private String content;
+@MappedSuperclass
+public abstract class OperationLogModel {
 
     private String operation;
 
-    /**
-     * HTTP状态码
-     */
+    private InetAddress ip;
+
+    private String location;
+
+    private String content;
+
+    @Column(name = "user_agent")
+    private String userAgent;
+
+    @Column(name = "status_code")
     private Integer statusCode;
 
-    /**
-     * 响应时间
-     */
+    @Column(name = "operated_times")
     private Long operatedTimes;
 
-    /**
-     * 来源页面
-     */
     private String referer;
 
-    /**
-     * 会话标识符
-     */
+    @Column(name = "session_id")
     private String sessionId;
 
-    /**
-     * 设备类型
-     */
+    @Column(name = "device_type")
     private String deviceType;
 
-    /**
-     * 操作系统
-     */
     private String os;
 
-    /**
-     * 浏览器
-     */
     private String browser;
 
 

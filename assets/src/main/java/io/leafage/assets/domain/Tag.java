@@ -14,64 +14,45 @@
  */
 package io.leafage.assets.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import io.leafage.assets.domain.superclass.TagModel;
+import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for tag.
+ * entity class for tag.
  *
  * @author wq li
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "tags")
-public class Tag extends AuditMetadata {
-
-
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
-
-
-    @Column(name = "enabled", nullable = false)
-    private boolean enabled = true;
-
+public class Tag extends TagModel {
 
     /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
+     * Primary key.
      */
-    public String getName() {
-        return name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
+
+
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>isEnabled.</p>
-     *
-     * @return a boolean
-     */
-    public boolean isEnabled() {
-        return enabled;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>enabled</code>.</p>
-     *
-     * @param enabled a boolean
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
-
-
 }

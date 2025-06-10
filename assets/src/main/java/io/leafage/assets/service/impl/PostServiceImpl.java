@@ -16,29 +16,20 @@ package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Post;
 import io.leafage.assets.domain.PostContent;
-import io.leafage.assets.domain.Tag;
-import io.leafage.assets.domain.TagPosts;
 import io.leafage.assets.dto.PostDTO;
 import io.leafage.assets.repository.PostContentRepository;
 import io.leafage.assets.repository.PostRepository;
-import io.leafage.assets.repository.TagPostsRepository;
-import io.leafage.assets.repository.TagRepository;
 import io.leafage.assets.service.PostService;
 import io.leafage.assets.vo.PostVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
+import top.leafage.common.DomainConverter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * posts service impl.
@@ -46,27 +37,20 @@ import java.util.stream.Collectors;
  * @author wq li
  */
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl extends DomainConverter implements PostService {
 
     private final PostRepository postRepository;
     private final PostContentRepository postContentRepository;
-    private final TagRepository tagRepository;
-    private final TagPostsRepository tagPostsRepository;
 
     /**
      * <p>Constructor for PostsServiceImpl.</p>
      *
      * @param postRepository        a {@link PostRepository} object
      * @param postContentRepository a {@link PostContentRepository} object
-     * @param tagRepository         a {@link TagRepository} object
-     * @param tagPostsRepository    a {@link TagPostsRepository} object
      */
-    public PostServiceImpl(PostRepository postRepository, PostContentRepository postContentRepository,
-                           TagRepository tagRepository, TagPostsRepository tagPostsRepository) {
+    public PostServiceImpl(PostRepository postRepository, PostContentRepository postContentRepository) {
         this.postRepository = postRepository;
         this.postContentRepository = postContentRepository;
-        this.tagRepository = tagRepository;
-        this.tagPostsRepository = tagPostsRepository;
     }
 
     /**
@@ -76,10 +60,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Post> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return postRepository.findAll(spec, pageable).map(this::convert);
+        return postRepository.findAll(pageable).map(post -> convertToVO(post, PostVO.class));
     }
 
     /**
@@ -89,7 +70,7 @@ public class PostServiceImpl implements PostService {
     public PostVO fetch(Long id) {
         Assert.notNull(id, "id must not be null.");
         //查询基本信息
-        PostVO vo = postRepository.findById(id).map(this::convert).orElse(null);
+        PostVO vo = postRepository.findById(id).map(post -> convertToVO(post, PostVO.class)).orElse(null);
         if (vo == null) {
             return null;
         }
@@ -134,10 +115,7 @@ public class PostServiceImpl implements PostService {
         postContent.setContent(dto.getContent());
         postContentRepository.saveAndFlush(postContent);
 
-        // sava tag
-        this.relation(post.getId(), dto.getTags());
-        //转换结果
-        return this.convert(post);
+        return convertToVO(post, PostVO.class);
     }
 
     /**
@@ -168,11 +146,7 @@ public class PostServiceImpl implements PostService {
         postContent.setContent(dto.getContent());
         postContentRepository.save(postContent);
 
-        // sava tag
-        this.relation(post.getId(), dto.getTags());
-
-        //转换结果
-        return this.convert(post);
+        return convertToVO(post, PostVO.class);
     }
 
     /**
@@ -183,50 +157,6 @@ public class PostServiceImpl implements PostService {
         Assert.notNull(id, "id must not be null.");
 
         postRepository.deleteById(id);
-    }
-
-    /**
-     * 对象转换为输出结果对象
-     *
-     * @param post 信息
-     * @return 输出转换后的vo对象
-     */
-    private PostVO convert(Post post) {
-        PostVO vo = convertToVO(post, PostVO.class);
-
-        List<TagPosts> tagPostsList = tagPostsRepository.findAllByPostId(post.getId());
-        // 转换 tags
-        if (!CollectionUtils.isEmpty(tagPostsList)) {
-            Set<String> tags = tagPostsList.stream().map(tagPosts -> {
-                Optional<Tag> optional = tagRepository.findById(tagPosts.getId());
-                return optional.map(Tag::getName).orElse(null);
-            }).collect(Collectors.toSet());
-
-            vo.setTags(tags);
-        }
-        return vo;
-    }
-
-    private void relation(Long id, Set<String> tags) {
-        tagPostsRepository.deleteByPostId(id);
-        // 设置新的关联
-        if (!CollectionUtils.isEmpty(tags)) {
-            List<TagPosts> tagPostsList = new ArrayList<>(tags.size());
-            tags.forEach(t -> {
-                Tag tag = tagRepository.getByName(t);
-                if (tag == null) {
-                    Tag newTag = new Tag();
-                    newTag.setName(t);
-                    tag = tagRepository.saveAndFlush(newTag);
-                }
-
-                TagPosts tagPosts = new TagPosts();
-                tagPosts.setPostId(id);
-                tagPosts.setTagId(tag.getId());
-                tagPostsList.add(tagPosts);
-            });
-            tagPostsRepository.saveAll(tagPostsList);
-        }
     }
 
 }

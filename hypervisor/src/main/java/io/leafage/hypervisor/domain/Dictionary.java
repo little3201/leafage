@@ -15,83 +15,45 @@
 
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import io.leafage.hypervisor.domain.superclass.DictionaryModel;
+import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for dictionary.
+ * entity class for dictionary.
  *
  * @author wq li
  */
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "dictionaries")
-public class Dictionary extends AuditMetadata {
-
-    @Column(name = "name", nullable = false, length = 50)
-    private String name;
-
-    @Column(name = "superior_id")
-    private Long superiorId;
-
-    private String description;
-
+public class Dictionary extends DictionaryModel {
 
     /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
+     * Primary key.
      */
-    public String getName() {
-        return name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
+
+
+    public Long getId() {
+        return id;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
-    public Long getSuperiorId() {
-        return superiorId;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link Long} object
-     */
-    public void setSuperiorId(Long superiorId) {
-        this.superiorId = superiorId;
-    }
-
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
 }

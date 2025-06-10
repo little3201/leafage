@@ -13,59 +13,63 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.assets.domain.superclass;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * bo class for role
+ * superclass class for file record.
  *
  * @author wq li
  */
-public abstract class RoleBO {
-
+@MappedSuperclass
+public abstract class FileRecordModel {
 
     @NotBlank
+    @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
-    /**
-     * 描述
-     */
-    private String description;
+    @NotBlank
+    private String path;
 
-    /**
-     * <p>Getter for the field <code>name</code>.</p>
-     *
-     * @return a {@link String} object
-     */
+    @NotBlank
+    @Column(name = "mime_type")
+    private String mimeType;
+
+    private float size;
+
+
     public String getName() {
         return name;
     }
 
-    /**
-     * <p>Setter for the field <code>name</code>.</p>
-     *
-     * @param name a {@link String} object
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * <p>Getter for the field <code>description</code>.</p>
-     *
-     * @return a {@link String} object
-     */
-    public String getDescription() {
-        return description;
+    public String getPath() {
+        return path;
     }
 
-    /**
-     * <p>Setter for the field <code>description</code>.</p>
-     *
-     * @param description a {@link String} object
-     */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public float getSize() {
+        return size;
+    }
+
+    public void setSize(float size) {
+        this.size = size;
     }
 }

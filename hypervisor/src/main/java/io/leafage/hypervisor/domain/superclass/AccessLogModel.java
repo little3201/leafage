@@ -13,34 +13,44 @@
  * limitations under the License.
  */
 
-package io.leafage.hypervisor.bo;
+package io.leafage.hypervisor.domain.superclass;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import java.net.InetAddress;
 
 /**
- * bo class for access log
+ * superclass class for access log
  *
  * @author wq li
  */
-public abstract class AccessLogBO {
+@MappedSuperclass
+public abstract class AccessLogModel {
 
     private String url;
 
+    @Column(name = "http_method", length = 10)
     private String httpMethod;
+
+    private InetAddress ip;
+
+    @Column(name = "location", length = 50)
+    private String location;
 
     private String params;
 
     private String body;
 
-    private InetAddress ip;
-
-    private String location;
-
+    @Column(name = "status_code")
     private Integer statusCode;
 
+    @Column(name = "response_times")
     private Long responseTimes;
 
+    @Column(name = "response_message")
     private String responseMessage;
+
 
 
     public String getUrl() {

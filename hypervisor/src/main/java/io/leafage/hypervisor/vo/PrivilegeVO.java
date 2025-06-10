@@ -14,46 +14,26 @@
  */
 package io.leafage.hypervisor.vo;
 
-import io.leafage.hypervisor.bo.PrivilegeBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.hypervisor.domain.superclass.PrivilegeModel;
 
 /**
  * vo class for privilege.
  *
  * @author wq li
  */
-public class PrivilegeVO extends PrivilegeBO implements ReadonlyMetadata {
+public class PrivilegeVO extends PrivilegeModel {
 
-    private final Long id;
-
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
+    private Long id;
 
     private long count;
 
-    public PrivilegeVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
 
-
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
-    }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public long getCount() {
@@ -63,5 +43,4 @@ public class PrivilegeVO extends PrivilegeBO implements ReadonlyMetadata {
     public void setCount(long count) {
         this.count = count;
     }
-
 }

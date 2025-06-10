@@ -81,7 +81,8 @@ class GroupControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new GroupVO(1L, true, Instant.now());
+        vo = new GroupVO();
+        vo.setId(1L);
         vo.setName("test");
 
         dto = new GroupDTO();

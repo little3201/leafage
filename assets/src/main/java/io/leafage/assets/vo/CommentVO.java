@@ -15,45 +15,28 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.CommentBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.assets.domain.superclass.CommentModel;
 
 /**
  * vo class for comment.
  *
  * @author wq li
  */
-public class CommentVO extends CommentBO implements ReadonlyMetadata {
+public class CommentVO extends CommentModel {
 
-    private final Long id;
-
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
+    private Long id;
 
     private long count;
 
-    public CommentVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
+    private String location;
 
-    @Override
+
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
-    }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public long getCount() {

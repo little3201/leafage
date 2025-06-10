@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.common.DomainConverter;
 
 /**
  * operation log service impl.
@@ -32,7 +33,7 @@ import org.springframework.util.Assert;
  * @author wq li
  */
 @Service
-public class OperationLogServiceImpl implements OperationLogService {
+public class OperationLogServiceImpl extends DomainConverter implements OperationLogService {
 
     private final OperationLogRepository operationLogRepository;
 
@@ -52,10 +53,7 @@ public class OperationLogServiceImpl implements OperationLogService {
     public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<OperationLog> spec = (root, query, cb) ->
-                buildJpaPredicate(filters, cb, root).orElse(null);
-
-        return operationLogRepository.findAll(spec, pageable)
+        return operationLogRepository.findAll(pageable)
                 .map(operationLog -> convertToVO(operationLog, OperationLogVO.class));
     }
 

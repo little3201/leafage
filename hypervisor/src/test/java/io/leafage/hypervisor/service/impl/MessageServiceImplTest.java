@@ -22,7 +22,6 @@ import io.leafage.hypervisor.vo.MessageVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,8 +56,7 @@ class MessageServiceImplTest {
     void retrieve() {
         Page<Message> page = new PageImpl<>(List.of(Mockito.mock(Message.class)));
 
-        given(this.messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+        given(this.messageRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
 
         Page<MessageVO> voPage = messageService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());

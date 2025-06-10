@@ -15,7 +15,7 @@
 
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.FileRecordBO;
+import io.leafage.assets.domain.superclass.FileRecordModel;
 
-public class FileRecordDTO extends FileRecordBO {
+public class FileRecordDTO extends FileRecordModel {
 }

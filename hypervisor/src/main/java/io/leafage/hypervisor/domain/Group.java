@@ -14,52 +14,45 @@
  */
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Table;
+import io.leafage.hypervisor.domain.superclass.GroupModel;
+import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.servlet.audit.AuditMetadata;
+import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
- * model class for group.
+ * entity class for group.
  *
  * @author wq li
  */
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "groups")
-public class Group extends AuditMetadata {
+public class Group extends GroupModel {
 
-    @Column(name = "group_name", nullable = false, unique = true)
-    private String name;
+    /**
+     * Primary key.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private Long superiorId;
+    @Embedded
+    private JdbcAuditMetadata auditMetadata;
 
-    private String description;
 
-
-    public String getName() {
-        return name;
+    public Long getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long getSuperiorId() {
-        return superiorId;
+    public JdbcAuditMetadata getAuditMetadata() {
+        return auditMetadata;
     }
 
-    public void setSuperiorId(Long superiorId) {
-        this.superiorId = superiorId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
     }
 }

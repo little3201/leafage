@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import top.leafage.common.TreeNode;
-import top.leafage.common.servlet.ServletAbstractTreeNodeService;
+import top.leafage.common.jdbc.JdbcTreeAndDomainConverter;
 
 import java.util.*;
 
@@ -39,7 +39,7 @@ import java.util.*;
  * @author wq li
  */
 @Service
-public class PrivilegeServiceImpl extends ServletAbstractTreeNodeService<Privilege, Long> implements PrivilegeService {
+public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, Long> implements PrivilegeService {
 
     public final RoleMembersRepository roleMembersRepository;
     public final RolePrivilegesRepository rolePrivilegesRepository;
