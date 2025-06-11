@@ -74,7 +74,7 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
     @Override
     public void removeRelation(Long groupId, Long privilegeId, Set<String> actions) {
-
+        groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId);
     }
 
     private GroupPrivileges privileges(Long groupId, Long privilegeId, Set<String> actions) {

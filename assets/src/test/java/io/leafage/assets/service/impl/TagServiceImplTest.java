@@ -73,9 +73,9 @@ class TagServiceImplTest {
     void fetch() {
         given(tagRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Tag.class)));
 
-        TagVO categoryVO = tagService.fetch(Mockito.anyLong());
+        TagVO vo = tagService.fetch(Mockito.anyLong());
 
-        Assertions.assertNotNull(categoryVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -100,10 +100,10 @@ class TagServiceImplTest {
     void create() {
         given(tagRepository.saveAndFlush(Mockito.any(Tag.class))).willReturn(Mockito.mock(Tag.class));
 
-        TagVO categoryVO = tagService.create(Mockito.mock(TagDTO.class));
+        TagVO vo = tagService.create(Mockito.mock(TagDTO.class));
 
         verify(tagRepository, times(1)).saveAndFlush(Mockito.any(Tag.class));
-        Assertions.assertNotNull(categoryVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -112,10 +112,10 @@ class TagServiceImplTest {
 
         given(tagRepository.save(Mockito.any(Tag.class))).willReturn(Mockito.mock(Tag.class));
 
-        TagVO categoryVO = tagService.modify(1L, dto);
+        TagVO vo = tagService.modify(1L, dto);
 
         verify(tagRepository, times(1)).save(Mockito.any(Tag.class));
-        Assertions.assertNotNull(categoryVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test

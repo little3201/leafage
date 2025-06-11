@@ -42,7 +42,7 @@ CREATE TABLE "public"."oauth2_authorization"
 COMMENT
 ON COLUMN "public"."oauth2_authorization"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."registered_client_id" IS '客户端ID';
+ON COLUMN "public"."oauth2_authorization"."registered_client_id" IS 'client id';
 COMMENT
 ON COLUMN "public"."oauth2_authorization"."principal_name" IS '认证账号';
 COMMENT
@@ -102,7 +102,7 @@ CREATE TABLE "public"."oauth2_authorization_consent"
 )
 ;
 COMMENT
-ON COLUMN "public"."oauth2_authorization_consent"."registered_client_id" IS '客户端ID';
+ON COLUMN "public"."oauth2_authorization_consent"."registered_client_id" IS '客户端id';
 COMMENT
 ON COLUMN "public"."oauth2_authorization_consent"."principal_name" IS '认证账号';
 COMMENT
@@ -134,7 +134,7 @@ CREATE TABLE "public"."oauth2_registered_client"
 COMMENT
 ON COLUMN "public"."oauth2_registered_client"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_id" IS '客户端ID';
+ON COLUMN "public"."oauth2_registered_client"."client_id" IS 'ID';
 COMMENT
 ON COLUMN "public"."oauth2_registered_client"."client_id_issued_at" IS '生效时间';
 COMMENT

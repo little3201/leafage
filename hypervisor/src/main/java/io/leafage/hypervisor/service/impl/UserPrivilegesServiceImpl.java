@@ -49,6 +49,6 @@ public class UserPrivilegesServiceImpl implements UserPrivilegesService {
 
     @Override
     public void removeRelation(String username, Long privilegeId, Set<String> actions) {
-
+        userPrivilegesRepository.findByUsernameAndPrivilegeId(username, privilegeId);
     }
 }

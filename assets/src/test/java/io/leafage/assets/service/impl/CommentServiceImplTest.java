@@ -100,8 +100,8 @@ class CommentServiceImplTest {
     void create() {
         given(commentRepository.saveAndFlush(Mockito.any(Comment.class))).willReturn(Mockito.mock(Comment.class));
 
-        CommentVO commentVO = commentService.create(Mockito.mock(CommentDTO.class));
-        Assertions.assertNotNull(commentVO);
+        CommentVO vo = commentService.create(Mockito.mock(CommentDTO.class));
+        Assertions.assertNotNull(vo);
     }
 
 }

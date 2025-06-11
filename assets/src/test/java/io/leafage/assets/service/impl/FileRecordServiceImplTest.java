@@ -19,7 +19,6 @@ import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.repository.FileRecordRepository;
 import io.leafage.assets.vo.FileRecordVO;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,10 +28,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * file record service test
@@ -46,12 +51,8 @@ class FileRecordServiceImplTest {
     private FileRecordRepository fileRecordRepository;
 
     @InjectMocks
-    private FileRecordServiceImpl fileService;
+    private FileRecordServiceImpl fileRecordService;
 
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void retrieve() {
@@ -59,11 +60,64 @@ class FileRecordServiceImplTest {
 
         given(this.fileRecordRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
 
-        Page<FileRecordVO> voPage = fileService.retrieve(0, 2, "id", true, "test");
+        Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
     }
 
     @Test
+    void fetch() {
+        given(fileRecordRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(FileRecord.class)));
+
+        FileRecordVO vo = fileRecordService.fetch(Mockito.anyLong());
+
+        Assertions.assertNotNull(vo);
+    }
+
+    @Test
+    void exists() {
+        given(fileRecordRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
+
+        boolean exists = fileRecordService.exists("test", 1L);
+
+        Assertions.assertTrue(exists);
+    }
+
+    @Test
+    void exists_id_null() {
+        given(fileRecordRepository.existsByName(Mockito.anyString())).willReturn(true);
+
+        boolean exists = fileRecordService.exists("test", null);
+
+        Assertions.assertTrue(exists);
+    }
+
+    @Test
     void upload() {
+        given(fileRecordRepository.saveAndFlush(Mockito.any(FileRecord.class))).willReturn(Mockito.mock(FileRecord.class));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
+        FileRecordVO vo = fileRecordService.upload(file);
+
+        verify(fileRecordRepository, times(1)).saveAndFlush(Mockito.any(FileRecord.class));
+        Assertions.assertNotNull(vo);
+    }
+
+    @Test
+    void download() {
+        FileRecord fileRecord = new FileRecord();
+        fileRecord.setName("test.jpg");
+        fileRecord.setPath("/text.jpg");
+        given(fileRecordRepository.findById(Mockito.anyLong())).willReturn(Optional.of(fileRecord));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String fileName = fileRecordService.download(1L, out);
+        Assertions.assertNotNull(fileName);
+    }
+
+    @Test
+    void remove() {
+        fileRecordService.remove(11L);
+
+        verify(this.fileRecordRepository, times(1)).deleteById(Mockito.anyLong());
     }
 }

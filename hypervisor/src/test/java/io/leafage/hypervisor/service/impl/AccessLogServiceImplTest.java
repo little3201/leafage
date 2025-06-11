@@ -65,9 +65,9 @@ class AccessLogServiceImplTest {
     void create() {
         given(this.accessLogRepository.saveAndFlush(Mockito.any(AccessLog.class))).willReturn(Mockito.mock(AccessLog.class));
 
-        AccessLogVO accessLogVO = accessLogService.create(Mockito.mock(AccessLogDTO.class));
+        AccessLogVO vo = accessLogService.create(Mockito.mock(AccessLogDTO.class));
 
         verify(this.accessLogRepository, times(1)).saveAndFlush(Mockito.any(AccessLog.class));
-        Assertions.assertNotNull(accessLogVO);
+        Assertions.assertNotNull(vo);
     }
 }

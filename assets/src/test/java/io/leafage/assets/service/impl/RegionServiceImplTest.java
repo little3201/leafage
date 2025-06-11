@@ -77,9 +77,9 @@ class RegionServiceImplTest {
     void fetch() {
         given(this.regionRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Region.class)));
 
-        RegionVO regionVO = regionService.fetch(Mockito.anyLong());
+        RegionVO vo = regionService.fetch(Mockito.anyLong());
 
-        Assertions.assertNotNull(regionVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -104,10 +104,10 @@ class RegionServiceImplTest {
     void create() {
         given(this.regionRepository.saveAndFlush(Mockito.any(Region.class))).willReturn(Mockito.mock(Region.class));
 
-        RegionVO regionVO = regionService.create(Mockito.mock(RegionDTO.class));
+        RegionVO vo = regionService.create(Mockito.mock(RegionDTO.class));
 
         verify(this.regionRepository, times(1)).saveAndFlush(Mockito.any(Region.class));
-        Assertions.assertNotNull(regionVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -116,10 +116,10 @@ class RegionServiceImplTest {
 
         given(this.regionRepository.save(Mockito.any(Region.class))).willReturn(Mockito.mock(Region.class));
 
-        RegionVO regionVO = regionService.modify(Mockito.anyLong(), dto);
+        RegionVO vo = regionService.modify(Mockito.anyLong(), dto);
 
         verify(this.regionRepository, times(1)).save(Mockito.any(Region.class));
-        Assertions.assertNotNull(regionVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test

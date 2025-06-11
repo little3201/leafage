@@ -79,9 +79,9 @@ class DictionaryServiceImplTest {
     void fetch() {
         given(this.dictionaryRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Dictionary.class)));
 
-        DictionaryVO dictionaryVO = dictionaryService.fetch(1L);
+        DictionaryVO vo = dictionaryService.fetch(1L);
 
-        Assertions.assertNotNull(dictionaryVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -125,10 +125,10 @@ class DictionaryServiceImplTest {
     void create() {
         given(this.dictionaryRepository.saveAndFlush(Mockito.any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
 
-        DictionaryVO dictionaryVO = dictionaryService.create(Mockito.mock(DictionaryDTO.class));
+        DictionaryVO vo = dictionaryService.create(Mockito.mock(DictionaryDTO.class));
 
         verify(this.dictionaryRepository, times(1)).saveAndFlush(Mockito.any(Dictionary.class));
-        Assertions.assertNotNull(dictionaryVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -137,10 +137,10 @@ class DictionaryServiceImplTest {
 
         given(this.dictionaryRepository.save(Mockito.any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
 
-        DictionaryVO dictionaryVO = dictionaryService.modify(1L, dto);
+        DictionaryVO vo = dictionaryService.modify(1L, dto);
 
         verify(this.dictionaryRepository, times(1)).save(Mockito.any(Dictionary.class));
-        Assertions.assertNotNull(dictionaryVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test

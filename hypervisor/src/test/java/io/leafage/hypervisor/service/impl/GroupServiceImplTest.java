@@ -84,9 +84,9 @@ class GroupServiceImplTest {
     void fetch() {
         given(this.groupRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Group.class)));
 
-        GroupVO groupVO = groupService.fetch(Mockito.anyLong());
+        GroupVO vo = groupService.fetch(Mockito.anyLong());
 
-        Assertions.assertNotNull(groupVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -112,10 +112,10 @@ class GroupServiceImplTest {
     void create() {
         given(this.groupRepository.saveAndFlush(Mockito.any(Group.class))).willReturn(Mockito.mock(Group.class));
 
-        GroupVO groupVO = groupService.create(Mockito.mock(GroupDTO.class));
+        GroupVO vo = groupService.create(Mockito.mock(GroupDTO.class));
 
         verify(this.groupRepository, times(1)).saveAndFlush(Mockito.any(Group.class));
-        Assertions.assertNotNull(groupVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -131,10 +131,10 @@ class GroupServiceImplTest {
 
         given(this.groupRepository.save(Mockito.any(Group.class))).willReturn(Mockito.mock(Group.class));
 
-        GroupVO groupVO = groupService.modify(1L, dto);
+        GroupVO vo = groupService.modify(1L, dto);
 
         verify(this.groupRepository, times(1)).save(Mockito.any(Group.class));
-        Assertions.assertNotNull(groupVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
