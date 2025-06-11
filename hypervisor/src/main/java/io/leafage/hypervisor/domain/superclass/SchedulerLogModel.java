@@ -78,7 +78,7 @@ public class SchedulerLogModel {
         return description;
     }
 
-    public void setDescription(String record) {
-        this.description = record;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
