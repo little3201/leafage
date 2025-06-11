@@ -2,9 +2,9 @@
 
 <p align="center">
  <img src="https://img.shields.io/badge/Spring%20Boot-3.5.0-green.svg" alt="Downloads">
- <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=alert_status" alt="Quality Gate Status">
+ <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=bugs" alt="bugs">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=code_smells" alt="code_smells">
- <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=coverage" alt="coverage"/>
+ <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=ncloc" alt="lines of code"/>
 </p>
 
 ### 依赖

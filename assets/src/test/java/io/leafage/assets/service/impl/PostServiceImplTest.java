@@ -64,7 +64,7 @@ class PostServiceImplTest {
     void setUp() {
         dto = new PostDTO();
         dto.setTitle("title");
-        dto.setExcerpt("excerpt");
+        dto.setSummary("excerpt");
         dto.setContent("content");
         dto.setTags(Set.of("code"));
     }

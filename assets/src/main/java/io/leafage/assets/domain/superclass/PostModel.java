@@ -40,7 +40,7 @@ public abstract class PostModel {
     /**
      * 概述
      */
-    private String excerpt;
+    private String summary;
 
     /**
      * 标签
@@ -60,12 +60,12 @@ public abstract class PostModel {
         this.title = title;
     }
 
-    public String getExcerpt() {
-        return excerpt;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setExcerpt(String excerpt) {
-        this.excerpt = excerpt;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public Set<String> getTags() {
