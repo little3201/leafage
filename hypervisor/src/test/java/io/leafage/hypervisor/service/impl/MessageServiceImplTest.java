@@ -66,9 +66,9 @@ class MessageServiceImplTest {
     void fetch() {
         given(this.messageRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Message.class)));
 
-        MessageVO messageVO = messageService.fetch(Mockito.anyLong());
+        MessageVO vo = messageService.fetch(Mockito.anyLong());
 
-        Assertions.assertNotNull(messageVO);
+        Assertions.assertNotNull(vo);
     }
 
 
@@ -76,9 +76,9 @@ class MessageServiceImplTest {
     void create() {
         given(this.messageRepository.saveAndFlush(Mockito.any(Message.class))).willReturn(Mockito.mock(Message.class));
 
-        MessageVO messageVO = messageService.create(Mockito.mock(MessageDTO.class));
+        MessageVO vo = messageService.create(Mockito.mock(MessageDTO.class));
 
         verify(this.messageRepository, times(1)).saveAndFlush(Mockito.any(Message.class));
-        Assertions.assertNotNull(messageVO);
+        Assertions.assertNotNull(vo);
     }
 }

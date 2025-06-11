@@ -90,10 +90,10 @@ class PrivilegeServiceImplTest {
 
         given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mockito.mock(Privilege.class));
 
-        PrivilegeVO privilegeVO = privilegeService.modify(Mockito.anyLong(), privilegeDTO);
+        PrivilegeVO vo = privilegeService.modify(Mockito.anyLong(), privilegeDTO);
 
         verify(this.privilegeRepository, times(1)).save(Mockito.any(Privilege.class));
-        Assertions.assertNotNull(privilegeVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test

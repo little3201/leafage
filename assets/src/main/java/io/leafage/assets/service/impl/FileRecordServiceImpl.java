@@ -69,8 +69,10 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
     @Override
     public boolean exists(String name, Long id) {
         Assert.hasText(name, "name must not be empty.");
-
-        return fileRecordRepository.existsByName(name);
+        if (id == null) {
+            return fileRecordRepository.existsByName(name);
+        }
+        return fileRecordRepository.existsByNameAndIdNot(name, id);
     }
 
     @Override
@@ -79,7 +81,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
         fileRecord.setName(file.getName());
         fileRecord.setMimeType(file.getContentType());
         fileRecord.setSize(file.getSize());
-        fileRecord = fileRecordRepository.save(fileRecord);
+        fileRecord = fileRecordRepository.saveAndFlush(fileRecord);
         return convertToVO(fileRecord, FileRecordVO.class);
     }
 

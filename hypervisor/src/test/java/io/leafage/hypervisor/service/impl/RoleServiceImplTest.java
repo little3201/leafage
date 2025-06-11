@@ -75,9 +75,9 @@ class RoleServiceImplTest {
     void fetch() {
         given(this.roleRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Role.class)));
 
-        RoleVO roleVO = roleService.fetch(Mockito.anyLong());
+        RoleVO vo = roleService.fetch(Mockito.anyLong());
 
-        Assertions.assertNotNull(roleVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -103,10 +103,10 @@ class RoleServiceImplTest {
     void create() {
         given(this.roleRepository.saveAndFlush(Mockito.any(Role.class))).willReturn(Mockito.mock(Role.class));
 
-        RoleVO roleVO = roleService.create(Mockito.mock(RoleDTO.class));
+        RoleVO vo = roleService.create(Mockito.mock(RoleDTO.class));
 
         verify(this.roleRepository, times(1)).saveAndFlush(Mockito.any(Role.class));
-        Assertions.assertNotNull(roleVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -115,10 +115,10 @@ class RoleServiceImplTest {
 
         given(this.roleRepository.save(Mockito.any(Role.class))).willReturn(Mockito.mock(Role.class));
 
-        RoleVO roleVO = roleService.modify(1L, dto);
+        RoleVO vo = roleService.modify(1L, dto);
 
         verify(this.roleRepository, times(1)).save(Mockito.any(Role.class));
-        Assertions.assertNotNull(roleVO);
+        Assertions.assertNotNull(vo);
     }
 
     @Test
