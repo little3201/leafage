@@ -33,8 +33,6 @@ jobs:
         run: mvn -B clean verify
 
       - name: SonarCloud Scan
-        with:
-          projectBaseDir: .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
