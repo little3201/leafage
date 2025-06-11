@@ -102,7 +102,8 @@ class GroupControllerTest {
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
@@ -119,6 +120,7 @@ class GroupControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print())
@@ -127,7 +129,7 @@ class GroupControllerTest {
 
     @Test
     void tree() throws Exception {
-        TreeNode treeNode = TreeNode.withId(1L).name("test").build();
+        TreeNode<Long> treeNode = TreeNode.withId(1L).name("test").build();
         given(this.groupService.tree()).willReturn(Collections.singletonList(treeNode));
 
         mvc.perform(get("/groups/tree")).andExpect(status().isOk())

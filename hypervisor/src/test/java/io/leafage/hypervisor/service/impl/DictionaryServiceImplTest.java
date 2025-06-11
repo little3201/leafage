@@ -68,7 +68,7 @@ class DictionaryServiceImplTest {
 
 //        given(this.dictionaryRepository.findAll(ArgumentMatchers.<Specification<Dictionary>>any(),
 //                Mockito.any(Pageable.class))).willReturn(page);
-        given(this.dictionaryRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
+        given(this.dictionaryRepository.findAllBySuperiorIdIsNull(Mockito.any(Pageable.class))).willReturn(page);
 
         Page<DictionaryVO> voPage = dictionaryService.retrieve(0, 2, "id", true, "test");
 
