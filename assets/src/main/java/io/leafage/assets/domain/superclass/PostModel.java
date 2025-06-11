@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package io.leafage.assets.bo;
+package io.leafage.assets.domain.superclass;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -26,7 +26,7 @@ import java.util.Set;
  *
  * @author wq li
  */
-public abstract class PostBO {
+public abstract class PostModel {
 
     /**
      * 标题

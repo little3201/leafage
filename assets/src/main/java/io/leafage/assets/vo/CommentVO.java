@@ -17,7 +17,7 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.CommentBO;
+import io.leafage.assets.domain.superclass.CommentModel;
 import top.leafage.common.ReadonlyMetadata;
 
 import java.time.Instant;
@@ -27,7 +27,7 @@ import java.time.Instant;
  *
  * @author wq li
  */
-public class CommentVO extends CommentBO implements ReadonlyMetadata {
+public class CommentVO extends CommentModel implements ReadonlyMetadata {
 
     private final Long id;
 

@@ -19,13 +19,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.vo.MessageVO;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * message service
  *
  * @author wq li
  */
-public interface MessageService extends ReactiveBasicService<MessageDTO, MessageVO> {
+public interface MessageService extends R2dbcCrudService<MessageDTO, MessageVO> {
 
 }

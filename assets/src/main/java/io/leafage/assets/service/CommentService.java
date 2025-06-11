@@ -20,14 +20,14 @@ package io.leafage.assets.service;
 import io.leafage.assets.dto.CommentDTO;
 import io.leafage.assets.vo.CommentVO;
 import reactor.core.publisher.Flux;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * comment service
  *
  * @author wq li
  */
-public interface CommentService extends ReactiveBasicService<CommentDTO, CommentVO> {
+public interface CommentService extends R2dbcCrudService<CommentDTO, CommentVO> {
 
     /**
      * 查询评论

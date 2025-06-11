@@ -22,14 +22,14 @@ import io.leafage.assets.vo.RegionVO;
 import org.springframework.data.domain.Page;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * region service
  *
  * @author wq li
  */
-public interface RegionService extends ReactiveBasicService<RegionDTO, RegionVO> {
+public interface RegionService extends R2dbcCrudService<RegionDTO, RegionVO> {
 
     Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending);
 

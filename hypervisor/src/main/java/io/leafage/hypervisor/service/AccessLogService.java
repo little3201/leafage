@@ -19,13 +19,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.AccessLogDTO;
 import io.leafage.hypervisor.vo.AccessLogVO;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * access log service
  *
  * @author wq li
  */
-public interface AccessLogService extends ReactiveBasicService<AccessLogDTO, AccessLogVO> {
+public interface AccessLogService extends R2dbcCrudService<AccessLogDTO, AccessLogVO> {
 
 }

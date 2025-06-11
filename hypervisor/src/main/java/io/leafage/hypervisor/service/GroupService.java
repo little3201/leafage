@@ -19,13 +19,13 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.vo.GroupVO;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * group service
  *
  * @author wq li
  */
-public interface GroupService extends ReactiveBasicService<GroupDTO, GroupVO> {
+public interface GroupService extends R2dbcCrudService<GroupDTO, GroupVO> {
 
 }

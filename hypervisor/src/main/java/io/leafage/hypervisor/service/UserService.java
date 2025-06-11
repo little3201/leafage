@@ -20,14 +20,14 @@ package io.leafage.hypervisor.service;
 import io.leafage.hypervisor.dto.UserDTO;
 import io.leafage.hypervisor.vo.UserVO;
 import reactor.core.publisher.Mono;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * user service
  *
  * @author wq li
  */
-public interface UserService extends ReactiveBasicService<UserDTO, UserVO> {
+public interface UserService extends R2dbcCrudService<UserDTO, UserVO> {
 
     /**
      * 根据用户名查询

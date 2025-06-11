@@ -18,13 +18,13 @@
 package io.leafage.assets.dto;
 
 
-import io.leafage.assets.bo.CategoryBO;
+import io.leafage.assets.domain.superclass.CategoryModel;
 
 /**
  * dto class for category
  *
  * @author wq li
  */
-public class CategoryDTO extends CategoryBO {
+public class CategoryDTO extends CategoryModel {
 
 }

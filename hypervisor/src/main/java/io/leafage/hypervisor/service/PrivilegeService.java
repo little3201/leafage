@@ -22,7 +22,7 @@ import io.leafage.hypervisor.vo.PrivilegeVO;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author wq li
  */
-public interface PrivilegeService extends ReactiveBasicService<PrivilegeDTO, PrivilegeVO> {
+public interface PrivilegeService extends R2dbcCrudService<PrivilegeDTO, PrivilegeVO> {
 
     /**
      * 查询构造树结构的数据

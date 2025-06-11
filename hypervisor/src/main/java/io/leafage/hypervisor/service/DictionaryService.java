@@ -20,14 +20,14 @@ package io.leafage.hypervisor.service;
 import io.leafage.hypervisor.dto.DictionaryDTO;
 import io.leafage.hypervisor.vo.DictionaryVO;
 import reactor.core.publisher.Flux;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * dictionary service
  *
  * @author wq li
  */
-public interface DictionaryService extends ReactiveBasicService<DictionaryDTO, DictionaryVO> {
+public interface DictionaryService extends R2dbcCrudService<DictionaryDTO, DictionaryVO> {
 
     /**
      * 获取下级

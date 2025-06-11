@@ -21,14 +21,14 @@ import io.leafage.assets.dto.CategoryDTO;
 import io.leafage.assets.vo.CategoryVO;
 import org.springframework.data.domain.Page;
 import reactor.core.publisher.Mono;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * category service
  *
  * @author wq li
  */
-public interface CategoryService extends ReactiveBasicService<CategoryDTO, CategoryVO> {
+public interface CategoryService extends R2dbcCrudService<CategoryDTO, CategoryVO> {
 
     Mono<Page<CategoryVO>> retrieve(int page, int size, String sortBy, boolean descending);
 }

@@ -17,7 +17,7 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.RegionBO;
+import io.leafage.assets.domain.superclass.RegionModel;
 import top.leafage.common.ReadonlyMetadata;
 
 import java.time.Instant;
@@ -27,7 +27,7 @@ import java.time.Instant;
  *
  * @author wq li
  */
-public class RegionVO extends RegionBO implements ReadonlyMetadata {
+public class RegionVO extends RegionModel implements ReadonlyMetadata {
 
     private final Long id;
 

@@ -17,7 +17,7 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.PostBO;
+import io.leafage.assets.domain.superclass.PostModel;
 import top.leafage.common.ReadonlyMetadata;
 
 import java.time.Instant;
@@ -27,7 +27,7 @@ import java.time.Instant;
  *
  * @author wq li
  */
-public class PostVO extends PostBO implements ReadonlyMetadata {
+public class PostVO extends PostModel implements ReadonlyMetadata {
 
     private final Long id;
 

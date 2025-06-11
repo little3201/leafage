@@ -17,43 +17,22 @@
 
 package io.leafage.assets.vo;
 
-import io.leafage.assets.bo.CategoryBO;
-import top.leafage.common.ReadonlyMetadata;
-
-import java.time.Instant;
+import io.leafage.assets.domain.superclass.CategoryModel;
 
 /**
  * vo class for category
  *
  * @author wq li
  */
-public class CategoryVO extends CategoryBO implements ReadonlyMetadata {
+public class CategoryVO extends CategoryModel {
 
-    private final Long id;
+    private Long id;
 
-    private final boolean enabled;
-
-    private final Instant lastModifiedDate;
-
-    public CategoryVO(Long id, boolean enabled, Instant lastModifiedDate) {
-        this.id = id;
-        this.enabled = enabled;
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    @Override
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
+    public void setId(Long id) {
+        this.id = id;
     }
-
-    @Override
-    public Instant getLastModifiedDate() {
-        return this.lastModifiedDate;
-    }
-
 }

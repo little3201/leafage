@@ -17,14 +17,14 @@
 
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.RegionBO;
+import io.leafage.assets.domain.superclass.RegionModel;
 
 /**
  * dto class for region
  *
  * @author wq li
  */
-public class RegionDTO extends RegionBO {
+public class RegionDTO extends RegionModel {
 
     /**
      * superior

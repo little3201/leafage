@@ -17,7 +17,7 @@
 
 package io.leafage.assets.dto;
 
-import io.leafage.assets.bo.PostBO;
+import io.leafage.assets.domain.superclass.PostModel;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotNull;
  *
  * @author wq li
  */
-public class PostDTO extends PostBO {
+public class PostDTO extends PostModel {
 
     /**
      * 分类

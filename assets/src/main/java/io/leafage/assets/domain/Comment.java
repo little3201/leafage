@@ -19,7 +19,7 @@ package io.leafage.assets.domain;
 
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.reactive.audit.ReactiveAuditMetadata;
+import top.leafage.common.r2dbc.audit.ReactiveAuditMetadata;
 
 
 /**

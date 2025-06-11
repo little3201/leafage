@@ -15,7 +15,7 @@
  *
  */
 
-package io.leafage.assets.bo;
+package io.leafage.assets.domain.superclass;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotNull;
  *
  * @author wq li
  */
-public abstract class CommentBO {
+public abstract class CommentModel {
 
     /**
      * 帖子

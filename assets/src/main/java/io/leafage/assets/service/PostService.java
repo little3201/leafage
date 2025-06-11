@@ -22,14 +22,14 @@ import io.leafage.assets.vo.PostVO;
 import org.springframework.data.domain.Page;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.reactive.ReactiveBasicService;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
  * posts service
  *
  * @author wq li
  */
-public interface PostService extends ReactiveBasicService<PostDTO, PostVO> {
+public interface PostService extends R2dbcCrudService<PostDTO, PostVO> {
 
     Mono<Page<PostVO>> retrieve(int page, int size, String sortBy, boolean descending);
 

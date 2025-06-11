@@ -15,16 +15,16 @@
  *
  */
 
-package io.leafage.assets.bo;
+package io.leafage.assets.domain.superclass;
 
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * bo class for region
+ * bo class for category
  *
  * @author wq li
  */
-public abstract class RegionBO {
+public abstract class CategoryModel {
 
     /**
      * 名称
@@ -33,20 +33,9 @@ public abstract class RegionBO {
     private String name;
 
     /**
-     * 邮编
-     */
-    private Integer postalCode;
-
-    /**
-     * 区号
-     */
-    private String areaCode;
-
-    /**
      * 描述
      */
     private String description;
-
 
     /**
      * <p>Getter for the field <code>name</code>.</p>
@@ -64,42 +53,6 @@ public abstract class RegionBO {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * <p>Getter for the field <code>postalCode</code>.</p>
-     *
-     * @return a {@link java.lang.Integer} object
-     */
-    public Integer getPostalCode() {
-        return postalCode;
-    }
-
-    /**
-     * <p>Setter for the field <code>postalCode</code>.</p>
-     *
-     * @param postalCode a {@link java.lang.Integer} object
-     */
-    public void setPostalCode(Integer postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    /**
-     * <p>Getter for the field <code>areaCode</code>.</p>
-     *
-     * @return a {@link java.lang.String} object
-     */
-    public String getAreaCode() {
-        return areaCode;
-    }
-
-    /**
-     * <p>Setter for the field <code>areaCode</code>.</p>
-     *
-     * @param areaCode a {@link java.lang.String} object
-     */
-    public void setAreaCode(String areaCode) {
-        this.areaCode = areaCode;
     }
 
     /**
