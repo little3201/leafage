@@ -80,13 +80,14 @@ class AccessLogControllerTest {
         Page<AccessLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         mvc.perform(get("/access-logs")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
+                        .queryParam("filters", "url:like:test")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
@@ -97,10 +98,15 @@ class AccessLogControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), eq("test"))).willThrow(new RuntimeException());
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/access-logs").queryParam("page", "0").queryParam("size", "2")
-                        .queryParam("sortBy", "id").queryParam("url", "test"))
+        mvc.perform(get("/access-logs")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "url:like:test")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();

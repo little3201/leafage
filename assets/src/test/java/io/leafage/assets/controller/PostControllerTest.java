@@ -93,7 +93,11 @@ class PostControllerTest {
 
         mvc.perform(get("/posts")
                         .queryParam("page", "0")
-                        .queryParam("size", "2"))
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "title:like:a")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andDo(print()).andReturn();
@@ -109,6 +113,7 @@ class PostControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
+                        .queryParam("filters", "title:like:a")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();

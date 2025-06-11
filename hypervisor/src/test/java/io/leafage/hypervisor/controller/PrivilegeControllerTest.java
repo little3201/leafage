@@ -26,7 +26,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -34,7 +36,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import top.leafage.common.TreeNode;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -93,9 +94,7 @@ class PrivilegeControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "id"));
-
-        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(vo), pageable, 2L);
+        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
@@ -105,6 +104,7 @@ class PrivilegeControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
+                        .queryParam("filters", "name:like:a")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
@@ -122,6 +122,7 @@ class PrivilegeControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "name:like:a")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print())

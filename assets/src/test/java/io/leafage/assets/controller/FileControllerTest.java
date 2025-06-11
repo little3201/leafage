@@ -85,6 +85,7 @@ class FileControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "name:like:a")
                 )
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
@@ -100,6 +101,7 @@ class FileControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "name:like:a")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();

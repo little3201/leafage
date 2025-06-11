@@ -98,11 +98,12 @@ class CommentControllerTest {
     void retrieve_error() throws Exception {
         given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString())).willThrow(new NoSuchElementException());
 
-        mvc.perform(get("/comments").queryParam("page", "0")
+        mvc.perform(get("/comments")
+                        .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
-                        .queryParam("filters", "test:eq:a")
+                        .queryParam("filters", "content:like:a")
                 )
                 .andExpect(status().isNoContent()).andDo(print()).andReturn();
     }

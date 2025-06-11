@@ -85,13 +85,14 @@ class UserControllerTest {
         Page<UserVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         mvc.perform(get("/users")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "username:like:a")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())

@@ -84,8 +84,13 @@ class TagControllerTest {
         given(tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
 
-        mvc.perform(get("/tags").queryParam("page", "0")
-                        .queryParam("size", "2").queryParam("sortBy", "id"))
+        mvc.perform(get("/tags")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "name:like:a")
+                )
                 .andExpect(status().isOk()).andDo(print()).andReturn();
     }
 
@@ -99,6 +104,7 @@ class TagControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
+                        .queryParam("filters", "name:like:a")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();

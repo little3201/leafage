@@ -88,13 +88,14 @@ class MessageControllerTest {
         Page<MessageVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         mvc.perform(get("/messages")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "title:like:a")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
@@ -111,7 +112,9 @@ class MessageControllerTest {
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("name", "test"))
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "title:like:a")
+                )
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();

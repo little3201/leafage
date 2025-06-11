@@ -84,13 +84,14 @@ class OperationLogControllerTest {
         Page<OperationLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.operationLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         mvc.perform(get("/operation-logs")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "operation:like:a")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
@@ -108,6 +109,7 @@ class OperationLogControllerTest {
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "true")
+                        .queryParam("filters", "operation:like:a")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print())
