@@ -19,6 +19,8 @@ import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
+import java.time.Instant;
+
 /**
  * entity class for posts.
  *
@@ -35,6 +37,11 @@ public class Post extends PostModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String status;
+
+    @Column(name = "published_at")
+    private Instant publishedAt;
 
     @Embedded
     private JdbcAuditMetadata auditMetadata;

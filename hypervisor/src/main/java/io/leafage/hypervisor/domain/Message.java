@@ -18,7 +18,6 @@ package io.leafage.hypervisor.domain;
 import io.leafage.hypervisor.domain.superclass.MessageModel;
 import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
  * entity class for message.
@@ -39,9 +38,6 @@ public class Message extends MessageModel {
 
     private boolean unread = true;
 
-    @Embedded
-    private JdbcAuditMetadata auditMetadata;
-
 
     public Long getId() {
         return id;
@@ -57,14 +53,6 @@ public class Message extends MessageModel {
 
     public void setUnread(boolean unread) {
         this.unread = unread;
-    }
-
-    public JdbcAuditMetadata getAuditMetadata() {
-        return auditMetadata;
-    }
-
-    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
     }
 
 }

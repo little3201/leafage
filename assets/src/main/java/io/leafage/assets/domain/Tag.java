@@ -17,7 +17,6 @@ package io.leafage.assets.domain;
 import io.leafage.assets.domain.superclass.TagModel;
 import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
 
 /**
  * entity class for tag.
@@ -36,9 +35,6 @@ public class Tag extends TagModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Embedded
-    private JdbcAuditMetadata auditMetadata;
-
 
     public Long getId() {
         return id;
@@ -48,11 +44,4 @@ public class Tag extends TagModel {
         this.id = id;
     }
 
-    public JdbcAuditMetadata getAuditMetadata() {
-        return auditMetadata;
-    }
-
-    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
-    }
 }

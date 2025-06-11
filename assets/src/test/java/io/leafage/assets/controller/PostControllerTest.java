@@ -78,7 +78,7 @@ class PostControllerTest {
 
         vo = new PostVO();
         vo.setId(1L);
-        vo.setExcerpt("excerpt");
+        vo.setSummary("excerpt");
         vo.setTitle(dto.getTitle());
         vo.setTags(dto.getTags());
 
