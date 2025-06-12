@@ -31,21 +31,12 @@ public class UserPrivileges {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * username
-     */
     @Column(nullable = false)
     private String username;
 
-    /**
-     * privilege id
-     */
     @Column(name = "privilege_id", nullable = false)
     private Long privilegeId;
 
-    /**
-     * 操作
-     */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_privilege_actions", joinColumns = @JoinColumn(name = "user_privilege_id"))
     @Column(name = "action")

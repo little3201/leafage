@@ -36,15 +36,9 @@ public abstract class CommentModel {
     @Column(name = "post_id", nullable = false)
     private Long postId;
 
-    /**
-     * 内容
-     */
     @NotBlank
     private String content;
 
-    /**
-     * 回复者
-     */
     private Long replier;
 
 

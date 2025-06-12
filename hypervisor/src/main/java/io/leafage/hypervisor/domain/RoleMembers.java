@@ -30,69 +30,33 @@ public class RoleMembers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * role主键
-     */
     @Column(name = "role_id", nullable = false)
     private Long roleId;
 
-    /**
-     * 用户名
-     */
     @Column(name = "username", nullable = false)
     private String username;
 
 
-    /**
-     * <p>Getter for the field <code>id</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
     public Long getId() {
         return id;
     }
 
-    /**
-     * <p>Setter for the field <code>id</code>.</p>
-     *
-     * @param id a {@link Long} object
-     */
     public void setId(Long id) {
         this.id = id;
     }
 
-    /**
-     * <p>Getter for the field <code>roleId</code>.</p>
-     *
-     * @return a {@link Long} object
-     */
     public Long getRoleId() {
         return roleId;
     }
 
-    /**
-     * <p>Setter for the field <code>roleId</code>.</p>
-     *
-     * @param roleId a {@link Long} object
-     */
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }
 
-    /**
-     * <p>Getter for the field <code>username</code>.</p>
-     *
-     * @return a {@link String} object
-     */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * <p>Setter for the field <code>username</code>.</p>
-     *
-     * @param username a {@link String} object
-     */
     public void setUsername(String username) {
         this.username = username;
     }

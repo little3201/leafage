@@ -30,21 +30,12 @@ import java.util.Set;
 @MappedSuperclass
 public abstract class PostModel {
 
-    /**
-     * 标题
-     */
     @NotBlank
     @Column(name = "title", nullable = false, unique = true)
     private String title;
 
-    /**
-     * 概述
-     */
     private String summary;
 
-    /**
-     * 标签
-     */
     @NotEmpty
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))

@@ -31,15 +31,9 @@ public class GroupAuthorities {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * group主键
-     */
     @Column(name = "group_id", nullable = false)
     private Long groupId;
 
-    /**
-     * role主键
-     */
     @Column(name = "authority", nullable = false, length = 50)
     private String authority;
 

@@ -31,21 +31,12 @@ public class GroupPrivileges {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * group主键
-     */
     @Column(name = "group_id", nullable = false)
     private Long groupId;
 
-    /**
-     * privilege id
-     */
     @Column(name = "privilege_id", nullable = false)
     private Long privilegeId;
 
-    /**
-     * 操作
-     */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "group_privilege_actions", joinColumns = @JoinColumn(name = "group_privilege_id"))
     @Column(name = "action")

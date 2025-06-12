@@ -38,8 +38,6 @@ public class Post extends PostModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status;
-
     @Column(name = "published_at")
     private Instant publishedAt;
 
@@ -53,6 +51,14 @@ public class Post extends PostModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Instant getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(Instant publishedAt) {
+        this.publishedAt = publishedAt;
     }
 
     public JdbcAuditMetadata getAuditMetadata() {

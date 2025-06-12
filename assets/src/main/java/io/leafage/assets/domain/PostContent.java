@@ -32,15 +32,9 @@ public class PostContent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * 帖子ID
-     */
     @Column(name = "post_id", nullable = false, unique = true)
     private Long postId;
 
-    /**
-     * 内容
-     */
     private String content;
 
 

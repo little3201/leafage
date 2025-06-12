@@ -31,27 +31,15 @@ public abstract class RegionModel {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    /**
-     * 上级
-     */
     @Column(name = "superior_id")
     private Long superiorId;
 
-    /**
-     * 区号
-     */
     @Column(name = "area_code", length = 4)
     private String areaCode;
 
-    /**
-     * 邮编
-     */
     @Column(name = "postal_code", length = 6)
     private Integer postalCode;
 
-    /**
-     * 描述
-     */
     private String description;
 
 

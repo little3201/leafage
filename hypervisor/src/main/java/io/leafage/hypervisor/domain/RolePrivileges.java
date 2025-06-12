@@ -32,21 +32,12 @@ public class RolePrivileges {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * role主键
-     */
     @Column(name = "role_id", nullable = false)
     private Long roleId;
 
-    /**
-     * privilege id
-     */
     @Column(name = "privilege_id", nullable = false)
     private Long privilegeId;
 
-    /**
-     * 操作
-     */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "role_privilege_actions", joinColumns = @JoinColumn(name = "role_privilege_id"))
     @Column(name = "action")
