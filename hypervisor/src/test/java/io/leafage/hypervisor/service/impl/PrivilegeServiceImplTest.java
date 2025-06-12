@@ -74,7 +74,7 @@ class PrivilegeServiceImplTest {
 
         given(this.privilegeRepository.countBySuperiorId(Mockito.anyLong())).willReturn(Mono.just(Mockito.anyLong()));
 
-        StepVerifier.create(privilegeService.retrieve(0, 2, "id", true))
+        StepVerifier.create(privilegeService.retrieve(0, 2, "id", true,"name:like:a"))
                 .expectNextCount(1).verifyComplete();
     }
 

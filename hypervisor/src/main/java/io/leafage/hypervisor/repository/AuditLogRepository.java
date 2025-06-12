@@ -15,24 +15,28 @@
  *
  */
 
-package io.leafage.assets.vo;
+package io.leafage.hypervisor.repository;
 
-import io.leafage.assets.domain.superclass.CategoryModel;
+import io.leafage.hypervisor.domain.AccessLog;
+import io.leafage.hypervisor.domain.AuditLog;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 /**
- * vo class for category
+ * audit log repository
  *
  * @author wq li
  */
-public class CategoryVO extends CategoryModel {
+@Repository
+public interface AuditLogRepository extends R2dbcRepository<AuditLog, Long> {
 
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    /**
+     * 查询
+     *
+     * @param pageable a {@link Pageable} object
+     * @return 有效帖子
+     */
+    Flux<AuditLog> findAllBy(Pageable pageable);
 }

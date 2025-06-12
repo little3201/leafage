@@ -26,27 +26,4 @@ import io.leafage.assets.domain.superclass.RegionModel;
  */
 public class RegionDTO extends RegionModel {
 
-    /**
-     * superior
-     */
-    private Long superiorId;
-
-    /**
-     * <p>Getter for the field <code>superiorId</code>.</p>
-     *
-     * @return a {@link java.lang.Long} object
-     */
-    public Long getSuperiorId() {
-        return superiorId;
-    }
-
-    /**
-     * <p>Setter for the field <code>superiorId</code>.</p>
-     *
-     * @param superiorId a {@link java.lang.Long} object
-     */
-    public void setSuperiorId(Long superiorId) {
-        this.superiorId = superiorId;
-    }
-
 }

@@ -37,7 +37,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -59,28 +58,30 @@ class PrivilegeControllerTest {
     @MockitoBean
     private PrivilegeService privilegeService;
 
-    private PrivilegeDTO privilegeDTO;
-    private PrivilegeVO privilegeVO;
+    private PrivilegeDTO dto;
+    private PrivilegeVO vo;
 
     @BeforeEach
     void setUp() {
-        privilegeDTO = new PrivilegeDTO();
-        privilegeDTO.setName("test");
-        privilegeDTO.setIcon("add");
-        privilegeDTO.setSuperiorId(1L);
-        privilegeDTO.setDescription("privilege");
+        dto = new PrivilegeDTO();
+        dto.setName("test");
+        dto.setIcon("add");
+        dto.setSuperiorId(1L);
+        dto.setDescription("privilege");
 
-        privilegeVO = new PrivilegeVO(1L, true, Instant.now());
-        privilegeVO.setName("test");
-        privilegeVO.setIcon("add");
-        privilegeVO.setPath("/test");
+        vo = new PrivilegeVO();
+        vo.setId(1L);
+        vo.setName("test");
+        vo.setIcon("add");
+        vo.setPath("/test");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(privilegeVO), pageable, 1L);
-        given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willReturn(Mono.just(voPage));
+        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/privileges").queryParam("page", 0)
                         .queryParam("size", 2).build()).exchange()
@@ -89,12 +90,15 @@ class PrivilegeControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willThrow(new RuntimeException());
+        given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/privileges")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "name:like:a")
                         .build())
                 .exchange()
                 .expectStatus().isNoContent();
@@ -102,7 +106,7 @@ class PrivilegeControllerTest {
 
     @Test
     void tree() {
-        TreeNode treeNode = TreeNode.withId(1L).name("test").build();
+        TreeNode<Long> treeNode = TreeNode.withId(1L).name("test").build();
         given(this.privilegeService.tree(Mockito.anyString())).willReturn(Mono.just(List.of(treeNode)));
 
         webTestClient.get().uri("/privileges/tree")
@@ -122,7 +126,7 @@ class PrivilegeControllerTest {
 
     @Test
     void fetch() {
-        given(this.privilegeService.fetch(Mockito.anyLong())).willReturn(Mono.just(privilegeVO));
+        given(this.privilegeService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/privileges/{id}", 1L)
                 .exchange()
@@ -164,9 +168,9 @@ class PrivilegeControllerTest {
 
     @Test
     void create() {
-        given(this.privilegeService.create(Mockito.any(PrivilegeDTO.class))).willReturn(Mono.just(privilegeVO));
+        given(this.privilegeService.create(Mockito.any(PrivilegeDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(privilegeDTO)
+        webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(dto)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
@@ -176,16 +180,16 @@ class PrivilegeControllerTest {
     void create_error() {
         given(this.privilegeService.create(Mockito.any(PrivilegeDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(privilegeDTO)
+        webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(dto)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }
 
     @Test
     void modify() {
-        given(this.privilegeService.modify(Mockito.anyLong(), Mockito.any(PrivilegeDTO.class))).willReturn(Mono.just(privilegeVO));
+        given(this.privilegeService.modify(Mockito.anyLong(), Mockito.any(PrivilegeDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(privilegeDTO)
+        webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(dto)
                 .exchange()
                 .expectStatus().isAccepted()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
@@ -195,7 +199,7 @@ class PrivilegeControllerTest {
     void modify_error() {
         given(this.privilegeService.modify(Mockito.anyLong(), Mockito.any(PrivilegeDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(privilegeDTO)
+        webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(dto)
                 .exchange()
                 .expectStatus().isNotModified();
     }

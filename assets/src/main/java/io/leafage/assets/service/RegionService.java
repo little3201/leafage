@@ -31,8 +31,6 @@ import top.leafage.common.r2dbc.R2dbcCrudService;
  */
 public interface RegionService extends R2dbcCrudService<RegionDTO, RegionVO> {
 
-    Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending);
-
     /**
      * 获取下级
      *

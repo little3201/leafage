@@ -67,7 +67,7 @@ class UserServiceImplTest {
 
         given(this.userRepository.count()).willReturn(Mono.just(2L));
 
-        StepVerifier.create(userService.retrieve(0, 2, "id", true)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(userService.retrieve(0, 2, "id", true,"username:like:a")).expectNextCount(1).verifyComplete();
     }
 
     @Test

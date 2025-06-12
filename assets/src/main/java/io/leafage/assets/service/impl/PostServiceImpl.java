@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.NoSuchElementException;
 
@@ -41,7 +42,7 @@ import java.util.NoSuchElementException;
  * @author wq li
  */
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl extends DomainConverter implements PostService {
 
     private final PostRepository postRepository;
     private final PostContentRepository postContentRepository;
@@ -62,7 +63,7 @@ public class PostServiceImpl implements PostService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<PostVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<PostVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return postRepository.findAllBy(pageable)
@@ -83,7 +84,7 @@ public class PostServiceImpl implements PostService {
                 .flatMap(post -> postContentRepository.getByPostId(post.getId())
                         .map(postContent -> {
                             PostVO vo = convertToVO(post, PostVO.class);
-                            vo.setContext(postContent.getContext());
+                            vo.setContent(postContent.getContent());
                             return vo;
                         })
                 );
@@ -99,7 +100,7 @@ public class PostServiceImpl implements PostService {
                 .flatMap(p -> {
                     PostContent postContent = new PostContent();
                     postContent.setPostId(p.getId());
-                    postContent.setContext(dto.getContext());
+                    postContent.setContent(dto.getContent());
                     return postContentRepository.save(postContent)
                             .map(pc -> convertToVO(p, PostVO.class));
                 });
@@ -121,7 +122,7 @@ public class PostServiceImpl implements PostService {
                         .defaultIfEmpty(new PostContent())
                         .doOnNext(postContent -> {
                             postContent.setPostId(p.getId());
-                            postContent.setContext(dto.getContext());
+                            postContent.setContent(dto.getContent());
                         })
                         .flatMap(postContentRepository::save)
                         .map(pc -> convertToVO(p, PostVO.class))
@@ -158,7 +159,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<Boolean> exists(String title, Long id) {
         Assert.hasText(title, "title must not be empty.");
-        return postRepository.existsByTitle(title);
+
+        if (id == null) {
+            return postRepository.existsByTitle(title);
+        }
+        return postRepository.existsByTitleAndIdNot(title, id);
     }
 
 }

@@ -15,16 +15,17 @@
  *
  */
 
-package io.leafage.assets.dto;
+package io.leafage.hypervisor.service;
 
-
-import io.leafage.assets.domain.superclass.CategoryModel;
+import io.leafage.hypervisor.dto.SchedulerLogDTO;
+import io.leafage.hypervisor.vo.SchedulerLogVO;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
- * dto class for category
+ * operation log service
  *
  * @author wq li
  */
-public class CategoryDTO extends CategoryModel {
+public interface SchedulerLogService extends R2dbcCrudService<SchedulerLogDTO, SchedulerLogVO> {
 
 }

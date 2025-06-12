@@ -55,15 +55,14 @@ class PostServiceImplTest {
     @InjectMocks
     private PostServiceImpl postsService;
 
-    private PostDTO postDTO;
+    private PostDTO dto;
 
     @BeforeEach
     void setUp() {
-        postDTO = new PostDTO();
-        postDTO.setTitle("标题");
-        postDTO.setTags(Set.of("test"));
-        postDTO.setCover("./avatar.jpg");
-        postDTO.setContext("内容信息");
+        dto = new PostDTO();
+        dto.setTitle("标题");
+        dto.setTags(Set.of("test"));
+        dto.setSummary("内容信息");
     }
 
     @Test
@@ -72,8 +71,7 @@ class PostServiceImplTest {
 
         given(this.postRepository.count()).willReturn(Mono.just(2L));
 
-        StepVerifier.create(this.postsService.retrieve(0, 2, "id", true))
-                .expectNextCount(1).verifyComplete();
+        StepVerifier.create(this.postsService.retrieve(0, 2, "id", true, "title:like:a")).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -87,9 +85,16 @@ class PostServiceImplTest {
 
     @Test
     void exists() {
-        given(this.postRepository.existsByTitle(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.postRepository.existsByTitleAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(postsService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void exists_id_null() {
+        given(this.postRepository.existsByTitle(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(postsService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
@@ -111,7 +116,7 @@ class PostServiceImplTest {
 
         given(this.postContentRepository.save(Mockito.any(PostContent.class))).willReturn(Mono.empty());
 
-        StepVerifier.create(this.postsService.modify(1L, postDTO)).verifyComplete();
+        StepVerifier.create(this.postsService.modify(1L, dto)).verifyComplete();
     }
 
     @Test

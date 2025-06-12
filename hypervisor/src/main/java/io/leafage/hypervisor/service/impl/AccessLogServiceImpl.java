@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 /**
  * access log service impl
@@ -32,7 +33,7 @@ import reactor.core.publisher.Mono;
  * @author wq li
  */
 @Service
-public class AccessLogServiceImpl implements AccessLogService {
+public class AccessLogServiceImpl extends DomainConverter implements AccessLogService {
 
     private final AccessLogRepository accessLogRepository;
 

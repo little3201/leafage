@@ -15,20 +15,28 @@
  *
  */
 
-package io.leafage.assets.service;
+package io.leafage.hypervisor.repository;
 
-import io.leafage.assets.dto.CategoryDTO;
-import io.leafage.assets.vo.CategoryVO;
-import org.springframework.data.domain.Page;
-import reactor.core.publisher.Mono;
-import top.leafage.common.r2dbc.R2dbcCrudService;
+import io.leafage.hypervisor.domain.AccessLog;
+import io.leafage.hypervisor.domain.OperationLog;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 /**
- * category service
+ * operation log repository
  *
  * @author wq li
  */
-public interface CategoryService extends R2dbcCrudService<CategoryDTO, CategoryVO> {
+@Repository
+public interface OperationLogRepository extends R2dbcRepository<OperationLog, Long> {
 
-    Mono<Page<CategoryVO>> retrieve(int page, int size, String sortBy, boolean descending);
+    /**
+     * 查询
+     *
+     * @param pageable a {@link Pageable} object
+     * @return 有效帖子
+     */
+    Flux<OperationLog> findAllBy(Pageable pageable);
 }

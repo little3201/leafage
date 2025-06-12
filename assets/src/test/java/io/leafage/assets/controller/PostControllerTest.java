@@ -38,7 +38,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,31 +60,29 @@ class PostControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private PostDTO postDTO;
-    private PostVO postVO;
+    private PostDTO dto;
+    private PostVO vo;
 
     @BeforeEach
     void setUp() {
         // 构造请求对象
-        postDTO = new PostDTO();
-        postDTO.setTitle("test");
-        postDTO.setCategoryId(1L);
-        postDTO.setCover("../test.jpg");
-        postDTO.setTags(Collections.singleton("java"));
-        postDTO.setContext("内容信息");
+        dto = new PostDTO();
+        dto.setTitle("test");
+        dto.setTags(Collections.singleton("java"));
+        dto.setSummary("内容信息");
 
-        postVO = new PostVO(1L, true, Instant.now());
-        postVO.setTitle(postDTO.getTitle());
-        postVO.setTags(postDTO.getTags());
-        postVO.setCover(postDTO.getCover());
-        postVO.setContext(postDTO.getContext());
+        vo = new PostVO();
+        vo.setId(1L);
+        vo.setTitle(dto.getTitle());
+        vo.setTags(dto.getTags());
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<PostVO> page = new PageImpl<>(List.of(postVO), pageable, 1L);
-        given(this.postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean()))
+        Page<PostVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString()))
                 .willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts")
@@ -99,13 +96,16 @@ class PostControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean()))
+        given(this.postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString()))
                 .willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "title:like:a")
                         .build())
                 .exchange()
                 .expectStatus().isNoContent();
@@ -113,7 +113,7 @@ class PostControllerTest {
 
     @Test
     void fetch() {
-        given(this.postService.fetch(Mockito.anyLong())).willReturn(Mono.just(postVO));
+        given(this.postService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/posts/{id}", 1)
                 .exchange()
@@ -132,7 +132,7 @@ class PostControllerTest {
 
     @Test
     void search() {
-        given(this.postService.search(Mockito.anyString())).willReturn(Flux.just(postVO));
+        given(this.postService.search(Mockito.anyString())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/search")
                         .queryParam("keyword", "test")
@@ -178,11 +178,11 @@ class PostControllerTest {
 
     @Test
     void create() {
-        given(this.postService.create(Mockito.any(PostDTO.class))).willReturn(Mono.just(postVO));
+        given(this.postService.create(Mockito.any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(postDTO)
+                .bodyValue(dto)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody().jsonPath("$.title").isEqualTo("test");
@@ -194,18 +194,18 @@ class PostControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(postDTO)
+                .bodyValue(dto)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }
 
     @Test
     void modify() {
-        given(this.postService.modify(Mockito.anyLong(), Mockito.any(PostDTO.class))).willReturn(Mono.just(postVO));
+        given(this.postService.modify(Mockito.anyLong(), Mockito.any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(postDTO)
+                .bodyValue(dto)
                 .exchange()
                 .expectStatus().isAccepted()
                 .expectBody().jsonPath("$.title").isEqualTo("test");
@@ -217,7 +217,7 @@ class PostControllerTest {
 
         webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(postDTO)
+                .bodyValue(dto)
                 .exchange()
                 .expectStatus().isNotModified();
     }

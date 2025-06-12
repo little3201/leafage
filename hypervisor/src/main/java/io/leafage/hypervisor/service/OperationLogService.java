@@ -15,24 +15,17 @@
  *
  */
 
-package io.leafage.assets.constants;
+package io.leafage.hypervisor.service;
+
+import io.leafage.hypervisor.dto.OperationLogDTO;
+import io.leafage.hypervisor.vo.OperationLogVO;
+import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
- * statistics type enum
+ * operation log service
  *
  * @author wq li
  */
-public enum StatisticsEnum {
+public interface OperationLogService extends R2dbcCrudService<OperationLogDTO, OperationLogVO> {
 
-    VIEWED("viewed"),
-
-    LIKES("likes"),
-
-    COMMENTS("comments");
-
-    public final String value;
-
-    StatisticsEnum(String value) {
-        this.value = value;
-    }
 }

@@ -47,13 +47,13 @@ class CommentServiceImplTest {
     @InjectMocks
     private CommentServiceImpl commentService;
 
-    private CommentDTO commentDTO;
+    private CommentDTO dto;
 
     @BeforeEach
     void setUp() {
-        commentDTO = new CommentDTO();
-        commentDTO.setPostId(1L);
-        commentDTO.setReplier(1L);
+        dto = new CommentDTO();
+        dto.setPostId(1L);
+        dto.setReplier(1L);
     }
 
     @Test
@@ -74,7 +74,7 @@ class CommentServiceImplTest {
     void create() {
         given(this.commentRepository.save(Mockito.any(Comment.class))).willReturn(Mono.just(Mockito.mock(Comment.class)));
 
-        StepVerifier.create(commentService.create(commentDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(commentService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
 }

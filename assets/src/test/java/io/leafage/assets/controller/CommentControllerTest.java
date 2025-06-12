@@ -19,8 +19,8 @@ package io.leafage.assets.controller;
 
 import io.leafage.assets.dto.CommentDTO;
 import io.leafage.assets.service.CommentService;
-import io.leafage.assets.vo.CategoryVO;
 import io.leafage.assets.vo.CommentVO;
+import io.leafage.assets.vo.TagVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +34,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -56,28 +54,29 @@ class CommentControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private CommentDTO commentDTO;
-    private CommentVO commentVO;
+    private CommentDTO dto;
+    private CommentVO vo;
 
     @BeforeEach
     void setUp() {
-        commentDTO = new CommentDTO();
-        commentDTO.setPostId(1L);
-        commentDTO.setContext("test");
+        dto = new CommentDTO();
+        dto.setPostId(1L);
+        dto.setContent("test");
 
-        commentVO = new CommentVO(1L, true, Instant.now());
-        commentVO.setPostId(commentDTO.getPostId());
-        commentVO.setContext(commentDTO.getContext());
+        vo = new CommentVO();
+        vo.setId(1L);
+        vo.setPostId(dto.getPostId());
+        vo.setContent(dto.getContent());
     }
 
     @Test
     void comments() {
-        given(this.commentService.comments(Mockito.anyLong())).willReturn(Flux.just(commentVO));
+        given(this.commentService.comments(Mockito.anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/comments/{id}", 1)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(CategoryVO.class);
+                .expectBodyList(TagVO.class);
     }
 
     @Test
@@ -91,11 +90,11 @@ class CommentControllerTest {
 
     @Test
     void replies() {
-        given(this.commentService.replies(Mockito.anyLong())).willReturn(Flux.just(commentVO));
+        given(this.commentService.replies(Mockito.anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/comments/{id}/replies", 1)
                 .exchange()
-                .expectStatus().isOk().expectBodyList(CategoryVO.class);
+                .expectStatus().isOk().expectBodyList(TagVO.class);
     }
 
     @Test
@@ -109,14 +108,14 @@ class CommentControllerTest {
 
     @Test
     void create() {
-        given(this.commentService.create(Mockito.any(CommentDTO.class))).willReturn(Mono.just(commentVO));
+        given(this.commentService.create(Mockito.any(CommentDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/comments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(commentDTO)
+                .bodyValue(dto)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody().jsonPath("$.context").isEqualTo("test");
+                .expectBody().jsonPath("$.content").isEqualTo("test");
     }
 
     @Test
@@ -125,7 +124,7 @@ class CommentControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/comments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(commentDTO)
+                .bodyValue(dto)
                 .exchange().expectStatus().is4xxClientError();
     }
 

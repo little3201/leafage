@@ -17,50 +17,51 @@
 
 package io.leafage.assets.service.impl;
 
-import io.leafage.assets.domain.Category;
-import io.leafage.assets.dto.CategoryDTO;
-import io.leafage.assets.repository.CategoryRepository;
-import io.leafage.assets.service.CategoryService;
-import io.leafage.assets.vo.CategoryVO;
+import io.leafage.assets.domain.Tag;
+import io.leafage.assets.dto.TagDTO;
+import io.leafage.assets.repository.TagRepository;
+import io.leafage.assets.service.TagService;
+import io.leafage.assets.vo.TagVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import javax.naming.NotContextException;
 
 /**
- * category service impl
+ * tag service impl
  *
  * @author wq li
  */
 @Service
-public class CategoryServiceImpl implements CategoryService {
+public class TagServiceImpl extends DomainConverter implements TagService {
 
-    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
 
     /**
      * <p>Constructor for CategoryServiceImpl.</p>
      *
-     * @param categoryRepository a {@link CategoryRepository} object
+     * @param tagRepository a {@link TagRepository} object
      */
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    public TagServiceImpl(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<CategoryVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<TagVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return categoryRepository.findAllBy(pageable)
-                .map(c -> convertToVO(c, CategoryVO.class))
+        return tagRepository.findAllBy(pageable)
+                .map(c -> convertToVO(c, TagVO.class))
                 .collectList()
-                .zipWith(categoryRepository.count())
+                .zipWith(tagRepository.count())
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
@@ -68,11 +69,11 @@ public class CategoryServiceImpl implements CategoryService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<CategoryVO> fetch(Long id) {
+    public Mono<TagVO> fetch(Long id) {
         Assert.notNull(id, "id must not be null.");
 
-        return categoryRepository.findById(id)
-                .map(c -> convertToVO(c, CategoryVO.class));
+        return tagRepository.findById(id)
+                .map(c -> convertToVO(c, TagVO.class));
     }
 
     /**
@@ -81,31 +82,33 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Mono<Boolean> exists(String name, Long id) {
         Assert.hasText(name, "name must not be empty.");
-
-        return categoryRepository.existsByName(name);
+        if (id == null) {
+            return tagRepository.existsByName(name);
+        }
+        return tagRepository.existsByNameAndIdNot(name, id);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<CategoryVO> create(CategoryDTO dto) {
-        return categoryRepository.save(convertToDomain(dto, Category.class))
-                .map(c -> convertToVO(c, CategoryVO.class));
+    public Mono<TagVO> create(TagDTO dto) {
+        return tagRepository.save(convertToDomain(dto, Tag.class))
+                .map(c -> convertToVO(c, TagVO.class));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<CategoryVO> modify(Long id, CategoryDTO dto) {
+    public Mono<TagVO> modify(Long id, TagDTO dto) {
         Assert.notNull(id, "id must not be null.");
 
-        return categoryRepository.findById(id)
+        return tagRepository.findById(id)
                 .switchIfEmpty(Mono.error(NotContextException::new))
-                .map(category -> convert(dto, category))
-                .flatMap(categoryRepository::save)
-                .map(c -> convertToVO(c, CategoryVO.class));
+                .map(tag -> convert(dto, tag))
+                .flatMap(tagRepository::save)
+                .map(c -> convertToVO(c, TagVO.class));
     }
 
     /**
@@ -115,7 +118,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, "id must not be null.");
 
-        return categoryRepository.deleteById(id);
+        return tagRepository.deleteById(id);
     }
 
 }

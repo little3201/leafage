@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,7 @@ import java.util.Set;
  * @author wq li
  */
 @Service
-public class GroupMembersServiceImpl implements GroupMembersService {
+public class GroupMembersServiceImpl extends DomainConverter implements GroupMembersService {
 
     private final GroupMembersRepository groupMembersRepository;
 

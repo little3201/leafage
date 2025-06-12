@@ -62,14 +62,15 @@ public class PostController {
      * @param size       大小
      * @param sortBy     排序字段
      * @param descending 是否倒序
+     * @param filters    filters
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
     public ResponseEntity<Mono<Page<PostVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending) {
+                                                       String sortBy, boolean descending, String filters) {
         Mono<Page<PostVO>> pageMono;
         try {
-            pageMono = postService.retrieve(page, size, sortBy, descending);
+            pageMono = postService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve posts occurred an error: ", e);
             return ResponseEntity.noContent().build();

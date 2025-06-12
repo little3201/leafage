@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.NoSuchElementException;
 
@@ -38,7 +39,7 @@ import java.util.NoSuchElementException;
  * @author wq li 2018-07-28 0:30
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends DomainConverter implements UserService {
 
     private final UserRepository userRepository;
 

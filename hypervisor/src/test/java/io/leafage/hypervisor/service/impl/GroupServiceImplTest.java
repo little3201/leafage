@@ -64,7 +64,7 @@ class GroupServiceImplTest {
 
         given(this.groupRepository.count()).willReturn(Mono.just(2L));
 
-        StepVerifier.create(groupService.retrieve(0, 2, "id", true)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(groupService.retrieve(0, 2, "id", true,"name:like:a")).expectNextCount(1).verifyComplete();
     }
 
     @Test

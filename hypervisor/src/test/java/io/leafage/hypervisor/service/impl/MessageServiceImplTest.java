@@ -54,7 +54,7 @@ class MessageServiceImplTest {
     void setUp() {
         messageDTO = new MessageDTO();
         messageDTO.setTitle("标题");
-        messageDTO.setContext("内容信息");
+        messageDTO.setContent("内容信息");
         messageDTO.setReceiver("test");
     }
 

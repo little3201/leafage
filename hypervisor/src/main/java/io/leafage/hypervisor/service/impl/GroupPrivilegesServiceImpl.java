@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 import java.util.Set;
@@ -39,7 +40,7 @@ import java.util.stream.Stream;
  * @author wq li
  */
 @Service
-public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
+public class GroupPrivilegesServiceImpl extends DomainConverter implements GroupPrivilegesService {
 
     private final GroupPrivilegesRepository groupPrivilegesRepository;
     private final PrivilegeRepository privilegeRepository;

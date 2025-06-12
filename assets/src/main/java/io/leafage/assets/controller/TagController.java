@@ -17,9 +17,9 @@
 
 package io.leafage.assets.controller;
 
-import io.leafage.assets.dto.CategoryDTO;
-import io.leafage.assets.service.CategoryService;
-import io.leafage.assets.vo.CategoryVO;
+import io.leafage.assets.dto.TagDTO;
+import io.leafage.assets.service.TagService;
+import io.leafage.assets.vo.TagVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,26 +32,26 @@ import reactor.core.publisher.Mono;
 
 
 /**
- * category controller
+ * tag controller
  *
  * @author wq li
  */
 @Validated
 @RestController
-@RequestMapping("/categories")
-public class CategoryController {
+@RequestMapping("/tags")
+public class TagController {
 
-    private final Logger logger = LoggerFactory.getLogger(CategoryController.class);
+    private final Logger logger = LoggerFactory.getLogger(TagController.class);
 
-    private final CategoryService categoryService;
+    private final TagService tagService;
 
     /**
      * <p>Constructor for CategoryController.</p>
      *
-     * @param categoryService a {@link CategoryService} object
+     * @param tagService a {@link TagService} object
      */
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public TagController(TagService tagService) {
+        this.tagService = tagService;
     }
 
     /**
@@ -62,13 +62,13 @@ public class CategoryController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<CategoryVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                           String sortBy, boolean descending) {
-        Mono<Page<CategoryVO>> pageMono;
+    public ResponseEntity<Mono<Page<TagVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+                                                      String sortBy, boolean descending, String filters) {
+        Mono<Page<TagVO>> pageMono;
         try {
-            pageMono = categoryService.retrieve(page, size, sortBy, descending);
+            pageMono = tagService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
-            logger.error("Retrieve categories occurred an error: ", e);
+            logger.error("Retrieve tags occurred an error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(pageMono);
@@ -81,12 +81,12 @@ public class CategoryController {
      * @return 查询到数据，异常时返回204
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<CategoryVO>> fetch(@PathVariable Long id) {
-        Mono<CategoryVO> voMono;
+    public ResponseEntity<Mono<TagVO>> fetch(@PathVariable Long id) {
+        Mono<TagVO> voMono;
         try {
-            voMono = categoryService.fetch(id);
+            voMono = tagService.fetch(id);
         } catch (Exception e) {
-            logger.error("Fetch category occurred an error: ", e);
+            logger.error("Fetch tag occurred an error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(voMono);
@@ -102,9 +102,9 @@ public class CategoryController {
     public ResponseEntity<Mono<Boolean>> exists(@RequestParam String name, Long id) {
         Mono<Boolean> existsMono;
         try {
-            existsMono = categoryService.exists(name, id);
+            existsMono = tagService.exists(name, id);
         } catch (Exception e) {
-            logger.error("Check category is exists occurred an error: ", e);
+            logger.error("Check tag is exists occurred an error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok().body(existsMono);
@@ -113,16 +113,16 @@ public class CategoryController {
     /**
      * 添加信息
      *
-     * @param categoryDTO 要添加的数据
+     * @param tagDTO 要添加的数据
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping
-    public ResponseEntity<Mono<CategoryVO>> create(@RequestBody @Valid CategoryDTO categoryDTO) {
-        Mono<CategoryVO> voMono;
+    public ResponseEntity<Mono<TagVO>> create(@RequestBody @Valid TagDTO tagDTO) {
+        Mono<TagVO> voMono;
         try {
-            voMono = categoryService.create(categoryDTO);
+            voMono = tagService.create(tagDTO);
         } catch (Exception e) {
-            logger.error("Create category occurred an error: ", e);
+            logger.error("Create tag occurred an error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
@@ -132,16 +132,16 @@ public class CategoryController {
      * 修改信息
      *
      * @param id          主键
-     * @param categoryDTO 要修改的数据
+     * @param tagDTO 要修改的数据
      * @return 修改后的信息，异常时返回304状态码
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<CategoryVO>> modify(@PathVariable Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
-        Mono<CategoryVO> voMono;
+    public ResponseEntity<Mono<TagVO>> modify(@PathVariable Long id, @RequestBody @Valid TagDTO tagDTO) {
+        Mono<TagVO> voMono;
         try {
-            voMono = categoryService.modify(id, categoryDTO);
+            voMono = tagService.modify(id, tagDTO);
         } catch (Exception e) {
-            logger.error("Modify category occurred an error: ", e);
+            logger.error("Modify tag occurred an error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
         return ResponseEntity.accepted().body(voMono);
@@ -157,9 +157,9 @@ public class CategoryController {
     public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
         Mono<Void> voidMono;
         try {
-            voidMono = categoryService.remove(id);
+            voidMono = tagService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove category occurred an error: ", e);
+            logger.error("Remove tag occurred an error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok(voidMono);

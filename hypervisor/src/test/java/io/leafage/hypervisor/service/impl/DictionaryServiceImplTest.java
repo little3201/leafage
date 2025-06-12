@@ -64,7 +64,7 @@ class DictionaryServiceImplTest {
 
         given(this.dictionaryRepository.count()).willReturn(Mono.just(Mockito.anyLong()));
 
-        StepVerifier.create(dictionaryService.retrieve(0, 2, "id", true)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.retrieve(0, 2, "id", true,"name:like:a")).expectNextCount(1).verifyComplete();
     }
 
     @Test

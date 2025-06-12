@@ -48,15 +48,15 @@ class RegionServiceImplTest {
     @InjectMocks
     private RegionServiceImpl regionService;
 
-    private RegionDTO regionDTO;
+    private RegionDTO dto;
 
     @BeforeEach
     void setUp() {
-        regionDTO = new RegionDTO();
-        regionDTO.setName("西安市");
-        regionDTO.setAreaCode("029");
-        regionDTO.setPostalCode(710000);
-        regionDTO.setSuperiorId(1L);
+        dto = new RegionDTO();
+        dto.setName("西安市");
+        dto.setAreaCode("029");
+        dto.setPostalCode(710000);
+        dto.setSuperiorId(1L);
     }
 
     @Test
@@ -65,7 +65,7 @@ class RegionServiceImplTest {
 
         given(this.regionRepository.countByEnabledTrue()).willReturn(Mono.just(Mockito.anyLong()));
 
-        StepVerifier.create(regionService.retrieve(0, 2, "id", true)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(regionService.retrieve(0, 2, "id", true, "name:like:a")).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -84,9 +84,16 @@ class RegionServiceImplTest {
 
     @Test
     void exists() {
-        given(this.regionRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.regionRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(regionService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void exists_id_null() {
+        given(this.regionRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(regionService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
@@ -102,7 +109,7 @@ class RegionServiceImplTest {
 
         given(this.regionRepository.save(Mockito.any(Region.class))).willReturn(Mono.just(Mockito.mock(Region.class)));
 
-        StepVerifier.create(regionService.modify(Mockito.anyLong(), regionDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(regionService.modify(Mockito.anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

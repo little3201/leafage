@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.NoSuchElementException;
 
@@ -37,7 +38,7 @@ import java.util.NoSuchElementException;
  * @author wq li
  */
 @Service
-public class MessageServiceImpl implements MessageService {
+public class MessageServiceImpl extends DomainConverter implements MessageService {
 
     private final MessageRepository messageRepository;
 

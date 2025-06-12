@@ -19,6 +19,7 @@ package io.leafage.hypervisor.controller;
 
 import io.leafage.hypervisor.dto.UserDTO;
 import io.leafage.hypervisor.service.UserService;
+import io.leafage.hypervisor.vo.PrivilegeVO;
 import io.leafage.hypervisor.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,6 +38,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -53,30 +59,61 @@ class UserControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private UserDTO userDTO;
-    private UserVO userVO;
+    private UserDTO dto;
+    private UserVO vo;
 
     @BeforeEach
     void setUp() {
-        userDTO = new UserDTO();
-        userDTO.setUsername("test");
-        userDTO.setAvatar("avatar.jpg");
-        userDTO.setGivenName("john");
-        userDTO.setFamilyName("steven");
-        userDTO.setAccountExpiresAt(Instant.now());
-        userDTO.setCredentialsExpiresAt(Instant.now());
+        dto = new UserDTO();
+        dto.setUsername("test");
+        dto.setAvatar("avatar.jpg");
+        dto.setGivenName("john");
+        dto.setFamilyName("steven");
+        dto.setAccountExpiresAt(Instant.now());
+        dto.setCredentialsExpiresAt(Instant.now());
 
-        userVO = new UserVO(1L, true, Instant.now());
-        userVO.setUsername("test");
-        userVO.setAccountExpiresAt(Instant.now());
-        userVO.setGivenName("john");
-        userVO.setMiddleName("steven");
-        userVO.setFamilyName("steven");
+        vo = new UserVO();
+        vo.setId(1L);
+        vo.setUsername("test");
+        vo.setAccountExpiresAt(Instant.now());
+        vo.setGivenName("john");
+        vo.setMiddleName("steven");
+        vo.setFamilyName("steven");
+    }
+
+
+    @Test
+    void retrieve() {
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<UserVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users")
+                        .queryParam("page", 0)
+                        .queryParam("size", 2).build()).exchange()
+                .expectStatus().isOk().expectBodyList(PrivilegeVO.class);
+    }
+
+    @Test
+    void retrieve_error() {
+        given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users")
+                        .queryParam("page", 0)
+                        .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "username:like:a")
+                        .build())
+                .exchange()
+                .expectStatus().isNoContent();
     }
 
     @Test
     void fetch() {
-        given(this.userService.fetch(Mockito.anyLong())).willReturn(Mono.just(userVO));
+        given(this.userService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/users/{id}", 1L).exchange()
                 .expectStatus().isOk()
@@ -116,18 +153,18 @@ class UserControllerTest {
 
     @Test
     void created() {
-        given(this.userService.create(Mockito.any(UserDTO.class))).willReturn(Mono.just(userVO));
+        given(this.userService.create(Mockito.any(UserDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).post().uri("/users").bodyValue(userDTO).exchange()
+        webTestClient.mutateWith(csrf()).post().uri("/users").bodyValue(dto).exchange()
                 .expectStatus().isCreated()
                 .expectBody().jsonPath("$.username").isEqualTo("test");
     }
 
     @Test
     void modify() {
-        given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willReturn(Mono.just(userVO));
+        given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(userDTO).exchange()
+        webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
                 .expectStatus().isAccepted()
                 .expectBody().jsonPath("$.username").isEqualTo("test");
     }
@@ -136,7 +173,7 @@ class UserControllerTest {
     void modify_error() {
         given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(userDTO).exchange()
+        webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
                 .expectStatus().isNotModified();
     }
 

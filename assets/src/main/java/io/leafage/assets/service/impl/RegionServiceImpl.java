@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.NoSuchElementException;
 
@@ -38,7 +39,7 @@ import java.util.NoSuchElementException;
  * @author wq li
  */
 @Service
-public class RegionServiceImpl implements RegionService {
+public class RegionServiceImpl extends DomainConverter implements RegionService {
 
     private final RegionRepository regionRepository;
 
@@ -55,7 +56,7 @@ public class RegionServiceImpl implements RegionService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending) {
+    public Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return regionRepository.findAllBy(pageable)
@@ -82,7 +83,11 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public Mono<Boolean> exists(String name, Long id) {
         Assert.hasText(name, "name must not be empty.");
-        return regionRepository.existsByName(name);
+
+        if (id == null) {
+            return regionRepository.existsByName(name);
+        }
+        return regionRepository.existsByNameAndIdNot(name, id);
     }
 
     /**

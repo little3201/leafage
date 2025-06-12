@@ -26,6 +26,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 /**
  * audit configuration
  *
@@ -38,13 +40,13 @@ public class AuditConfiguration {
     /**
      * <p>auditorProvider.</p>
      *
-     * @return a {@link org.springframework.data.domain.ReactiveAuditorAware} object
+     * @return a {@link ReactiveAuditorAware} object
      */
     @Bean
     public ReactiveAuditorAware<String> auditorProvider() {
         return () -> Mono.defer(() -> Mono.justOrEmpty(SecurityContextHolder.getContext()))
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
-                .map(Authentication::getName);
+                .map(Principal::getName);
     }
 }

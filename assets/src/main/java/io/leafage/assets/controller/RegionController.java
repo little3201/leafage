@@ -60,10 +60,10 @@ public class RegionController {
      */
     @GetMapping
     public ResponseEntity<Mono<Page<RegionVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                         String sortBy, boolean descending) {
+                                                         String sortBy, boolean descending, String filters) {
         Mono<Page<RegionVO>> pageMono;
         try {
-            pageMono = regionService.retrieve(page, size, sortBy, descending);
+            pageMono = regionService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve regions occurred an error: ", e);
             return ResponseEntity.noContent().build();

@@ -36,7 +36,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -58,27 +57,29 @@ class MessageControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private MessageVO messageVO;
-    private MessageDTO messageDTO;
+    private MessageVO vo;
+    private MessageDTO dto;
 
     @BeforeEach
     void setUp() {
-        messageVO = new MessageVO(1L, true, Instant.now());
-        messageVO.setTitle("标题");
-        messageVO.setContext("内容");
-        messageVO.setReceiver("test");
+        vo = new MessageVO();
+        vo.setId(1L);
+        vo.setTitle("标题");
+        vo.setContent("内容");
+        vo.setReceiver("test");
 
-        messageDTO = new MessageDTO();
-        messageDTO.setTitle("标题");
-        messageDTO.setContext("内容信息");
-        messageDTO.setReceiver("test");
+        dto = new MessageDTO();
+        dto.setTitle("标题");
+        dto.setContent("内容信息");
+        dto.setReceiver("test");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<MessageVO> voPage = new PageImpl<>(List.of(messageVO), pageable, 1L);
-        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+        Page<MessageVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/messages")
                         .queryParam("page", 0)
@@ -92,7 +93,8 @@ class MessageControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/messages")
                         .queryParam("page", 0)
@@ -106,7 +108,7 @@ class MessageControllerTest {
 
     @Test
     void fetch() {
-        given(this.messageService.fetch(Mockito.anyLong())).willReturn(Mono.just(messageVO));
+        given(this.messageService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/messages/{id}", 1L)
                 .exchange()
@@ -123,9 +125,9 @@ class MessageControllerTest {
 
     @Test
     void create() {
-        given(this.messageService.create(Mockito.any(MessageDTO.class))).willReturn(Mono.just(messageVO));
+        given(this.messageService.create(Mockito.any(MessageDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(messageDTO)
+        webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody().jsonPath("$.title").isEqualTo("标题");
@@ -135,7 +137,7 @@ class MessageControllerTest {
     void create_error() {
         given(this.messageService.create(Mockito.any(MessageDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(messageDTO)
+        webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }

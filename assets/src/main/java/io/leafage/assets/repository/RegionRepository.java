@@ -49,6 +49,15 @@ public interface RegionRepository extends R2dbcRepository<Region, Long> {
     Mono<Boolean> existsByName(String name);
 
     /**
+     * 是否已存在
+     *
+     * @param name 名称
+     * @param id 主键
+     * @return true-是，false-否
+     */
+    Mono<Boolean> existsByNameAndIdNot(String name, Long id);
+
+    /**
      * 查询下级
      *
      * @param superiorId superior id

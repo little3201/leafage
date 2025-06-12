@@ -41,23 +41,6 @@ public interface PostRepository extends R2dbcRepository<Post, Long> {
     Flux<Post> findAllBy(Pageable pageable);
 
     /**
-     * 根据分类分页查询
-     *
-     * @param categoryId 分类ID
-     * @param pageable   分页参数
-     * @return 有效帖子
-     */
-    Flux<Post> findByCategoryId(Long categoryId, Pageable pageable);
-
-    /**
-     * 关联统计
-     *
-     * @param categoryId 分类ID
-     * @return 帖子数
-     */
-    Mono<Long> countByCategoryId(Long categoryId);
-
-    /**
      * 关键词查询
      *
      * @param keyword 关键词
@@ -68,8 +51,17 @@ public interface PostRepository extends R2dbcRepository<Post, Long> {
     /**
      * 是否已存在
      *
-     * @param title 名称
+     * @param title 标题
      * @return true-是，false-否
      */
     Mono<Boolean> existsByTitle(String title);
+
+    /**
+     * 是否已存在
+     *
+     * @param title 标题
+     * @param id    主键
+     * @return true-是，false-否
+     */
+    Mono<Boolean> existsByTitleAndIdNot(String title, Long id);
 }

@@ -28,17 +28,17 @@ CREATE TABLE posts
     title              varchar(127) not null,
     tags               varchar[],
     cover              varchar(127),
-    category_id        bigint       not null,
+    tag_id        bigint       not null,
     enabled boolean not null default true,
     created_by         varchar(32)  not null,
     created_date       timestamp    not null default CURRENT_TIMESTAMP,
     last_modified_by   varchar(32)  not null,
     last_modified_date timestamp    not null default CURRENT_TIMESTAMP,
-    CONSTRAINT fk_category
-        FOREIGN KEY (category_id) REFERENCES categories (id)
+    CONSTRAINT fk_tag
+        FOREIGN KEY (tag_id) REFERENCES categories (id)
 );
 
-CREATE INDEX idx_category_id ON posts (category_id);
+CREATE INDEX idx_tag_id ON posts (tag_id);
 CREATE INDEX idx_created_by ON posts (created_by);
 
 

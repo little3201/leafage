@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.NoSuchElementException;
 
@@ -38,7 +39,7 @@ import java.util.NoSuchElementException;
  * @author wq li
  */
 @Service
-public class DictionaryServiceImpl implements DictionaryService {
+public class DictionaryServiceImpl extends DomainConverter implements DictionaryService {
 
     private final DictionaryRepository dictionaryRepository;
 

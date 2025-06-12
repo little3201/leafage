@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 /**
- * record repository
+ * access log repository
  *
  * @author wq li
  */

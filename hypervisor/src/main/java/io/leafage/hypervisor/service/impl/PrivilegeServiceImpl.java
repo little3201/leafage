@@ -33,8 +33,7 @@ import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
-import top.leafage.common.r2dbc.ReactiveAbstractTreeNodeService;
-import top.leafage.common.r2dbc.audit.ReactiveAuditMetadata;
+import top.leafage.common.r2dbc.R2dbcTreeAndDomainConverter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +46,7 @@ import java.util.Set;
  * @author wq li
  */
 @Service
-public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privilege, Long> implements PrivilegeService {
+public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege, Long> implements PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
@@ -165,7 +164,7 @@ public class PrivilegeServiceImpl extends ReactiveAbstractTreeNodeService<Privil
         }
 
         return privilegeRepository.findById(privilegeId)
-                .filter(ReactiveAuditMetadata::isEnabled)
+                .filter(Privilege::isEnabled)
                 .flatMapMany(privilege -> {
                     if (privilege.getSuperiorId() == null) {
                         return Flux.just(privilege);

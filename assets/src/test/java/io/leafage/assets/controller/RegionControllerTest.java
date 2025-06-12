@@ -57,22 +57,24 @@ class RegionControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private RegionVO regionVO;
+    private RegionVO vo;
 
     @BeforeEach
     void setUp() {
-        regionVO = new RegionVO(1L, true, Instant.now());
-        regionVO.setName("test");
-        regionVO.setAreaCode("023333");
-        regionVO.setPostalCode(232);
-        regionVO.setDescription("region");
+        vo = new RegionVO();
+        vo.setId(1L);
+        vo.setName("test");
+        vo.setAreaCode("023333");
+        vo.setPostalCode(232);
+        vo.setDescription("region");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<RegionVO> voPage = new PageImpl<>(List.of(regionVO), pageable, 1L);
-        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willReturn(Mono.just(voPage));
+        Page<RegionVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/regions")
                         .queryParam("page", 0)
@@ -85,12 +87,15 @@ class RegionControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willThrow(new RuntimeException());
+        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/regions")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "name:like:a")
                         .build())
                 .exchange()
                 .expectStatus().isNoContent();
@@ -98,7 +103,7 @@ class RegionControllerTest {
 
     @Test
     void fetch() {
-        given(this.regionService.fetch(Mockito.anyLong())).willReturn(Mono.just(regionVO));
+        given(this.regionService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/regions/{id}", 1L)
                 .exchange()
@@ -117,7 +122,7 @@ class RegionControllerTest {
 
     @Test
     void subset() {
-        given(this.regionService.subset(Mockito.anyLong())).willReturn(Flux.just(regionVO));
+        given(this.regionService.subset(Mockito.anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/regions/{id}/subset", 1L)
                 .exchange()

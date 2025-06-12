@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 /**
  * comment service impl
@@ -34,7 +35,7 @@ import reactor.core.publisher.Mono;
  * @author wq li
  */
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends DomainConverter implements CommentService {
 
     private final CommentRepository commentRepository;
 

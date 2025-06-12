@@ -52,7 +52,7 @@ class AccessLogServiceImplTest {
 
         given(this.accessLogRepository.count()).willReturn(Mono.just(Mockito.anyLong()));
 
-        StepVerifier.create(recordService.retrieve(0, 2, "id", true)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(recordService.retrieve(0, 2, "id", true, "url:like:a")).expectNextCount(1).verifyComplete();
     }
 
 }

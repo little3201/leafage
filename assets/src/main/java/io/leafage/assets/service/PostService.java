@@ -31,8 +31,6 @@ import top.leafage.common.r2dbc.R2dbcCrudService;
  */
 public interface PostService extends R2dbcCrudService<PostDTO, PostVO> {
 
-    Mono<Page<PostVO>> retrieve(int page, int size, String sortBy, boolean descending);
-
     /**
      * 全文搜索
      *

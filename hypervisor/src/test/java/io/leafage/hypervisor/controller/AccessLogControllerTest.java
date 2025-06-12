@@ -35,7 +35,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -57,21 +58,23 @@ class AccessLogControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private AccessLogVO accessLogVO;
+    private AccessLogVO vo;
 
     @BeforeEach
-    void setUp() {
-        accessLogVO = new AccessLogVO(1L, true, Instant.now());
-        accessLogVO.setIp("12.1.2.1");
-        accessLogVO.setLocation("某国某城市");
-        accessLogVO.setDescription("更新个人资料");
+    void setUp() throws UnknownHostException {
+        vo = new AccessLogVO();
+        vo.setId(1L);
+        vo.setIp(InetAddress.getByName("12.1.2.1"));
+        vo.setLocation("某国某城市");
+        vo.setBody("更新个人资料");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<AccessLogVO> page = new PageImpl<>(List.of(accessLogVO), pageable, 1L);
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willReturn(Mono.just(page));
+        Page<AccessLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
                         .queryParam("page", 0)
@@ -84,12 +87,15 @@ class AccessLogControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean())).willThrow(new NoSuchElementException());
+        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new NoSuchElementException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "url:like:a")
                         .build())
                 .exchange()
                 .expectStatus().isNoContent();

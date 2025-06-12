@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.DomainConverter;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -39,7 +40,7 @@ import java.util.NoSuchElementException;
  * @author wq li 2018/12/17 19:25
  */
 @Service
-public class GroupServiceImpl implements GroupService {
+public class GroupServiceImpl extends DomainConverter implements GroupService {
 
     private final GroupRepository groupRepository;
 

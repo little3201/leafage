@@ -18,7 +18,6 @@
 package io.leafage.assets.dto;
 
 import io.leafage.assets.domain.superclass.PostModel;
-import jakarta.validation.constraints.NotNull;
 
 /**
  * dto class for post
@@ -27,28 +26,14 @@ import jakarta.validation.constraints.NotNull;
  */
 public class PostDTO extends PostModel {
 
-    /**
-     * 分类
-     */
-    @NotNull(message = "categoryId must not be null.")
-    private Long categoryId;
+    private String content;
 
-    /**
-     * <p>Getter for the field <code>categoryId</code>.</p>
-     *
-     * @return a {@link java.lang.Long} object
-     */
-    public Long getCategoryId() {
-        return categoryId;
+
+    public String getContent() {
+        return content;
     }
 
-    /**
-     * <p>Setter for the field <code>categoryId</code>.</p>
-     *
-     * @param categoryId a {@link java.lang.Long} object
-     */
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setContent(String content) {
+        this.content = content;
     }
-
 }
