@@ -41,7 +41,7 @@ public class User extends UserModel {
     private boolean accountNonLocked;
 
     @Embedded
-    private JdbcAuditMetadata auditMetadata;
+    private JdbcAuditMetadata auditMetadata = new JdbcAuditMetadata();
 
 
     public Long getId() {

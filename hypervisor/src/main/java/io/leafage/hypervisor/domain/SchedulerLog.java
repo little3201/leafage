@@ -41,7 +41,7 @@ public class SchedulerLog extends SchedulerLogModel {
     private ScheduleStatus status;
 
     @Embedded
-    private JdbcAuditMetadata auditMetadata;
+    private JdbcAuditMetadata auditMetadata = new JdbcAuditMetadata();
 
 
     public Long getId() {

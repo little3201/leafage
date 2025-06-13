@@ -38,7 +38,7 @@ public class Dictionary extends DictionaryModel {
     private Long id;
 
     @Embedded
-    private JdbcAuditMetadata auditMetadata;
+    private JdbcAuditMetadata auditMetadata = new JdbcAuditMetadata();
 
 
     public Long getId() {

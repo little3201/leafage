@@ -39,7 +39,7 @@ public class AuditLog extends AuditLogModel {
     private Long id;
 
     @Embedded
-    private JdbcAuditMetadata auditMetadata;
+    private JdbcAuditMetadata auditMetadata = new JdbcAuditMetadata();
 
 
     public Long getId() {
