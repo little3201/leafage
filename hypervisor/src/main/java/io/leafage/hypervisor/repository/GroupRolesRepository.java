@@ -29,11 +29,18 @@ import java.util.List;
 public interface GroupRolesRepository extends JpaRepository<GroupRoles, Long> {
 
     /**
-     * 根据role查group
+     * 根据 role查
      *
-     * @param roleId role主键
+     * @param roleId role id
      * @return 关联数据集
      */
     List<GroupRoles> findAllByRoleId(Long roleId);
 
+    /**
+     * 根据 group查
+     *
+     * @param groupId group id
+     * @return 关联数据集
+     */
+    List<GroupRoles> findAllByGroupId(Long groupId);
 }

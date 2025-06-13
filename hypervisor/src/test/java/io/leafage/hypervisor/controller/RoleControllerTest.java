@@ -17,7 +17,6 @@ package io.leafage.hypervisor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.leafage.hypervisor.domain.RolePrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.service.RoleMembersService;
 import io.leafage.hypervisor.service.RolePrivilegesService;
@@ -255,25 +254,24 @@ class RoleControllerTest {
 
     @Test
     void relation() throws Exception {
-        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anyList()))
-                .willReturn(List.of(Mockito.mock(RolePrivileges.class)));
+        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString()))
+                .willReturn(Mockito.mock(RolePrivileges.class));
 
-        mvc.perform(patch("/roles/{id}/privileges", 1L)
-                        .queryParam("privilegeId", "1")
+        mvc.perform(patch("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
+                        .queryParam("action", "create")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(List.of(Mockito.mock(AuthorizePrivilegesDTO.class)))).with(csrf().asHeader()))
+                        .with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void relation_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anyList());
+        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
 
-        mvc.perform(patch("/roles/{id}/privileges", "1")
-                        .queryParam("privilegeId", "1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(List.of(Mockito.mock(AuthorizePrivilegesDTO.class)))).with(csrf().asHeader()))
+        mvc.perform(patch("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
+                        .queryParam("action", "create")
+                        .contentType(MediaType.APPLICATION_JSON).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

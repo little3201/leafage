@@ -17,31 +17,29 @@ package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.GroupAuthorities;
 import io.leafage.hypervisor.domain.GroupPrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
+import io.leafage.hypervisor.domain.Privilege;
 import io.leafage.hypervisor.repository.GroupAuthoritiesRepository;
 import io.leafage.hypervisor.repository.GroupPrivilegesRepository;
-import io.leafage.hypervisor.repository.GroupRepository;
 import io.leafage.hypervisor.repository.PrivilegeRepository;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
-    private final GroupRepository groupRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
     private final PrivilegeRepository privilegeRepository;
     private final GroupAuthoritiesRepository groupAuthoritiesRepository;
 
-    public GroupPrivilegesServiceImpl(GroupRepository groupRepository, GroupPrivilegesRepository groupPrivilegesRepository,
-                                      PrivilegeRepository privilegeRepository, GroupAuthoritiesRepository groupAuthoritiesRepository) {
-        this.groupRepository = groupRepository;
+    public GroupPrivilegesServiceImpl(GroupPrivilegesRepository groupPrivilegesRepository, PrivilegeRepository privilegeRepository,
+                                      GroupAuthoritiesRepository groupAuthoritiesRepository) {
         this.groupPrivilegesRepository = groupPrivilegesRepository;
         this.privilegeRepository = privilegeRepository;
         this.groupAuthoritiesRepository = groupAuthoritiesRepository;
@@ -58,36 +56,53 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
     }
 
     @Override
-    public List<GroupPrivileges> relation(Long groupId, List<AuthorizePrivilegesDTO> dtoList) {
+    public GroupPrivileges relation(Long groupId, Long privilegeId, String action) {
         Assert.notNull(groupId, "groupId must not be null.");
 
-        // 优化 Optional 的使用，减少嵌套
-        return dtoList.stream().map(dto -> {
-            GroupPrivileges groupPrivileges = privileges(groupId, dto.getPrivilegeId(), dto.getActions());
+        GroupPrivileges groupPrivilege = new GroupPrivileges(groupId, privilegeId,
+                StringUtils.hasText(action) ? Set.of(action) : Collections.emptySet());
+        // 如果已存在，更新
+        groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId)
+                .ifPresent(r -> groupPrivilege.setId(r.getId()));
 
-            privilegeRepository.findById(dto.getPrivilegeId()).ifPresent(privilege ->
-                    addGroupAuthority(groupId, privilege.getName(), dto.getActions()));
-            // 保存并立即刷新
-            return groupPrivilegesRepository.saveAndFlush(groupPrivileges);
-        }).toList();
+        privilegeRepository.findById(privilegeId).ifPresent(privilege ->
+                addGroupAuthority(groupId, privilege.getName(),
+                        StringUtils.hasText(action) ? Set.of("", action) : Set.of("")));
+        // 保存并立即刷新
+        return groupPrivilegesRepository.saveAndFlush(groupPrivilege);
     }
 
     @Override
-    public void removeRelation(Long groupId, Long privilegeId, Set<String> actions) {
-        groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId);
-    }
-
-    private GroupPrivileges privileges(Long groupId, Long privilegeId, Set<String> actions) {
-        // actions添加read
-        Set<String> effectiveActions = new HashSet<>();
-        if (!CollectionUtils.isEmpty(actions)) {
-            effectiveActions.addAll(actions);
-        }
-
-        return new GroupPrivileges(groupId, privilegeId, effectiveActions);
+    public void removeRelation(Long groupId, Long privilegeId, String action) {
+        groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId)
+                .ifPresent(rolePrivilege -> {
+                    // actions为空，删除菜单
+                    if (!StringUtils.hasText(action)) {
+                        groupPrivilegesRepository.deleteById(rolePrivilege.getId());
+                    }
+                    privilegeRepository.findById(privilegeId).ifPresent(privilege ->
+                            removeGroupAuthority(groupId, privilege, action));
+                });
     }
 
     private void addGroupAuthority(Long groupId, String privilegeName, Set<String> actions) {
-        actions.forEach(action -> groupAuthoritiesRepository.save(new GroupAuthorities(groupId, privilegeName + ":" + action)));
+        List<GroupAuthorities> groupAuthorities = actions.stream().map(action -> {
+                    String authority = action.isBlank() ? privilegeName : privilegeName + ":" + action;
+                    // 检查是否已存在
+                    Optional<GroupAuthorities> optional = groupAuthoritiesRepository.findByGroupIdAndAuthority(groupId, authority);
+                    return optional.orElseGet(() -> new GroupAuthorities(groupId, authority));
+                })
+                .toList();
+        groupAuthoritiesRepository.saveAll(groupAuthorities);
     }
+
+    private void removeGroupAuthority(Long groupId, Privilege privilege, String action) {
+        // 移除授权actions
+        if (StringUtils.hasText(action)) {
+            groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupId, privilege.getName() + ":" + action);
+        } else {
+            groupAuthoritiesRepository.deleteByGroupIdAndAuthorityStartingWith(groupId, privilege.getName());
+        }
+    }
+
 }

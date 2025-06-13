@@ -16,7 +16,6 @@ package io.leafage.hypervisor.controller;
 
 import io.leafage.hypervisor.domain.GroupMembers;
 import io.leafage.hypervisor.domain.GroupPrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.service.GroupMembersService;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
@@ -315,22 +314,43 @@ public class GroupController {
     }
 
     /**
-     * 保存role-privilege关联
+     * 保存 group-privilege关联
      *
-     * @param id      role id
-     * @param dtoList dto list
+     * @param id          role id
+     * @param privilegeId privilege id
+     * @param action      操作
      * @return 操作结果
      */
-    @PatchMapping("/{id}/privileges")
-    public ResponseEntity<List<GroupPrivileges>> authorization(@PathVariable Long id, @RequestBody List<AuthorizePrivilegesDTO> dtoList) {
-        List<GroupPrivileges> list;
+    @PatchMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<GroupPrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                         String action) {
+        GroupPrivileges gp;
         try {
-            list = groupPrivilegesService.relation(id, dtoList);
+            gp = groupPrivilegesService.relation(id, privilegeId, action);
         } catch (Exception e) {
             logger.error("Relation group privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.accepted().body(list);
+        return ResponseEntity.accepted().body(gp);
     }
 
+    /**
+     * 删除 group-privilege关联
+     *
+     * @param id          group id
+     * @param privilegeId privilege id
+     * @param action      操作
+     * @return 操作结果
+     */
+    @DeleteMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                    String action) {
+        try {
+            groupPrivilegesService.removeRelation(id, privilegeId, action);
+        } catch (Exception e) {
+            logger.error("Remove relation group privileges error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
 }

@@ -57,7 +57,7 @@ class UserServiceImplTest {
         dto = new UserDTO();
         dto.setUsername("test");
         dto.setMiddleName("middle");
-        dto.setFamilyName("zhang");
+        dto.setLastname("zhang");
         dto.setAvatar("a.jpg");
         dto.setEmail("zhang@test.com");
     }

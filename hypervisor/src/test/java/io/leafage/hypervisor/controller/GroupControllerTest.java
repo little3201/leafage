@@ -16,6 +16,7 @@
 package io.leafage.hypervisor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.leafage.hypervisor.domain.GroupPrivileges;
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.service.GroupMembersService;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
@@ -37,7 +38,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import top.leafage.common.TreeNode;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -244,6 +244,32 @@ class GroupControllerTest {
         doThrow(new RuntimeException()).when(this.groupMembersService).members(Mockito.anyLong());
 
         mvc.perform(get("/groups/{id}/members", Mockito.anyLong())).andExpect(status().isNoContent())
+                .andDo(print()).andReturn();
+    }
+
+
+    @Test
+    void relation() throws Exception {
+        given(this.groupPrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString()))
+                .willReturn(Mockito.mock(GroupPrivileges.class));
+
+        mvc.perform(patch("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
+                        .queryParam("action", "create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf().asHeader()))
+                .andExpect(status().isAccepted())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
+    void relation_error() throws Exception {
+        doThrow(new RuntimeException()).when(this.groupPrivilegesService).relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
+
+        mvc.perform(patch("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
+                        .queryParam("action", "create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf().asHeader()))
+                .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }
 

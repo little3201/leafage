@@ -15,11 +15,10 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.Group;
+import io.leafage.hypervisor.domain.GroupAuthorities;
 import io.leafage.hypervisor.domain.GroupRoles;
 import io.leafage.hypervisor.domain.Privilege;
 import io.leafage.hypervisor.domain.RolePrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.repository.GroupAuthoritiesRepository;
 import io.leafage.hypervisor.repository.GroupRolesRepository;
 import io.leafage.hypervisor.repository.PrivilegeRepository;
@@ -35,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -64,22 +62,11 @@ class RolePrivilegeServiceImplTest {
     @InjectMocks
     private RolePrivilegesServiceImpl rolePrivilegesService;
 
-    private AuthorizePrivilegesDTO authorizePrivilegesDTO;
-    private Group group;
     private GroupRoles groupRoles;
     private Privilege privilege;
 
     @BeforeEach
     void setUp() {
-        authorizePrivilegesDTO = new AuthorizePrivilegesDTO();
-        authorizePrivilegesDTO.setPrivilegeId(1L);
-        authorizePrivilegesDTO.setActions(Set.of("create"));
-
-        group = new Group();
-        group.setId(1L);
-        group.setName("group1");
-        group.setDescription("description");
-
         groupRoles = new GroupRoles();
         groupRoles.setGroupId(1L);
         groupRoles.setRoleId(2L);
@@ -107,14 +94,24 @@ class RolePrivilegeServiceImplTest {
 
     @Test
     void relation() {
+        RolePrivileges rolePrivilege = new RolePrivileges();
+        rolePrivilege.setId(1L);
+        rolePrivilege.setPrivilegeId(1L);
+        rolePrivilege.setRoleId(1L);
+        given(this.rolePrivilegesRepository.findByRoleIdAndPrivilegeId(Mockito.anyLong(), Mockito.anyLong())).willReturn(Optional.of(rolePrivilege));
+
         given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(privilege));
 
         given(this.groupRolesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(groupRoles));
 
-        List<RolePrivileges> relations = rolePrivilegesService.relation(1L, List.of(authorizePrivilegesDTO));
+        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(Mockito.anyLong(), Mockito.anyString())).willReturn(Optional.ofNullable(Mockito.mock(GroupAuthorities.class)));
+
+        given(this.rolePrivilegesRepository.saveAndFlush(Mockito.any(RolePrivileges.class))).willReturn(rolePrivilege);
+        RolePrivileges relation = rolePrivilegesService.relation(1L, 1L, "");
 
         verify(this.rolePrivilegesRepository, times(1)).saveAndFlush(Mockito.any(RolePrivileges.class));
-        Assertions.assertNotNull(relations);
-        Assertions.assertFalse(relations.isEmpty());
+        verify(this.groupAuthoritiesRepository, times(1)).saveAll(Mockito.anyList());
+
+        Assertions.assertNotNull(relation);
     }
 }

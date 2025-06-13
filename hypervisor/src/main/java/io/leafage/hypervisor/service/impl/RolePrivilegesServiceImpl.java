@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -116,8 +116,8 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
                 .stream().flatMap(groupRole -> actions.stream().map(action -> {
                     String authority = action.isBlank() ? privilegeName : privilegeName + ":" + action;
                     // 检查是否已存在
-                    GroupAuthorities auth = groupAuthoritiesRepository.findByGroupIdAndAuthority(groupRole.getGroupId(), authority);
-                    return Objects.requireNonNullElseGet(auth, () -> new GroupAuthorities(groupRole.getGroupId(), authority));
+                    Optional<GroupAuthorities> optional = groupAuthoritiesRepository.findByGroupIdAndAuthority(groupRole.getGroupId(), authority);
+                    return optional.orElseGet(() -> new GroupAuthorities(groupRole.getGroupId(), authority));
                 }))
                 .toList();
         groupAuthoritiesRepository.saveAll(groupAuthorities);

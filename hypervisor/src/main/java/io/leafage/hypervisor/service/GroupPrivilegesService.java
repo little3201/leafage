@@ -16,10 +16,8 @@
 package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.domain.GroupPrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * group privileges service.
@@ -47,18 +45,19 @@ public interface GroupPrivilegesService {
     /**
      * 保存group-privilege关系
      *
-     * @param groupId group主键
-     * @param dtoList dto list
+     * @param groupId     group id
+     * @param privilegeId privilege id
+     * @param action      操作
      * @return 结果集
      */
-    List<GroupPrivileges> relation(Long groupId, List<AuthorizePrivilegesDTO> dtoList);
+    GroupPrivileges relation(Long groupId, Long privilegeId, String action);
 
     /**
      * 移除group-privilege关系
      *
      * @param groupId     group主键
      * @param privilegeId privilege主键
-     * @param actions     操作
+     * @param action      操作
      */
-    void removeRelation(Long groupId, Long privilegeId, Set<String> actions);
+    void removeRelation(Long groupId, Long privilegeId, String action);
 }

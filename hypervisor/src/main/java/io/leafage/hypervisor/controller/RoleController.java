@@ -319,8 +319,8 @@ public class RoleController {
     /**
      * 删除 role-privilege关联
      *
-     * @param id          role主键
-     * @param privilegeId privilege主键
+     * @param id          role id
+     * @param privilegeId privilege id
      * @param action      操作
      * @return 操作结果
      */
