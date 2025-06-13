@@ -26,7 +26,6 @@ import jakarta.persistence.*;
 @Table(name = "group_authorities")
 public class GroupAuthorities {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

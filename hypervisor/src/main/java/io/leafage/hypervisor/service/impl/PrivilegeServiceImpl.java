@@ -14,20 +14,16 @@
  */
 package io.leafage.hypervisor.service.impl;
 
+import io.leafage.hypervisor.domain.GroupRoles;
 import io.leafage.hypervisor.domain.Privilege;
-import io.leafage.hypervisor.domain.RoleMembers;
-import io.leafage.hypervisor.domain.RolePrivileges;
 import io.leafage.hypervisor.dto.PrivilegeDTO;
-import io.leafage.hypervisor.repository.PrivilegeRepository;
-import io.leafage.hypervisor.repository.RoleMembersRepository;
-import io.leafage.hypervisor.repository.RolePrivilegesRepository;
+import io.leafage.hypervisor.repository.*;
 import io.leafage.hypervisor.service.PrivilegeService;
 import io.leafage.hypervisor.vo.PrivilegeVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import top.leafage.common.TreeNode;
 import top.leafage.common.jdbc.JdbcTreeAndDomainConverter;
 
@@ -44,6 +40,9 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public final RoleMembersRepository roleMembersRepository;
     public final RolePrivilegesRepository rolePrivilegesRepository;
     private final PrivilegeRepository privilegeRepository;
+    private final GroupMembersRepository groupMembersRepository;
+    private final GroupRolesRepository groupRolesRepository;
+    private final GroupPrivilegesRepository groupPrivilegesRepository;
 
     /**
      * <p>Constructor for PrivilegeServiceImpl.</p>
@@ -51,10 +50,14 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      * @param rolePrivilegesRepository a {@link RolePrivilegesRepository} object
      * @param privilegeRepository      a {@link PrivilegeRepository} object
      */
-    public PrivilegeServiceImpl(RoleMembersRepository roleMembersRepository, RolePrivilegesRepository rolePrivilegesRepository, PrivilegeRepository privilegeRepository) {
+    public PrivilegeServiceImpl(RoleMembersRepository roleMembersRepository, RolePrivilegesRepository rolePrivilegesRepository,
+                                PrivilegeRepository privilegeRepository, GroupMembersRepository groupMembersRepository, GroupRolesRepository groupRolesRepository, GroupPrivilegesRepository groupPrivilegesRepository) {
         this.roleMembersRepository = roleMembersRepository;
         this.rolePrivilegesRepository = rolePrivilegesRepository;
         this.privilegeRepository = privilegeRepository;
+        this.groupMembersRepository = groupMembersRepository;
+        this.groupRolesRepository = groupRolesRepository;
+        this.groupPrivilegesRepository = groupPrivilegesRepository;
     }
 
     /**
@@ -80,25 +83,24 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public List<TreeNode<Long>> tree(String username) {
         Assert.hasText(username, "username must not be empty.");
 
-        List<RoleMembers> roleMembers = roleMembersRepository.findAllByUsername(username);
-        if (CollectionUtils.isEmpty(roleMembers)) {
-            return Collections.emptyList();
-        }
-
         Map<Long, Privilege> privilegeMap = new HashMap<>();
-        for (RoleMembers roleMember : roleMembers) {
-            List<RolePrivileges> rolePrivileges = rolePrivilegesRepository.findAllByRoleId(roleMember.getRoleId());
-            for (RolePrivileges rolePrivilege : rolePrivileges) {
-                privilegeRepository.findById(rolePrivilege.getPrivilegeId()).ifPresent(privilege -> {
-                    if (privilege.isEnabled() && !privilegeMap.containsKey(privilege.getId())) {
-                        privilege.setActions(rolePrivilege.getActions());
-                        privilegeMap.put(privilege.getId(), privilege);
-                        // 处理没有勾选父级的数据（递归查找父级数据）
-                        addSuperior(privilege, privilegeMap);
-                    }
-                });
-            }
-        }
+
+        // group
+        groupMembersRepository.findAllByUsername(username).forEach(groupMember -> {
+            List<GroupRoles> groupRoles = groupRolesRepository.findAllByGroupId(groupMember.getGroupId());
+            groupRoles.forEach(groupRole -> {
+                groupPrivilegesRepository.findAllByGroupId(groupRole.getGroupId()).forEach(groupPrivilege ->
+                        privileges(groupPrivilege.getPrivilegeId(), groupPrivilege.getActions(), privilegeMap));
+                rolePrivilegesRepository.findAllByRoleId(groupRole.getRoleId()).forEach(rolePrivilege ->
+                        privileges(rolePrivilege.getPrivilegeId(), rolePrivilege.getActions(), privilegeMap));
+            });
+        });
+
+        // role
+        roleMembersRepository.findAllByUsername(username).forEach(roleMember ->
+                rolePrivilegesRepository.findAllByRoleId(roleMember.getRoleId()).forEach(rolePrivilege ->
+                        privileges(rolePrivilege.getPrivilegeId(), rolePrivilege.getActions(), privilegeMap))
+        );
 
         List<Privilege> privileges = new ArrayList<>(privilegeMap.values());
         Set<String> meta = new HashSet<>();
@@ -153,6 +155,17 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
                     return convertToVO(privilege, PrivilegeVO.class);
                 })
                 .orElseThrow();
+    }
+
+    private void privileges(Long privilegeId, Set<String> actions, Map<Long, Privilege> privilegeMap) {
+        privilegeRepository.findById(privilegeId).ifPresent(privilege -> {
+            if (privilege.isEnabled() && !privilegeMap.containsKey(privilege.getId())) {
+                privilege.setActions(actions);
+                privilegeMap.put(privilege.getId(), privilege);
+                // 处理没有勾选父级的数据（递归查找父级数据）
+                addSuperior(privilege, privilegeMap);
+            }
+        });
     }
 
     private void addSuperior(Privilege privilege, Map<Long, Privilege> privilegeMap) {
