@@ -14,7 +14,6 @@
  */
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.GroupRoles;
 import io.leafage.hypervisor.domain.Privilege;
 import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.repository.*;
@@ -86,15 +85,14 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
         Map<Long, Privilege> privilegeMap = new HashMap<>();
 
         // group
-        groupMembersRepository.findAllByUsername(username).forEach(groupMember -> {
-            List<GroupRoles> groupRoles = groupRolesRepository.findAllByGroupId(groupMember.getGroupId());
-            groupRoles.forEach(groupRole -> {
-                groupPrivilegesRepository.findAllByGroupId(groupRole.getGroupId()).forEach(groupPrivilege ->
-                        privileges(groupPrivilege.getPrivilegeId(), groupPrivilege.getActions(), privilegeMap));
-                rolePrivilegesRepository.findAllByRoleId(groupRole.getRoleId()).forEach(rolePrivilege ->
-                        privileges(rolePrivilege.getPrivilegeId(), rolePrivilege.getActions(), privilegeMap));
-            });
-        });
+        groupMembersRepository.findAllByUsername(username).forEach(groupMember ->
+                groupRolesRepository.findAllByGroupId(groupMember.getGroupId()).forEach(groupRole -> {
+                    groupPrivilegesRepository.findAllByGroupId(groupRole.getGroupId()).forEach(groupPrivilege ->
+                            privileges(groupPrivilege.getPrivilegeId(), groupPrivilege.getActions(), privilegeMap));
+                    rolePrivilegesRepository.findAllByRoleId(groupRole.getRoleId()).forEach(rolePrivilege ->
+                            privileges(rolePrivilege.getPrivilegeId(), rolePrivilege.getActions(), privilegeMap));
+                })
+        );
 
         // role
         roleMembersRepository.findAllByUsername(username).forEach(roleMember ->
