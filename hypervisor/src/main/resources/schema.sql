@@ -673,15 +673,15 @@ CREATE TABLE "public"."users"
     "id"                     int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "username"               varchar(64)  NOT NULL,
     "password"               varchar(100) NOT NULL,
+    "firstname"              varchar(64),
+    "lastname"               varchar(64),
+    "middle_name"            varchar(64),
     "email"                  varchar(64),
     "avatar"                 varchar(255),
     "enabled"                bool         NOT NULL DEFAULT true,
     "account_non_locked"     bool,
     "account_expires_at"     timestamp(6),
     "credentials_expires_at" timestamp(6),
-    "given_name"             varchar(64),
-    "family_name"            varchar(64),
-    "middle_name"            varchar(64),
     "created_by"             varchar(64),
     "created_date"           timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "last_modified_by"       varchar(64),
@@ -695,6 +695,12 @@ ON COLUMN "public"."users"."username" IS '用户名';
 COMMENT
 ON COLUMN "public"."users"."password" IS '密码';
 COMMENT
+ON COLUMN "public"."users"."firstname" IS '名字';
+COMMENT
+ON COLUMN "public"."users"."lastname" IS '姓';
+COMMENT
+ON COLUMN "public"."users"."middle_name" IS '中间名';
+COMMENT
 ON COLUMN "public"."users"."email" IS '邮箱';
 COMMENT
 ON COLUMN "public"."users"."avatar" IS '头像';
@@ -706,12 +712,6 @@ COMMENT
 ON COLUMN "public"."users"."account_expires_at" IS '失效时间';
 COMMENT
 ON COLUMN "public"."users"."credentials_expires_at" IS '密码失效时间';
-COMMENT
-ON COLUMN "public"."users"."given_name" IS '名字';
-COMMENT
-ON COLUMN "public"."users"."family_name" IS '姓';
-COMMENT
-ON COLUMN "public"."users"."middle_name" IS '中间名';
 COMMENT
 ON COLUMN "public"."users"."created_by" IS '创建者';
 COMMENT

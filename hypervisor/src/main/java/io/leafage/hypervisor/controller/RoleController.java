@@ -16,7 +16,6 @@ package io.leafage.hypervisor.controller;
 
 import io.leafage.hypervisor.domain.RoleMembers;
 import io.leafage.hypervisor.domain.RolePrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.service.RoleMembersService;
 import io.leafage.hypervisor.service.RolePrivilegesService;
@@ -299,20 +298,22 @@ public class RoleController {
     /**
      * 保存role-privilege关联
      *
-     * @param id      role id
-     * @param dtoList dto list
+     * @param id          role id
+     * @param privilegeId privilege id
+     * @param action      操作
      * @return 操作结果
      */
-    @PatchMapping("/{id}/privileges")
-    public ResponseEntity<List<RolePrivileges>> authorization(@PathVariable Long id, @RequestBody List<AuthorizePrivilegesDTO> dtoList) {
-        List<RolePrivileges> list;
+    @PatchMapping("/{id}/privileges/{privilegeId}")
+    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                        String action) {
+        RolePrivileges rp;
         try {
-            list = rolePrivilegesService.relation(id, dtoList);
+            rp = rolePrivilegesService.relation(id, privilegeId, action);
         } catch (Exception e) {
             logger.error("Relation role privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.accepted().body(list);
+        return ResponseEntity.accepted().body(rp);
     }
 
     /**
@@ -320,14 +321,14 @@ public class RoleController {
      *
      * @param id          role主键
      * @param privilegeId privilege主键
-     * @param actions     操作
+     * @param action      操作
      * @return 操作结果
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
     public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId,
-                                                    @RequestParam(required = false) Set<String> actions) {
+                                                    String action) {
         try {
-            rolePrivilegesService.removeRelation(id, privilegeId, actions);
+            rolePrivilegesService.removeRelation(id, privilegeId, action);
         } catch (Exception e) {
             logger.error("Remove relation role privileges error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

@@ -31,11 +31,9 @@ public abstract class UserModel {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "given_name")
-    private String givenName;
+    private String firstname;
 
-    @Column(name = "family_name")
-    private String familyName;
+    private String lastname;
 
     @Column(name = "middle_name")
     private String middleName;
@@ -64,20 +62,20 @@ public abstract class UserModel {
         this.username = username;
     }
 
-    public String getGivenName() {
-        return givenName;
+    public String getFirstname() {
+        return firstname;
     }
 
-    public void setGivenName(String givenName) {
-        this.givenName = givenName;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
-    public String getFamilyName() {
-        return familyName;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setFamilyName(String familyName) {
-        this.familyName = familyName;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 
     public String getMiddleName() {

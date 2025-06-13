@@ -16,6 +16,7 @@
 package io.leafage.hypervisor.vo;
 
 import io.leafage.hypervisor.domain.superclass.UserModel;
+import jakarta.persistence.Column;
 
 /**
  * vo class for user.
@@ -26,6 +27,8 @@ public class UserVO extends UserModel {
 
     private Long id;
 
+    private boolean accountNonLocked;
+
 
     public Long getId() {
         return id;
@@ -33,5 +36,13 @@ public class UserVO extends UserModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
     }
 }

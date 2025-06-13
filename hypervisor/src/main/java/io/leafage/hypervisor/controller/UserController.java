@@ -195,6 +195,25 @@ public class UserController {
     }
 
     /**
+     * Unlock a record when account is lock.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:unlock')")
+    @PatchMapping("/{id}/unlock")
+    public ResponseEntity<Boolean> unlock(@PathVariable Long id) {
+        boolean unlock;
+        try {
+            unlock = userService.unlock(id);
+        } catch (Exception e) {
+            logger.error("Unlock user error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(unlock);
+    }
+
+    /**
      * Import the records.
      *
      * @return 200 status code if successful, or 417 status code if an error occurs.

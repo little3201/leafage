@@ -16,6 +16,7 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.GroupAuthorities;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupAuthoritiesRepository extends JpaRepository<GroupAuthorities, Long> {
 
+    GroupAuthorities findByGroupIdAndAuthority(Long groupId, String authority);
+
+    @Transactional
     void deleteByGroupIdAndAuthority(Long groupId, String authority);
+
+    @Transactional
+    void deleteByGroupIdAndAuthorityStartingWith(Long groupId, String authority);
 }

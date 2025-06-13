@@ -18,7 +18,6 @@ package io.leafage.hypervisor.service.impl;
 import io.leafage.hypervisor.domain.GroupAuthorities;
 import io.leafage.hypervisor.domain.Privilege;
 import io.leafage.hypervisor.domain.RolePrivileges;
-import io.leafage.hypervisor.dto.AuthorizePrivilegesDTO;
 import io.leafage.hypervisor.repository.GroupAuthoritiesRepository;
 import io.leafage.hypervisor.repository.GroupRolesRepository;
 import io.leafage.hypervisor.repository.PrivilegeRepository;
@@ -26,9 +25,11 @@ import io.leafage.hypervisor.repository.RolePrivilegesRepository;
 import io.leafage.hypervisor.service.RolePrivilegesService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -81,51 +82,54 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      * {@inheritDoc}
      */
     @Override
-    public List<RolePrivileges> relation(Long roleId, List<AuthorizePrivilegesDTO> dtoList) {
+    public RolePrivileges relation(Long roleId, Long privilegeId, String action) {
         Assert.notNull(roleId, "roleId must not be null.");
 
-        // 优化 Optional 的使用，减少嵌套
-        return dtoList.stream().map(dto -> {
-            RolePrivileges rolePrivilege = new RolePrivileges(roleId, dto.getPrivilegeId(), dto.getActions());
-            // 如果已存在，更新
-            rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, dto.getPrivilegeId())
-                    .ifPresent(r -> rolePrivilege.setId(r.getId()));
+        RolePrivileges rolePrivilege = new RolePrivileges(roleId, privilegeId,
+                StringUtils.hasText(action) ? Set.of(action) : Collections.emptySet());
+        // 如果已存在，更新
+        rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, privilegeId)
+                .ifPresent(r -> rolePrivilege.setId(r.getId()));
 
-            privilegeRepository.findById(dto.getPrivilegeId()).ifPresent(privilege ->
-                    addGroupAuthority(roleId, privilege.getName(), dto.getActions()));
-            // 保存并立即刷新
-            return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
-        }).toList();
+        privilegeRepository.findById(privilegeId).ifPresent(privilege ->
+                addGroupAuthority(roleId, privilege.getName(),
+                        StringUtils.hasText(action) ? Set.of("", action) : Set.of("")));
+        // 保存并立即刷新
+        return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
     }
 
     @Override
-    public void removeRelation(Long roleId, Long privilegeId, Set<String> actions) {
-        rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, privilegeId).ifPresent(rolePrivilege -> {
-            // actions为空，删除菜单
-            if (CollectionUtils.isEmpty(actions) || rolePrivilege.getActions().containsAll(actions)) {
-                rolePrivilegesRepository.deleteById(rolePrivilege.getId());
-            }
-            privilegeRepository.findById(privilegeId).ifPresent(privilege ->
-                    removeGroupAuthority(roleId, privilege, actions));
-        });
+    public void removeRelation(Long roleId, Long privilegeId, String action) {
+        rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, privilegeId)
+                .ifPresent(rolePrivilege -> {
+                    // actions为空，删除菜单
+                    if (!StringUtils.hasText(action)) {
+                        rolePrivilegesRepository.deleteById(rolePrivilege.getId());
+                    }
+                    privilegeRepository.findById(privilegeId).ifPresent(privilege ->
+                            removeGroupAuthority(roleId, privilege, action));
+                });
     }
 
     private void addGroupAuthority(Long roleId, String privilegeName, Set<String> actions) {
-        List<GroupAuthorities> groupAuthorities = groupRolesRepository.findAllByRoleId(roleId).stream().flatMap(groupRole ->
-                        actions.stream().map(action ->
-                                new GroupAuthorities(groupRole.getGroupId(), privilegeName + ":" + action)))
+        List<GroupAuthorities> groupAuthorities = groupRolesRepository.findAllByRoleId(roleId)
+                .stream().flatMap(groupRole -> actions.stream().map(action -> {
+                    String authority = action.isBlank() ? privilegeName : privilegeName + ":" + action;
+                    // 检查是否已存在
+                    GroupAuthorities auth = groupAuthoritiesRepository.findByGroupIdAndAuthority(groupRole.getGroupId(), authority);
+                    return Objects.requireNonNullElseGet(auth, () -> new GroupAuthorities(groupRole.getGroupId(), authority));
+                }))
                 .toList();
         groupAuthoritiesRepository.saveAll(groupAuthorities);
     }
 
-    private void removeGroupAuthority(Long roleId, Privilege privilege, Set<String> actions) {
+    private void removeGroupAuthority(Long roleId, Privilege privilege, String action) {
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole -> {
                     // 移除授权actions
-                    if (CollectionUtils.isEmpty(actions)) {
-                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName());
+                    if (StringUtils.hasText(action)) {
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":" + action);
                     } else {
-                        actions.forEach(action ->
-                                groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":" + action));
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthorityStartingWith(groupRole.getGroupId(), privilege.getName());
                     }
                 }
         );
