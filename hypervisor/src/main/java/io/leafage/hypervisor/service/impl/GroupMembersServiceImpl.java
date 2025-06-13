@@ -82,6 +82,9 @@ public class GroupMembersServiceImpl implements GroupMembersService {
 
     @Override
     public void removeRelation(Long groupId, Set<String> usernames) {
+        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notEmpty(usernames, "usernames must not be empty.");
+
         List<GroupMembers> groupMembers = groupMembersRepository.findAllByGroupId(groupId);
         List<Long> filteredIds = groupMembers.stream()
                 .filter(roleMember -> usernames.contains(roleMember.getUsername()))

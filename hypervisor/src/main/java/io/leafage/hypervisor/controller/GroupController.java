@@ -16,9 +16,11 @@ package io.leafage.hypervisor.controller;
 
 import io.leafage.hypervisor.domain.GroupMembers;
 import io.leafage.hypervisor.domain.GroupPrivileges;
+import io.leafage.hypervisor.domain.GroupRoles;
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.service.GroupMembersService;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
+import io.leafage.hypervisor.service.GroupRolesService;
 import io.leafage.hypervisor.service.GroupService;
 import io.leafage.hypervisor.vo.GroupVO;
 import jakarta.validation.Valid;
@@ -49,6 +51,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final GroupMembersService groupMembersService;
+    private final GroupRolesService groupRolesService;
     private final GroupPrivilegesService groupPrivilegesService;
 
     /**
@@ -57,9 +60,11 @@ public class GroupController {
      * @param groupMembersService a {@link GroupMembersService} object
      * @param groupService        a {@link GroupService} object
      */
-    public GroupController(GroupService groupService, GroupMembersService groupMembersService, GroupPrivilegesService groupPrivilegesService) {
+    public GroupController(GroupService groupService, GroupMembersService groupMembersService,
+                           GroupRolesService groupRolesService, GroupPrivilegesService groupPrivilegesService) {
         this.groupService = groupService;
         this.groupMembersService = groupMembersService;
+        this.groupRolesService = groupRolesService;
         this.groupPrivilegesService = groupPrivilegesService;
     }
 
@@ -241,7 +246,7 @@ public class GroupController {
     }
 
     /**
-     * 保存group-privilege关联
+     * 保存group-users关联
      *
      * @param id        group id
      * @param usernames 账号
@@ -260,7 +265,7 @@ public class GroupController {
     }
 
     /**
-     * 删除 group-privilege关联
+     * 删除 group-users关联
      *
      * @param id        group主键
      * @param usernames username集合
@@ -285,6 +290,61 @@ public class GroupController {
      */
     @GetMapping("/{id}/members")
     public ResponseEntity<List<GroupMembers>> members(@PathVariable Long id) {
+        List<GroupMembers> voList;
+        try {
+            voList = groupMembersService.members(id);
+        } catch (Exception e) {
+            logger.error("Retrieve group users error: ", e);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(voList);
+    }
+
+    /**
+     * 保存group-roles关联
+     *
+     * @param id      group id
+     * @param roleIds role ids
+     * @return 操作结果
+     */
+    @PatchMapping("/{id}/roles")
+    public ResponseEntity<List<GroupRoles>> relationRoles(@PathVariable Long id, @RequestBody Set<Long> roleIds) {
+        List<GroupRoles> list;
+        try {
+            list = groupRolesService.relation(id, roleIds);
+        } catch (Exception e) {
+            logger.error("Relation group roles error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.accepted().body(list);
+    }
+
+    /**
+     * 删除 group-roles关联
+     *
+     * @param id      group id
+     * @param roleIds role ids
+     * @return 操作结果
+     */
+    @DeleteMapping("/{id}/roles")
+    public ResponseEntity<Void> removeRelationRoles(@PathVariable Long id, @RequestParam Set<Long> roleIds) {
+        try {
+            groupRolesService.removeRelation(id, roleIds);
+        } catch (Exception e) {
+            logger.error("Remove relation group roles error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 根据group查询关联roles
+     *
+     * @param id group id
+     * @return 查询到的数据集，异常时返回204状态码
+     */
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<List<GroupMembers>> roles(@PathVariable Long id) {
         List<GroupMembers> voList;
         try {
             voList = groupMembersService.members(id);
