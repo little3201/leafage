@@ -14,6 +14,7 @@
  */
 package io.leafage.assets.service.impl;
 
+import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.domain.Post;
 import io.leafage.assets.domain.PostContent;
 import io.leafage.assets.dto.PostDTO;
@@ -24,6 +25,7 @@ import io.leafage.assets.vo.PostVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -60,7 +62,10 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     public Page<PostVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return postRepository.findAll(pageable).map(post -> convertToVO(post, PostVO.class));
+        Specification<Post> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return postRepository.findAll(spec, pageable).map(post -> convertToVO(post, PostVO.class));
     }
 
     /**

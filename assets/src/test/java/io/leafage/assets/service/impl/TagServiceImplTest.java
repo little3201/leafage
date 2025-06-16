@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -29,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +64,9 @@ class TagServiceImplTest {
     @Test
     void retrieve() {
         Page<Tag> page = new PageImpl<>(List.of(Mockito.mock(Tag.class)));
-        given(tagRepository.findAll(Mockito.any(PageRequest.class))).willReturn(page);
+
+        given(tagRepository.findAll(ArgumentMatchers.<Specification<Tag>>any(),
+                Mockito.any(PageRequest.class))).willReturn(page);
 
         Page<TagVO> voPage = tagService.retrieve(0, 2, "id", true, "");
 

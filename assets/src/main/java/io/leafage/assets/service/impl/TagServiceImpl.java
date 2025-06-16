@@ -14,6 +14,7 @@
  */
 package io.leafage.assets.service.impl;
 
+import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.domain.Tag;
 import io.leafage.assets.dto.TagDTO;
 import io.leafage.assets.repository.TagRepository;
@@ -22,6 +23,7 @@ import io.leafage.assets.vo.TagVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.DomainConverter;
@@ -52,7 +54,10 @@ public class TagServiceImpl extends DomainConverter implements TagService {
     public Page<TagVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return tagRepository.findAll(pageable).map(tag -> convertToVO(tag, TagVO.class));
+        Specification<Tag> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return tagRepository.findAll(spec, pageable).map(tag -> convertToVO(tag, TagVO.class));
     }
 
     /**

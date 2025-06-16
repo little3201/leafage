@@ -16,6 +16,7 @@ package io.leafage.assets.repository;
 
 import io.leafage.assets.domain.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -24,15 +25,7 @@ import org.springframework.stereotype.Repository;
  * @author wq li
  */
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-
-    /**
-     * get
-     *
-     * @param name 名称
-     * @return 结果
-     */
-    Tag getByName(String name);
+public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificationExecutor<Tag> {
 
     /**
      * 是否已存在

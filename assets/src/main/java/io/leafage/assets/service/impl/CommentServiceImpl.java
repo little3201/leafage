@@ -23,6 +23,7 @@ import io.leafage.assets.vo.CommentVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -55,7 +56,11 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
     @Override
     public Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
-        return commentRepository.findAll(pageable).map(comment -> {
+
+        Specification<Comment> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return commentRepository.findAll(spec, pageable).map(comment -> {
             CommentVO vo = convertToVO(comment, CommentVO.class);
             Long count = commentRepository.countByReplier(comment.getId());
             vo.setCount(count);

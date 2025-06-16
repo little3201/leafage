@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +69,8 @@ class RegionServiceImplTest {
     void retrieve() {
         Page<Region> page = new PageImpl<>(List.of(Mockito.mock(Region.class)));
 
-        given(this.regionRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
+        given(this.regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(),
+                Mockito.any(Pageable.class))).willReturn(page);
 
         Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
         Assertions.assertNotNull(voPage.getContent());

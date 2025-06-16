@@ -21,6 +21,7 @@ import io.leafage.assets.vo.FileRecordVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -28,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayOutputStream;
@@ -57,7 +59,8 @@ class FileRecordServiceImplTest {
     void retrieve() {
         Page<FileRecord> page = new PageImpl<>(List.of(Mockito.mock(FileRecord.class)));
 
-        given(this.fileRecordRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
+        given(this.fileRecordRepository.findAll(ArgumentMatchers.<Specification<FileRecord>>any(),
+                Mockito.any(Pageable.class))).willReturn(page);
 
         Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
