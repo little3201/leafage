@@ -23,6 +23,7 @@ import io.leafage.hypervisor.vo.AccessLogVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.DomainConverter;
@@ -53,7 +54,10 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
     public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return accessLogRepository.findAll(pageable)
+        Specification<AccessLog> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return accessLogRepository.findAll(spec, pageable)
                 .map(accessLog -> convertToVO(accessLog, AccessLogVO.class));
     }
 

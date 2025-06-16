@@ -1,12 +1,14 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.SchedulerLog;
+import io.leafage.hypervisor.domain.User;
 import io.leafage.hypervisor.dto.SchedulerLogDTO;
 import io.leafage.hypervisor.repository.SchedulerLogRepository;
 import io.leafage.hypervisor.service.SchedulerLogService;
 import io.leafage.hypervisor.vo.SchedulerLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -33,7 +35,10 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
     public Page<SchedulerLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return schedulerLogRepository.findAll(pageable)
+        Specification<SchedulerLog> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return schedulerLogRepository.findAll(spec, pageable)
                 .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class));
     }
 

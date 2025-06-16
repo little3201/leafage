@@ -15,8 +15,6 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.Privilege;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -33,14 +31,6 @@ import java.util.List;
  */
 @Repository
 public interface PrivilegeRepository extends JpaRepository<Privilege, Long>, JpaSpecificationExecutor<Privilege> {
-
-    /**
-     * Finds all records where the superior ID is null.
-     *
-     * @param pageable The pagination information.
-     * @return A paginated list of records.
-     */
-    Page<Privilege> findAllBySuperiorIdIsNull(Pageable pageable);
 
     /**
      * Finds all records by superior ID.

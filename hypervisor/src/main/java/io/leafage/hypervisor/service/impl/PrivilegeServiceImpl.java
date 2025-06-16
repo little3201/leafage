@@ -19,8 +19,10 @@ import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.repository.*;
 import io.leafage.hypervisor.service.PrivilegeService;
 import io.leafage.hypervisor.vo.PrivilegeVO;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.TreeNode;
@@ -66,7 +68,18 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return privilegeRepository.findAllBySuperiorIdIsNull(pageable)
+        Specification<Privilege> spec = (root, query, cb) -> {
+            Predicate filterPredicate = parseFilters(filters, cb, root).orElse(null);
+            Predicate superiorIsNull = cb.isNull(root.get("superiorId"));
+
+            if (filterPredicate == null) {
+                return superiorIsNull; // 只有 superiorId is null 条件
+            } else {
+                return cb.and(filterPredicate, superiorIsNull);
+            }
+        };
+
+        return privilegeRepository.findAll(spec, pageable)
                 .map(privilege -> {
                     PrivilegeVO vo = convertToVO(privilege, PrivilegeVO.class);
                     long count = privilegeRepository.countBySuperiorId(privilege.getId());

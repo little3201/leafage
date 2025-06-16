@@ -16,12 +16,14 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Message;
+import io.leafage.hypervisor.domain.Role;
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.repository.MessageRepository;
 import io.leafage.hypervisor.service.MessageService;
 import io.leafage.hypervisor.vo.MessageVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.DomainConverter;
@@ -52,7 +54,10 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
     public Page<MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return messageRepository.findAll(pageable)
+        Specification<Message> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return messageRepository.findAll(spec, pageable)
                 .map(message -> convertToVO(message, MessageVO.class));
     }
 

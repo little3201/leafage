@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -34,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import top.leafage.common.TreeNode;
 
 import java.util.Collections;
@@ -78,7 +80,9 @@ class PrivilegeServiceImplTest {
     @Test
     void retrieve() {
         Page<Privilege> page = new PageImpl<>(List.of(new Privilege()));
-        given(this.privilegeRepository.findAllBySuperiorIdIsNull(Mockito.any(Pageable.class))).willReturn(page);
+
+        given(this.privilegeRepository.findAll(ArgumentMatchers.<Specification<Privilege>>any(),
+                Mockito.any(Pageable.class))).willReturn(page);
 
         Page<PrivilegeVO> voPage = privilegeService.retrieve(0, 2, "id", true, null);
         Assertions.assertNotNull(voPage.getContent());

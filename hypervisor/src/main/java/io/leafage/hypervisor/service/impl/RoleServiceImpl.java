@@ -21,6 +21,7 @@ import io.leafage.hypervisor.service.RoleService;
 import io.leafage.hypervisor.vo.RoleVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.DomainConverter;
@@ -51,7 +52,10 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
     public Page<RoleVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return roleRepository.findAll(pageable)
+        Specification<Role> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return roleRepository.findAll(spec, pageable)
                 .map(role -> convertToVO(role, RoleVO.class));
     }
 

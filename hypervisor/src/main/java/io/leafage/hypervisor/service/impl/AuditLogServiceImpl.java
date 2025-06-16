@@ -16,6 +16,7 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.AuditLog;
+import io.leafage.hypervisor.domain.Group;
 import io.leafage.hypervisor.dto.AuditLogDTO;
 import io.leafage.hypervisor.repository.AuditLogRepository;
 import io.leafage.hypervisor.service.AuditLogService;
@@ -23,6 +24,7 @@ import io.leafage.hypervisor.vo.AuditLogVO;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.DomainConverter;
@@ -53,7 +55,10 @@ public class AuditLogServiceImpl extends DomainConverter implements AuditLogServ
     public Page<AuditLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return auditLogRepository.findAll(pageable)
+        Specification<AuditLog> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return auditLogRepository.findAll(spec, pageable)
                 .map(auditLog -> convertToVO(auditLog, AuditLogVO.class));
     }
 

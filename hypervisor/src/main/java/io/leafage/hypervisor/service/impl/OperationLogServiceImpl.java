@@ -16,6 +16,7 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.OperationLog;
+import io.leafage.hypervisor.domain.Role;
 import io.leafage.hypervisor.dto.OperationLogDTO;
 import io.leafage.hypervisor.repository.OperationLogRepository;
 import io.leafage.hypervisor.service.OperationLogService;
@@ -53,7 +54,10 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
     public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return operationLogRepository.findAll(pageable)
+        Specification<OperationLog> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return operationLogRepository.findAll(spec, pageable)
                 .map(operationLog -> convertToVO(operationLog, OperationLogVO.class));
     }
 

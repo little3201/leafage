@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +54,10 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
     public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return fileRecordRepository.findAll(pageable)
+        Specification<FileRecord> spec = (root, query, cb) ->
+                parseFilters(filters, cb, root).orElse(null);
+
+        return fileRecordRepository.findAll(spec, pageable)
                 .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class));
     }
 
