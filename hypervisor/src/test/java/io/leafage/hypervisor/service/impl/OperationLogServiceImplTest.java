@@ -15,11 +15,10 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.Dictionary;
-import io.leafage.hypervisor.domain.Message;
-import io.leafage.hypervisor.dto.MessageDTO;
-import io.leafage.hypervisor.repository.MessageRepository;
-import io.leafage.hypervisor.vo.MessageVO;
+import io.leafage.hypervisor.domain.OperationLog;
+import io.leafage.hypervisor.dto.OperationLogDTO;
+import io.leafage.hypervisor.repository.OperationLogRepository;
+import io.leafage.hypervisor.vo.OperationLogVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,48 +40,62 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * message service test
+ * operation log service test
  *
  * @author wq li
  **/
 @ExtendWith(MockitoExtension.class)
-class MessageServiceImplTest {
+class OperationLogServiceImplTest {
 
     @Mock
-    private MessageRepository messageRepository;
+    private OperationLogRepository operationLogRepository;
 
     @InjectMocks
-    private MessageServiceImpl messageService;
-
+    private OperationLogServiceImpl operationLogService;
 
     @Test
     void retrieve() {
-        Page<Message> page = new PageImpl<>(List.of(Mockito.mock(Message.class)));
+        Page<OperationLog> page = new PageImpl<>(List.of(Mockito.mock(OperationLog.class)));
 
-        given(this.messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
+        given(this.operationLogRepository.findAll(ArgumentMatchers.<Specification<OperationLog>>any(),
                 Mockito.any(Pageable.class))).willReturn(page);
 
-        Page<MessageVO> voPage = messageService.retrieve(0, 2, "id", true, "test");
+        Page<OperationLogVO> voPage = operationLogService.retrieve(0, 2, "id", true, "test");
+
         Assertions.assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(this.messageRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Message.class)));
+        given(this.operationLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(OperationLog.class)));
 
-        MessageVO vo = messageService.fetch(Mockito.anyLong());
+        OperationLogVO vo = operationLogService.fetch(Mockito.anyLong());
 
         Assertions.assertNotNull(vo);
     }
-
 
     @Test
     void create() {
-        given(this.messageRepository.saveAndFlush(Mockito.any(Message.class))).willReturn(Mockito.mock(Message.class));
+        given(this.operationLogRepository.saveAndFlush(Mockito.any(OperationLog.class))).willReturn(Mockito.mock(OperationLog.class));
 
-        MessageVO vo = messageService.create(Mockito.mock(MessageDTO.class));
+        OperationLogVO vo = operationLogService.create(Mockito.mock(OperationLogDTO.class));
 
-        verify(this.messageRepository, times(1)).saveAndFlush(Mockito.any(Message.class));
+        verify(this.operationLogRepository, times(1)).saveAndFlush(Mockito.any(OperationLog.class));
         Assertions.assertNotNull(vo);
     }
+
+    @Test
+    void remove() {
+        operationLogService.remove(1L);
+
+        verify(this.operationLogRepository, times(1)).deleteById(Mockito.anyLong());
+    }
+
+    @Test
+    void clear() {
+        operationLogService.clear();
+
+        verify(this.operationLogRepository, times(1)).deleteAll();
+    }
+
 }

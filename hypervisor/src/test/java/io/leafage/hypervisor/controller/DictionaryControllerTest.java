@@ -177,6 +177,15 @@ class DictionaryControllerTest {
     }
 
     @Test
+    void enable() throws Exception {
+        given(this.dictionaryService.enable(Mockito.anyLong())).willReturn(true);
+
+        mvc.perform(patch("/dictionaries/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+                .andExpect(status().isAccepted())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
     void exists() throws Exception {
         given(this.dictionaryService.exists(Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong())).willReturn(true);
 
@@ -198,7 +207,7 @@ class DictionaryControllerTest {
     }
 
     @Test
-    void lower_error() throws Exception {
+    void subset_error() throws Exception {
         given(this.dictionaryService.subset(Mockito.anyLong())).willThrow(new RuntimeException());
 
         mvc.perform(get("/dictionaries/{id}/subset", "1"))

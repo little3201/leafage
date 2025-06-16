@@ -15,8 +15,8 @@
 
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.service.SchedulerLogService;
+import io.leafage.hypervisor.vo.SchedulerLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +31,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,50 +46,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * access log controller test
+ * scheduler log controller test
  *
  * @author wq li
  **/
 @WithMockUser
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(AccessLogController.class)
-class AccessLogControllerTest {
+@WebMvcTest(SchedulerLogController.class)
+class SchedulerLogControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @MockitoBean
-    private AccessLogService accessLogService;
+    private SchedulerLogService schedulerLogService;
 
-    private AccessLogVO vo;
+    private SchedulerLogVO vo;
 
     @BeforeEach
-    void setUp() throws UnknownHostException {
-        vo = new AccessLogVO();
+    void setUp() {
+        vo = new SchedulerLogVO();
         vo.setId(1L);
-        vo.setIp(InetAddress.getByName("12.1.3.2"));
-        vo.setLocation("test");
-        vo.setHttpMethod("POST");
-        vo.setResponseTimes(232L);
-        vo.setResponseMessage("sessionId");
-        vo.setStatusCode(200);
-        vo.setUrl("test");
-        vo.setParams("xxx");
+        vo.setName("test");
+        vo.setExecutedTimes(200);
+        vo.setStartTime(Instant.now());
+        vo.setNextExecuteTime(Instant.now().plus(12, ChronoUnit.HOURS));
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<AccessLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
+        given(this.schedulerLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
-        mvc.perform(get("/access-logs")
+        mvc.perform(get("/scheduler-logs")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("descending", "false")
-                        .queryParam("filters", "url:like:test")
+                        .queryParam("descending", "true")
+                        .queryParam("filters", "scheduler:like:a")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isNotEmpty())
@@ -99,15 +95,15 @@ class AccessLogControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
+        given(this.schedulerLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/access-logs")
+        mvc.perform(get("/scheduler-logs")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
-                        .queryParam("descending", "false")
-                        .queryParam("filters", "url:like:test")
+                        .queryParam("descending", "true")
+                        .queryParam("filters", "scheduler:like:a")
                 )
                 .andExpect(status().isNoContent())
                 .andDo(print())
@@ -116,50 +112,50 @@ class AccessLogControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.accessLogService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.schedulerLogService.fetch(Mockito.anyLong())).willReturn(vo);
 
-        mvc.perform(get("/access-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.url").value("test")).andDo(print()).andReturn();
+        mvc.perform(get("/scheduler-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.accessLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.schedulerLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/access-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/scheduler-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove() throws Exception {
-        this.accessLogService.remove(Mockito.anyLong());
+        this.schedulerLogService.remove(Mockito.anyLong());
 
-        mvc.perform(delete("/access-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
+        mvc.perform(delete("/scheduler-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.accessLogService).remove(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.schedulerLogService).remove(Mockito.anyLong());
 
-        mvc.perform(delete("/access-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/scheduler-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void clear() throws Exception {
-        this.accessLogService.clear();
+        this.schedulerLogService.clear();
 
-        mvc.perform(delete("/access-logs").with(csrf().asHeader())).andExpect(status().isOk())
+        mvc.perform(delete("/scheduler-logs").with(csrf().asHeader())).andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void clear_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.accessLogService).clear();
+        doThrow(new RuntimeException()).when(this.schedulerLogService).clear();
 
-        mvc.perform(delete("/access-logs").with(csrf().asHeader()))
+        mvc.perform(delete("/scheduler-logs").with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

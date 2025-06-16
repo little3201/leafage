@@ -33,11 +33,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -114,6 +116,56 @@ class OperationLogControllerTest {
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();
+    }
+
+    @Test
+    void fetch() throws Exception {
+        given(this.operationLogService.fetch(Mockito.anyLong())).willReturn(vo);
+
+        mvc.perform(get("/operation-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.operation").value("test")).andDo(print()).andReturn();
+    }
+
+    @Test
+    void fetch_error() throws Exception {
+        given(this.operationLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+
+        mvc.perform(get("/operation-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
+    void remove() throws Exception {
+        this.operationLogService.remove(Mockito.anyLong());
+
+        mvc.perform(delete("/operation-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
+    void remove_error() throws Exception {
+        doThrow(new RuntimeException()).when(this.operationLogService).remove(Mockito.anyLong());
+
+        mvc.perform(delete("/operation-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+                .andExpect(status().isExpectationFailed())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
+    void clear() throws Exception {
+        this.operationLogService.clear();
+
+        mvc.perform(delete("/operation-logs").with(csrf().asHeader())).andExpect(status().isOk())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
+    void clear_error() throws Exception {
+        doThrow(new RuntimeException()).when(this.operationLogService).clear();
+
+        mvc.perform(delete("/operation-logs").with(csrf().asHeader()))
+                .andExpect(status().isExpectationFailed())
+                .andDo(print()).andReturn();
     }
 
 }

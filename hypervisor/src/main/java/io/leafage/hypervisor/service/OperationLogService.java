@@ -26,6 +26,8 @@ import top.leafage.common.jdbc.JdbcCrudService;
  */
 public interface OperationLogService extends JdbcCrudService<OperationLogDTO, OperationLogVO> {
 
+    /**
+     * 清空日志
+     */
     void clear();
-
 }

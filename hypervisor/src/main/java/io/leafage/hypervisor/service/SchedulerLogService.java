@@ -11,4 +11,8 @@ import top.leafage.common.jdbc.JdbcCrudService;
  */
 public interface SchedulerLogService extends JdbcCrudService<SchedulerLogDTO, SchedulerLogVO> {
 
+    /**
+     * 清空日志
+     */
+    void clear();
 }

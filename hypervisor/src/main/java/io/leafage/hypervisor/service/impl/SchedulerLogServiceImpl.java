@@ -1,7 +1,6 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.SchedulerLog;
-import io.leafage.hypervisor.domain.User;
 import io.leafage.hypervisor.dto.SchedulerLogDTO;
 import io.leafage.hypervisor.repository.SchedulerLogRepository;
 import io.leafage.hypervisor.service.SchedulerLogService;
@@ -71,7 +70,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
     @Override
     public SchedulerLogVO create(SchedulerLogDTO dto) {
         SchedulerLog schedulerLog = convertToDomain(dto, SchedulerLog.class);
-        schedulerLogRepository.save(schedulerLog);
+        schedulerLogRepository.saveAndFlush(schedulerLog);
         return convertToVO(schedulerLog, SchedulerLogVO.class);
     }
 
@@ -101,4 +100,8 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
         schedulerLogRepository.deleteById(id);
     }
 
+    @Override
+    public void clear() {
+        schedulerLogRepository.deleteAll();
+    }
 }

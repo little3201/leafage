@@ -120,7 +120,7 @@ public class OperationLogController {
         try {
             operationLogService.clear();
         } catch (Exception e) {
-            logger.error("Clear access log error: ", e);
+            logger.error("Clear operation log error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

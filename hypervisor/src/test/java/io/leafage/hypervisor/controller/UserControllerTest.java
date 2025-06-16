@@ -170,4 +170,13 @@ class UserControllerTest {
                 .andDo(print()).andReturn();
     }
 
+    @Test
+    void enable() throws Exception {
+        given(this.userService.enable(Mockito.anyLong())).willReturn(true);
+
+        mvc.perform(patch("/users/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+                .andExpect(status().isAccepted())
+                .andDo(print()).andReturn();
+    }
+
 }

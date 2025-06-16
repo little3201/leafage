@@ -11,10 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.poi.ExcelReader;
-
-import java.util.List;
 
 /**
  * controller for scheduler_logs.
@@ -172,23 +168,22 @@ public class SchedulerLogController {
         return ResponseEntity.accepted().body(enabled);
     }
 
+
     /**
-     * Import the records.
+     * 清空信息
      *
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
-    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:import')")
-    @PostMapping("/import")
-    public ResponseEntity<List<SchedulerLogVO>> importFromExcel(MultipartFile file) {
-        List<SchedulerLogVO> voList;
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_operation_logs:clear')")
+    @DeleteMapping
+    public ResponseEntity<Void> clear() {
         try {
-            List<SchedulerLogDTO> dtoList = ExcelReader.read(file.getInputStream(), SchedulerLogDTO.class);
-            voList = schedulerLogService.createAll(dtoList);
+            schedulerLogService.clear();
         } catch (Exception e) {
-            logger.error("Import scheduler-logs error: ", e);
+            logger.error("Clear scheduler log error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.ok().body(voList);
+        return ResponseEntity.ok().build();
     }
 
 }

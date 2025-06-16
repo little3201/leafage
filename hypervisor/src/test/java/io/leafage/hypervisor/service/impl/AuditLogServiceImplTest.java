@@ -15,11 +15,10 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.Dictionary;
-import io.leafage.hypervisor.domain.Message;
-import io.leafage.hypervisor.dto.MessageDTO;
-import io.leafage.hypervisor.repository.MessageRepository;
-import io.leafage.hypervisor.vo.MessageVO;
+import io.leafage.hypervisor.domain.AuditLog;
+import io.leafage.hypervisor.dto.AuditLogDTO;
+import io.leafage.hypervisor.repository.AuditLogRepository;
+import io.leafage.hypervisor.vo.AuditLogVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,48 +40,55 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * message service test
+ * audit log service test
  *
  * @author wq li
  **/
 @ExtendWith(MockitoExtension.class)
-class MessageServiceImplTest {
+class AuditLogServiceImplTest {
 
     @Mock
-    private MessageRepository messageRepository;
+    private AuditLogRepository auditLogRepository;
 
     @InjectMocks
-    private MessageServiceImpl messageService;
-
+    private AuditLogServiceImpl auditLogService;
 
     @Test
     void retrieve() {
-        Page<Message> page = new PageImpl<>(List.of(Mockito.mock(Message.class)));
+        Page<AuditLog> page = new PageImpl<>(List.of(Mockito.mock(AuditLog.class)));
 
-        given(this.messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
+        given(this.auditLogRepository.findAll(ArgumentMatchers.<Specification<AuditLog>>any(),
                 Mockito.any(Pageable.class))).willReturn(page);
 
-        Page<MessageVO> voPage = messageService.retrieve(0, 2, "id", true, "test");
+        Page<AuditLogVO> voPage = auditLogService.retrieve(0, 2, "id", true, "test");
+
         Assertions.assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(this.messageRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Message.class)));
+        given(this.auditLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(AuditLog.class)));
 
-        MessageVO vo = messageService.fetch(Mockito.anyLong());
+        AuditLogVO vo = auditLogService.fetch(Mockito.anyLong());
 
         Assertions.assertNotNull(vo);
     }
-
 
     @Test
     void create() {
-        given(this.messageRepository.saveAndFlush(Mockito.any(Message.class))).willReturn(Mockito.mock(Message.class));
+        given(this.auditLogRepository.saveAndFlush(Mockito.any(AuditLog.class))).willReturn(Mockito.mock(AuditLog.class));
 
-        MessageVO vo = messageService.create(Mockito.mock(MessageDTO.class));
+        AuditLogVO vo = auditLogService.create(Mockito.mock(AuditLogDTO.class));
 
-        verify(this.messageRepository, times(1)).saveAndFlush(Mockito.any(Message.class));
+        verify(this.auditLogRepository, times(1)).saveAndFlush(Mockito.any(AuditLog.class));
         Assertions.assertNotNull(vo);
     }
+
+    @Test
+    void remove() {
+        auditLogService.remove(1L);
+
+        verify(this.auditLogRepository, times(1)).deleteById(Mockito.anyLong());
+    }
+
 }

@@ -15,8 +15,8 @@
 
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.service.AuditLogService;
+import io.leafage.hypervisor.vo.AuditLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,45 +46,43 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * access log controller test
+ * audit log controller test
  *
  * @author wq li
  **/
 @WithMockUser
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(AccessLogController.class)
-class AccessLogControllerTest {
+@WebMvcTest(AuditLogController.class)
+class AuditLogControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @MockitoBean
-    private AccessLogService accessLogService;
+    private AuditLogService auditLogService;
 
-    private AccessLogVO vo;
+    private AuditLogVO vo;
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new AccessLogVO();
+        vo = new AuditLogVO();
         vo.setId(1L);
         vo.setIp(InetAddress.getByName("12.1.3.2"));
         vo.setLocation("test");
-        vo.setHttpMethod("POST");
-        vo.setResponseTimes(232L);
-        vo.setResponseMessage("sessionId");
+        vo.setOldValue("test");
+        vo.setNewValue("test");
+        vo.setOperation("test");
         vo.setStatusCode(200);
-        vo.setUrl("test");
-        vo.setParams("xxx");
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<AccessLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<AuditLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
+        given(this.auditLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
-        mvc.perform(get("/access-logs")
+        mvc.perform(get("/audit-logs")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
@@ -99,10 +97,10 @@ class AccessLogControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
+        given(this.auditLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/access-logs")
+        mvc.perform(get("/audit-logs")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
                         .queryParam("sortBy", "id")
@@ -116,50 +114,33 @@ class AccessLogControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.accessLogService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.auditLogService.fetch(Mockito.anyLong())).willReturn(vo);
 
-        mvc.perform(get("/access-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.url").value("test")).andDo(print()).andReturn();
+        mvc.perform(get("/audit-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.operation").value("test")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.accessLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.auditLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/access-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/audit-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove() throws Exception {
-        this.accessLogService.remove(Mockito.anyLong());
+        this.auditLogService.remove(Mockito.anyLong());
 
-        mvc.perform(delete("/access-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
+        mvc.perform(delete("/audit-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.accessLogService).remove(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.auditLogService).remove(Mockito.anyLong());
 
-        mvc.perform(delete("/access-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void clear() throws Exception {
-        this.accessLogService.clear();
-
-        mvc.perform(delete("/access-logs").with(csrf().asHeader())).andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void clear_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.accessLogService).clear();
-
-        mvc.perform(delete("/access-logs").with(csrf().asHeader()))
+        mvc.perform(delete("/audit-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

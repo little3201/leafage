@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import top.leafage.common.TreeNode;
 
 import java.util.Arrays;
@@ -66,7 +68,8 @@ class GroupServiceImplTest {
     void retrieve() {
         Page<Group> page = new PageImpl<>(List.of(Mockito.mock(Group.class)));
 
-        given(this.groupRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
+        given(this.groupRepository.findAll(ArgumentMatchers.<Specification<Group>>any(),
+                Mockito.any(Pageable.class))).willReturn(page);
 
         Page<GroupVO> voPage = groupService.retrieve(0, 2, "id", true, "filter_superiorId:=:2L,filter_name:like:test");
         Assertions.assertNotNull(voPage.getContent());
@@ -142,6 +145,15 @@ class GroupServiceImplTest {
         groupService.remove(1L);
 
         verify(this.groupRepository, times(1)).deleteById(Mockito.anyLong());
+    }
+
+    @Test
+    void enable() {
+        given(this.groupRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+
+        boolean enabled = groupService.enable(1L);
+
+        Assertions.assertTrue(enabled);
     }
 
 }

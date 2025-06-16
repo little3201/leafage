@@ -221,6 +221,15 @@ class RoleControllerTest {
     }
 
     @Test
+    void enable() throws Exception {
+        given(this.roleService.enable(Mockito.anyLong())).willReturn(true);
+
+        mvc.perform(patch("/roles/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+                .andExpect(status().isAccepted())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
     void members() throws Exception {
         given(this.roleMembersService.members(Mockito.anyLong())).willReturn(Mockito.anyList());
 

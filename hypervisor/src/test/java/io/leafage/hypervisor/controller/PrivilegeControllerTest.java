@@ -41,8 +41,7 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -184,6 +183,15 @@ class PrivilegeControllerTest {
                 .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();
+    }
+
+    @Test
+    void enable() throws Exception {
+        given(this.privilegeService.enable(Mockito.anyLong())).willReturn(true);
+
+        mvc.perform(patch("/privileges/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+                .andExpect(status().isAccepted())
+                .andDo(print()).andReturn();
     }
 
 }

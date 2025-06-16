@@ -20,6 +20,7 @@ import io.leafage.hypervisor.domain.GroupPrivileges;
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.service.GroupMembersService;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
+import io.leafage.hypervisor.service.GroupRolesService;
 import io.leafage.hypervisor.service.GroupService;
 import io.leafage.hypervisor.vo.GroupVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,6 +75,9 @@ class GroupControllerTest {
 
     @MockitoBean
     private GroupMembersService groupMembersService;
+
+    @MockitoBean
+    private GroupRolesService groupRolesService;
 
     private GroupVO vo;
 
@@ -228,6 +232,15 @@ class GroupControllerTest {
 
         mvc.perform(delete("/groups/{id}", Mockito.anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
+                .andDo(print()).andReturn();
+    }
+
+    @Test
+    void enable() throws Exception {
+        given(this.groupService.enable(Mockito.anyLong())).willReturn(true);
+
+        mvc.perform(patch("/groups/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+                .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
 

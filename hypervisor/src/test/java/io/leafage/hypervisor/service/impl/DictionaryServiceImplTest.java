@@ -95,7 +95,7 @@ class DictionaryServiceImplTest {
     }
 
     @Test
-    void lower_empty() {
+    void subset_empty() {
         given(this.dictionaryRepository.findAllBySuperiorId(Mockito.anyLong())).willReturn(Collections.emptyList());
 
         List<DictionaryVO> dictionaryVOS = dictionaryService.subset(1L);
@@ -150,4 +150,14 @@ class DictionaryServiceImplTest {
 
         verify(this.dictionaryRepository, times(1)).deleteById(Mockito.anyLong());
     }
+
+    @Test
+    void enable() {
+        given(this.dictionaryRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+
+        boolean enabled = dictionaryService.enable(1L);
+
+        Assertions.assertTrue(enabled);
+    }
+
 }

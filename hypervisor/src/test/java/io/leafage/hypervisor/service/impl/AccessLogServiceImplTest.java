@@ -22,6 +22,7 @@ import io.leafage.hypervisor.vo.AccessLogVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -29,15 +30,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * message service test
+ * access log service test
  *
  * @author wq li
  **/
@@ -54,11 +57,21 @@ class AccessLogServiceImplTest {
     void retrieve() {
         Page<AccessLog> page = new PageImpl<>(List.of(Mockito.mock(AccessLog.class)));
 
-        given(this.accessLogRepository.findAll(Mockito.any(Pageable.class))).willReturn(page);
+        given(this.accessLogRepository.findAll(ArgumentMatchers.<Specification<AccessLog>>any(),
+                Mockito.any(Pageable.class))).willReturn(page);
 
         Page<AccessLogVO> voPage = accessLogService.retrieve(0, 2, "id", true, "test");
 
         Assertions.assertNotNull(voPage.getContent());
+    }
+
+    @Test
+    void fetch() {
+        given(this.accessLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(AccessLog.class)));
+
+        AccessLogVO vo = accessLogService.fetch(Mockito.anyLong());
+
+        Assertions.assertNotNull(vo);
     }
 
     @Test
@@ -70,4 +83,19 @@ class AccessLogServiceImplTest {
         verify(this.accessLogRepository, times(1)).saveAndFlush(Mockito.any(AccessLog.class));
         Assertions.assertNotNull(vo);
     }
+
+    @Test
+    void remove() {
+        accessLogService.remove(1L);
+
+        verify(this.accessLogRepository, times(1)).deleteById(Mockito.anyLong());
+    }
+
+    @Test
+    void clear() {
+        accessLogService.clear();
+
+        verify(this.accessLogRepository, times(1)).deleteAll();
+    }
+
 }
