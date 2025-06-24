@@ -23,15 +23,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,32 +55,33 @@ class OperationLogControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
+    @MockitoBean
     private OperationLogService operationLogService;
 
-    private OperationLogVO operationLogVO;
+    private OperationLogVO vo;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UnknownHostException {
         // vo
-        operationLogVO = new OperationLogVO(1L, true, Instant.now());
-        operationLogVO.setIp("12.1.3.2");
-        operationLogVO.setLocation("test");
-        operationLogVO.setBrowser("Chrome");
-        operationLogVO.setDeviceType("PC");
-        operationLogVO.setBrowser("Edge");
-        operationLogVO.setOs("Mac OS");
-        operationLogVO.setReferer("test");
-        operationLogVO.setContent("content");
-        operationLogVO.setSessionId("sessionId");
-        operationLogVO.setStatusCode(200);
-        operationLogVO.setOperation("test");
-        operationLogVO.setUserAgent("xxx");
+        vo = new OperationLogVO();
+        vo.setId(1L);
+        vo.setIp(InetAddress.getByName("12.1.3.2"));
+        vo.setLocation("test");
+        vo.setBrowser("Chrome");
+        vo.setDeviceType("PC");
+        vo.setBrowser("Edge");
+        vo.setOs("Mac OS");
+        vo.setReferer("test");
+        vo.setContent("content");
+        vo.setSessionId("sessionId");
+        vo.setStatusCode(200);
+        vo.setOperation("test");
+        vo.setUserAgent("xxx");
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<OperationLogVO> voPage = new PageImpl<>(List.of(operationLogVO), Mockito.mock(PageRequest.class), 2L);
+        Page<OperationLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.operationLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);

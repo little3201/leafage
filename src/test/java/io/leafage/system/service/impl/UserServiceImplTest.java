@@ -30,7 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,14 +57,13 @@ class UserServiceImplTest {
     void setUp() {
         userDTO = new UserDTO();
         userDTO.setUsername("test");
-        userDTO.setFullName("zhang");
+        userDTO.setFirstname("zhang");
         userDTO.setAvatar("a.jpg");
         userDTO.setEmail("zhang@test.com");
 
         user = new User();
         user.setId(1L);
         user.setUsername("test");
-        user.setLastModifiedDate(Instant.now());
     }
 
     @Test

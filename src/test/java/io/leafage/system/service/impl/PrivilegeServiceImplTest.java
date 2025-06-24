@@ -15,7 +15,6 @@
 
 package io.leafage.system.service.impl;
 
-import com.server.starter.domain.TreeNode;
 import io.leafage.system.domain.Privilege;
 import io.leafage.system.domain.RoleMembers;
 import io.leafage.system.domain.RolePrivileges;
@@ -30,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import top.leafage.common.TreeNode;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +69,7 @@ class PrivilegeServiceImplTest {
 
         given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(Privilege.class)));
 
-        List<TreeNode> nodes = privilegeService.tree("test");
+        List<TreeNode<Long>> nodes = privilegeService.tree("test");
         Assertions.assertNotNull(nodes);
     }
 

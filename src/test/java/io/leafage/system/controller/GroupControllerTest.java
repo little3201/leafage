@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.leafage.system.dto.GroupDTO;
 import io.leafage.system.service.GroupMembersService;
 import io.leafage.system.service.GroupService;
-import com.server.starter.domain.TreeNode;
 import io.leafage.system.vo.GroupVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,16 +26,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import top.leafage.common.TreeNode;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -65,33 +64,34 @@ class GroupControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private GroupService groupService;
 
-    @MockBean
+    @MockitoBean
     private GroupMembersService groupMembersService;
 
-    private GroupVO groupVO;
+    private GroupVO vo;
 
-    private GroupDTO groupDTO;
+    private GroupDTO dto;
 
     @BeforeEach
     void setUp() {
-        groupVO = new GroupVO(1L, true, Instant.now());
-        groupVO.setName("test");
+        vo = new GroupVO();
+        vo.setId(1L);
+        vo.setName("test");
 
-        groupDTO = new GroupDTO();
-        groupDTO.setName("test");
-        groupDTO.setSuperiorId(1L);
-        groupDTO.setDescription("description");
+        dto = new GroupDTO();
+        dto.setName("test");
+        dto.setSuperiorId(1L);
+        dto.setDescription("description");
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<GroupVO> voPage = new PageImpl<>(List.of(groupVO), Mockito.mock(PageRequest.class), 2L);
+        Page<GroupVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyLong(), eq("test"))).willReturn(voPage);
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
 
         mvc.perform(get("/groups").queryParam("page", "0").queryParam("size", "2")
                         .queryParam("sortBy", "id").queryParam("superiorId", "1")
@@ -104,7 +104,7 @@ class GroupControllerTest {
     @Test
     void retrieve_error() throws Exception {
         given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"), Mockito.anyBoolean(),
-                Mockito.anyLong(), Mockito.anyString())).willThrow(new RuntimeException());
+                Mockito.anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/groups").queryParam("page", "0").queryParam("size", "2")
                         .queryParam("sortBy", "id").queryParam("superiorId", "1")
@@ -116,7 +116,7 @@ class GroupControllerTest {
 
     @Test
     void tree() throws Exception {
-        TreeNode treeNode = TreeNode.withId(1L).name("test").build();
+        TreeNode<Long> treeNode = TreeNode.withId(1L).name("test").build();
         given(this.groupService.tree()).willReturn(Collections.singletonList(treeNode));
 
         mvc.perform(get("/groups/tree")).andExpect(status().isOk())
@@ -125,7 +125,7 @@ class GroupControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.groupService.fetch(Mockito.anyLong())).willReturn(groupVO);
+        given(this.groupService.fetch(Mockito.anyLong())).willReturn(vo);
 
         mvc.perform(get("/groups/{id}", Mockito.anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
@@ -141,10 +141,10 @@ class GroupControllerTest {
 
     @Test
     void create() throws Exception {
-        given(this.groupService.create(Mockito.any(GroupDTO.class))).willReturn(groupVO);
+        given(this.groupService.create(Mockito.any(GroupDTO.class))).willReturn(vo);
 
         mvc.perform(post("/groups").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(groupDTO)).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("test"))
                 .andDo(print()).andReturn();
@@ -155,17 +155,17 @@ class GroupControllerTest {
         given(this.groupService.create(Mockito.any(GroupDTO.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/groups").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(groupDTO)).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void modify() throws Exception {
-        given(this.groupService.modify(Mockito.anyLong(), Mockito.any(GroupDTO.class))).willReturn(groupVO);
+        given(this.groupService.modify(Mockito.anyLong(), Mockito.any(GroupDTO.class))).willReturn(vo);
 
         mvc.perform(put("/groups/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(groupDTO)).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
@@ -175,7 +175,7 @@ class GroupControllerTest {
         given(this.groupService.modify(Mockito.anyLong(), Mockito.any(GroupDTO.class))).willThrow(new RuntimeException());
 
         mvc.perform(put("/groups/{id}", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(groupDTO)).with(csrf().asHeader()))
+                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isNotModified())
                 .andDo(print()).andReturn();
     }

@@ -23,15 +23,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,28 +55,28 @@ class AccessLogControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
+    @MockitoBean
     private AccessLogService accessLogService;
 
-    private AccessLogVO accessLogVO;
+    private AccessLogVO vo;
 
     @BeforeEach
-    void setUp() {
-        // vo
-        accessLogVO = new AccessLogVO(1L, true, Instant.now());
-        accessLogVO.setIp("12.1.3.2");
-        accessLogVO.setLocation("test");
-        accessLogVO.setHttpMethod("POST");
-        accessLogVO.setResponseTimes(232L);
-        accessLogVO.setResponseMessage("sessionId");
-        accessLogVO.setStatusCode(200);
-        accessLogVO.setUrl("/test");
-        accessLogVO.setParams("xxx");
+    void setUp() throws UnknownHostException {
+        vo = new AccessLogVO();
+        vo.setId(1L);
+        vo.setIp(InetAddress.getByName("12.1.3.2"));
+        vo.setLocation("test");
+        vo.setHttpMethod("POST");
+        vo.setResponseTimes(232L);
+        vo.setResponseMessage("sessionId");
+        vo.setStatusCode(200);
+        vo.setUrl("/test");
+        vo.setParams("xxx");
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<AccessLogVO> voPage = new PageImpl<>(List.of(accessLogVO), Mockito.mock(PageRequest.class), 2L);
+        Page<AccessLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
 
         given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
                 Mockito.anyBoolean(), eq("test"))).willReturn(voPage);
