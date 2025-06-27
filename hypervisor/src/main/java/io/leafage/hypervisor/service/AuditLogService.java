@@ -17,8 +17,8 @@
 
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.AccessLogDTO;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.dto.AuditLogDTO;
+import io.leafage.hypervisor.vo.AuditLogVO;
 import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
@@ -26,6 +26,6 @@ import top.leafage.common.r2dbc.R2dbcCrudService;
  *
  * @author wq li
  */
-public interface AuditLogService extends R2dbcCrudService<AccessLogDTO, AccessLogVO> {
+public interface AuditLogService extends R2dbcCrudService<AuditLogDTO, AuditLogVO> {
 
 }
