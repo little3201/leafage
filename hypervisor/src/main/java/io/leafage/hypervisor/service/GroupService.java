@@ -16,13 +16,17 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.GroupDTO;
 import io.leafage.hypervisor.vo.GroupVO;
-import top.leafage.common.jdbc.JdbcTreeService;
+import top.leafage.common.TreeNode;
+import top.leafage.common.jpa.JpaCrudService;
+
+import java.util.List;
 
 /**
  * group service.
  *
  * @author wq li
  */
-public interface GroupService extends JdbcTreeService<GroupDTO, GroupVO, Long> {
+public interface GroupService extends JpaCrudService<GroupDTO, GroupVO> {
 
+    List<TreeNode<Long>> tree();
 }

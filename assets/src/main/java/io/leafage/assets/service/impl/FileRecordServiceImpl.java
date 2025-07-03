@@ -55,7 +55,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<FileRecord> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return fileRecordRepository.findAll(spec, pageable)
                 .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class));

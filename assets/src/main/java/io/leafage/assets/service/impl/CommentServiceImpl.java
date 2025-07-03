@@ -58,7 +58,7 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Comment> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return commentRepository.findAll(spec, pageable).map(comment -> {
             CommentVO vo = convertToVO(comment, CommentVO.class);

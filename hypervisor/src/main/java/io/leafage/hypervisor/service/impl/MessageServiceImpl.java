@@ -55,7 +55,7 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Message> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return messageRepository.findAll(spec, pageable)
                 .map(message -> convertToVO(message, MessageVO.class));

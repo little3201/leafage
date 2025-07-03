@@ -17,7 +17,7 @@ package io.leafage.assets.domain;
 import io.leafage.assets.domain.superclass.PostModel;
 import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
+import top.leafage.common.jpa.JpaAuditMetadata;
 
 import java.time.Instant;
 
@@ -42,7 +42,7 @@ public class Post extends PostModel {
     private Instant publishedAt;
 
     @Embedded
-    private JdbcAuditMetadata auditMetadata = new JdbcAuditMetadata();
+    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
 
 
     public Long getId() {
@@ -61,11 +61,11 @@ public class Post extends PostModel {
         this.publishedAt = publishedAt;
     }
 
-    public JdbcAuditMetadata getAuditMetadata() {
+    public JpaAuditMetadata getAuditMetadata() {
         return auditMetadata;
     }
 
-    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
         this.auditMetadata = auditMetadata;
     }
 }

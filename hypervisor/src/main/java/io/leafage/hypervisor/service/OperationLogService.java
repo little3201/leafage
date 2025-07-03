@@ -17,14 +17,14 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.OperationLogDTO;
 import io.leafage.hypervisor.vo.OperationLogVO;
-import top.leafage.common.jdbc.JdbcCrudService;
+import top.leafage.common.jpa.JpaCrudService;
 
 /**
  * operation log service.
  *
  * @author wq li
  */
-public interface OperationLogService extends JdbcCrudService<OperationLogDTO, OperationLogVO> {
+public interface OperationLogService extends JpaCrudService<OperationLogDTO, OperationLogVO> {
 
     /**
      * 清空日志

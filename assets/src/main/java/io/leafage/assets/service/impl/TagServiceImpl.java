@@ -55,7 +55,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Tag> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return tagRepository.findAll(spec, pageable).map(tag -> convertToVO(tag, TagVO.class));
     }

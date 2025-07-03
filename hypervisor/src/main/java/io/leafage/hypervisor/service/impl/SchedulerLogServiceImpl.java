@@ -35,7 +35,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<SchedulerLog> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return schedulerLogRepository.findAll(spec, pageable)
                 .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class));

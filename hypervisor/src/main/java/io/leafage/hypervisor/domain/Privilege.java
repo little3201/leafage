@@ -17,7 +17,7 @@ package io.leafage.hypervisor.domain;
 import io.leafage.hypervisor.domain.superclass.PrivilegeModel;
 import jakarta.persistence.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jdbc.audit.JdbcAuditMetadata;
+import top.leafage.common.jpa.JpaAuditMetadata;
 
 /**
  * entity class for privilege.
@@ -37,7 +37,7 @@ public class Privilege extends PrivilegeModel {
     private Long id;
 
     @Embedded
-    private JdbcAuditMetadata auditMetadata = new JdbcAuditMetadata();
+    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
 
 
     public Long getId() {
@@ -48,11 +48,11 @@ public class Privilege extends PrivilegeModel {
         this.id = id;
     }
 
-    public JdbcAuditMetadata getAuditMetadata() {
+    public JpaAuditMetadata getAuditMetadata() {
         return auditMetadata;
     }
 
-    public void setAuditMetadata(JdbcAuditMetadata auditMetadata) {
+    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
         this.auditMetadata = auditMetadata;
     }
 }

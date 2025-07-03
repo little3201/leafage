@@ -56,7 +56,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Group> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return groupRepository.findAll(spec, pageable)
                 .map(group -> convertToVO(group, GroupVO.class));

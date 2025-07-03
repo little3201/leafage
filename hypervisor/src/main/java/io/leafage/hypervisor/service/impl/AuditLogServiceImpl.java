@@ -56,7 +56,7 @@ public class AuditLogServiceImpl extends DomainConverter implements AuditLogServ
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<AuditLog> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return auditLogRepository.findAll(spec, pageable)
                 .map(auditLog -> convertToVO(auditLog, AuditLogVO.class));

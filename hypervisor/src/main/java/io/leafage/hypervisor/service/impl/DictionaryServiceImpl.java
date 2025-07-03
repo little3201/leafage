@@ -57,7 +57,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Dictionary> spec = (root, query, cb) -> {
-            Predicate filterPredicate = parseFilters(filters, cb, root).orElse(null);
+            Predicate filterPredicate = buildPredicate(filters, cb, root).orElse(null);
             Predicate superiorIsNull = cb.isNull(root.get("superiorId"));
 
             if (filterPredicate == null) {

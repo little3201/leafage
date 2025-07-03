@@ -53,7 +53,7 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Role> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return roleRepository.findAll(spec, pageable)
                 .map(role -> convertToVO(role, RoleVO.class));

@@ -63,7 +63,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<Post> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return postRepository.findAll(spec, pageable).map(post -> convertToVO(post, PostVO.class));
     }

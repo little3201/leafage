@@ -55,7 +55,7 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<OperationLog> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return operationLogRepository.findAll(spec, pageable)
                 .map(operationLog -> convertToVO(operationLog, OperationLogVO.class));

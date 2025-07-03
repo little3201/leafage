@@ -53,7 +53,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<User> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return userRepository.findAll(spec, pageable)
                 .map(user -> convertToVO(user, UserVO.class));

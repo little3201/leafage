@@ -17,7 +17,7 @@ package io.leafage.hypervisor.service;
 import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.vo.PrivilegeVO;
 import top.leafage.common.TreeNode;
-import top.leafage.common.jdbc.JdbcCrudService;
+import top.leafage.common.jpa.JpaCrudService;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author wq li
  */
-public interface PrivilegeService extends JdbcCrudService<PrivilegeDTO, PrivilegeVO> {
+public interface PrivilegeService extends JpaCrudService<PrivilegeDTO, PrivilegeVO> {
 
     /**
      * 获取树结构数据

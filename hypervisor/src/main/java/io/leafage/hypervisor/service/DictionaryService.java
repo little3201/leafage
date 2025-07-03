@@ -17,7 +17,7 @@ package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.dto.DictionaryDTO;
 import io.leafage.hypervisor.vo.DictionaryVO;
-import top.leafage.common.jdbc.JdbcCrudService;
+import top.leafage.common.jpa.JpaCrudService;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author wq li
  */
-public interface DictionaryService extends JdbcCrudService<DictionaryDTO, DictionaryVO> {
+public interface DictionaryService extends JpaCrudService<DictionaryDTO, DictionaryVO> {
 
     /**
      * 获取子节点

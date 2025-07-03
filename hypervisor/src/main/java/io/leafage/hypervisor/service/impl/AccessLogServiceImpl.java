@@ -55,7 +55,7 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         Specification<AccessLog> spec = (root, query, cb) ->
-                parseFilters(filters, cb, root).orElse(null);
+                buildPredicate(filters, cb, root).orElse(null);
 
         return accessLogRepository.findAll(spec, pageable)
                 .map(accessLog -> convertToVO(accessLog, AccessLogVO.class));

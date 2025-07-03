@@ -16,13 +16,13 @@ package io.leafage.assets.service;
 
 import io.leafage.assets.dto.TagDTO;
 import io.leafage.assets.vo.TagVO;
-import top.leafage.common.jdbc.JdbcCrudService;
+import top.leafage.common.jpa.JpaCrudService;
 
 /**
  * tag service.
  *
  * @author wq li
  */
-public interface TagService extends JdbcCrudService<TagDTO, TagVO> {
+public interface TagService extends JpaCrudService<TagDTO, TagVO> {
 
 }
