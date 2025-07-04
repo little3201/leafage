@@ -16,7 +16,6 @@
 package io.leafage.hypervisor.vo;
 
 import io.leafage.hypervisor.domain.superclass.UserModel;
-import jakarta.persistence.Column;
 
 /**
  * vo class for user.

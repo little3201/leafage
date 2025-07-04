@@ -15,7 +15,6 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.Dictionary;
 import io.leafage.hypervisor.domain.Message;
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.repository.MessageRepository;

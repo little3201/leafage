@@ -24,6 +24,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Set;
 
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_EMPTY;
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+
 /**
  * role members service impl.
  *
@@ -48,7 +51,7 @@ public class RoleMembersServiceImpl implements RoleMembersService {
      */
     @Override
     public List<RoleMembers> members(Long roleId) {
-        Assert.notNull(roleId, "roleId must not be null.");
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
 
         return roleMembersRepository.findAllByRoleId(roleId);
     }
@@ -58,7 +61,7 @@ public class RoleMembersServiceImpl implements RoleMembersService {
      */
     @Override
     public List<RoleMembers> roles(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         return roleMembersRepository.findAllByUsername(username);
     }
@@ -68,8 +71,8 @@ public class RoleMembersServiceImpl implements RoleMembersService {
      */
     @Override
     public List<RoleMembers> relation(Long roleId, Set<String> usernames) {
-        Assert.notNull(roleId, "roleId must not be null.");
-        Assert.notEmpty(usernames, "usernames must not be empty.");
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
+        Assert.notEmpty(usernames, String.format(_MUST_NOT_BE_EMPTY, "usernames"));
 
         List<RoleMembers> roleMembers = usernames.stream().map(username -> {
             RoleMembers roleMember = new RoleMembers();

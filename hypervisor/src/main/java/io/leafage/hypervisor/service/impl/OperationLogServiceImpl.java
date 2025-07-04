@@ -16,7 +16,6 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.OperationLog;
-import io.leafage.hypervisor.domain.Role;
 import io.leafage.hypervisor.dto.OperationLogDTO;
 import io.leafage.hypervisor.repository.OperationLogRepository;
 import io.leafage.hypervisor.service.OperationLogService;

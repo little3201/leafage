@@ -24,6 +24,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Set;
 
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_EMPTY;
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+
 
 /**
  * group roles service impl.
@@ -46,21 +49,21 @@ public class GroupRolesServiceImpl implements GroupRolesService {
 
     @Override
     public List<GroupRoles> roles(Long groupId) {
-        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
 
         return groupRolesRepository.findAllByGroupId(groupId);
     }
 
     @Override
     public List<GroupRoles> groups(Long roleId) {
-        Assert.notNull(roleId, "roleId must not be null.");
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
 
         return groupRolesRepository.findAllByRoleId(roleId);
     }
 
     @Override
     public List<GroupRoles> relation(Long groupId, Set<Long> roleIds) {
-        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
         List<GroupRoles> groupRoles = roleIds.stream().map(roleId -> {
             GroupRoles groupRole = new GroupRoles();
             groupRole.setGroupId(groupId);
@@ -72,8 +75,8 @@ public class GroupRolesServiceImpl implements GroupRolesService {
 
     @Override
     public void removeRelation(Long groupId, Set<Long> roleIds) {
-        Assert.notNull(groupId, "groupId must not be null.");
-        Assert.notEmpty(roleIds, "role ids must not be empty.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
+        Assert.notEmpty(roleIds, String.format(_MUST_NOT_BE_EMPTY, "roleIds"));
 
         List<GroupRoles> groupRoles = groupRolesRepository.findAllByGroupId(groupId);
         List<Long> filteredIds = groupRoles.stream()

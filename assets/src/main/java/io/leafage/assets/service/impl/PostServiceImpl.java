@@ -14,7 +14,6 @@
  */
 package io.leafage.assets.service.impl;
 
-import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.domain.Post;
 import io.leafage.assets.domain.PostContent;
 import io.leafage.assets.dto.PostDTO;
@@ -89,7 +88,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
      */
     @Override
     public boolean exists(String title, Long id) {
-        Assert.hasText(title, "title must not be empty.");
+        Assert.hasText(title, String.format(_MUST_NOT_BE_EMPTY, "title"));
         if (id == null) {
             return postRepository.existsByTitle(title);
         }

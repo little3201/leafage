@@ -61,7 +61,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
 
     @Override
     public UserVO findByUsername(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         return userRepository.findByUsername(username)
                 .map(user -> convertToVO(user, UserVO.class)).orElse(null);
@@ -93,7 +93,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public boolean exists(String username, Long id) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
         if (id == null) {
             return userRepository.existsByUsername(username);
         }

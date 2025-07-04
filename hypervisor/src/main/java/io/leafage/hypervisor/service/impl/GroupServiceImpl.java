@@ -89,7 +89,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
 
     @Override
     public boolean exists(String name, Long id) {
-        Assert.hasText(name, NAME_MUST_NOT_BE_EMPTY);
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
         if (id == null) {
             return groupRepository.existsByName(name);
         }

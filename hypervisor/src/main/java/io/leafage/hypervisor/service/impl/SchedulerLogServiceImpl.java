@@ -60,7 +60,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
 
     @Override
     public boolean exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
         if (id == null) {
             return schedulerLogRepository.existsByName(name);
         }

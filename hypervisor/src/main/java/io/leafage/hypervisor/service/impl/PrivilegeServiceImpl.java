@@ -93,7 +93,7 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public List<TreeNode<Long>> tree(String username) {
-        Assert.hasText(username, "The given username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         Map<Long, Privilege> privilegeMap = new HashMap<>();
 

@@ -14,7 +14,6 @@
  */
 package io.leafage.assets.service.impl;
 
-import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.domain.Tag;
 import io.leafage.assets.dto.TagDTO;
 import io.leafage.assets.repository.TagRepository;
@@ -78,7 +77,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public boolean exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
         if (id == null) {
             return tagRepository.existsByName(name);
         }

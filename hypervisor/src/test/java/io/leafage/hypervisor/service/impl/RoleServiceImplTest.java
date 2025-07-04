@@ -15,7 +15,6 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.Dictionary;
 import io.leafage.hypervisor.domain.Role;
 import io.leafage.hypervisor.dto.RoleDTO;
 import io.leafage.hypervisor.repository.RoleRepository;

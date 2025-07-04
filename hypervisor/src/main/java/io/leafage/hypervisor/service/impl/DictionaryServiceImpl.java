@@ -103,7 +103,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public boolean exists(Long superiorId, String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
 
         if (id == null) {
             return dictionaryRepository.existsBySuperiorIdAndName(superiorId, name);

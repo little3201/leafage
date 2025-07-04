@@ -16,7 +16,6 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.AuditLog;
-import io.leafage.hypervisor.domain.Group;
 import io.leafage.hypervisor.dto.AuditLogDTO;
 import io.leafage.hypervisor.repository.AuditLogRepository;
 import io.leafage.hypervisor.service.AuditLogService;

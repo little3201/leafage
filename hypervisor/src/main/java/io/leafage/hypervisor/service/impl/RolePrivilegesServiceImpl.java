@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+
 /**
  * role privileges service impl.
  *
@@ -63,7 +65,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      */
     @Override
     public List<RolePrivileges> privileges(Long roleId) {
-        Assert.notNull(roleId, "roleId must not be null.");
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
 
         return rolePrivilegesRepository.findAllByRoleId(roleId);
     }
@@ -73,7 +75,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      */
     @Override
     public List<RolePrivileges> roles(Long privilegeId) {
-        Assert.notNull(privilegeId, "privilegeId must not be null.");
+        Assert.notNull(privilegeId, String.format(_MUST_NOT_BE_NULL, "privilegeId"));
 
         return rolePrivilegesRepository.findAllByPrivilegeId(privilegeId);
     }
@@ -83,7 +85,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
      */
     @Override
     public RolePrivileges relation(Long roleId, Long privilegeId, String action) {
-        Assert.notNull(roleId, "roleId must not be null.");
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
 
         RolePrivileges rolePrivilege = new RolePrivileges(roleId, privilegeId,
                 StringUtils.hasText(action) ? Set.of(action) : Collections.emptySet());

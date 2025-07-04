@@ -24,6 +24,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Set;
 
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_EMPTY;
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+
 /**
  * group members service impl.
  *
@@ -48,7 +51,7 @@ public class GroupMembersServiceImpl implements GroupMembersService {
      */
     @Override
     public List<GroupMembers> members(Long groupId) {
-        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
 
         return groupMembersRepository.findAllByGroupId(groupId);
     }
@@ -58,7 +61,7 @@ public class GroupMembersServiceImpl implements GroupMembersService {
      */
     @Override
     public List<GroupMembers> groups(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         return groupMembersRepository.findAllByUsername(username);
     }
@@ -68,8 +71,8 @@ public class GroupMembersServiceImpl implements GroupMembersService {
      */
     @Override
     public List<GroupMembers> relation(Long groupId, Set<String> usernames) {
-        Assert.notNull(groupId, "groupId must not be null.");
-        Assert.notEmpty(usernames, "usernames must not be empty.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
+        Assert.notEmpty(usernames, String.format(_MUST_NOT_BE_EMPTY, "usernames"));
 
         List<GroupMembers> groupMembers = usernames.stream().map(username -> {
             GroupMembers groupMember = new GroupMembers();
@@ -82,8 +85,8 @@ public class GroupMembersServiceImpl implements GroupMembersService {
 
     @Override
     public void removeRelation(Long groupId, Set<String> usernames) {
-        Assert.notNull(groupId, "groupId must not be null.");
-        Assert.notEmpty(usernames, "usernames must not be empty.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
+        Assert.notEmpty(usernames, String.format(_MUST_NOT_BE_EMPTY, "usernames"));
 
         List<GroupMembers> groupMembers = groupMembersRepository.findAllByGroupId(groupId);
         List<Long> filteredIds = groupMembers.stream()

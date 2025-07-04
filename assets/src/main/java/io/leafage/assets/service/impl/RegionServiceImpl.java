@@ -88,7 +88,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public boolean exists(String name, Long id) {
-        Assert.hasText(name, "name must not bu empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
         if (id == null) {
             return regionRepository.existsByName(name);
         }

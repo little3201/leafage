@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+
 @Service
 public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
@@ -57,7 +59,7 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
     @Override
     public GroupPrivileges relation(Long groupId, Long privilegeId, String action) {
-        Assert.notNull(groupId, "groupId must not be null.");
+        Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
 
         GroupPrivileges groupPrivilege = new GroupPrivileges(groupId, privilegeId,
                 StringUtils.hasText(action) ? Set.of(action) : Collections.emptySet());
