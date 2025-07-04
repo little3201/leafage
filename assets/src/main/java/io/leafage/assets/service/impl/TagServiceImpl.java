@@ -65,7 +65,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public TagVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         Tag tag = tagRepository.findById(id).orElse(null);
         if (tag == null) {
             return null;
@@ -103,7 +103,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public TagVO modify(Long id, TagDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         Tag tag = tagRepository.findById(id).orElse(null);
         if (tag == null) {
             return null;
@@ -120,7 +120,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         tagRepository.deleteById(id);
     }

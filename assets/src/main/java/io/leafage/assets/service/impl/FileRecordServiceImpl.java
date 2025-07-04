@@ -63,7 +63,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
 
     @Override
     public FileRecordVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return fileRecordRepository.findById(id)
                 .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class))
@@ -72,7 +72,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
 
     @Override
     public boolean exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, NAME_MUST_NOT_BE_EMPTY);
         if (id == null) {
             return fileRecordRepository.existsByName(name);
         }
@@ -91,7 +91,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
 
     @Override
     public String download(Long id, OutputStream outputStream) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return fileRecordRepository.findById(id).map(fileRecord -> {
             File file = new File(fileRecord.getPath());

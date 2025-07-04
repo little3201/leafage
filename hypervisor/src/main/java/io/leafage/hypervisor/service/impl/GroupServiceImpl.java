@@ -76,7 +76,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
      */
     @Override
     public GroupVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return groupRepository.findById(id)
                 .map(group -> convertToVO(group, GroupVO.class)).orElse(null);
@@ -89,6 +89,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
 
     @Override
     public boolean exists(String name, Long id) {
+        Assert.hasText(name, NAME_MUST_NOT_BE_EMPTY);
         if (id == null) {
             return groupRepository.existsByName(name);
         }
@@ -111,7 +112,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
      */
     @Override
     public GroupVO modify(Long id, GroupDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return groupRepository.findById(id).map(existing -> {
                     Group group = convert(dto, existing);
                     group = groupRepository.save(group);
@@ -125,7 +126,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         groupRepository.deleteById(id);
     }
 

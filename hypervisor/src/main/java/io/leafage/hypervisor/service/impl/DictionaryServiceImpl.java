@@ -76,7 +76,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public DictionaryVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return dictionaryRepository.findById(id)
                 .map(dictionary -> convertToVO(dictionary, DictionaryVO.class)).orElse(null);
@@ -92,7 +92,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public List<DictionaryVO> subset(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return dictionaryRepository.findAllBySuperiorId(id).stream()
                 .map(dictionary -> convertToVO(dictionary, DictionaryVO.class)).toList();
@@ -127,7 +127,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public DictionaryVO modify(Long id, DictionaryDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return dictionaryRepository.findById(id).map(existing -> {
             Dictionary dictionary = convert(dto, existing);
             dictionary = dictionaryRepository.save(dictionary);
@@ -140,7 +140,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         dictionaryRepository.deleteById(id);
     }
 

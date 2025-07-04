@@ -63,7 +63,7 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
 
     @Override
     public AccessLogVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return accessLogRepository.findById(id)
                 .map(accessLog -> convertToVO(accessLog, AccessLogVO.class)).orElse(null);
@@ -84,7 +84,7 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
 
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         accessLogRepository.deleteById(id);
     }
 

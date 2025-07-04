@@ -75,7 +75,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public RegionVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         Region region = regionRepository.findById(id).orElse(null);
         if (region == null) {
             return null;
@@ -113,7 +113,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public RegionVO modify(Long id, RegionDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         Region region = regionRepository.findById(id).orElse(null);
         if (region == null) {
             return null;
@@ -130,7 +130,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         regionRepository.deleteById(id);
     }
 

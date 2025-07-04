@@ -73,7 +73,7 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
      */
     @Override
     public List<CommentVO> relation(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return commentRepository.findAllByPostIdAndReplierIsNull(id)
                 .stream().map(comment -> convertToVO(comment, CommentVO.class)).toList();
     }

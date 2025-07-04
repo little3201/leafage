@@ -73,7 +73,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
      */
     @Override
     public PostVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         //查询基本信息
         PostVO vo = postRepository.findById(id).map(post -> convertToVO(post, PostVO.class)).orElse(null);
         if (vo == null) {
@@ -128,7 +128,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
      */
     @Override
     public PostVO modify(Long id, PostDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         //查询基本信息
         Post post = postRepository.findById(id).orElse(null);
         if (post == null) {
@@ -159,7 +159,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         postRepository.deleteById(id);
     }

@@ -63,7 +63,7 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
 
     @Override
     public OperationLogVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return operationLogRepository.findById(id)
                 .map(operationLog -> convertToVO(operationLog, OperationLogVO.class))
@@ -83,7 +83,7 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
 
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         operationLogRepository.deleteById(id);
     }
 

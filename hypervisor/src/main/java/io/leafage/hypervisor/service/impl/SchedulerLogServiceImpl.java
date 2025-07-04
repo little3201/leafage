@@ -83,7 +83,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
 
     @Override
     public SchedulerLogVO modify(Long id, SchedulerLogDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return schedulerLogRepository.findById(id)
                 .map(existing -> {
@@ -95,7 +95,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
 
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         schedulerLogRepository.deleteById(id);
     }

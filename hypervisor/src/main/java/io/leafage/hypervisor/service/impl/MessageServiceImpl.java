@@ -66,7 +66,7 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
      */
     @Override
     public MessageVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return messageRepository.findById(id)
                 .map(message -> convertToVO(message, MessageVO.class)).orElse(null);

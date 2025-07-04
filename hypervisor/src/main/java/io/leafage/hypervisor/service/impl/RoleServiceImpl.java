@@ -64,7 +64,7 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
      */
     @Override
     public RoleVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return roleRepository.findById(id)
                 .map(role -> convertToVO(role, RoleVO.class)).orElse(null);
@@ -99,7 +99,7 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
      */
     @Override
     public RoleVO modify(Long id, RoleDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return roleRepository.findById(id).map(existing -> {
             Role role = convert(dto, existing);
             role = roleRepository.save(role);
@@ -112,7 +112,7 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         roleRepository.deleteById(id);
     }
 

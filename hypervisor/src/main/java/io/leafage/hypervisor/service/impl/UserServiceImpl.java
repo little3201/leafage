@@ -72,7 +72,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public UserVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.findById(id)
                 .map(user -> convertToVO(user, UserVO.class)).orElse(null);
@@ -117,7 +117,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public UserVO modify(Long id, UserDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.findById(id).map(existing -> {
             User user = convert(dto, existing);
@@ -131,7 +131,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public void remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         userRepository.deleteById(id);
     }
 

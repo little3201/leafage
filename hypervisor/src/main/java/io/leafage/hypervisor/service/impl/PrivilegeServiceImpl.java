@@ -93,7 +93,7 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public List<TreeNode<Long>> tree(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, "The given username must not be empty.");
 
         Map<Long, Privilege> privilegeMap = new HashMap<>();
 
@@ -142,7 +142,7 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public PrivilegeVO fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return privilegeRepository.findById(id)
                 .map(privilege -> convertToVO(privilege, PrivilegeVO.class))
@@ -151,6 +151,8 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
 
     @Override
     public boolean enable(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return privilegeRepository.updateEnabledById(id) > 0;
     }
 
@@ -159,7 +161,8 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public PrivilegeVO modify(Long id, PrivilegeDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return privilegeRepository.findById(id).map(existing -> {
                     Privilege privilege = convert(dto, existing);
                     privilege = privilegeRepository.save(privilege);
@@ -174,19 +177,18 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
                 privilege.setActions(actions);
                 privilegeMap.put(privilege.getId(), privilege);
                 // 处理没有勾选父级的数据（递归查找父级数据）
-                addSuperior(privilege, privilegeMap);
+                addSuperior(privilege.getSuperiorId(), privilegeMap);
             }
         });
     }
 
-    private void addSuperior(Privilege privilege, Map<Long, Privilege> privilegeMap) {
-        Long superiorId = privilege.getSuperiorId();
+    private void addSuperior(Long superiorId, Map<Long, Privilege> privilegeMap) {
         if (superiorId != null && !privilegeMap.containsKey(superiorId)) {
             privilegeRepository.findById(superiorId).ifPresent(superior -> {
                 if (superior.isEnabled()) {
                     privilegeMap.put(superior.getId(), superior);
                     // 递归，添加上级
-                    addSuperior(superior, privilegeMap);
+                    addSuperior(superior.getSuperiorId(), privilegeMap);
                 }
             });
         }
