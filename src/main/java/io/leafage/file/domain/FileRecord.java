@@ -16,8 +16,11 @@
 package io.leafage.file.domain;
 
 
-import top.leafage.common.AuditMetadata;
+import io.leafage.file.domain.superclass.FileRecordModel;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
+import top.leafage.common.AuditMetadata;
 
 /**
  * model class for file record.
@@ -25,6 +28,31 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author wq li
  */
 @Table(name = "file_records")
-public class FileRecord extends AuditMetadata {
+public class FileRecord extends FileRecordModel {
 
+    /**
+     * Primary key.
+     */
+    @Id
+    private Long id;
+
+    @Embedded.Nullable
+    private AuditMetadata auditMetadata = new AuditMetadata();
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public AuditMetadata getAuditMetadata() {
+        return auditMetadata;
+    }
+
+    public void setAuditMetadata(AuditMetadata auditMetadata) {
+        this.auditMetadata = auditMetadata;
+    }
 }

@@ -20,7 +20,7 @@
     <parent>
         <groupId>top.leafage</groupId>
         <artifactId>leafage-starter-parent</artifactId>
-        <version>0.3.5</version>
+        <version>0.3.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 

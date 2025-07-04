@@ -22,6 +22,7 @@ import io.leafage.file.service.FileRecordService;
 import io.leafage.file.vo.FileRecordVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.DomainConverter;
@@ -36,6 +37,8 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
 
     private final FileRecordRepository fileRecordRepository;
     private final FileRecordMapper fileRecordMapper;
+
+    private JdbcAggregateTemplate jdbcAggregateTemplate;
 
     public FileRecordServiceImpl(FileRecordRepository fileRecordRepository, FileRecordMapper fileRecordMapper) {
         this.fileRecordRepository = fileRecordRepository;
