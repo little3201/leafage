@@ -16,6 +16,7 @@
 package io.leafage.file.domain.superclass;
 
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.relational.core.mapping.Column;
 
 /**
  * superclass class for file record.
@@ -31,10 +32,18 @@ public abstract class FileRecordModel {
     private String path;
 
     @NotBlank
-    private String type;
+    private FileType type;
+
+    @Column(value = "mime_type")
+    private String mimeType;
 
     private float size;
 
+
+    public enum FileType {
+        FILE,
+        DIRECTORY
+    }
 
     public String getName() {
         return name;
@@ -52,12 +61,20 @@ public abstract class FileRecordModel {
         this.path = path;
     }
 
-    public String getType() {
+    public FileType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(FileType type) {
         this.type = type;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
     public float getSize() {
@@ -67,4 +84,6 @@ public abstract class FileRecordModel {
     public void setSize(float size) {
         this.size = size;
     }
+
+
 }

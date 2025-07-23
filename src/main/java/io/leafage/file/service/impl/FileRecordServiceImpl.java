@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.DomainConverter;
 
+import java.io.File;
+
 /**
  * file common impl.
  *
