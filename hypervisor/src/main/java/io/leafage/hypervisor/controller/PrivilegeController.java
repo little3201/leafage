@@ -92,21 +92,6 @@ public class PrivilegeController {
     }
 
     /**
-     * 查询
-     *
-     * @return 查询到的数据，否则返回空
-     */
-    @GetMapping("/{superiorId}/subset")
-    public Flux<ResponseEntity<PrivilegeVO>> subset(@PathVariable Long superiorId) {
-        return privilegeService.subset(superiorId)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve privilege subset error: ", e);
-                    return Flux.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
-    }
-
-    /**
      * 根据 id 查询信息
      *
      * @param id 主键
@@ -135,6 +120,20 @@ public class PrivilegeController {
                 .onErrorResume(e -> {
                     logger.error("Check is exists error: ", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
+    }
+
+    /**
+     * 查询
+     *
+     * @return 查询到的数据，否则返回空
+     */
+    @GetMapping("/{superiorId}/subset")
+    public Flux<PrivilegeVO> subset(@PathVariable Long superiorId) {
+        return privilegeService.subset(superiorId)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve privilege subset error: ", e);
+                    return Flux.empty();
                 });
     }
 

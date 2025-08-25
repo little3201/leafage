@@ -111,12 +111,11 @@ public class RegionController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public Flux<ResponseEntity<RegionVO>> subset(@PathVariable Long id) {
+    public Flux<RegionVO> subset(@PathVariable Long id) {
         return regionService.subset(id)
-                .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
                     logger.error("Retrieve region subset error: ", e);
-                    return Flux.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                    return Flux.empty();
                 });
     }
 

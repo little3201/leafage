@@ -111,12 +111,11 @@ public class DictionaryController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public Flux<ResponseEntity<DictionaryVO>> subset(@PathVariable Long id) {
+    public Flux<DictionaryVO> subset(@PathVariable Long id) {
         return dictionaryService.subset(id)
-                .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
                     logger.error("Retrieve dictionary subset error: ", e);
-                    return Flux.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                    return Flux.empty();
                 });
     }
 
