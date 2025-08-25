@@ -62,16 +62,14 @@ public class TagController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<TagVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<TagVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                       String sortBy, boolean descending, String filters) {
-        Mono<Page<TagVO>> pageMono;
-        try {
-            pageMono = tagService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve tags occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return tagService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve tags error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -81,15 +79,13 @@ public class TagController {
      * @return 查询到数据，异常时返回204
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<TagVO>> fetch(@PathVariable Long id) {
-        Mono<TagVO> voMono;
-        try {
-            voMono = tagService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch tag occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<TagVO>> fetch(@PathVariable Long id) {
+        return tagService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch tag error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -99,52 +95,46 @@ public class TagController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public ResponseEntity<Mono<Boolean>> exists(@RequestParam String name, Long id) {
-        Mono<Boolean> existsMono;
-        try {
-            existsMono = tagService.exists(name, id);
-        } catch (Exception e) {
-            logger.error("Check tag is exists occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok().body(existsMono);
+    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String name, Long id) {
+        return tagService.exists(name, id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Check is exists error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
      * 添加信息
      *
-     * @param tagDTO 要添加的数据
+     * @param dto 要添加的数据
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping
-    public ResponseEntity<Mono<TagVO>> create(@RequestBody @Valid TagDTO tagDTO) {
-        Mono<TagVO> voMono;
-        try {
-            voMono = tagService.create(tagDTO);
-        } catch (Exception e) {
-            logger.error("Create tag occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<ResponseEntity<TagVO>> create(@RequestBody @Valid TagDTO dto) {
+        return tagService.create(dto)
+                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Create tag occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
      * 修改信息
      *
-     * @param id          主键
-     * @param tagDTO 要修改的数据
-     * @return 修改后的信息，异常时返回304状态码
+     * @param id  主键
+     * @param dto 要修改的数据
+     * @return 修改后的信息，异常时返回417状态码
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<TagVO>> modify(@PathVariable Long id, @RequestBody @Valid TagDTO tagDTO) {
-        Mono<TagVO> voMono;
-        try {
-            voMono = tagService.modify(id, tagDTO);
-        } catch (Exception e) {
-            logger.error("Modify tag occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(voMono);
+    public Mono<ResponseEntity<TagVO>> modify(@PathVariable Long id, @RequestBody @Valid TagDTO dto) {
+        return tagService.modify(id, dto)
+                .map(vo -> ResponseEntity.accepted().body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Modify tag occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
@@ -154,15 +144,13 @@ public class TagController {
      * @return 200状态码，异常时返回417状态码
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
-        Mono<Void> voidMono;
-        try {
-            voidMono = tagService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove tag occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+        return tagService.remove(id)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(e -> {
+                    logger.error("Remove tag error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
 }

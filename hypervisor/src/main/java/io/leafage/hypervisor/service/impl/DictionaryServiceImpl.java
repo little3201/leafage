@@ -121,4 +121,10 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
                 .map(d -> convertToVO(d, DictionaryVO.class));
     }
 
+    @Override
+    public Mono<Void> remove(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return dictionaryRepository.deleteById(id);
+    }
 }

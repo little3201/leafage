@@ -74,16 +74,14 @@ public class GroupController {
      * @return 查询的数据集，异常时返回204状态码
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<GroupVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<GroupVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                         String sortBy, boolean descending, String filters) {
-        Mono<Page<GroupVO>> pageMono;
-        try {
-            pageMono = groupService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve groups occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return groupService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve groups error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -93,15 +91,13 @@ public class GroupController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<GroupVO>> fetch(@PathVariable Long id) {
-        Mono<GroupVO> voMono;
-        try {
-            voMono = groupService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch group occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<GroupVO>> fetch(@PathVariable Long id) {
+        return groupService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch group error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -111,52 +107,46 @@ public class GroupController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public ResponseEntity<Mono<Boolean>> exists(@RequestParam String name, Long id) {
-        Mono<Boolean> existsMono;
-        try {
-            existsMono = groupService.exists(name, id);
-        } catch (Exception e) {
-            logger.error("Check group is exists occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok().body(existsMono);
+    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String name, Long id) {
+        return groupService.exists(name, id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Check is exists error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
      * 添加
      *
-     * @param groupDTO 要添加的数据
+     * @param dto 要添加的数据
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping
-    public ResponseEntity<Mono<GroupVO>> create(@RequestBody @Valid GroupDTO groupDTO) {
-        Mono<GroupVO> voMono;
-        try {
-            voMono = groupService.create(groupDTO);
-        } catch (Exception e) {
-            logger.error("Create group occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<ResponseEntity<GroupVO>> create(@RequestBody @Valid GroupDTO dto) {
+        return groupService.create(dto)
+                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Create group occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
      * 修改
      *
-     * @param id       主键
-     * @param groupDTO 要修改的数据
-     * @return 修改后的信息，否则返回304状态码
+     * @param id  主键
+     * @param dto 要修改的数据
+     * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<GroupVO>> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO groupDTO) {
-        Mono<GroupVO> voMono;
-        try {
-            voMono = groupService.modify(id, groupDTO);
-        } catch (Exception e) {
-            logger.error("Modify group occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(voMono);
+    public Mono<ResponseEntity<GroupVO>> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO dto) {
+        return groupService.modify(id, dto)
+                .map(vo -> ResponseEntity.accepted().body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Modify group occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
@@ -166,15 +156,13 @@ public class GroupController {
      * @return 200状态码，异常时返回417状态码
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
-        Mono<Void> voidMono;
-        try {
-            voidMono = groupService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove group occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+        return groupService.remove(id)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(e -> {
+                    logger.error("Remove group error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**

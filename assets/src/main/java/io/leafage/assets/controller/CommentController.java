@@ -60,15 +60,13 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{postId}")
-    public ResponseEntity<Flux<CommentVO>> comments(@PathVariable Long postId) {
-        Flux<CommentVO> voFlux;
-        try {
-            voFlux = commentService.comments(postId);
-        } catch (Exception e) {
-            logger.error("Retrieve comments by postId occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voFlux);
+    public Flux<ResponseEntity<CommentVO>> comments(@PathVariable Long postId) {
+        return commentService.comments(postId)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve comments error: ", e);
+                    return Flux.just(ResponseEntity.noContent().build());
+                });
     }
 
 
@@ -79,15 +77,13 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{id}/replies")
-    public ResponseEntity<Flux<CommentVO>> replies(@PathVariable Long id) {
-        Flux<CommentVO> voFlux;
-        try {
-            voFlux = commentService.replies(id);
-        } catch (Exception e) {
-            logger.error("Retrieve comment repliers occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voFlux);
+    public Flux<ResponseEntity<CommentVO>> replies(@PathVariable Long id) {
+        return commentService.replies(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve comment repliers error: ", e);
+                    return Flux.just(ResponseEntity.noContent().build());
+                });
     }
 
     /**

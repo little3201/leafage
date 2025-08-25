@@ -22,6 +22,7 @@ import io.leafage.hypervisor.vo.OperationLogVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -58,16 +59,14 @@ public class OperationLogController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<OperationLogVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<OperationLogVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                                String sortBy, boolean descending, String filters) {
-        Mono<Page<OperationLogVO>> pageMono;
-        try {
-            pageMono = operationLogService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve operation logs occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return operationLogService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve operation logs error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -77,15 +76,13 @@ public class OperationLogController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<OperationLogVO>> fetch(@PathVariable Long id) {
-        Mono<OperationLogVO> voMono;
-        try {
-            voMono = operationLogService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch operation log occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<OperationLogVO>> fetch(@PathVariable Long id) {
+        return operationLogService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch operation log error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
 }

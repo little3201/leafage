@@ -17,11 +17,14 @@
 
 package io.leafage.assets.controller;
 
+import io.leafage.assets.dto.RegionDTO;
 import io.leafage.assets.service.RegionService;
 import io.leafage.assets.vo.RegionVO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -59,16 +62,14 @@ public class RegionController {
      * @return 查询的数据集，异常时返回204状态码
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<RegionVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<RegionVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                          String sortBy, boolean descending, String filters) {
-        Mono<Page<RegionVO>> pageMono;
-        try {
-            pageMono = regionService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve regions occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return regionService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve regions error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -78,15 +79,29 @@ public class RegionController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<RegionVO>> fetch(@PathVariable Long id) {
-        Mono<RegionVO> voMono;
-        try {
-            voMono = regionService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch region occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<RegionVO>> fetch(@PathVariable Long id) {
+        return regionService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch region error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
+    }
+
+    /**
+     * 是否已存在
+     *
+     * @param title 标题
+     * @return true-是，false-否
+     */
+    @GetMapping("/exists")
+    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String title, Long id) {
+        return regionService.exists(title, id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Check is exists error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -96,15 +111,61 @@ public class RegionController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public ResponseEntity<Flux<RegionVO>> subset(@PathVariable Long id) {
-        Flux<RegionVO> voFlux;
-        try {
-            voFlux = regionService.subset(id);
-        } catch (Exception e) {
-            logger.info("Retrieve region subset occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voFlux);
+    public Flux<ResponseEntity<RegionVO>> subset(@PathVariable Long id) {
+        return regionService.subset(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve region subset error: ", e);
+                    return Flux.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
+    /**
+     * 添加信息
+     *
+     * @param dto 要添加的数据
+     * @return 修改后的信息，异常时返回417状态码
+     */
+    @PostMapping
+    public Mono<ResponseEntity<RegionVO>> create(@RequestBody @Valid RegionDTO dto) {
+        return regionService.create(dto)
+                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Create region occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
+    }
+
+    /**
+     * 修改信息
+     *
+     * @param id  user 主键
+     * @param dto 要修改的数据
+     * @return 修改后的信息，异常时返回417状态码
+     */
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<RegionVO>> modify(@PathVariable Long id, @RequestBody @Valid RegionDTO dto) {
+        return regionService.modify(id, dto)
+                .map(vo -> ResponseEntity.accepted().body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Modify region occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
+    }
+
+    /**
+     * 删除信息
+     *
+     * @param id user 主键
+     * @return 200状态码，异常时返回417状态码
+     */
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+        return regionService.remove(id)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(e -> {
+                    logger.error("Remove region error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
+    }
 }

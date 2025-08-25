@@ -68,7 +68,7 @@ public class UserController {
         return userService.retrieve(page, size, sortBy, descending, filters)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
-                    logger.error("Retrieve users records error: ", e);
+                    logger.error("Retrieve users error: ", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
     }
@@ -100,7 +100,7 @@ public class UserController {
         return userService.exists(username, id)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> {
-                    logger.error("Check user is exists user error: ", e);
+                    logger.error("Check is exists user error: ", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
     }
@@ -124,12 +124,12 @@ public class UserController {
     /**
      * 添加信息
      *
-     * @param userDTO 要修改的数据
-     * @return 修改后的信息，异常时返回304状态码
+     * @param dto 要添加的数据
+     * @return 修改后的信息，异常时返回417状态码
      */
     @PostMapping
-    public Mono<ResponseEntity<UserVO>> create(@RequestBody @Valid UserDTO userDTO) {
-        return userService.create(userDTO)
+    public Mono<ResponseEntity<UserVO>> create(@RequestBody @Valid UserDTO dto) {
+        return userService.create(dto)
                 .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
                 .onErrorResume(e -> {
                     logger.error("Create user occurred an error: ", e);
@@ -141,12 +141,12 @@ public class UserController {
      * 修改信息
      *
      * @param id      user 主键
-     * @param userDTO 要修改的数据
-     * @return 修改后的信息，异常时返回304状态码
+     * @param dto 要修改的数据
+     * @return 修改后的信息，异常时返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<UserVO>> modify(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        return userService.modify(id, userDTO)
+    public Mono<ResponseEntity<UserVO>> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
+        return userService.modify(id, dto)
                 .map(vo -> ResponseEntity.accepted().body(vo))
                 .onErrorResume(e -> {
                     logger.error("Modify user occurred an error: ", e);
@@ -162,7 +162,8 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
-        return userService.remove(id).then(Mono.just(ResponseEntity.ok().<Void>build()))
+        return userService.remove(id)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
                 .onErrorResume(e -> {
                     logger.error("Remove user error: ", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());

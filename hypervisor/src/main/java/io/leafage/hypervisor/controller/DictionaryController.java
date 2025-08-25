@@ -62,16 +62,14 @@ public class DictionaryController {
      * @return 查询的数据集，异常时返回204状态码
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<DictionaryVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<DictionaryVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                              String sortBy, boolean descending, String filters) {
-        Mono<Page<DictionaryVO>> pageMono;
-        try {
-            pageMono = dictionaryService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve dictionary occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return dictionaryService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve dictionaries error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -81,15 +79,29 @@ public class DictionaryController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<DictionaryVO>> fetch(@PathVariable Long id) {
-        Mono<DictionaryVO> voMono;
-        try {
-            voMono = dictionaryService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch dictionary occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<DictionaryVO>> fetch(@PathVariable Long id) {
+        return dictionaryService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch dictionary error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
+    }
+
+    /**
+     * 是否已存在
+     *
+     * @param title 标题
+     * @return true-是，false-否
+     */
+    @GetMapping("/exists")
+    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String title, Long id) {
+        return dictionaryService.exists(title, id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Check is exists error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -99,33 +111,62 @@ public class DictionaryController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public ResponseEntity<Flux<DictionaryVO>> subset(@PathVariable Long id) {
-        Flux<DictionaryVO> voFlux;
-        try {
-            voFlux = dictionaryService.subset(id);
-        } catch (Exception e) {
-            logger.info("Retrieve dictionaries subset occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voFlux);
+    public Flux<ResponseEntity<DictionaryVO>> subset(@PathVariable Long id) {
+        return dictionaryService.subset(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve dictionary subset error: ", e);
+                    return Flux.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
      * 添加
      *
-     * @param dictionaryDTO 要添加的数据
+     * @param dto 要添加的数据
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping
-    public ResponseEntity<Mono<DictionaryVO>> create(@RequestBody @Valid DictionaryDTO dictionaryDTO) {
-        Mono<DictionaryVO> voMono;
-        try {
-            voMono = dictionaryService.create(dictionaryDTO);
-        } catch (Exception e) {
-            logger.info("Create dictionary occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<ResponseEntity<DictionaryVO>> create(@RequestBody @Valid DictionaryDTO dto) {
+        return dictionaryService.create(dto)
+                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Create dictionary occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
+    }
+
+    /**
+     * 修改信息
+     *
+     * @param id  user 主键
+     * @param dto 要修改的数据
+     * @return 修改后的信息，异常时返回417状态码
+     */
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<DictionaryVO>> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
+        return dictionaryService.modify(id, dto)
+                .map(vo -> ResponseEntity.accepted().body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Modify user occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
+    }
+
+    /**
+     * 删除
+     *
+     * @param id 主键
+     * @return 200状态码，异常时返回417状态码
+     */
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+        return dictionaryService.remove(id)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(e -> {
+                    logger.error("Remove dictionary error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
 }
