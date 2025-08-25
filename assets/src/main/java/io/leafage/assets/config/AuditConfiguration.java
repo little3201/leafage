@@ -22,11 +22,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.ReactiveAuditorAware;
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import reactor.core.publisher.Mono;
-
-import java.security.Principal;
 
 /**
  * audit configuration
@@ -44,9 +41,9 @@ public class AuditConfiguration {
      */
     @Bean
     public ReactiveAuditorAware<String> auditorProvider() {
-        return () -> Mono.defer(() -> Mono.justOrEmpty(SecurityContextHolder.getContext()))
+        return () -> ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
-                .map(Principal::getName);
+                .map(Authentication::getName);
     }
 }

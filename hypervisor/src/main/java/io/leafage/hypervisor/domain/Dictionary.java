@@ -18,10 +18,12 @@
 package io.leafage.hypervisor.domain;
 
 import io.leafage.hypervisor.domain.superclass.DictionaryModel;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.annotation.*;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.r2dbc.audit.R2dbcAuditMetadata;
+
+import java.time.Instant;
 
 /**
  * entity class for dictionary.
@@ -37,8 +39,23 @@ public class Dictionary extends DictionaryModel {
     @Id
     private Long id;
 
-    @Embedded.Nullable
-    private R2dbcAuditMetadata auditMetadata = new R2dbcAuditMetadata();
+    @InsertOnlyProperty
+    @CreatedBy
+    @Column(value = "created_by")
+    private String createdBy;
+
+    @InsertOnlyProperty
+    @CreatedDate
+    @Column(value = "created_date")
+    private Instant createdDate;
+
+    @LastModifiedBy
+    @Column(value = "last_modified_by")
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(value = "last_modified_date")
+    private Instant lastModifiedDate;
 
 
     public Long getId() {
@@ -49,11 +66,35 @@ public class Dictionary extends DictionaryModel {
         this.id = id;
     }
 
-    public R2dbcAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setAuditMetadata(R2dbcAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }

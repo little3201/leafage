@@ -61,9 +61,9 @@ class RegionServiceImplTest {
 
     @Test
     void retrieve() {
-        given(this.regionRepository.findAllBy(Mockito.any(PageRequest.class))).willReturn(Flux.just(Mockito.mock(Region.class)));
+        given(this.regionRepository.findAllBySuperiorIdIsNull(Mockito.any(PageRequest.class))).willReturn(Flux.just(Mockito.mock(Region.class)));
 
-        given(this.regionRepository.countByEnabledTrue()).willReturn(Mono.just(Mockito.anyLong()));
+        given(this.regionRepository.countBySuperiorIdIsNullAndEnabledTrue()).willReturn(Mono.just(Mockito.anyLong()));
 
         StepVerifier.create(regionService.retrieve(0, 2, "id", true, "name:like:a")).expectNextCount(1).verifyComplete();
     }

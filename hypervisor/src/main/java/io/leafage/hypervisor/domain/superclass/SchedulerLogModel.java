@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 2025.  little3201.
+ *  Copyright 2018-2025 little3201.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
  *       https://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 
 package io.leafage.hypervisor.domain.superclass;
@@ -38,7 +40,7 @@ public class SchedulerLogModel {
     @Column(value = "next_execute_time")
     private Instant nextExecuteTime;
 
-    private String description;
+    private String record;
 
 
     public String getName() {
@@ -73,11 +75,11 @@ public class SchedulerLogModel {
         this.nextExecuteTime = nextExecuteTime;
     }
 
-    public String getDescription() {
-        return description;
+    public String getRecord() {
+        return record;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setRecord(String record) {
+        this.record = record;
     }
 }

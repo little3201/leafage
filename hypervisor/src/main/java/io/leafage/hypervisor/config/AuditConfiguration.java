@@ -21,10 +21,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.ReactiveAuditorAware;
 import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import reactor.core.publisher.Mono;
 
 /**
  * <p>AuditConfiguration class.</p>
@@ -38,13 +37,13 @@ public class AuditConfiguration {
     /**
      * <p>auditorProvider.</p>
      *
-     * @return a {@link org.springframework.data.domain.ReactiveAuditorAware} object
+     * @return a {@link ReactiveAuditorAware} object
      */
     @Bean
     public ReactiveAuditorAware<String> auditorProvider() {
-        return () -> Mono.defer(() -> Mono.justOrEmpty(SecurityContextHolder.getContext()))
+        return () -> ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .filter(auth -> auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof User)
-                .map(auth -> ((User) auth.getPrincipal()).getUsername());
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getName);
     }
 }

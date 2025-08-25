@@ -89,7 +89,7 @@ public class GroupController {
     /**
      * 根据 id 查询
      *
-     * @param id 业务id
+     * @param id 主键 ID
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
@@ -154,7 +154,7 @@ public class GroupController {
             voMono = groupService.modify(id, groupDTO);
         } catch (Exception e) {
             logger.error("Modify group occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.accepted().body(voMono);
     }

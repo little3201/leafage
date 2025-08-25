@@ -17,47 +17,55 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.repository.AccessLogRepository;
-import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.repository.AuditLogRepository;
+import io.leafage.hypervisor.service.AuditLogService;
+import io.leafage.hypervisor.vo.AuditLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import top.leafage.common.DomainConverter;
 
 /**
- * access log service impl
+ * audit log service impl
  *
  * @author wq li
  */
 @Service
-public class AuditLogServiceImpl extends DomainConverter implements AccessLogService {
+public class AuditLogServiceImpl extends DomainConverter implements AuditLogService {
 
-    private final AccessLogRepository accessLogRepository;
+    private final AuditLogRepository auditLogRepository;
 
     /**
-     * <p>Constructor for AccessLogServiceImpl.</p>
+     * <p>Constructor for AuditLogServiceImpl.</p>
      *
-     * @param accessLogRepository a {@link AccessLogRepository} object
+     * @param auditLogRepository a {@link AuditLogRepository} object
      */
-    public AuditLogServiceImpl(AccessLogRepository accessLogRepository) {
-        this.accessLogRepository = accessLogRepository;
+    public AuditLogServiceImpl(AuditLogRepository auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<AccessLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Mono<Page<AuditLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return accessLogRepository.findAllBy(pageable)
-                .map(accessLog -> convertToVO(accessLog, AccessLogVO.class))
+        return auditLogRepository.findAllBy(pageable)
+                .map(a -> convertToVO(a, AuditLogVO.class))
                 .collectList()
-                .zipWith(accessLogRepository.count())
+                .zipWith(auditLogRepository.count())
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
+    @Override
+    public Mono<AuditLogVO> fetch(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return auditLogRepository.findById(id)
+                .map(a -> convertToVO(a, AuditLogVO.class));
+    }
 }

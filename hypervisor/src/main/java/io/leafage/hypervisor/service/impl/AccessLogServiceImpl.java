@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import top.leafage.common.DomainConverter;
 
@@ -54,10 +55,17 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return accessLogRepository.findAllBy(pageable)
-                .map(accessLog -> convertToVO(accessLog, AccessLogVO.class))
+                .map(a -> convertToVO(a, AccessLogVO.class))
                 .collectList()
                 .zipWith(accessLogRepository.count())
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
+    @Override
+    public Mono<AccessLogVO> fetch(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return accessLogRepository.findById(id)
+                .map(a -> convertToVO(a, AccessLogVO.class));
+    }
 }

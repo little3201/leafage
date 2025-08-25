@@ -17,47 +17,55 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.repository.AccessLogRepository;
-import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.repository.SchedulerLogRepository;
+import io.leafage.hypervisor.service.SchedulerLogService;
+import io.leafage.hypervisor.vo.SchedulerLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import top.leafage.common.DomainConverter;
 
 /**
- * access log service impl
+ * scheduler log service impl
  *
  * @author wq li
  */
 @Service
-public class SchedulerLogServiceImpl extends DomainConverter implements AccessLogService {
+public class SchedulerLogServiceImpl extends DomainConverter implements SchedulerLogService {
 
-    private final AccessLogRepository accessLogRepository;
+    private final SchedulerLogRepository schedulerLogRepository;
 
     /**
-     * <p>Constructor for AccessLogServiceImpl.</p>
+     * <p>Constructor for SchedulerLogServiceImpl.</p>
      *
-     * @param accessLogRepository a {@link AccessLogRepository} object
+     * @param schedulerLogRepository a {@link SchedulerLogRepository} object
      */
-    public SchedulerLogServiceImpl(AccessLogRepository accessLogRepository) {
-        this.accessLogRepository = accessLogRepository;
+    public SchedulerLogServiceImpl(SchedulerLogRepository schedulerLogRepository) {
+        this.schedulerLogRepository = schedulerLogRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<AccessLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Mono<Page<SchedulerLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return accessLogRepository.findAllBy(pageable)
-                .map(accessLog -> convertToVO(accessLog, AccessLogVO.class))
+        return schedulerLogRepository.findAllBy(pageable)
+                .map(s -> convertToVO(s, SchedulerLogVO.class))
                 .collectList()
-                .zipWith(accessLogRepository.count())
+                .zipWith(schedulerLogRepository.count())
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
+    @Override
+    public Mono<SchedulerLogVO> fetch(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return schedulerLogRepository.findById(id)
+                .map(s -> convertToVO(s, SchedulerLogVO.class));
+    }
 }

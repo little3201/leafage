@@ -17,11 +17,10 @@
 package io.leafage.assets.domain;
 
 import io.leafage.assets.domain.superclass.PostModel;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.r2dbc.audit.R2dbcAuditMetadata;
 
 import java.time.Instant;
 
@@ -44,8 +43,23 @@ public class Post extends PostModel {
     @Column(value = "published_at")
     private Instant publishedAt;
 
-    @Embedded.Nullable
-    private R2dbcAuditMetadata auditMetadata = new R2dbcAuditMetadata();
+    @InsertOnlyProperty
+    @CreatedBy
+    @Column(value = "created_by")
+    private String createdBy;
+
+    @InsertOnlyProperty
+    @CreatedDate
+    @Column(value = "created_date")
+    private Instant createdDate;
+
+    @LastModifiedBy
+    @Column(value = "last_modified_by")
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(value = "last_modified_date")
+    private Instant lastModifiedDate;
 
 
     public Long getId() {
@@ -56,11 +70,51 @@ public class Post extends PostModel {
         this.id = id;
     }
 
-    public R2dbcAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getStatus() {
+        return status;
     }
 
-    public void setAuditMetadata(R2dbcAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Instant getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(Instant publishedAt) {
+        this.publishedAt = publishedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Instant createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Instant lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }

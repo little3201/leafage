@@ -142,7 +142,7 @@ public class TagController {
             voMono = tagService.modify(id, tagDTO);
         } catch (Exception e) {
             logger.error("Modify tag occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.accepted().body(voMono);
     }

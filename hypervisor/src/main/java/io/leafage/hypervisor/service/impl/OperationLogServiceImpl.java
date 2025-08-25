@@ -17,47 +17,55 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.repository.AccessLogRepository;
-import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.repository.OperationLogRepository;
+import io.leafage.hypervisor.service.OperationLogService;
+import io.leafage.hypervisor.vo.OperationLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import top.leafage.common.DomainConverter;
 
 /**
- * access log service impl
+ * operation log service impl
  *
  * @author wq li
  */
 @Service
-public class OperationLogServiceImpl extends DomainConverter implements AccessLogService {
+public class OperationLogServiceImpl extends DomainConverter implements OperationLogService {
 
-    private final AccessLogRepository accessLogRepository;
+    private final OperationLogRepository operationLogRepository;
 
     /**
-     * <p>Constructor for AccessLogServiceImpl.</p>
+     * <p>Constructor for OperationLogServiceImpl.</p>
      *
-     * @param accessLogRepository a {@link AccessLogRepository} object
+     * @param operationLogRepository a {@link OperationLogRepository} object
      */
-    public OperationLogServiceImpl(AccessLogRepository accessLogRepository) {
-        this.accessLogRepository = accessLogRepository;
+    public OperationLogServiceImpl(OperationLogRepository operationLogRepository) {
+        this.operationLogRepository = operationLogRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<AccessLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Mono<Page<OperationLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return accessLogRepository.findAllBy(pageable)
-                .map(accessLog -> convertToVO(accessLog, AccessLogVO.class))
+        return operationLogRepository.findAllBy(pageable)
+                .map(o -> convertToVO(o, OperationLogVO.class))
                 .collectList()
-                .zipWith(accessLogRepository.count())
+                .zipWith(operationLogRepository.count())
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
+    @Override
+    public Mono<OperationLogVO> fetch(Long id) {
+        Assert.notNull(id, "id must not be null.");
+
+        return operationLogRepository.findById(id)
+                .map(o -> convertToVO(o, OperationLogVO.class));
+    }
 }

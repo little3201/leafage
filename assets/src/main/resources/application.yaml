@@ -16,7 +16,7 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://localhost:8761
+          issuer-uri: http://127.0.0.1:8761
 
 management:
   endpoints:

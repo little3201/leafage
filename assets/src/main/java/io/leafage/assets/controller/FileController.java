@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 2024-2025.  little3201.
+ *  Copyright 2018-2025 little3201.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
  *       https://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
  */
 
 package io.leafage.assets.controller;
@@ -19,7 +21,6 @@ import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
-import java.io.OutputStream;
+import java.io.FileNotFoundException;
 import java.nio.file.FileAlreadyExistsException;
 
 /**
@@ -68,35 +69,31 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping
-    public ResponseEntity<Mono<Page<FileRecordVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<FileRecordVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                              String sortBy, boolean descending, String filters) {
-        Mono<Page<FileRecordVO>> pageMono;
-        try {
-            pageMono = fileRecordService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve file error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return fileRecordService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve file records error: ", e);
+                    return Mono.just(ResponseEntity.noContent().build());
+                });
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 业务id
+     * @param id 主键 ID
      * @return 查询的数据，异常时返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<FileRecordVO>> fetch(@PathVariable Long id) {
-        Mono<FileRecordVO> voMono;
-        try {
-            voMono = fileRecordService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch file error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<FileRecordVO>> fetch(@PathVariable Long id) {
+        return fileRecordService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch file record error: ", e);
+                    return Mono.just(ResponseEntity.noContent().build());
+                });
     }
 
     /**
@@ -107,44 +104,49 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
-    public ResponseEntity<Mono<FileRecordVO>> upload(MultipartFile file) {
-        Mono<FileRecordVO> voMono;
-        try {
-            voMono = fileRecordService.exists(file.getName(), null).flatMap(exists -> {
-                if (exists) {
-                    return Mono.error(new FileAlreadyExistsException("File already exists."));
-                }
-                return fileRecordService.upload(file);
-            });
-        } catch (Exception e) {
-            logger.error("Upload file error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<ResponseEntity<FileRecordVO>> upload(MultipartFile file) {
+        return fileRecordService.exists(file.getOriginalFilename(), null)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new FileAlreadyExistsException("File already exists."));
+                    }
+                    return fileRecordService.upload(file);
+                })
+                .map(saved -> ResponseEntity.status(HttpStatus.CREATED).body(saved))
+                .onErrorResume(FileAlreadyExistsException.class, e -> {
+                    logger.warn("Upload failed: {}", e.getMessage());
+                    return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).build());
+                })
+                .onErrorResume(e -> {
+                    logger.error("Upload file error", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 业务id
+     * @param id 主键 ID
      * @return 查询的数据，异常时返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")
-    public ResponseEntity<Mono<Void>> download(@PathVariable Long id, ServerHttpResponse response) {
-        Mono<Void> voidMono;
-        // 设置响应头
-        response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        DataBuffer buffer = response.bufferFactory().allocateBuffer(256);
-        try (OutputStream os = buffer.asOutputStream()) {
-            voidMono = fileRecordService.download(id, os).doOnNext(name ->
-                    response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + name + "\"")
-            ).then();
-        } catch (Exception e) {
-            logger.error("Download file error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<Void> download(@PathVariable Long id, ServerHttpResponse response) {
+        return fileRecordService.download(id)
+                .flatMap(fileData -> {
+                    response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                    response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + fileData.fileName() + "\"");
+                    return response.writeWith(fileData.content());
+                })
+                .onErrorResume(FileNotFoundException.class, e -> {
+                    response.setStatusCode(HttpStatus.NOT_FOUND);
+                    return response.setComplete();
+                })
+                .onErrorResume(e -> {
+                    response.setStatusCode(HttpStatus.EXPECTATION_FAILED);
+                    return response.setComplete();
+                });
     }
 
     /**
@@ -155,14 +157,12 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
-        Mono<Void> voidMono;
-        try {
-            voidMono = fileRecordService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove file error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+        return fileRecordService.remove(id)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(e -> {
+                    logger.error("Remove file error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 }

@@ -17,6 +17,7 @@
 
 package io.leafage.assets.controller;
 
+import io.leafage.assets.dto.FileDataDTO;
 import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
@@ -155,7 +156,7 @@ class FileControllerTest {
 
     @Test
     void download() {
-        given(this.fileRecordService.download(Mockito.anyLong(), Mockito.any())).willReturn(Mono.just("test.txt"));
+        given(this.fileRecordService.download(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(FileDataDTO.class)));
 
         webTestClient.mutateWith(csrf()).get().uri("/files/{id}", 1)
                 .exchange()

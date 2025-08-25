@@ -180,7 +180,7 @@ public class PrivilegeController {
             voMono = privilegeService.modify(id, privilegeDTO);
         } catch (Exception e) {
             logger.error("Modify privilege occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.accepted().body(voMono);
     }

@@ -59,10 +59,10 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
     public Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        return regionRepository.findAllBy(pageable)
+        return regionRepository.findAllBySuperiorIdIsNull(pageable)
                 .map(r -> convertToVO(r, RegionVO.class))
                 .collectList()
-                .zipWith(regionRepository.countByEnabledTrue())
+                .zipWith(regionRepository.countBySuperiorIdIsNullAndEnabledTrue())
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

@@ -33,8 +33,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.ByteArrayOutputStream;
-
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -105,8 +103,7 @@ class FileRecordServiceImplTest {
         fileRecord.setPath("/text.jpg");
         given(this.fileRecordRepository.findById(Mockito.anyLong())).willReturn(Mono.just(fileRecord));
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        StepVerifier.create(fileRecordService.download(1L, outputStream)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(fileRecordService.download(1L)).expectNextCount(1).verifyComplete();
     }
 
     @Test

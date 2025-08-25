@@ -63,16 +63,14 @@ public class UserController {
      * @return a {@link org.springframework.http.ResponseEntity} object
      */
     @GetMapping
-    public ResponseEntity<Mono<Page<UserVO>>> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<ResponseEntity<Page<UserVO>>> retrieve(@RequestParam int page, @RequestParam int size,
                                                        String sortBy, boolean descending, String filters) {
-        Mono<Page<UserVO>> pageMono;
-        try {
-            pageMono = userService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve users occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(pageMono);
+        return userService.retrieve(page, size, sortBy, descending, filters)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Retrieve users records error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -82,15 +80,13 @@ public class UserController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<UserVO>> fetch(@PathVariable Long id) {
-        Mono<UserVO> voMono;
-        try {
-            voMono = userService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch user occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<UserVO>> fetch(@PathVariable Long id) {
+        return userService.fetch(id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch user error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -100,15 +96,13 @@ public class UserController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public ResponseEntity<Mono<Boolean>> exists(@RequestParam String username, Long id) {
-        Mono<Boolean> existsMono;
-        try {
-            existsMono = userService.exists(username, id);
-        } catch (Exception e) {
-            logger.error("Check user is exists occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok().body(existsMono);
+    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String username, Long id) {
+        return userService.exists(username, id)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Check user is exists user error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -118,15 +112,13 @@ public class UserController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/me")
-    public ResponseEntity<Mono<UserVO>> fetchMe(Principal principal) {
-        Mono<UserVO> voMono;
-        try {
-            voMono = userService.findByUsername(principal.getName());
-        } catch (Exception e) {
-            logger.error("Fetch me occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<ResponseEntity<UserVO>> fetchMe(Principal principal) {
+        return userService.findByUsername(principal.getName())
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    logger.error("Fetch me error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
     }
 
     /**
@@ -136,15 +128,13 @@ public class UserController {
      * @return 修改后的信息，异常时返回304状态码
      */
     @PostMapping
-    public ResponseEntity<Mono<UserVO>> create(@RequestBody @Valid UserDTO userDTO) {
-        Mono<UserVO> voMono;
-        try {
-            voMono = userService.create(userDTO);
-        } catch (Exception e) {
-            logger.error("Create user occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<ResponseEntity<UserVO>> create(@RequestBody @Valid UserDTO userDTO) {
+        return userService.create(userDTO)
+                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Create user occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
@@ -155,15 +145,13 @@ public class UserController {
      * @return 修改后的信息，异常时返回304状态码
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<UserVO>> modify(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        Mono<UserVO> voMono;
-        try {
-            voMono = userService.modify(id, userDTO);
-        } catch (Exception e) {
-            logger.error("Modify user occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(voMono);
+    public Mono<ResponseEntity<UserVO>> modify(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
+        return userService.modify(id, userDTO)
+                .map(vo -> ResponseEntity.accepted().body(vo))
+                .onErrorResume(e -> {
+                    logger.error("Modify user occurred an error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
     /**
@@ -173,15 +161,12 @@ public class UserController {
      * @return 200状态码，异常时返回417状态码
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
-        Mono<Void> voidMono;
-        try {
-            voidMono = userService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove user occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+        return userService.remove(id).then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(e -> {
+                    logger.error("Remove user error: ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
+                });
     }
 
 }
