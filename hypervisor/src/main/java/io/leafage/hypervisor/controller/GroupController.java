@@ -28,13 +28,11 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -71,33 +69,25 @@ public class GroupController {
      *
      * @param page 页码
      * @param size 大小
-     * @return 查询的数据集，异常时返回204状态码
+     * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<GroupVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                        String sortBy, boolean descending, String filters) {
+    public Mono<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                        String sortBy, boolean descending, String filters) {
         return groupService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve groups error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve groups error: ", e));
     }
 
     /**
      * 根据 id 查询
      *
      * @param id 主键 ID
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<GroupVO>> fetch(@PathVariable Long id) {
+    public Mono<GroupVO> fetch(@PathVariable Long id) {
         return groupService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch group error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Fetch group error: ", e));
     }
 
     /**
@@ -107,13 +97,9 @@ public class GroupController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String name, Long id) {
+    public Mono<Boolean> exists(@RequestParam String name, Long id) {
         return groupService.exists(name, id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Check is exists error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Check is exists error: ", e));
     }
 
     /**
@@ -123,13 +109,9 @@ public class GroupController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ResponseEntity<GroupVO>> create(@RequestBody @Valid GroupDTO dto) {
+    public Mono<GroupVO> create(@RequestBody @Valid GroupDTO dto) {
         return groupService.create(dto)
-                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Create group occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Create group occurred an error: ", e));
     }
 
     /**
@@ -140,13 +122,9 @@ public class GroupController {
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<GroupVO>> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO dto) {
+    public Mono<GroupVO> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO dto) {
         return groupService.modify(id, dto)
-                .map(vo -> ResponseEntity.accepted().body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Modify group occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Modify group occurred an error: ", e));
     }
 
     /**
@@ -156,66 +134,44 @@ public class GroupController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+    public Mono<Void> remove(@PathVariable Long id) {
         return groupService.remove(id)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .onErrorResume(e -> {
-                    logger.error("Remove group error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Remove group error: ", e));
     }
 
     /**
      * 查询关联user
      *
      * @param id 组id
-     * @return 查询到的数据集，异常时返回204状态码
+     * @return 查询到的数据集
      */
     @GetMapping("/{id}/members")
-    public ResponseEntity<Mono<List<GroupMembers>>> members(@PathVariable Long id) {
-        Mono<List<GroupMembers>> listMono;
-        try {
-            listMono = groupMembersService.members(id);
-        } catch (Exception e) {
-            logger.error("Retrieve group members occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(listMono);
+    public Flux<GroupMembers> members(@PathVariable Long id) {
+        return groupMembersService.members(id)
+                .doOnError(e -> logger.error("Retrieve group members occurred an error: ", e));
     }
 
     /**
      * 关联权限
      *
      * @param id 组id
-     * @return 查询到的数据集，异常时返回204状态码
+     * @return 查询到的数据集
      */
     @PatchMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<Mono<GroupPrivileges>> relation(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
-        Mono<GroupPrivileges> mono;
-        try {
-            mono = groupPrivilegesService.relation(id, privilegeId, actions);
-        } catch (Exception e) {
-            logger.error("Relation group privileges occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(mono);
+    public Mono<GroupPrivileges> relation(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
+        return groupPrivilegesService.relation(id, privilegeId, actions)
+                .doOnError(e -> logger.error("Relation group privileges occurred an error: ", e));
     }
 
     /**
      * 关联权限
      *
      * @param id 组id
-     * @return 查询到的数据集，异常时返回204状态码
+     * @return 查询到的数据集
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<Mono<Void>> removeRelation(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
-        Mono<Void> voidMono;
-        try {
-            voidMono = groupPrivilegesService.removeRelation(id, privilegeId, actions);
-        } catch (Exception e) {
-            logger.error("Remove group privileges occurred an error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<Void> removeRelation(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
+        return groupPrivilegesService.removeRelation(id, privilegeId, actions)
+                .doOnError(e -> logger.error("Remove group privileges occurred an error: ", e));
     }
 }

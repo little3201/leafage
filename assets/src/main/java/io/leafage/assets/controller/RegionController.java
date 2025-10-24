@@ -59,7 +59,7 @@ public class RegionController {
      *
      * @param page 页码
      * @param size 大小
-     * @return 查询的数据集，异常时返回204状态码
+     * @return 查询的数据集
      */
     @GetMapping
     public Mono<ResponseEntity<Page<RegionVO>>> retrieve(@RequestParam int page, @RequestParam int size,
@@ -76,7 +76,7 @@ public class RegionController {
      * 根据 id 查询
      *
      * @param id 主键
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/{id}")
     public Mono<ResponseEntity<RegionVO>> fetch(@PathVariable Long id) {

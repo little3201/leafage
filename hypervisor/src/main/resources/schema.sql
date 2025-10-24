@@ -355,7 +355,8 @@ CREATE TABLE "public"."messages"
 (
     "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "title"              varchar(64)  NOT NULL,
-    "content"            text,
+    "summary"            varchar(255),
+    "body"               text,
     "unread"             bool         NOT NULL DEFAULT false,
     "receiver"           varchar(64)  NOT NULL,
     "description"        varchar(255),
@@ -371,7 +372,9 @@ ON COLUMN "public"."messages"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."messages"."title" IS '标题';
 COMMENT
-ON COLUMN "public"."messages"."content" IS '内容';
+ON COLUMN "public"."messages"."summary" IS '摘要';
+COMMENT
+ON COLUMN "public"."messages"."body" IS '正文';
 COMMENT
 ON COLUMN "public"."messages"."unread" IS '是否未读';
 COMMENT

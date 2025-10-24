@@ -67,8 +67,7 @@ class UserControllerTest {
         dto = new UserDTO();
         dto.setUsername("test");
         dto.setAvatar("avatar.jpg");
-        dto.setGivenName("john");
-        dto.setFamilyName("steven");
+        dto.setFullname("john steven");
         dto.setAccountExpiresAt(Instant.now());
         dto.setCredentialsExpiresAt(Instant.now());
 
@@ -76,9 +75,7 @@ class UserControllerTest {
         vo.setId(1L);
         vo.setUsername("test");
         vo.setAccountExpiresAt(Instant.now());
-        vo.setGivenName("john");
-        vo.setMiddleName("steven");
-        vo.setFamilyName("steven");
+        vo.setFullname("john steven");
     }
 
 
@@ -91,8 +88,13 @@ class UserControllerTest {
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users")
                         .queryParam("page", 0)
-                        .queryParam("size", 2).build()).exchange()
-                .expectStatus().isOk().expectBodyList(PrivilegeVO.class);
+                        .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", true)
+                        .queryParam("filters", "")
+                        .build()).exchange()
+                .expectStatus().isOk()
+                .expectBodyList(PrivilegeVO.class);
     }
 
     @Test
@@ -108,7 +110,7 @@ class UserControllerTest {
                         .queryParam("filters", "username:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -125,7 +127,16 @@ class UserControllerTest {
         given(this.userService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/users/{id}", 1L).exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void fetchMe() {
+        given(this.userService.findByUsername(Mockito.anyString())).willReturn(Mono.just(vo));
+
+        webTestClient.get().uri("/users/me").exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.username").isNotEmpty();
     }
 
     @Test
@@ -148,7 +159,7 @@ class UserControllerTest {
                         .queryParam("id", 1L)
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -156,7 +167,7 @@ class UserControllerTest {
         given(this.userService.create(Mockito.any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/users").bodyValue(dto).exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.username").isEqualTo("test");
     }
 
@@ -165,7 +176,7 @@ class UserControllerTest {
         given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
-                .expectStatus().isAccepted()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.username").isEqualTo("test");
     }
 
@@ -174,7 +185,7 @@ class UserControllerTest {
         given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
-                .expectStatus().isNotModified();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -190,7 +201,7 @@ class UserControllerTest {
         given(this.userService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).delete().uri("/users/{id}", 1L).exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 
 }

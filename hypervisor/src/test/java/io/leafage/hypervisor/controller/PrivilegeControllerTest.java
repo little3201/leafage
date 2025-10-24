@@ -83,9 +83,15 @@ class PrivilegeControllerTest {
         given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
                 Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/privileges").queryParam("page", 0)
-                        .queryParam("size", 2).build()).exchange()
-                .expectStatus().isOk().expectBodyList(PrivilegeVO.class);
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/privileges")
+                        .queryParam("page", 0)
+                        .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", true)
+                        .queryParam("filters", "")
+                        .build()).exchange()
+                .expectStatus().isOk()
+                .expectBodyList(PrivilegeVO.class);
     }
 
     @Test
@@ -101,7 +107,7 @@ class PrivilegeControllerTest {
                         .queryParam("filters", "name:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -121,7 +127,7 @@ class PrivilegeControllerTest {
 
         webTestClient.get().uri("/privileges/tree")
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -140,7 +146,7 @@ class PrivilegeControllerTest {
 
         webTestClient.get().uri("/privileges/{id}", 1L)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -163,7 +169,7 @@ class PrivilegeControllerTest {
                         .queryParam("id", 1L)
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -172,7 +178,7 @@ class PrivilegeControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(dto)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
     }
 
@@ -182,7 +188,7 @@ class PrivilegeControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(dto)
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -191,7 +197,7 @@ class PrivilegeControllerTest {
 
         webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(dto)
                 .exchange()
-                .expectStatus().isAccepted()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
     }
 
@@ -201,7 +207,7 @@ class PrivilegeControllerTest {
 
         webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(dto)
                 .exchange()
-                .expectStatus().isNotModified();
+                .expectStatus().is5xxServerError();
     }
 
 }

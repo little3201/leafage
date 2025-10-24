@@ -50,15 +50,14 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    private UserDTO userDTO;
+    private UserDTO dto;
 
     @BeforeEach
     void setUp() {
-        userDTO = new UserDTO();
-        userDTO.setUsername("test");
-        userDTO.setFamilyName("john");
-        userDTO.setGivenName("steven");
-        userDTO.setCredentialsExpiresAt(Instant.now());
+        dto = new UserDTO();
+        dto.setUsername("test");
+        dto.setFullname("john steven");
+        dto.setCredentialsExpiresAt(Instant.now());
     }
 
     @Test
@@ -99,7 +98,7 @@ class UserServiceImplTest {
         given(this.userRepository.save(Mockito.any(User.class))).willReturn(Mono.just(Mockito.mock(User.class)));
 
 
-        StepVerifier.create(userService.modify(Mockito.anyLong(), userDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(userService.modify(Mockito.anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

@@ -81,7 +81,7 @@ public class UserController {
      * 根据 id 查询
      *
      * @param id user 主键
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/{id}")
     public Mono<UserVO> fetch(@PathVariable Long id) {
@@ -110,7 +110,7 @@ public class UserController {
      * 查询当前用户
      *
      * @param principal 当前用户
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/me")
     public Mono<UserVO> fetchMe(Principal principal) {

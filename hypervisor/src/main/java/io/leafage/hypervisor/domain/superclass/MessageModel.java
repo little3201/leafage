@@ -28,8 +28,17 @@ public abstract class MessageModel {
     @NotBlank
     private String title;
 
+    /**
+     * 消息摘要
+     */
     @NotBlank
-    private String content;
+    private String summary;
+
+    /**
+     * 消息正文
+     */
+    @NotBlank
+    private String body;
 
     @NotBlank
     private String receiver;
@@ -43,12 +52,20 @@ public abstract class MessageModel {
         this.title = title;
     }
 
-    public String getContent() {
-        return content;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public String getReceiver() {

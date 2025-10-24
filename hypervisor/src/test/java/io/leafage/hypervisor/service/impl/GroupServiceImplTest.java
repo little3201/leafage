@@ -50,12 +50,12 @@ class GroupServiceImplTest {
     @InjectMocks
     private GroupServiceImpl groupService;
 
-    private GroupDTO groupDTO;
+    private GroupDTO dto;
 
     @BeforeEach
     void setUp() {
-        groupDTO = new GroupDTO();
-        groupDTO.setName("test");
+        dto = new GroupDTO();
+        dto.setName("test");
     }
 
     @Test
@@ -101,7 +101,7 @@ class GroupServiceImplTest {
 
         given(this.groupRepository.save(Mockito.any(Group.class))).willReturn(Mono.just(Mockito.mock(Group.class)));
 
-        StepVerifier.create(groupService.modify(Mockito.anyLong(), groupDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(groupService.modify(Mockito.anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

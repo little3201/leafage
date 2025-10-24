@@ -48,14 +48,15 @@ class MessageServiceImplTest {
     @InjectMocks
     private MessageServiceImpl messageService;
 
-    private MessageDTO messageDTO;
+    private MessageDTO dto;
 
     @BeforeEach
     void setUp() {
-        messageDTO = new MessageDTO();
-        messageDTO.setTitle("标题");
-        messageDTO.setContent("内容信息");
-        messageDTO.setReceiver("test");
+        dto = new MessageDTO();
+        dto.setTitle("标题");
+        dto.setSummary("这个是摘要内容");
+        dto.setBody("这个是正文内容");
+        dto.setReceiver("test");
     }
 
     @Test
@@ -81,7 +82,7 @@ class MessageServiceImplTest {
     void create() {
         given(this.messageRepository.save(Mockito.any(Message.class))).willReturn(Mono.just(Mockito.mock(Message.class)));
 
-        StepVerifier.create(messageService.create(messageDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(messageService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

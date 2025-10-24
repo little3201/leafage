@@ -20,6 +20,8 @@ package io.leafage.hypervisor.controller;
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.service.MessageService;
 import io.leafage.hypervisor.vo.MessageVO;
+import io.leafage.hypervisor.vo.PrivilegeVO;
+import io.leafage.hypervisor.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -65,26 +68,30 @@ class MessageControllerTest {
         vo = new MessageVO();
         vo.setId(1L);
         vo.setTitle("标题");
-        vo.setContent("内容");
+        vo.setSummary("这个是摘要内容");
+        vo.setBody("这个是正文内容");
         vo.setReceiver("test");
 
         dto = new MessageDTO();
         dto.setTitle("标题");
-        dto.setContent("内容信息");
+        dto.setSummary("这个是摘要内容");
+        dto.setBody("这个是正文内容");
         dto.setReceiver("test");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<MessageVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<MessageVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(page));
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/messages")
+        webTestClient.mutateWith(SecurityMockServerConfigurers.mockUser())
+                .get().uri(uriBuilder -> uriBuilder.path("/messages")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
-                        .queryParam("receiver", "test")
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", true)
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -103,7 +110,7 @@ class MessageControllerTest {
                         .queryParam("receiver", "test")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -120,7 +127,7 @@ class MessageControllerTest {
     void fetch_error() {
         given(this.messageService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/messages/{id}", 1L).exchange().expectStatus().isNoContent();
+        webTestClient.get().uri("/messages/{id}", 1L).exchange().expectStatus().is5xxServerError();
     }
 
     @Test
@@ -129,7 +136,7 @@ class MessageControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.title").isEqualTo("标题");
     }
 
@@ -139,7 +146,7 @@ class MessageControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -157,6 +164,6 @@ class MessageControllerTest {
 
         webTestClient.mutateWith(csrf()).delete().uri("/messages/{id}", 1L)
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 }

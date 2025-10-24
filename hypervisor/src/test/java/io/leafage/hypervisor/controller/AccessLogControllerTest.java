@@ -79,6 +79,9 @@ class AccessLogControllerTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", true)
+                        .queryParam("filters", "")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -98,7 +101,7 @@ class AccessLogControllerTest {
                         .queryParam("filters", "url:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
 }

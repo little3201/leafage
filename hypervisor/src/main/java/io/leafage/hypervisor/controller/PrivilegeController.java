@@ -24,8 +24,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -63,17 +61,13 @@ public class PrivilegeController {
      *
      * @param page 页码
      * @param size 大小
-     * @return 查询的数据集，异常时返回204状态码
+     * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<PrivilegeVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                            String sortBy, boolean descending, String filters) {
+    public Mono<Page<PrivilegeVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                            String sortBy, boolean descending, String filters) {
         return privilegeService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve privileges error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve privileges error: ", e));
     }
 
     /**
@@ -82,29 +76,21 @@ public class PrivilegeController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/tree")
-    public Mono<ResponseEntity<List<TreeNode<Long>>>> tree(Principal principal) {
+    public Mono<List<TreeNode<Long>>> tree(Principal principal) {
         return privilegeService.tree(principal.getName())
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve privilege tree error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve privilege tree error: ", e));
     }
 
     /**
      * 根据 id 查询信息
      *
      * @param id 主键
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<PrivilegeVO>> fetch(@PathVariable Long id) {
+    public Mono<PrivilegeVO> fetch(@PathVariable Long id) {
         return privilegeService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch privilege error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Fetch privilege error: ", e));
     }
 
     /**
@@ -114,13 +100,9 @@ public class PrivilegeController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String name, Long id) {
+    public Mono<Boolean> exists(@RequestParam String name, Long id) {
         return privilegeService.exists(name, id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Check is exists error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Check is exists error: ", e));
     }
 
     /**
@@ -131,10 +113,7 @@ public class PrivilegeController {
     @GetMapping("/{superiorId}/subset")
     public Flux<PrivilegeVO> subset(@PathVariable Long superiorId) {
         return privilegeService.subset(superiorId)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve privilege subset error: ", e);
-                    return Flux.empty();
-                });
+                .doOnError(e -> logger.error("Retrieve privilege subset error: ", e));
     }
 
     /**
@@ -144,30 +123,22 @@ public class PrivilegeController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ResponseEntity<PrivilegeVO>> create(@RequestBody @Valid PrivilegeDTO dto) {
+    public Mono<PrivilegeVO> create(@RequestBody @Valid PrivilegeDTO dto) {
         return privilegeService.create(dto)
-                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Create privilege occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Create privilege occurred an error: ", e));
     }
 
     /**
      * 修改
      *
-     * @param id           主键
+     * @param id  主键
      * @param dto 要修改的数据
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<PrivilegeVO>> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
+    public Mono<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
         return privilegeService.modify(id, dto)
-                .map(vo -> ResponseEntity.accepted().body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Modify privilege occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Modify privilege occurred an error: ", e));
     }
 
 }

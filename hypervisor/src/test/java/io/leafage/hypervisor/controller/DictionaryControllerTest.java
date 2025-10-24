@@ -83,6 +83,9 @@ class DictionaryControllerTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/dictionaries")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", true)
+                        .queryParam("filters", "")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -102,7 +105,7 @@ class DictionaryControllerTest {
                         .queryParam("filters", "name:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -121,7 +124,7 @@ class DictionaryControllerTest {
 
         webTestClient.get().uri("/dictionaries/{id}", 1L)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -140,7 +143,7 @@ class DictionaryControllerTest {
 
         webTestClient.get().uri("/dictionaries/{id}/subset", 1L)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -149,7 +152,7 @@ class DictionaryControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
     }
 
@@ -159,6 +162,6 @@ class DictionaryControllerTest {
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 }

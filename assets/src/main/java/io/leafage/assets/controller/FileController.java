@@ -65,7 +65,7 @@ public class FileController {
      * @param size       大小
      * @param sortBy     排序字段
      * @param descending 排序方向
-     * @return 查询的数据集，异常时返回204状态码
+     * @return 查询的数据集
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping
@@ -83,7 +83,7 @@ public class FileController {
      * 根据 id 查询
      *
      * @param id 主键 ID
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
@@ -127,7 +127,7 @@ public class FileController {
      * 根据 id 查询
      *
      * @param id 主键 ID
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")

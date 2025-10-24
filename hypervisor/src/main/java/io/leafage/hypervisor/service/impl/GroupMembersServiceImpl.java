@@ -52,10 +52,10 @@ public class GroupMembersServiceImpl extends DomainConverter implements GroupMem
      * {@inheritDoc}
      */
     @Override
-    public Mono<List<GroupMembers>> members(Long groupId) {
+    public Flux<GroupMembers> members(Long groupId) {
         Assert.notNull(groupId, "groupId must not be null.");
 
-        return groupMembersRepository.findByGroupId(groupId).collectList();
+        return groupMembersRepository.findByGroupId(groupId);
     }
 
     /**

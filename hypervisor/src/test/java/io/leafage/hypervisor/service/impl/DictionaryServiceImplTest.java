@@ -48,13 +48,13 @@ class DictionaryServiceImplTest {
     @InjectMocks
     private DictionaryServiceImpl dictionaryService;
 
-    private DictionaryDTO dictionaryDTO;
+    private DictionaryDTO dto;
 
     @BeforeEach
     void setUp() {
-        dictionaryDTO = new DictionaryDTO();
-        dictionaryDTO.setName("Gender");
-        dictionaryDTO.setDescription("描述");
+        dto = new DictionaryDTO();
+        dto.setName("Gender");
+        dto.setDescription("描述");
     }
 
     @Test
@@ -85,7 +85,7 @@ class DictionaryServiceImplTest {
     void create() {
         given(this.dictionaryRepository.save(Mockito.any(Dictionary.class))).willReturn(Mono.just(Mockito.mock(Dictionary.class)));
 
-        StepVerifier.create(dictionaryService.create(dictionaryDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -94,7 +94,7 @@ class DictionaryServiceImplTest {
 
         given(this.dictionaryRepository.save(Mockito.any(Dictionary.class))).willReturn(Mono.just(Mockito.mock(Dictionary.class)));
 
-        StepVerifier.create(dictionaryService.modify(Mockito.anyLong(), dictionaryDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.modify(Mockito.anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

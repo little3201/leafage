@@ -24,12 +24,11 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.security.Principal;
 
 /**
  * message controller
@@ -59,33 +58,25 @@ public class MessageController {
      *
      * @param page 页码
      * @param size 大小
-     * @return 查询的数据集，异常时返回204状态码
+     * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<MessageVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                          String sortBy, boolean descending, Authentication authentication) {
-        return messageService.retrieve(page, size, sortBy, descending, authentication.getName())
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve messages error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+    public Mono<Page<MessageVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                          String sortBy, boolean descending, Principal principal) {
+        return messageService.retrieve(page, size, sortBy, descending, principal.getName())
+                .doOnError(e -> logger.error("Retrieve messages error: ", e));
     }
 
     /**
      * 根据 id 查询
      *
      * @param id 主键
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<MessageVO>> fetch(@PathVariable Long id) {
+    public Mono<MessageVO> fetch(@PathVariable Long id) {
         return messageService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch message error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Fetch message error: ", e));
     }
 
     /**
@@ -95,13 +86,9 @@ public class MessageController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String title, Long id) {
+    public Mono<Boolean> exists(@RequestParam String title, Long id) {
         return messageService.exists(title, id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Check is exists error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Check is exists error: ", e));
     }
 
     /**
@@ -111,13 +98,9 @@ public class MessageController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ResponseEntity<MessageVO>> create(@RequestBody @Valid MessageDTO dto) {
+    public Mono<MessageVO> create(@RequestBody @Valid MessageDTO dto) {
         return messageService.create(dto)
-                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Create message occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Create message occurred an error: ", e));
     }
 
     /**
@@ -127,13 +110,9 @@ public class MessageController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+    public Mono<Void> remove(@PathVariable Long id) {
         return messageService.remove(id)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .onErrorResume(e -> {
-                    logger.error("Remove message error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Remove message error: ", e));
     }
 
 }

@@ -18,6 +18,7 @@
 package io.leafage.hypervisor.service;
 
 import io.leafage.hypervisor.domain.GroupMembers;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public interface GroupMembersService {
      * @param groupId group主键
      * @return 数据集
      */
-    Mono<List<GroupMembers>> members(Long groupId);
+    Flux<GroupMembers> members(Long groupId);
 
     /**
      * 查询关联group

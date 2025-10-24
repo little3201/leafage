@@ -22,8 +22,6 @@ import io.leafage.hypervisor.vo.AuditLogVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -59,30 +57,22 @@ public class AuditLogController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<AuditLogVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                           String sortBy, boolean descending, String filters) {
+    public Mono<Page<AuditLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                           String sortBy, boolean descending, String filters) {
         return auditLogService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve audit logs error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve audit logs error: ", e));
     }
 
     /**
      * 根据 id 查询
      *
      * @param id 主键 ID
-     * @return 查询的数据，异常时返回204状态码
+     * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<AuditLogVO>> fetch(@PathVariable Long id) {
+    public Mono<AuditLogVO> fetch(@PathVariable Long id) {
         return auditLogService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch audit log error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Fetch audit log error: ", e));
     }
 
 }

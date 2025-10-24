@@ -60,12 +60,12 @@ class PrivilegeServiceImplTest {
     @InjectMocks
     private PrivilegeServiceImpl privilegeService;
 
-    private PrivilegeDTO privilegeDTO;
+    private PrivilegeDTO dto;
 
     @BeforeEach
     void setUp() {
-        privilegeDTO = new PrivilegeDTO();
-        privilegeDTO.setName("test");
+        dto = new PrivilegeDTO();
+        dto.setName("test");
     }
 
     @Test
@@ -111,7 +111,7 @@ class PrivilegeServiceImplTest {
     void create() {
         given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mono.just(Mockito.mock(Privilege.class)));
 
-        StepVerifier.create(privilegeService.create(privilegeDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(privilegeService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
 
@@ -119,7 +119,7 @@ class PrivilegeServiceImplTest {
     void create_no_superior() {
         given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mono.just(Mockito.mock(Privilege.class)));
 
-        StepVerifier.create(privilegeService.create(privilegeDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(privilegeService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -128,7 +128,7 @@ class PrivilegeServiceImplTest {
 
         given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mono.just(Mockito.mock(Privilege.class)));
 
-        StepVerifier.create(privilegeService.modify(1L, privilegeDTO)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(privilegeService.modify(1L, dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
