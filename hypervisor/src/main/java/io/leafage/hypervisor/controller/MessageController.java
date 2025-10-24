@@ -108,7 +108,7 @@ public class MessageController {
      * 添加
      *
      * @param dto 要添加的数据
-     * @return 添加后的信息，异常时返回417状态码
+     * @return 添加后的信息
      */
     @PostMapping
     public Mono<ResponseEntity<MessageVO>> create(@RequestBody @Valid MessageDTO dto) {
@@ -124,7 +124,7 @@ public class MessageController {
      * 删除
      *
      * @param id 主键
-     * @return 200状态码，异常时返回417状态码
+     * @return 200状态码
      */
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {

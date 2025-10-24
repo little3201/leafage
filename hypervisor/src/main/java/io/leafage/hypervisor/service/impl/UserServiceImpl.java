@@ -128,4 +128,14 @@ public class UserServiceImpl extends DomainConverter implements UserService {
         return userRepository.deleteById(id);
     }
 
+    @Override
+    public Mono<Boolean> enable(Long id) {
+        return userRepository.updateEnabledById(id).map(count -> count > 0);
+    }
+
+    @Override
+    public Mono<Boolean> unlock(Long id) {
+        return userRepository.updateAccountNonLockedById(id).map(count -> count > 0);
+    }
+
 }

@@ -90,7 +90,7 @@ public class CommentController {
      * 添加信息
      *
      * @param commentDTO 要添加的数据
-     * @return 添加后的信息，异常时返回417状态码
+     * @return 添加后的信息
      */
     @PostMapping
     public ResponseEntity<Mono<CommentVO>> create(@RequestBody @Valid CommentDTO commentDTO) {
@@ -108,7 +108,7 @@ public class CommentController {
      * 删除信息
      *
      * @param id 主键
-     * @return 200状态码，异常时返回417状态码
+     * @return 200状态码
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {

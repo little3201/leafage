@@ -23,13 +23,21 @@ import io.leafage.hypervisor.vo.UserVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.poi.ExcelReader;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.Principal;
 
 /**
@@ -63,14 +71,10 @@ public class UserController {
      * @return a {@link org.springframework.http.ResponseEntity} object
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<UserVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending, String filters) {
+    public Mono<Page<UserVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                       String sortBy, boolean descending, String filters) {
         return userService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve users error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve users error: ", e));
     }
 
     /**
@@ -80,12 +84,13 @@ public class UserController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<UserVO>> fetch(@PathVariable Long id) {
+    public Mono<UserVO> fetch(@PathVariable Long id) {
         return userService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch user error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")))
+                .doOnError(e -> {
+                    if (!(e instanceof ResponseStatusException)) {
+                        logger.error("Fetch user error, id: {}", id, e);
+                    }
                 });
     }
 
@@ -96,13 +101,9 @@ public class UserController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String username, Long id) {
+    public Mono<Boolean> exists(@RequestParam String username, Long id) {
         return userService.exists(username, id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Check is exists user error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Check user exists error, username: {}", username, e));
     }
 
     /**
@@ -112,12 +113,13 @@ public class UserController {
      * @return 查询的数据，异常时返回204状态码
      */
     @GetMapping("/me")
-    public Mono<ResponseEntity<UserVO>> fetchMe(Principal principal) {
+    public Mono<UserVO> fetchMe(Principal principal) {
         return userService.findByUsername(principal.getName())
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch me error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Current user not found")))
+                .doOnError(e -> {
+                    if (!(e instanceof ResponseStatusException)) {
+                        logger.error("Fetch me error: ", e);
+                    }
                 });
     }
 
@@ -125,49 +127,104 @@ public class UserController {
      * 添加信息
      *
      * @param dto 要添加的数据
-     * @return 修改后的信息，异常时返回417状态码
+     * @return 修改后的信息
      */
     @PostMapping
-    public Mono<ResponseEntity<UserVO>> create(@RequestBody @Valid UserDTO dto) {
+    public Mono<UserVO> create(@RequestBody @Valid UserDTO dto) {
         return userService.create(dto)
-                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Create user occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Create user error: ", e));
     }
 
     /**
      * 修改信息
      *
-     * @param id      user 主键
+     * @param id  user 主键
      * @param dto 要修改的数据
-     * @return 修改后的信息，异常时返回417状态码
+     * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<UserVO>> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
+    public Mono<UserVO> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
         return userService.modify(id, dto)
-                .map(vo -> ResponseEntity.accepted().body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Modify user occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Modify user error, id: {}", id, e));
     }
 
     /**
      * 删除信息
      *
      * @param id user 主键
-     * @return 200状态码，异常时返回417状态码
+     * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+    public Mono<Void> remove(@PathVariable Long id) {
         return userService.remove(id)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .onErrorResume(e -> {
-                    logger.error("Remove user error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Remove user error, id: {}", id, e));
     }
 
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
+    @PatchMapping("/{id}")
+    public Mono<Boolean> enable(@PathVariable Long id) {
+        return userService.enable(id)
+                .doOnSuccess(result -> logger.debug("User enabled state toggled, id: {}, result: {}", id, result))
+                .doOnError(e -> logger.error("Toggle enabled error, id: {}", id, e));
+    }
+
+    /**
+     * Unlock a record when account is lock.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:unlock')")
+    @PatchMapping("/{id}/unlock")
+    public Mono<Boolean> unlock(@PathVariable Long id) {
+        return userService.unlock(id)
+                .doOnSuccess(result -> logger.debug("User unlocked, id: {}, result: {}", id, result))
+                .doOnError(e -> logger.error("Unlock user error, id: {}", id, e));
+    }
+
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_users:import')")
+    @PostMapping("/import")
+    public Flux<UserVO> importFromFile(FilePart file) {
+        return file.content()
+                .collectList()
+                .map(dataBuffers -> {
+                    // 将 DataBuffer 列表转换为字节数组
+                    byte[] bytes = new byte[dataBuffers.stream().mapToInt(DataBuffer::readableByteCount).sum()];
+                    int offset = 0;
+                    for (DataBuffer buffer : dataBuffers) {
+                        int length = buffer.readableByteCount();
+                        buffer.read(bytes, offset, length);
+                        offset += length;
+                        DataBufferUtils.release(buffer); // 释放资源
+                    }
+                    return bytes;
+                })
+                .map(bytes -> {
+                    try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
+                        return ExcelReader.read(inputStream, UserDTO.class);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to read Excel file", e);
+                    }
+                })
+                .onErrorMap(e -> {
+                    logger.error("Failed to read Excel file: ", e);
+                    return new RuntimeException("Failed to process Excel file", e);
+                })
+                .flatMapMany(userService::createAll)
+                .onErrorResume(e -> {
+                    logger.error("Import user error: ", e);
+                    return Flux.error(e);
+                });
+    }
 }

@@ -123,7 +123,7 @@ public class RegionController {
      * 添加信息
      *
      * @param dto 要添加的数据
-     * @return 修改后的信息，异常时返回417状态码
+     * @return 修改后的信息
      */
     @PostMapping
     public Mono<ResponseEntity<RegionVO>> create(@RequestBody @Valid RegionDTO dto) {
@@ -140,7 +140,7 @@ public class RegionController {
      *
      * @param id  user 主键
      * @param dto 要修改的数据
-     * @return 修改后的信息，异常时返回417状态码
+     * @return 修改后的信息
      */
     @PutMapping("/{id}")
     public Mono<ResponseEntity<RegionVO>> modify(@PathVariable Long id, @RequestBody @Valid RegionDTO dto) {
@@ -156,7 +156,7 @@ public class RegionController {
      * 删除信息
      *
      * @param id user 主键
-     * @return 200状态码，异常时返回417状态码
+     * @return 200状态码
      */
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {

@@ -19,6 +19,8 @@ package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.User;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Modifying;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -56,4 +58,23 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
      */
     Mono<Boolean> existsByUsername(String username);
 
+    /**
+     * Toggles the enabled status of a record by its ID.
+     *
+     * @param id The ID of the record.
+     * @return result.
+     */
+    @Modifying
+    @Query("UPDATE users SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
+    Mono<Integer> updateEnabledById(Long id);
+
+    /**
+     * Toggles the accountNonLocked status of a record by its ID.
+     *
+     * @param id The ID of the record.
+     * @return result.
+     */
+    @Modifying
+    @Query("UPDATE users SET account_non_locked = CASE WHEN account_non_locked = true THEN false ELSE true END WHERE id = :id")
+    Mono<Integer> updateAccountNonLockedById(Long id);
 }

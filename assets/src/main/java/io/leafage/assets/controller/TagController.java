@@ -108,7 +108,7 @@ public class TagController {
      * 添加信息
      *
      * @param dto 要添加的数据
-     * @return 添加后的信息，异常时返回417状态码
+     * @return 添加后的信息
      */
     @PostMapping
     public Mono<ResponseEntity<TagVO>> create(@RequestBody @Valid TagDTO dto) {
@@ -125,7 +125,7 @@ public class TagController {
      *
      * @param id  主键
      * @param dto 要修改的数据
-     * @return 修改后的信息，异常时返回417状态码
+     * @return 修改后的信息
      */
     @PutMapping("/{id}")
     public Mono<ResponseEntity<TagVO>> modify(@PathVariable Long id, @RequestBody @Valid TagDTO dto) {
@@ -141,7 +141,7 @@ public class TagController {
      * 删除信息
      *
      * @param id 主键
-     * @return 200状态码，异常时返回417状态码
+     * @return 200状态码
      */
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {

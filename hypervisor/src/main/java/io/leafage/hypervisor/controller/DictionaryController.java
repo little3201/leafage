@@ -123,7 +123,7 @@ public class DictionaryController {
      * 添加
      *
      * @param dto 要添加的数据
-     * @return 添加后的信息，异常时返回417状态码
+     * @return 添加后的信息
      */
     @PostMapping
     public Mono<ResponseEntity<DictionaryVO>> create(@RequestBody @Valid DictionaryDTO dto) {
@@ -140,7 +140,7 @@ public class DictionaryController {
      *
      * @param id  user 主键
      * @param dto 要修改的数据
-     * @return 修改后的信息，异常时返回417状态码
+     * @return 修改后的信息
      */
     @PutMapping("/{id}")
     public Mono<ResponseEntity<DictionaryVO>> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
@@ -156,7 +156,7 @@ public class DictionaryController {
      * 删除
      *
      * @param id 主键
-     * @return 200状态码，异常时返回417状态码
+     * @return 200状态码
      */
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {

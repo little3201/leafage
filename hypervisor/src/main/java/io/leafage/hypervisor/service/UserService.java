@@ -36,4 +36,12 @@ public interface UserService extends R2dbcCrudService<UserDTO, UserVO> {
      * @return 查询结果
      */
     Mono<UserVO> findByUsername(String username);
+
+    /**
+     * Update accountNonLocked.
+     *
+     * @param id 主键
+     * @return result.
+     */
+    Mono<Boolean> unlock(Long id);
 }
