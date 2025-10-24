@@ -673,9 +673,7 @@ CREATE TABLE "public"."users"
     "id"                     int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "username"               varchar(64)  NOT NULL,
     "password"               varchar(100) NOT NULL,
-    "firstname"              varchar(64),
-    "lastname"               varchar(64),
-    "middle_name"            varchar(64),
+    "fullname"              varchar(64),
     "email"                  varchar(64),
     "avatar"                 varchar(255),
     "enabled"                bool         NOT NULL DEFAULT true,
@@ -695,11 +693,7 @@ ON COLUMN "public"."users"."username" IS '用户名';
 COMMENT
 ON COLUMN "public"."users"."password" IS '密码';
 COMMENT
-ON COLUMN "public"."users"."firstname" IS '名字';
-COMMENT
-ON COLUMN "public"."users"."lastname" IS '姓';
-COMMENT
-ON COLUMN "public"."users"."middle_name" IS '中间名';
+ON COLUMN "public"."users"."fullname" IS '姓名';
 COMMENT
 ON COLUMN "public"."users"."email" IS '邮箱';
 COMMENT
