@@ -31,15 +31,7 @@ public abstract class UserModel {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    private String firstname;
-
-    private String lastname;
-
-    @Column(name = "middle_name")
-    private String middleName;
-
-    @Column(name = "password", nullable = false)
-    private String password;
+    private String fullname;
 
     private String email;
 
@@ -62,36 +54,12 @@ public abstract class UserModel {
         this.username = username;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public String getEmail() {

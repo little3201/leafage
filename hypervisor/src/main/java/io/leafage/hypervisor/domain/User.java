@@ -37,6 +37,9 @@ public class User extends UserModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
     @Column(name = "account_non_locked")
     private boolean accountNonLocked;
 
@@ -50,6 +53,14 @@ public class User extends UserModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public boolean isAccountNonLocked() {
