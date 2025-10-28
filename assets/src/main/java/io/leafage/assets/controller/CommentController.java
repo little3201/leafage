@@ -23,8 +23,6 @@ import io.leafage.assets.vo.CommentVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -60,13 +58,9 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{postId}")
-    public Flux<ResponseEntity<CommentVO>> comments(@PathVariable Long postId) {
+    public Flux<CommentVO> comments(@PathVariable Long postId) {
         return commentService.comments(postId)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve comments error: ", e);
-                    return Flux.just(ResponseEntity.noContent().build());
-                });
+                .doOnError(e -> logger.error("Retrieve comments error: ", e));
     }
 
 
@@ -77,13 +71,9 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{id}/replies")
-    public Flux<ResponseEntity<CommentVO>> replies(@PathVariable Long id) {
+    public Flux<CommentVO> replies(@PathVariable Long id) {
         return commentService.replies(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve comment repliers error: ", e);
-                    return Flux.just(ResponseEntity.noContent().build());
-                });
+                .doOnError(e -> logger.error("Retrieve comment repliers error: ", e));
     }
 
     /**
@@ -93,15 +83,9 @@ public class CommentController {
      * @return 添加后的信息
      */
     @PostMapping
-    public ResponseEntity<Mono<CommentVO>> create(@RequestBody @Valid CommentDTO commentDTO) {
-        Mono<CommentVO> voMono;
-        try {
-            voMono = commentService.create(commentDTO);
-        } catch (Exception e) {
-            logger.error("Create comment occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<CommentVO> create(@RequestBody @Valid CommentDTO commentDTO) {
+        return commentService.create(commentDTO)
+                .doOnError(e -> logger.error("Create comment occurred an error: ", e));
     }
 
     /**
@@ -111,15 +95,9 @@ public class CommentController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
-        Mono<Void> voidMono;
-        try {
-            voidMono = commentService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove comment occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voidMono);
+    public Mono<Void> remove(@PathVariable Long id) {
+        return commentService.remove(id)
+                .doOnError(e -> logger.error("Remove comment occurred an error: ", e));
     }
 
 }

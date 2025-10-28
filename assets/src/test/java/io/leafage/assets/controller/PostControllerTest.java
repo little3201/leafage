@@ -88,6 +88,9 @@ class PostControllerTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -108,7 +111,7 @@ class PostControllerTest {
                         .queryParam("filters", "title:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -127,7 +130,7 @@ class PostControllerTest {
 
         webTestClient.get().uri("/posts/{id}", 1)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -150,7 +153,7 @@ class PostControllerTest {
                         .queryParam("keyword", "test")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -159,6 +162,7 @@ class PostControllerTest {
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/exists")
                         .queryParam("title", "test")
+                        .queryParam("id", 1L)
                         .build())
                 .exchange()
                 .expectStatus().isOk();
@@ -173,7 +177,7 @@ class PostControllerTest {
                         .queryParam("id", 1L)
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -184,7 +188,7 @@ class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.title").isEqualTo("test");
     }
 
@@ -196,7 +200,7 @@ class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -207,7 +211,7 @@ class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
-                .expectStatus().isAccepted()
+                .expectStatus().isOk()
                 .expectBody().jsonPath("$.title").isEqualTo("test");
     }
 
@@ -219,7 +223,7 @@ class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
-                .expectStatus().isNotModified();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -237,6 +241,6 @@ class PostControllerTest {
 
         webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1)
                 .exchange()
-                .expectStatus().is4xxClientError();
+                .expectStatus().is5xxServerError();
     }
 }

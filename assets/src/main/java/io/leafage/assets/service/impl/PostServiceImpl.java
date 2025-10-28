@@ -18,9 +18,9 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Post;
-import io.leafage.assets.domain.PostContent;
+import io.leafage.assets.domain.PostBody;
 import io.leafage.assets.dto.PostDTO;
-import io.leafage.assets.repository.PostContentRepository;
+import io.leafage.assets.repository.PostBodyRepository;
 import io.leafage.assets.repository.PostRepository;
 import io.leafage.assets.service.PostService;
 import io.leafage.assets.vo.PostVO;
@@ -45,18 +45,18 @@ import java.util.NoSuchElementException;
 public class PostServiceImpl extends DomainConverter implements PostService {
 
     private final PostRepository postRepository;
-    private final PostContentRepository postContentRepository;
+    private final PostBodyRepository postBodyRepository;
 
 
     /**
      * <p>Constructor for PostServiceImpl.</p>
      *
      * @param postRepository        a {@link PostRepository} object
-     * @param postContentRepository a {@link PostContentRepository} object
+     * @param postBodyRepository a {@link PostBodyRepository} object
      */
-    public PostServiceImpl(PostRepository postRepository, PostContentRepository postContentRepository) {
+    public PostServiceImpl(PostRepository postRepository, PostBodyRepository postBodyRepository) {
         this.postRepository = postRepository;
-        this.postContentRepository = postContentRepository;
+        this.postBodyRepository = postBodyRepository;
     }
 
     /**
@@ -81,10 +81,10 @@ public class PostServiceImpl extends DomainConverter implements PostService {
         Assert.notNull(id, "id must not be null.");
 
         return postRepository.findById(id)
-                .flatMap(post -> postContentRepository.getByPostId(post.getId())
-                        .map(postContent -> {
+                .flatMap(post -> postBodyRepository.getByPostId(post.getId())
+                        .map(postBody -> {
                             PostVO vo = convertToVO(post, PostVO.class);
-                            vo.setContent(postContent.getContent());
+                            vo.setBody(postBody.getBody());
                             return vo;
                         })
                 );
@@ -98,10 +98,10 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     public Mono<PostVO> create(PostDTO dto) {
         return postRepository.save(convertToDomain(dto, Post.class))
                 .flatMap(p -> {
-                    PostContent postContent = new PostContent();
-                    postContent.setPostId(p.getId());
-                    postContent.setContent(dto.getContent());
-                    return postContentRepository.save(postContent)
+                    PostBody postBody = new PostBody();
+                    postBody.setPostId(p.getId());
+                    postBody.setBody(dto.getBody());
+                    return postBodyRepository.save(postBody)
                             .map(pc -> convertToVO(p, PostVO.class));
                 });
     }
@@ -118,13 +118,13 @@ public class PostServiceImpl extends DomainConverter implements PostService {
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
                 .map(post -> convert(dto, post))
                 .flatMap(postRepository::save)
-                .flatMap(p -> postContentRepository.getByPostId(p.getId())
-                        .defaultIfEmpty(new PostContent())
-                        .doOnNext(postContent -> {
-                            postContent.setPostId(p.getId());
-                            postContent.setContent(dto.getContent());
+                .flatMap(p -> postBodyRepository.getByPostId(p.getId())
+                        .defaultIfEmpty(new PostBody())
+                        .doOnNext(postBody -> {
+                            postBody.setPostId(p.getId());
+                            postBody.setBody(dto.getBody());
                         })
-                        .flatMap(postContentRepository::save)
+                        .flatMap(postBodyRepository::save)
                         .map(pc -> convertToVO(p, PostVO.class))
                 );
     }
@@ -136,9 +136,9 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, "id must not be null.");
 
-        return postContentRepository.getByPostId(id)
+        return postBodyRepository.getByPostId(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .flatMap(postContent -> postContentRepository.deleteById(postContent.getId()))
+                .flatMap(postBody -> postBodyRepository.deleteById(postBody.getId()))
                 .then(postRepository.deleteById(id));
     }
 

@@ -79,6 +79,9 @@ class RegionControllerTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/regions")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -98,7 +101,7 @@ class RegionControllerTest {
                         .queryParam("filters", "name:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -117,7 +120,7 @@ class RegionControllerTest {
 
         webTestClient.get().uri("/regions/{id}", 1L)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -136,7 +139,7 @@ class RegionControllerTest {
 
         webTestClient.get().uri("/regions/{id}/subset", 1L)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
 }

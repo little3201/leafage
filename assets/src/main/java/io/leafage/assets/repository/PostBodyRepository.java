@@ -17,7 +17,7 @@
 
 package io.leafage.assets.repository;
 
-import io.leafage.assets.domain.PostContent;
+import io.leafage.assets.domain.PostBody;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
  * @author wq li
  */
 @Repository
-public interface PostContentRepository extends R2dbcRepository<PostContent, Long> {
+public interface PostBodyRepository extends R2dbcRepository<PostBody, Long> {
 
     /**
      * 查询信息
@@ -36,5 +36,5 @@ public interface PostContentRepository extends R2dbcRepository<PostContent, Long
      * @param postId 帖子id
      * @return 内容
      */
-    Mono<PostContent> getByPostId(Long postId);
+    Mono<PostBody> getByPostId(Long postId);
 }

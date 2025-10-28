@@ -26,14 +26,13 @@ import io.leafage.assets.domain.superclass.PostModel;
  */
 public class PostDTO extends PostModel {
 
-    private String content;
+    private String body;
 
-
-    public String getContent() {
-        return content;
+    public String getBody() {
+        return body;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setBody(String body) {
+        this.body = body;
     }
 }

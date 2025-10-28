@@ -17,11 +17,8 @@
 
 package io.leafage.assets.service;
 
-import io.leafage.assets.dto.FileDataDTO;
 import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.vo.FileRecordVO;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 import top.leafage.common.r2dbc.R2dbcCrudService;
 
 /**
@@ -30,20 +27,4 @@ import top.leafage.common.r2dbc.R2dbcCrudService;
  * @author wq li
  */
 public interface FileRecordService extends R2dbcCrudService<FileRecordDTO, FileRecordVO> {
-
-    /**
-     * 上传
-     *
-     * @param file 文件
-     * @return 结果
-     */
-    Mono<FileRecordVO> upload(MultipartFile file);
-
-    /**
-     * 下载
-     *
-     * @param id           主键
-     * @return 文件名
-     */
-    Mono<FileDataDTO> download(Long id);
 }

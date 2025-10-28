@@ -18,21 +18,28 @@
 package io.leafage.assets.controller;
 
 import io.leafage.assets.service.FileRecordService;
+import io.leafage.assets.service.FileStorageService;
 import io.leafage.assets.vo.FileRecordVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.FileNotFoundException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 
 /**
@@ -48,14 +55,16 @@ public class FileController {
     private final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     private final FileRecordService fileRecordService;
+    private final FileStorageService fileStorageService;
 
     /**
      * <p>Constructor for RegionController.</p>
      * <p>
      * //     * @param regionService a {@link FileRecordService} object
      */
-    public FileController(FileRecordService fileRecordService) {
+    public FileController(FileRecordService fileRecordService, FileStorageService fileStorageService) {
         this.fileRecordService = fileRecordService;
+        this.fileStorageService = fileStorageService;
     }
 
     /**
@@ -69,14 +78,10 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping
-    public Mono<ResponseEntity<Page<FileRecordVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                             String sortBy, boolean descending, String filters) {
+    public Mono<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                             String sortBy, boolean descending, String filters) {
         return fileRecordService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve file records error: ", e);
-                    return Mono.just(ResponseEntity.noContent().build());
-                });
+                .doOnError(e -> logger.error("Retrieve file records error: ", e));
     }
 
     /**
@@ -87,13 +92,9 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<FileRecordVO>> fetch(@PathVariable Long id) {
+    public Mono<FileRecordVO> fetch(@PathVariable Long id) {
         return fileRecordService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch file record error: ", e);
-                    return Mono.just(ResponseEntity.noContent().build());
-                });
+                .doOnError(e -> logger.error("Fetch file record error: ", e));
     }
 
     /**
@@ -104,23 +105,18 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
-    public Mono<ResponseEntity<FileRecordVO>> upload(MultipartFile file) {
-        return fileRecordService.exists(file.getOriginalFilename(), null)
+    public Mono<FileRecordVO> upload(FilePart file) {
+        return fileRecordService.exists(file.filename(), null)
                 .flatMap(exists -> {
                     if (exists) {
-                        return Mono.error(new FileAlreadyExistsException("File already exists."));
+                        return Mono.error(new FileAlreadyExistsException("File already exists: " + file.filename()));
+                    } else {
+                        return fileStorageService.upload(file)
+                                .flatMap(fileRecordService::create);
                     }
-                    return fileRecordService.upload(file);
                 })
-                .map(saved -> ResponseEntity.status(HttpStatus.CREATED).body(saved))
-                .onErrorResume(FileAlreadyExistsException.class, e -> {
-                    logger.warn("Upload failed: {}", e.getMessage());
-                    return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).build());
-                })
-                .onErrorResume(e -> {
-                    logger.error("Upload file error", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnSuccess(vo -> logger.debug("File uploaded successfully: {}", file.filename()))
+                .doOnError(e -> logger.error("Upload file error: {}", file.filename(), e));
     }
 
     /**
@@ -132,20 +128,17 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")
     public Mono<Void> download(@PathVariable Long id, ServerHttpResponse response) {
-        return fileRecordService.download(id)
-                .flatMap(fileData -> {
+        return fileRecordService.fetch(id)
+                .switchIfEmpty(Mono.error(new FileNotFoundException("File not found.")))
+                .flatMap(vo -> {
+                    Resource resource = new PathResource(vo.getPath());
+                    String fileName = URLEncoder.encode(vo.getName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
                     response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
                     response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + fileData.fileName() + "\"");
-                    return response.writeWith(fileData.content());
-                })
-                .onErrorResume(FileNotFoundException.class, e -> {
-                    response.setStatusCode(HttpStatus.NOT_FOUND);
-                    return response.setComplete();
-                })
-                .onErrorResume(e -> {
-                    response.setStatusCode(HttpStatus.EXPECTATION_FAILED);
-                    return response.setComplete();
+                            "attachment; filename=" + fileName + ";filename*=UTF_8''" + fileName);
+
+                    Flux<DataBuffer> content = DataBufferUtils.readInputStream(resource::getInputStream, new DefaultDataBufferFactory(), 4096);
+                    return response.writeWith(content);
                 });
     }
 
@@ -157,12 +150,8 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+    public Mono<Void> remove(@PathVariable Long id) {
         return fileRecordService.remove(id)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .onErrorResume(e -> {
-                    logger.error("Remove file error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnEach(e -> logger.error("Remove file error: {}", e));
     }
 }

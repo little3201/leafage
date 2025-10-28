@@ -18,9 +18,9 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Post;
-import io.leafage.assets.domain.PostContent;
+import io.leafage.assets.domain.PostBody;
 import io.leafage.assets.dto.PostDTO;
-import io.leafage.assets.repository.PostContentRepository;
+import io.leafage.assets.repository.PostBodyRepository;
 import io.leafage.assets.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class PostServiceImplTest {
     private PostRepository postRepository;
 
     @Mock
-    private PostContentRepository postContentRepository;
+    private PostBodyRepository postBodyRepository;
 
     @InjectMocks
     private PostServiceImpl postsService;
@@ -78,7 +78,7 @@ class PostServiceImplTest {
     void fetch() {
         given(this.postRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Post.class)));
 
-        given(this.postContentRepository.getByPostId(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(PostContent.class)));
+        given(this.postBodyRepository.getByPostId(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(PostBody.class)));
 
         StepVerifier.create(this.postsService.fetch(Mockito.anyLong())).expectNextCount(1).verifyComplete();
     }
@@ -101,7 +101,7 @@ class PostServiceImplTest {
     void create() {
         given(this.postRepository.save(Mockito.any(Post.class))).willReturn(Mono.just(Mockito.mock(Post.class)));
 
-        given(this.postContentRepository.save(Mockito.any(PostContent.class))).willReturn(Mono.empty());
+        given(this.postBodyRepository.save(Mockito.any(PostBody.class))).willReturn(Mono.empty());
 
         StepVerifier.create(this.postsService.create(Mockito.mock(PostDTO.class))).verifyComplete();
     }
@@ -112,18 +112,18 @@ class PostServiceImplTest {
 
         given(this.postRepository.save(Mockito.any(Post.class))).willReturn(Mono.just(Mockito.mock(Post.class)));
 
-        given(this.postContentRepository.getByPostId(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(PostContent.class)));
+        given(this.postBodyRepository.getByPostId(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(PostBody.class)));
 
-        given(this.postContentRepository.save(Mockito.any(PostContent.class))).willReturn(Mono.empty());
+        given(this.postBodyRepository.save(Mockito.any(PostBody.class))).willReturn(Mono.empty());
 
         StepVerifier.create(this.postsService.modify(1L, dto)).verifyComplete();
     }
 
     @Test
     void remove() {
-        given(this.postContentRepository.getByPostId(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(PostContent.class)));
+        given(this.postBodyRepository.getByPostId(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(PostBody.class)));
 
-        given(this.postContentRepository.deleteById(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.postBodyRepository.deleteById(Mockito.anyLong())).willReturn(Mono.empty());
 
         given(this.postRepository.deleteById(Mockito.anyLong())).willReturn(Mono.empty());
 

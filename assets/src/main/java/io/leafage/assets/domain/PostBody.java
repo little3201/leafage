@@ -20,12 +20,12 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * entity class for posts content.
+ * entity class for posts body.
  *
  * @author wq li
  */
-@Table(name = "post_content")
-public class PostContent {
+@Table(name = "post_body")
+public class PostBody {
 
     /**
      * Primary key.
@@ -42,7 +42,7 @@ public class PostContent {
     /**
      * 内容
      */
-    private String content;
+    private String body;
 
 
     public Long getId() {
@@ -61,11 +61,11 @@ public class PostContent {
         this.postId = postId;
     }
 
-    public String getContent() {
-        return content;
+    public String getBody() {
+        return body;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setBody(String body) {
+        this.body = body;
     }
 }

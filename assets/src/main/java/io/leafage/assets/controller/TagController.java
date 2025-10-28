@@ -24,8 +24,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -62,14 +60,10 @@ public class TagController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<TagVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                      String sortBy, boolean descending, String filters) {
+    public Mono<Page<TagVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                      String sortBy, boolean descending, String filters) {
         return tagService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve tags error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve tags error: ", e));
     }
 
     /**
@@ -79,13 +73,9 @@ public class TagController {
      * @return 查询到数据，异常时返回204
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<TagVO>> fetch(@PathVariable Long id) {
+    public Mono<TagVO> fetch(@PathVariable Long id) {
         return tagService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch tag error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Fetch tag error: ", e));
     }
 
     /**
@@ -95,13 +85,9 @@ public class TagController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String name, Long id) {
+    public Mono<Boolean> exists(@RequestParam String name, Long id) {
         return tagService.exists(name, id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Check is exists error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Check is exists error: ", e));
     }
 
     /**
@@ -111,13 +97,9 @@ public class TagController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ResponseEntity<TagVO>> create(@RequestBody @Valid TagDTO dto) {
+    public Mono<TagVO> create(@RequestBody @Valid TagDTO dto) {
         return tagService.create(dto)
-                .map(vo -> ResponseEntity.status(HttpStatus.CREATED).body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Create tag occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Create tag occurred an error: ", e));
     }
 
     /**
@@ -128,13 +110,9 @@ public class TagController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<TagVO>> modify(@PathVariable Long id, @RequestBody @Valid TagDTO dto) {
+    public Mono<TagVO> modify(@PathVariable Long id, @RequestBody @Valid TagDTO dto) {
         return tagService.modify(id, dto)
-                .map(vo -> ResponseEntity.accepted().body(vo))
-                .onErrorResume(e -> {
-                    logger.error("Modify tag occurred an error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Modify tag occurred an error: ", e));
     }
 
     /**
@@ -144,13 +122,9 @@ public class TagController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> remove(@PathVariable Long id) {
+    public Mono<Void> remove(@PathVariable Long id) {
         return tagService.remove(id)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .onErrorResume(e -> {
-                    logger.error("Remove tag error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build());
-                });
+                .doOnError(e -> logger.error("Remove tag error: ", e));
     }
 
 }

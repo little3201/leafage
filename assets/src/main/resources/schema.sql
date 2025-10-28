@@ -107,15 +107,15 @@ COMMENT
 ON COLUMN tag_posts.post_id IS 'post主键';
 
 
--- Drop table if exists post_content
-DROP TABLE IF EXISTS post_content;
+-- Drop table if exists post_body
+DROP TABLE IF EXISTS post_body;
 
--- Table structure post_content
-CREATE TABLE post_content
+-- Table structure post_body
+CREATE TABLE post_body
 (
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     post_id            bigint    NOT NULL UNIQUE,
-    content            text,
+    body            text,
     enabled            boolean   NOT NULL DEFAULT true,
     created_by         varchar(50),
     created_date       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -126,23 +126,23 @@ CREATE TABLE post_content
 
 -- Add comment to the table and columns
 COMMENT
-ON TABLE post_content IS '帖子内容表';
+ON TABLE post_body IS '帖子内容表';
 COMMENT
-ON COLUMN post_content.id IS '主键';
+ON COLUMN post_body.id IS '主键';
 COMMENT
-ON COLUMN post_content.post_id IS '帖子ID';
+ON COLUMN post_body.post_id IS '帖子ID';
 COMMENT
-ON COLUMN post_content.content IS '内容';
+ON COLUMN post_body.body IS '内容';
 COMMENT
 ON COLUMN posts.enabled IS '是否启用';
 COMMENT
-ON COLUMN post_content.created_by IS '创建者';
+ON COLUMN post_body.created_by IS '创建者';
 COMMENT
-ON COLUMN post_content.created_date IS '创建时间';
+ON COLUMN post_body.created_date IS '创建时间';
 COMMENT
-ON COLUMN post_content.last_modified_by IS '最后修改者';
+ON COLUMN post_body.last_modified_by IS '最后修改者';
 COMMENT
-ON COLUMN post_content.last_modified_date IS '最后修改时间';
+ON COLUMN post_body.last_modified_date IS '最后修改时间';
 
 
 -- Drop table if exists comments
@@ -154,7 +154,7 @@ CREATE TABLE comments
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     post_id            bigint    NOT NULL,
     location           varchar(255),
-    content            varchar(512),
+    body            varchar(512),
     created_by         varchar(50),
     created_date       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_by   varchar(50),
@@ -172,7 +172,7 @@ ON COLUMN comments.post_id IS '帖子ID';
 COMMENT
 ON COLUMN comments.location IS '位置';
 COMMENT
-ON COLUMN comments.content IS '内容';
+ON COLUMN comments.body IS '内容';
 COMMENT
 ON COLUMN comments.created_by IS '创建者';
 COMMENT

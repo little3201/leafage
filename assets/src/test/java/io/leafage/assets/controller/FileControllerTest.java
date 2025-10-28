@@ -17,9 +17,9 @@
 
 package io.leafage.assets.controller;
 
-import io.leafage.assets.dto.FileDataDTO;
 import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.service.FileRecordService;
+import io.leafage.assets.service.FileStorageService;
 import io.leafage.assets.vo.FileRecordVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +32,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,7 +41,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -57,6 +58,9 @@ class FileControllerTest {
 
     @MockitoBean
     private FileRecordService fileRecordService;
+
+    @MockitoBean
+    private FileStorageService fileStorageService;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -85,6 +89,9 @@ class FileControllerTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/files")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
+                        .queryParam("sortBy", "id")
+                        .queryParam("descending", "false")
+                        .queryParam("filters", "")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
@@ -104,7 +111,7 @@ class FileControllerTest {
                         .queryParam("filters", "name:like:a")
                         .build())
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
@@ -123,46 +130,40 @@ class FileControllerTest {
 
         webTestClient.get().uri("/files/{id}", 1)
                 .exchange()
-                .expectStatus().isNoContent();
+                .expectStatus().is5xxServerError();
     }
 
     @Test
     void upload() {
-        byte[] content = "Sample file".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "test".getBytes());
 
-        given(this.fileRecordService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(false));
-        given(this.fileRecordService.upload(Mockito.any())).willReturn(Mono.just(vo));
+        given(this.fileRecordService.exists("test.xlsx", null)).willReturn(Mono.just(Boolean.FALSE));
+        given(this.fileStorageService.upload(Mockito.any(FilePart.class))).willReturn(Mono.just(dto));
+        given(this.fileRecordService.create(Mockito.any(FileRecordDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/files")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("text.txt", ""))
+                .body(BodyInserters.fromMultipartData("file", file.getResource()))
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus().isOk()
+                .expectBody(FileRecordVO.class);
     }
 
     @Test
     void upload_error() {
-        byte[] content = "Sample file".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[0]);
 
-        given(this.fileRecordService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(false));
-        given(this.fileRecordService.upload(Mockito.any())).willThrow(new RuntimeException());
+        given(this.fileRecordService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.fileStorageService.upload(Mockito.any(FilePart.class))).willReturn(Mono.just(dto));
+        given(this.fileRecordService.create(Mockito.any(FileRecordDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/files")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("text.txt", ""))
+                .body(BodyInserters.fromMultipartData("file", file.getResource()))
                 .exchange()
-                .expectStatus().is4xxClientError();
-    }
-
-    @Test
-    void download() {
-        given(this.fileRecordService.download(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(FileDataDTO.class)));
-
-        webTestClient.mutateWith(csrf()).get().uri("/files/{id}", 1)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().valueEquals("Content-Disposition", "attachment; filename=\"test.txt\"")
-                .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM);
+                .expectStatus().is5xxServerError();
     }
 
     @Test

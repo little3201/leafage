@@ -222,9 +222,6 @@ public class UserController {
                     return new RuntimeException("Failed to process Excel file", e);
                 })
                 .flatMapMany(userService::createAll)
-                .onErrorResume(e -> {
-                    logger.error("Import user error: ", e);
-                    return Flux.error(e);
-                });
+                .doOnError(e -> logger.error("Import user error: ", e));
     }
 }

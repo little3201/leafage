@@ -28,7 +28,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.mock.web.MockMultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -78,32 +77,21 @@ class FileRecordServiceImplTest {
     void exists() {
         given(this.fileRecordRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(fileRecordService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+        StepVerifier.create(fileRecordService.exists("test.xlsx", 1L)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
     void exists_id_null() {
         given(this.fileRecordRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(fileRecordService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
+        StepVerifier.create(fileRecordService.exists("test", Mockito.isNull())).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
-    void upload() {
+    void create() {
         given(this.fileRecordRepository.save(Mockito.any(FileRecord.class))).willReturn(Mono.just(Mockito.mock(FileRecord.class)));
 
-        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
-        StepVerifier.create(fileRecordService.upload(file)).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void download() {
-        FileRecord fileRecord = new FileRecord();
-        fileRecord.setName("test.jpg");
-        fileRecord.setPath("/text.jpg");
-        given(this.fileRecordRepository.findById(Mockito.anyLong())).willReturn(Mono.just(fileRecord));
-
-        StepVerifier.create(fileRecordService.download(1L)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(fileRecordService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

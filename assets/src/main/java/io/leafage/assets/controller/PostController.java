@@ -24,8 +24,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -66,14 +64,10 @@ public class PostController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ResponseEntity<Page<PostVO>>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                       String sortBy, boolean descending, String filters) {
+    public Mono<Page<PostVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                       String sortBy, boolean descending, String filters) {
         return postService.retrieve(page, size, sortBy, descending, filters)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Retrieve posts error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Retrieve posts error: ", e));
     }
 
     /**
@@ -83,13 +77,9 @@ public class PostController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping("/search")
-    public Flux<ResponseEntity<PostVO>> search(@RequestParam String keyword) {
+    public Flux<PostVO> search(@RequestParam String keyword) {
         return postService.search(keyword)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Search posts error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Search posts error: ", e));
     }
 
     /**
@@ -99,13 +89,9 @@ public class PostController {
      * @return 查询到数据，异常时返回204
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<PostVO>> fetch(@PathVariable Long id) {
+    public Mono<PostVO> fetch(@PathVariable Long id) {
         return postService.fetch(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Fetch post error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Fetch post error: ", e));
     }
 
     /**
@@ -115,13 +101,9 @@ public class PostController {
      * @return true-是，false-否
      */
     @GetMapping("/exists")
-    public Mono<ResponseEntity<Boolean>> exists(@RequestParam String title, Long id) {
+    public Mono<Boolean> exists(@RequestParam String title, Long id) {
         return postService.exists(title, id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    logger.error("Check is exists error: ", e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+                .doOnError(e -> logger.error("Check is exists error: ", e));
     }
 
     /**
@@ -131,15 +113,9 @@ public class PostController {
      * @return 添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public ResponseEntity<Mono<PostVO>> create(@RequestBody @Valid PostDTO postDTO) {
-        Mono<PostVO> voMono;
-        try {
-            voMono = postService.create(postDTO);
-        } catch (Exception e) {
-            logger.error("Create post occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(voMono);
+    public Mono<PostVO> create(@RequestBody @Valid PostDTO postDTO) {
+        return postService.create(postDTO)
+                .doOnError(e -> logger.error("Create post occurred an error: ", e));
     }
 
     /**
@@ -150,15 +126,9 @@ public class PostController {
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<PostVO>> modify(@PathVariable Long id, @RequestBody @Valid PostDTO postDTO) {
-        Mono<PostVO> voMono;
-        try {
-            voMono = postService.modify(id, postDTO);
-        } catch (Exception e) {
-            logger.error("Modify post occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(voMono);
+    public Mono<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO postDTO) {
+        return postService.modify(id, postDTO)
+                .doOnError(e -> logger.error("Modify post occurred an error: ", e));
     }
 
 
@@ -169,15 +139,9 @@ public class PostController {
      * @return 查询到数据，异常时返回204
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Mono<Void>> remove(@PathVariable Long id) {
-        Mono<Void> voMono;
-        try {
-            voMono = postService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove post occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(voMono);
+    public Mono<Void> remove(@PathVariable Long id) {
+        return postService.remove(id)
+                .doOnError(e -> logger.error("Remove post occurred an error: ", e));
     }
 
 }

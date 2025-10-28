@@ -31,10 +31,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -202,6 +207,20 @@ class UserControllerTest {
 
         webTestClient.mutateWith(csrf()).delete().uri("/users/{id}", 1L).exchange()
                 .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void importFromFile() {
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        given(this.userService.createAll(Mockito.anyIterable())).willReturn(Flux.just(vo));
+
+        webTestClient.mutateWith(csrf()).post().uri("/users/import")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file.getResource()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserVO.class);
     }
 
 }

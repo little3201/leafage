@@ -25,7 +25,7 @@ public class PostVO extends PostModel {
 
     private Long id;
 
-    private String content;
+    private String body;
 
 
     public Long getId() {
@@ -36,11 +36,11 @@ public class PostVO extends PostModel {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
+    public String getBody() {
+        return body;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setBody(String body) {
+        this.body = body;
     }
 }
