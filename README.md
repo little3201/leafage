@@ -31,8 +31,8 @@ leafage 是一个基于 Spring Boot 构建的通用后台管理系统，适用�
 - Spring Boot
 - Spring Security
 
-| 技术栈  | 分支    | 框架/库                      |
-| ------- | ------- | ---------------------------- |
+| 技术栈     | 分支      | 框架/库                         |
+|---------|---------|------------------------------|
 | webmvc  | develop | Spring data jpa              |
 |         |         | Spring cloud gateway webmvc  |
 | webflux | webflux | Spring data r2dbc            |
@@ -40,11 +40,11 @@ leafage 是一个基于 Spring Boot 构建的通用后台管理系统，适用�
 
 ### 2. 前端技术栈与分支
 
-| 技术栈 | 分支      | 框架/库      |
-| ------ | --------- | ------------ |
-| Vue    | develop   | Quasar       |
-| Vue    | develop-2 | Element Plus |
-| React  | react     | PrimeReact   |
+| 技术栈   | 分支        | 框架/库         |
+|-------|-----------|--------------|
+| Vue   | develop   | Quasar       |
+| Vue   | develop-2 | Element Plus |
+| React | react     | PrimeReact   |
 
 前端源码及详细文档请见 [@little3201/leafage-ui](https://github.com/little3201/leafage-ui)
 

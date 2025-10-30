@@ -18,7 +18,6 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.Dictionary;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -31,14 +30,6 @@ import reactor.core.publisher.Mono;
  */
 @Repository
 public interface DictionaryRepository extends R2dbcRepository<Dictionary, Long> {
-
-    /**
-     * 分页查询
-     *
-     * @param pageable 分页参数
-     * @return 有效数据集
-     */
-    Flux<Dictionary> findAllBySuperiorIdIsNull(Pageable pageable);
 
     /**
      * 是否已存在

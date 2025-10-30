@@ -25,13 +25,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * comment service test
@@ -58,21 +60,21 @@ class CommentServiceImplTest {
 
     @Test
     void comments() {
-        given(this.commentRepository.findByPostIdAndReplierIsNull(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(Comment.class)));
+        given(this.commentRepository.findByPostIdAndReplierIsNull(anyLong())).willReturn(Flux.just(mock(Comment.class)));
 
-        StepVerifier.create(commentService.comments(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(commentService.comments(anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void repliers() {
-        given(this.commentRepository.findByReplier(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(Comment.class)));
+        given(this.commentRepository.findByReplier(anyLong())).willReturn(Flux.just(mock(Comment.class)));
 
-        StepVerifier.create(commentService.replies(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(commentService.replies(anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void create() {
-        given(this.commentRepository.save(Mockito.any(Comment.class))).willReturn(Mono.just(Mockito.mock(Comment.class)));
+        given(this.commentRepository.save(any(Comment.class))).willReturn(Mono.just(mock(Comment.class)));
 
         StepVerifier.create(commentService.create(dto)).expectNextCount(1).verifyComplete();
     }

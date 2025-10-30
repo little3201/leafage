@@ -20,19 +20,24 @@ package io.leafage.hypervisor.service.impl;
 import io.leafage.hypervisor.domain.Dictionary;
 import io.leafage.hypervisor.dto.DictionaryDTO;
 import io.leafage.hypervisor.repository.DictionaryRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation;
+import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * dictionary service test
@@ -48,58 +53,75 @@ class DictionaryServiceImplTest {
     @InjectMocks
     private DictionaryServiceImpl dictionaryService;
 
+    @Mock
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
+
     private DictionaryDTO dto;
+    private Dictionary entity;
 
     @BeforeEach
     void setUp() {
         dto = new DictionaryDTO();
         dto.setName("Gender");
         dto.setDescription("描述");
+
+        entity = new Dictionary();
+        entity.setName("Gender");
+        entity.setDescription("描述");
     }
 
     @Test
     void retrieve() {
-        given(this.dictionaryRepository.findAllBySuperiorIdIsNull(Mockito.any(PageRequest.class)))
-                .willReturn(Flux.just(Mockito.mock(Dictionary.class)));
+        ReactiveSelectOperation.ReactiveSelect<Dictionary> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<Dictionary> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(this.dictionaryRepository.count()).willReturn(Mono.just(Mockito.anyLong()));
+        given(r2dbcEntityTemplate.select(Dictionary.class)).willReturn(select);
+        given(select.matching(any(Query.class))).willReturn(terminating);
+        given(terminating.all()).willReturn(Flux.just(entity));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(Dictionary.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(dictionaryService.retrieve(0, 2, "id", true,"name:like:a")).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.retrieve(0, 2, "id", true, "name:like:a"))
+                .assertNext(page -> {
+                    assertThat(page.getContent()).hasSize(1);
+                    AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
+                    AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
+                    AssertionsForClassTypes.assertThat(page.getSize()).isEqualTo(2);
+                }).verifyComplete();
     }
 
     @Test
     void fetch() {
-        given(this.dictionaryRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Mono.just(mock(Dictionary.class)));
 
-        StepVerifier.create(dictionaryService.fetch(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void subset() {
-        given(this.dictionaryRepository.findBySuperiorId(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.findBySuperiorId(anyLong())).willReturn(Flux.just(mock(Dictionary.class)));
 
-        StepVerifier.create(dictionaryService.subset(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.subset(anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void create() {
-        given(this.dictionaryRepository.save(Mockito.any(Dictionary.class))).willReturn(Mono.just(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(mock(Dictionary.class)));
 
         StepVerifier.create(dictionaryService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.dictionaryRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Mono.just(mock(Dictionary.class)));
 
-        given(this.dictionaryRepository.save(Mockito.any(Dictionary.class))).willReturn(Mono.just(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(mock(Dictionary.class)));
 
-        StepVerifier.create(dictionaryService.modify(Mockito.anyLong(), dto)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(dictionaryService.modify(anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void exists() {
-        given(this.dictionaryRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.dictionaryRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(dictionaryService.exists("vip", 1L)).expectNext(Boolean.TRUE).verifyComplete();
     }

@@ -24,7 +24,6 @@ import io.leafage.hypervisor.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -37,7 +36,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,6 +43,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -88,8 +87,8 @@ class UserControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<UserVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+        given(this.userService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users")
                         .queryParam("page", 0)
@@ -104,8 +103,8 @@ class UserControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.userService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users")
                         .queryParam("page", 0)
@@ -120,7 +119,7 @@ class UserControllerTest {
 
     @Test
     void fetch() {
-        given(this.userService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.userService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/users/{id}", 1L).exchange()
                 .expectStatus().isOk()
@@ -129,7 +128,7 @@ class UserControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.userService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.userService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/users/{id}", 1L).exchange()
                 .expectStatus().is5xxServerError();
@@ -137,7 +136,7 @@ class UserControllerTest {
 
     @Test
     void fetchMe() {
-        given(this.userService.findByUsername(Mockito.anyString())).willReturn(Mono.just(vo));
+        given(this.userService.findByUsername(anyString())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/users/me").exchange()
                 .expectStatus().isOk()
@@ -146,7 +145,7 @@ class UserControllerTest {
 
     @Test
     void exists() {
-        given(this.userService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.userService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users/exists")
                         .queryParam("username", "test")
@@ -157,7 +156,7 @@ class UserControllerTest {
 
     @Test
     void exist_error() {
-        given(this.userService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.userService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users/exists")
                         .queryParam("username", "test")
@@ -169,7 +168,7 @@ class UserControllerTest {
 
     @Test
     void created() {
-        given(this.userService.create(Mockito.any(UserDTO.class))).willReturn(Mono.just(vo));
+        given(this.userService.create(any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/users").bodyValue(dto).exchange()
                 .expectStatus().isOk()
@@ -178,7 +177,7 @@ class UserControllerTest {
 
     @Test
     void modify() {
-        given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willReturn(Mono.just(vo));
+        given(this.userService.modify(anyLong(), any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
                 .expectStatus().isOk()
@@ -187,7 +186,7 @@ class UserControllerTest {
 
     @Test
     void modify_error() {
-        given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willThrow(new RuntimeException());
+        given(this.userService.modify(anyLong(), any(UserDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
                 .expectStatus().is5xxServerError();
@@ -195,7 +194,7 @@ class UserControllerTest {
 
     @Test
     void remove() {
-        given(this.userService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.userService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/users/{id}", 1L).exchange()
                 .expectStatus().isOk();
@@ -203,7 +202,7 @@ class UserControllerTest {
 
     @Test
     void remove_error() {
-        given(this.userService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.userService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).delete().uri("/users/{id}", 1L).exchange()
                 .expectStatus().is5xxServerError();
@@ -213,7 +212,7 @@ class UserControllerTest {
     void importFromFile() {
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
-        given(this.userService.createAll(Mockito.anyIterable())).willReturn(Flux.just(vo));
+        given(this.userService.createAll(anyIterable())).willReturn(Flux.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/users/import")
                 .contentType(MediaType.MULTIPART_FORM_DATA)

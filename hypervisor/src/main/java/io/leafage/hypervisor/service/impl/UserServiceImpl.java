@@ -25,6 +25,9 @@ import io.leafage.hypervisor.vo.UserVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -42,14 +45,16 @@ import java.util.NoSuchElementException;
 public class UserServiceImpl extends DomainConverter implements UserService {
 
     private final UserRepository userRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for UserServiceImpl.</p>
      *
      * @param userRepository a {@link UserRepository} object
      */
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.userRepository = userRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -58,11 +63,14 @@ public class UserServiceImpl extends DomainConverter implements UserService {
     @Override
     public Mono<Page<UserVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, User.class);
 
-        return userRepository.findAllBy(pageable)
-                .map(u -> convertToVO(u, UserVO.class))
+        return r2dbcEntityTemplate.select(User.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(user -> convertToVO(user, UserVO.class))
                 .collectList()
-                .zipWith(userRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), User.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

@@ -3,8 +3,8 @@
 <head>
     <title>Login</title>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="initial-scale=1, width=device-width"/>
-    <link rel="icon" type="image/ico" href="/favicon.ico"/>
+    <meta content="initial-scale=1, width=device-width" name="viewport"/>
+    <link href="/favicon.ico" rel="icon" type="image/ico"/>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body class="min-h-screen">
@@ -18,7 +18,7 @@
             <!-- 左侧插图区（仅 XL 显示） -->
             <div class="flex items-center justify-center">
                 <figure>
-                    <img th:src="@{/svgs/illustration.svg}" alt="leafage illustration" width="560" height="100%">
+                    <img alt="leafage illustration" height="100%" th:src="@{/svgs/illustration.svg}" width="560">
                 </figure>
             </div>
 
@@ -27,30 +27,31 @@
                 <div class="max-w-xs m-auto px-4 py-8 xl:p-0 rounded-md shadow-sm xl:shadow-none w-full">
                     <div class="text-xl text-center mb-6">
                         <figure class="text-center">
-                            <img th:src="@{/svgs/logo.svg}" alt="logo" width="64" height="64" style="display: inline-block">
+                            <img alt="logo" height="64" style="display: inline-block" th:src="@{/svgs/logo.svg}"
+                                 width="64">
                         </figure>
                         登录您的帐户
                     </div>
                     <!-- 登录表单区域 -->
-                    <form th:action="@{/login}" method="post" class="space-y-4">
+                    <form class="space-y-4" method="post" th:action="@{/login}">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="username">用户名</label>
-                            <input type="text" id="username" name="username" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-blue-600">
+                            <input class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-blue-600" id="username" name="username" required
+                                   type="text">
                         </div>
                         <div class="my-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="password">密码</label>
-                            <input type="password" id="password" name="password" required
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-blue-600">
+                            <input class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-blue-600" id="password" name="password" required
+                                   type="password">
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="rememberMe" name="rememberMe"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <input class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" id="rememberMe" name="rememberMe"
+                                   type="checkbox">
                             <label class="block text-sm font-medium text-gray-700 ml-1" for="rememberMe">记住我？</label>
                         </div>
                         <div>
-                            <button type="submit"
-                                    class="w-full bg-blue-600 text-white font-medium py-2 rounded-md hover:bg-blue-700 transition">
+                            <button class="w-full bg-blue-600 text-white font-medium py-2 rounded-md hover:bg-blue-700 transition"
+                                    type="submit">
                                 登&nbsp;录
                             </button>
                         </div>

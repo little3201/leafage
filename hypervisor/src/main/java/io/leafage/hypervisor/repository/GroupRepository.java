@@ -18,10 +18,8 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.Group;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,14 +29,6 @@ import reactor.core.publisher.Mono;
  */
 @Repository
 public interface GroupRepository extends R2dbcRepository<Group, Long> {
-
-    /**
-     * 分页查询
-     *
-     * @param pageable 分页参数
-     * @return 有效组
-     */
-    Flux<Group> findAllBy(Pageable pageable);
 
     /**
      * 是否已存在

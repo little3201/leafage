@@ -18,7 +18,6 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.Privilege;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -31,14 +30,6 @@ import reactor.core.publisher.Mono;
  */
 @Repository
 public interface PrivilegeRepository extends R2dbcRepository<Privilege, Long> {
-
-    /**
-     * 查询
-     *
-     * @param pageable a {@link org.springframework.data.domain.Pageable} object
-     * @return 有效帖子
-     */
-    Flux<Privilege> findAllBySuperiorIdIsNull(Pageable pageable);
 
     /**
      * 查询

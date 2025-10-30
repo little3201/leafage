@@ -18,10 +18,8 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.AccessLog;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 
 /**
  * access log repository
@@ -31,11 +29,4 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface AccessLogRepository extends R2dbcRepository<AccessLog, Long> {
 
-    /**
-     * 查询
-     *
-     * @param pageable a {@link Pageable} object
-     * @return 有效帖子
-     */
-    Flux<AccessLog> findAllBy(Pageable pageable);
 }

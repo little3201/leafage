@@ -23,7 +23,6 @@ import io.leafage.assets.vo.PostVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -41,6 +40,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -81,8 +81,8 @@ class PostControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<PostVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString()))
+        given(this.postService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString()))
                 .willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts")
@@ -99,8 +99,8 @@ class PostControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.postService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString()))
+        given(this.postService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString()))
                 .willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts")
@@ -116,7 +116,7 @@ class PostControllerTest {
 
     @Test
     void fetch() {
-        given(this.postService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.postService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/posts/{id}", 1)
                 .exchange()
@@ -126,7 +126,7 @@ class PostControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.postService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.postService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/posts/{id}", 1)
                 .exchange()
@@ -135,7 +135,7 @@ class PostControllerTest {
 
     @Test
     void search() {
-        given(this.postService.search(Mockito.anyString())).willReturn(Flux.just(vo));
+        given(this.postService.search(anyString())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/search")
                         .queryParam("keyword", "test")
@@ -147,7 +147,7 @@ class PostControllerTest {
 
     @Test
     void search_error() {
-        given(this.postService.search(Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.postService.search(anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/search")
                         .queryParam("keyword", "test")
@@ -158,7 +158,7 @@ class PostControllerTest {
 
     @Test
     void exists() {
-        given(this.postService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.postService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/exists")
                         .queryParam("title", "test")
@@ -170,7 +170,7 @@ class PostControllerTest {
 
     @Test
     void exist_error() {
-        given(this.postService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.postService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/exists")
                         .queryParam("title", "test")
@@ -182,7 +182,7 @@ class PostControllerTest {
 
     @Test
     void create() {
-        given(this.postService.create(Mockito.any(PostDTO.class))).willReturn(Mono.just(vo));
+        given(this.postService.create(any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -194,7 +194,7 @@ class PostControllerTest {
 
     @Test
     void create_error() {
-        given(this.postService.create(Mockito.any(PostDTO.class))).willThrow(new RuntimeException());
+        given(this.postService.create(any(PostDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -205,7 +205,7 @@ class PostControllerTest {
 
     @Test
     void modify() {
-        given(this.postService.modify(Mockito.anyLong(), Mockito.any(PostDTO.class))).willReturn(Mono.just(vo));
+        given(this.postService.modify(anyLong(), any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -217,7 +217,7 @@ class PostControllerTest {
 
     @Test
     void modify_error() {
-        given(this.postService.modify(Mockito.anyLong(), Mockito.any(PostDTO.class))).willThrow(new RuntimeException());
+        given(this.postService.modify(anyLong(), any(PostDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -228,7 +228,7 @@ class PostControllerTest {
 
     @Test
     void remove() {
-        given(this.postService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.postService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1)
                 .exchange()
@@ -237,7 +237,7 @@ class PostControllerTest {
 
     @Test
     void remove_error() {
-        given(this.postService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.postService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1)
                 .exchange()

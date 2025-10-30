@@ -24,7 +24,6 @@ import io.leafage.assets.vo.FileRecordVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -43,6 +42,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -83,8 +83,8 @@ class FileControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<FileRecordVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.fileRecordService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(page));
+        given(this.fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/files")
                         .queryParam("page", 0)
@@ -100,8 +100,8 @@ class FileControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.fileRecordService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/files")
                         .queryParam("page", 0)
@@ -116,7 +116,7 @@ class FileControllerTest {
 
     @Test
     void fetch() {
-        given(this.fileRecordService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.fileRecordService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/files/{id}", 1)
                 .exchange()
@@ -126,7 +126,7 @@ class FileControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.fileRecordService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.fileRecordService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/files/{id}", 1)
                 .exchange()
@@ -139,8 +139,8 @@ class FileControllerTest {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "test".getBytes());
 
         given(this.fileRecordService.exists("test.xlsx", null)).willReturn(Mono.just(Boolean.FALSE));
-        given(this.fileStorageService.upload(Mockito.any(FilePart.class))).willReturn(Mono.just(dto));
-        given(this.fileRecordService.create(Mockito.any(FileRecordDTO.class))).willReturn(Mono.just(vo));
+        given(this.fileStorageService.upload(any(FilePart.class))).willReturn(Mono.just(dto));
+        given(this.fileRecordService.create(any(FileRecordDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/files")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -155,9 +155,9 @@ class FileControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[0]);
 
-        given(this.fileRecordService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.FALSE));
-        given(this.fileStorageService.upload(Mockito.any(FilePart.class))).willReturn(Mono.just(dto));
-        given(this.fileRecordService.create(Mockito.any(FileRecordDTO.class))).willReturn(Mono.just(vo));
+        given(this.fileRecordService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.fileStorageService.upload(any(FilePart.class))).willReturn(Mono.just(dto));
+        given(this.fileRecordService.create(any(FileRecordDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/files")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -168,7 +168,7 @@ class FileControllerTest {
 
     @Test
     void remove() {
-        given(this.fileRecordService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.fileRecordService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/files/{id}", 1)
                 .exchange()
@@ -177,7 +177,7 @@ class FileControllerTest {
 
     @Test
     void remove_error() {
-        given(this.fileRecordService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.fileRecordService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.delete().uri("/files/{id}", 1)
                 .exchange()

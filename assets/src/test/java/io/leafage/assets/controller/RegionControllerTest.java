@@ -22,7 +22,6 @@ import io.leafage.assets.vo.RegionVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -36,9 +35,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -73,8 +72,8 @@ class RegionControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<RegionVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+        given(this.regionService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/regions")
                         .queryParam("page", 0)
@@ -90,8 +89,8 @@ class RegionControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.regionService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/regions")
                         .queryParam("page", 0)
@@ -106,7 +105,7 @@ class RegionControllerTest {
 
     @Test
     void fetch() {
-        given(this.regionService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.regionService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/regions/{id}", 1L)
                 .exchange()
@@ -116,7 +115,7 @@ class RegionControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.regionService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.regionService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/regions/{id}", 1L)
                 .exchange()
@@ -125,7 +124,7 @@ class RegionControllerTest {
 
     @Test
     void subset() {
-        given(this.regionService.subset(Mockito.anyLong())).willReturn(Flux.just(vo));
+        given(this.regionService.subset(anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/regions/{id}/subset", 1L)
                 .exchange()
@@ -135,7 +134,7 @@ class RegionControllerTest {
 
     @Test
     void subordinates_error() {
-        given(this.regionService.subset(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.regionService.subset(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/regions/{id}/subset", 1L)
                 .exchange()

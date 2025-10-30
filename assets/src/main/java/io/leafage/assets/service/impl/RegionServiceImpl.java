@@ -25,6 +25,9 @@ import io.leafage.assets.vo.RegionVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
@@ -42,14 +45,16 @@ import java.util.NoSuchElementException;
 public class RegionServiceImpl extends DomainConverter implements RegionService {
 
     private final RegionRepository regionRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for RegionServiceImpl.</p>
      *
      * @param regionRepository a {@link RegionRepository} object
      */
-    public RegionServiceImpl(RegionRepository regionRepository) {
+    public RegionServiceImpl(RegionRepository regionRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.regionRepository = regionRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -58,11 +63,14 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
     @Override
     public Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Region.class);
 
-        return regionRepository.findAllBySuperiorIdIsNull(pageable)
-                .map(r -> convertToVO(r, RegionVO.class))
+        return r2dbcEntityTemplate.select(Region.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(region -> convertToVO(region, RegionVO.class))
                 .collectList()
-                .zipWith(regionRepository.countBySuperiorIdIsNullAndEnabledTrue())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Region.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

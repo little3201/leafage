@@ -23,7 +23,6 @@ import io.leafage.hypervisor.vo.DictionaryVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -39,6 +38,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -77,8 +77,8 @@ class DictionaryControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<DictionaryVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.dictionaryService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+        given(this.dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/dictionaries")
                         .queryParam("page", 0)
@@ -94,8 +94,8 @@ class DictionaryControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.dictionaryService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/dictionaries")
                         .queryParam("page", 0)
@@ -110,7 +110,7 @@ class DictionaryControllerTest {
 
     @Test
     void fetch() {
-        given(this.dictionaryService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.dictionaryService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/dictionaries/{id}", 1L)
                 .exchange()
@@ -120,7 +120,7 @@ class DictionaryControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.dictionaryService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.dictionaryService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/dictionaries/{id}", 1L)
                 .exchange()
@@ -129,7 +129,7 @@ class DictionaryControllerTest {
 
     @Test
     void subset() {
-        given(this.dictionaryService.subset(Mockito.anyLong())).willReturn(Flux.just(vo));
+        given(this.dictionaryService.subset(anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/dictionaries/{id}/subset", 1L)
                 .exchange()
@@ -139,7 +139,7 @@ class DictionaryControllerTest {
 
     @Test
     void subset_error() {
-        given(this.dictionaryService.subset(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.dictionaryService.subset(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/dictionaries/{id}/subset", 1L)
                 .exchange()
@@ -148,7 +148,7 @@ class DictionaryControllerTest {
 
     @Test
     void create() {
-        given(this.dictionaryService.create(Mockito.any(DictionaryDTO.class))).willReturn(Mono.just(vo));
+        given(this.dictionaryService.create(any(DictionaryDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
                 .exchange()
@@ -158,7 +158,7 @@ class DictionaryControllerTest {
 
     @Test
     void create_error() {
-        given(this.dictionaryService.create(Mockito.any(DictionaryDTO.class))).willThrow(new RuntimeException());
+        given(this.dictionaryService.create(any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
                 .exchange()

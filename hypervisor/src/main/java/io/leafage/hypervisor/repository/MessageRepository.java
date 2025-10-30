@@ -18,11 +18,8 @@
 package io.leafage.hypervisor.repository;
 
 import io.leafage.hypervisor.domain.Message;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * message repository
@@ -31,21 +28,4 @@ import reactor.core.publisher.Mono;
  */
 @Repository
 public interface MessageRepository extends R2dbcRepository<Message, Long> {
-
-    /**
-     * 分页查询
-     *
-     * @param receiver 接收者
-     * @param pageable 分页参数
-     * @return 有效数据集
-     */
-    Flux<Message> findByReceiver(String receiver, Pageable pageable);
-
-    /**
-     * 查询未读记录数
-     *
-     * @param receiver a {@link java.lang.String} object
-     * @return 记录数
-     */
-    Mono<Long> countByReceiver(String receiver);
 }

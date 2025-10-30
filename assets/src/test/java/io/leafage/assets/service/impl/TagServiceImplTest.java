@@ -20,19 +20,24 @@ package io.leafage.assets.service.impl;
 import io.leafage.assets.domain.Tag;
 import io.leafage.assets.dto.TagDTO;
 import io.leafage.assets.repository.TagRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation;
+import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * tag service test
@@ -45,68 +50,85 @@ class TagServiceImplTest {
     @Mock
     private TagRepository tagRepository;
 
+    @Mock
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
+
     @InjectMocks
     private TagServiceImpl tagService;
 
     private TagDTO dto;
+    private Tag entity;
 
     @BeforeEach
     void setUp() {
         dto = new TagDTO();
         dto.setName("test");
+
+        entity = new Tag();
+        entity.setName("test");
     }
 
     @Test
     void retrieve() {
-        given(this.tagRepository.findAllBy(Mockito.any(PageRequest.class))).willReturn(Flux.just(Mockito.mock(Tag.class)));
+        ReactiveSelectOperation.ReactiveSelect<Tag> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<Tag> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(this.tagRepository.count()).willReturn(Mono.just(Mockito.anyLong()));
+        given(r2dbcEntityTemplate.select(Tag.class)).willReturn(select);
+        given(select.matching(any(Query.class))).willReturn(terminating);
+        given(terminating.all()).willReturn(Flux.just(entity));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(Tag.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(this.tagService.retrieve(0, 2, "id", true, "name:like:a")).expectNextCount(1).verifyComplete();
+        StepVerifier.create(tagService.retrieve(0, 2, "id", true, "name:like:a"))
+                .assertNext(page -> {
+                    assertThat(page.getContent()).hasSize(1);
+                    AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
+                    AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
+                    AssertionsForClassTypes.assertThat(page.getSize()).isEqualTo(2);
+                }).verifyComplete();
     }
 
     @Test
     void fetch() {
-        given(this.tagRepository.findById(Mockito.anyLong()))
-                .willReturn(Mono.just(Mockito.mock(Tag.class)));
+        given(this.tagRepository.findById(anyLong()))
+                .willReturn(Mono.just(mock(Tag.class)));
 
-        StepVerifier.create(tagService.fetch(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(tagService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void exists() {
-        given(this.tagRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.tagRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(tagService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
     void exists_id_null() {
-        given(this.tagRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.tagRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(tagService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
     void create() {
-        given(this.tagRepository.save(Mockito.any(Tag.class))).willReturn(Mono.just(Mockito.mock(Tag.class)));
+        given(this.tagRepository.save(any(Tag.class))).willReturn(Mono.just(mock(Tag.class)));
 
-        StepVerifier.create(tagService.create(Mockito.mock(TagDTO.class))).expectNextCount(1).verifyComplete();
+        StepVerifier.create(tagService.create(mock(TagDTO.class))).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.tagRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Tag.class)));
+        given(this.tagRepository.findById(anyLong())).willReturn(Mono.just(mock(Tag.class)));
 
-        given(this.tagRepository.save(Mockito.any(Tag.class))).willReturn(Mono.just(Mockito.mock(Tag.class)));
+        given(this.tagRepository.save(any(Tag.class))).willReturn(Mono.just(mock(Tag.class)));
 
         StepVerifier.create(tagService.modify(1L, dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void remove() {
-        given(this.tagRepository.deleteById(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.tagRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
-        StepVerifier.create(tagService.remove(Mockito.anyLong())).verifyComplete();
+        StepVerifier.create(tagService.remove(anyLong())).verifyComplete();
     }
 }

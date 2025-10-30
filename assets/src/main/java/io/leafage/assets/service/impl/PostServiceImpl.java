@@ -27,6 +27,9 @@ import io.leafage.assets.vo.PostVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -46,17 +49,19 @@ public class PostServiceImpl extends DomainConverter implements PostService {
 
     private final PostRepository postRepository;
     private final PostBodyRepository postBodyRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
 
     /**
      * <p>Constructor for PostServiceImpl.</p>
      *
-     * @param postRepository        a {@link PostRepository} object
+     * @param postRepository     a {@link PostRepository} object
      * @param postBodyRepository a {@link PostBodyRepository} object
      */
-    public PostServiceImpl(PostRepository postRepository, PostBodyRepository postBodyRepository) {
+    public PostServiceImpl(PostRepository postRepository, PostBodyRepository postBodyRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.postRepository = postRepository;
         this.postBodyRepository = postBodyRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -65,11 +70,14 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     @Override
     public Mono<Page<PostVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Post.class);
 
-        return postRepository.findAllBy(pageable)
+        return r2dbcEntityTemplate.select(Post.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
                 .map(post -> convertToVO(post, PostVO.class))
                 .collectList()
-                .zipWith(postRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Post.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

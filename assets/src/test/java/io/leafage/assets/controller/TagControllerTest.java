@@ -23,7 +23,6 @@ import io.leafage.assets.vo.TagVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -39,6 +38,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -76,8 +76,8 @@ class TagControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<TagVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(page));
+        given(this.tagService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/tags")
                         .queryParam("page", 0)
@@ -93,8 +93,8 @@ class TagControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.tagService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.tagService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/tags")
                         .queryParam("page", 0)
@@ -109,7 +109,7 @@ class TagControllerTest {
 
     @Test
     void fetch() {
-        given(this.tagService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.tagService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/tags/{id}", 1)
                 .exchange()
@@ -119,7 +119,7 @@ class TagControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.tagService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.tagService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/tags/{id}", 1)
                 .exchange()
@@ -128,7 +128,7 @@ class TagControllerTest {
 
     @Test
     void exists() {
-        given(this.tagService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.tagService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/tags/exists")
                         .queryParam("name", "test")
@@ -140,7 +140,7 @@ class TagControllerTest {
 
     @Test
     void exist_error() {
-        given(this.tagService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.tagService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/tags/exists")
                         .queryParam("name", "test")
@@ -152,7 +152,7 @@ class TagControllerTest {
 
     @Test
     void create() {
-        given(this.tagService.create(Mockito.any(TagDTO.class))).willReturn(Mono.just(vo));
+        given(this.tagService.create(any(TagDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/tags")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -164,7 +164,7 @@ class TagControllerTest {
 
     @Test
     void create_error() {
-        given(this.tagService.create(Mockito.any(TagDTO.class))).willThrow(new RuntimeException());
+        given(this.tagService.create(any(TagDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/tags")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -175,7 +175,7 @@ class TagControllerTest {
 
     @Test
     void modify() {
-        given(this.tagService.modify(Mockito.anyLong(), Mockito.any(TagDTO.class))).willReturn(Mono.just(vo));
+        given(this.tagService.modify(anyLong(), any(TagDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -187,7 +187,7 @@ class TagControllerTest {
 
     @Test
     void modify_error() {
-        given(this.tagService.modify(Mockito.anyLong(), Mockito.any(TagDTO.class))).willThrow(new RuntimeException());
+        given(this.tagService.modify(anyLong(), any(TagDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -198,7 +198,7 @@ class TagControllerTest {
 
     @Test
     void remove() {
-        given(this.tagService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.tagService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/tags/{id}", 1)
                 .exchange()
@@ -207,7 +207,7 @@ class TagControllerTest {
 
     @Test
     void remove_error() {
-        given(this.tagService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.tagService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.delete().uri("/tags/{id}", 1)
                 .exchange()

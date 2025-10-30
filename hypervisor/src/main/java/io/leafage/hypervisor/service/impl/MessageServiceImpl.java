@@ -25,6 +25,9 @@ import io.leafage.hypervisor.vo.MessageVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -41,27 +44,32 @@ import java.util.NoSuchElementException;
 public class MessageServiceImpl extends DomainConverter implements MessageService {
 
     private final MessageRepository messageRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for MessageServiceImpl.</p>
      *
      * @param messageRepository a {@link MessageRepository} object
      */
-    public MessageServiceImpl(MessageRepository messageRepository) {
+    public MessageServiceImpl(MessageRepository messageRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.messageRepository = messageRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Mono<Page<MessageVO>> retrieve(int page, int size, String sortBy, boolean descending, String receiver) {
+    public Mono<Page<MessageVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Message.class);
 
-        return messageRepository.findByReceiver(receiver, pageable)
-                .map(m -> convertToVO(m, MessageVO.class))
+        return r2dbcEntityTemplate.select(Message.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(message -> convertToVO(message, MessageVO.class))
                 .collectList()
-                .zipWith(messageRepository.countByReceiver(receiver))
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Message.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

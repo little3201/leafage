@@ -22,7 +22,6 @@ import io.leafage.hypervisor.vo.AccessLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -40,6 +39,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -73,8 +73,8 @@ class AccessLogControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<AccessLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(page));
+        given(this.accessLogService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
                         .queryParam("page", 0)
@@ -90,8 +90,8 @@ class AccessLogControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.accessLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new NoSuchElementException());
+        given(this.accessLogService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new NoSuchElementException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
                         .queryParam("page", 0)

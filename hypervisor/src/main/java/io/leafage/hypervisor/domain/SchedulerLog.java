@@ -63,6 +63,10 @@ public class SchedulerLog extends SchedulerLogModel {
         return createdBy;
     }
 
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public Long getId() {
         return id;
     }
@@ -77,10 +81,6 @@ public class SchedulerLog extends SchedulerLogModel {
 
     public void setStatus(ScheduleStatus status) {
         this.status = status;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
     }
 
     public Instant getCreatedDate() {

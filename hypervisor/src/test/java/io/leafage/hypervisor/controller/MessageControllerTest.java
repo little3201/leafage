@@ -20,12 +20,9 @@ package io.leafage.hypervisor.controller;
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.service.MessageService;
 import io.leafage.hypervisor.vo.MessageVO;
-import io.leafage.hypervisor.vo.PrivilegeVO;
-import io.leafage.hypervisor.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -41,6 +38,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -83,8 +81,8 @@ class MessageControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<MessageVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(page));
+        given(this.messageService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(page));
 
         webTestClient.mutateWith(SecurityMockServerConfigurers.mockUser())
                 .get().uri(uriBuilder -> uriBuilder.path("/messages")
@@ -100,8 +98,8 @@ class MessageControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.messageService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/messages")
                         .queryParam("page", 0)
@@ -115,7 +113,7 @@ class MessageControllerTest {
 
     @Test
     void fetch() {
-        given(this.messageService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.messageService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/messages/{id}", 1L)
                 .exchange()
@@ -125,14 +123,14 @@ class MessageControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.messageService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.messageService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/messages/{id}", 1L).exchange().expectStatus().is5xxServerError();
     }
 
     @Test
     void create() {
-        given(this.messageService.create(Mockito.any(MessageDTO.class))).willReturn(Mono.just(vo));
+        given(this.messageService.create(any(MessageDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
@@ -142,7 +140,7 @@ class MessageControllerTest {
 
     @Test
     void create_error() {
-        given(this.messageService.create(Mockito.any(MessageDTO.class))).willThrow(new RuntimeException());
+        given(this.messageService.create(any(MessageDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
@@ -151,7 +149,7 @@ class MessageControllerTest {
 
     @Test
     void remove() {
-        given(this.messageService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.messageService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/messages/{id}", 1L)
                 .exchange()
@@ -160,7 +158,7 @@ class MessageControllerTest {
 
     @Test
     void remove_error() {
-        given(this.messageService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.messageService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).delete().uri("/messages/{id}", 1L)
                 .exchange()

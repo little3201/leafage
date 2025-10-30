@@ -24,21 +24,26 @@ import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.repository.GroupMembersRepository;
 import io.leafage.hypervisor.repository.GroupPrivilegesRepository;
 import io.leafage.hypervisor.repository.PrivilegeRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation;
+import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * privilege service test
@@ -60,27 +65,43 @@ class PrivilegeServiceImplTest {
     @InjectMocks
     private PrivilegeServiceImpl privilegeService;
 
+    @Mock
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
+
     private PrivilegeDTO dto;
+    private Privilege entity;
 
     @BeforeEach
     void setUp() {
         dto = new PrivilegeDTO();
         dto.setName("test");
+
+        entity = new Privilege();
+        entity.setName("test");
     }
 
     @Test
     void retrieve_page() {
-        given(this.privilegeRepository.findAllBySuperiorIdIsNull(Mockito.any(PageRequest.class))).willReturn(Flux.just(Mockito.mock(Privilege.class)));
+        ReactiveSelectOperation.ReactiveSelect<Privilege> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<Privilege> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(this.privilegeRepository.countBySuperiorId(Mockito.anyLong())).willReturn(Mono.just(Mockito.anyLong()));
+        given(r2dbcEntityTemplate.select(Privilege.class)).willReturn(select);
+        given(select.matching(any(Query.class))).willReturn(terminating);
+        given(terminating.all()).willReturn(Flux.just(entity));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(Privilege.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(privilegeService.retrieve(0, 2, "id", true,"name:like:a"))
-                .expectNextCount(1).verifyComplete();
+        StepVerifier.create(privilegeService.retrieve(0, 2, "id", true, "name:like:a"))
+                .assertNext(page -> {
+                    assertThat(page.getContent()).hasSize(1);
+                    AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
+                    AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
+                    AssertionsForClassTypes.assertThat(page.getSize()).isEqualTo(2);
+                }).verifyComplete();
     }
 
     @Test
     void retrieve() {
-        given(this.privilegeRepository.findAllById(Mockito.anyList())).willReturn(Flux.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findAllById(anyList())).willReturn(Flux.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.retrieve(List.of(1L)))
                 .expectNextCount(1).verifyComplete();
@@ -88,28 +109,28 @@ class PrivilegeServiceImplTest {
 
     @Test
     void retrieve_ids_null() {
-        given(this.privilegeRepository.findAll()).willReturn(Flux.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findAll()).willReturn(Flux.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.retrieve(null)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void fetch() {
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.fetch(1L)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void fetch_no_superior() {
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.fetch(1L)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void create() {
-        given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.create(dto)).expectNextCount(1).verifyComplete();
     }
@@ -117,34 +138,34 @@ class PrivilegeServiceImplTest {
 
     @Test
     void create_no_superior() {
-        given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(mock(Privilege.class)));
 
-        given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.modify(1L, dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void tree() {
-        given(this.groupMembersRepository.findByUsername(Mockito.anyString())).willReturn(Flux.just(Mockito.mock(GroupMembers.class)));
+        given(this.groupMembersRepository.findByUsername(anyString())).willReturn(Flux.just(mock(GroupMembers.class)));
 
-        given(this.groupPrivilegesRepository.findByGroupId(Mockito.anyLong())).willReturn(Flux.just(Mockito.mock(GroupPrivileges.class)));
+        given(this.groupPrivilegesRepository.findByGroupId(anyLong())).willReturn(Flux.just(mock(GroupPrivileges.class)));
 
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.tree("test")).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void exists() {
-        given(this.privilegeRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.privilegeRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(privilegeService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
     }

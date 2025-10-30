@@ -17,12 +17,16 @@
 
 package io.leafage.hypervisor.service.impl;
 
+import io.leafage.hypervisor.domain.OperationLog;
 import io.leafage.hypervisor.repository.OperationLogRepository;
 import io.leafage.hypervisor.service.OperationLogService;
 import io.leafage.hypervisor.vo.OperationLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -37,14 +41,16 @@ import top.leafage.common.DomainConverter;
 public class OperationLogServiceImpl extends DomainConverter implements OperationLogService {
 
     private final OperationLogRepository operationLogRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for OperationLogServiceImpl.</p>
      *
      * @param operationLogRepository a {@link OperationLogRepository} object
      */
-    public OperationLogServiceImpl(OperationLogRepository operationLogRepository) {
+    public OperationLogServiceImpl(OperationLogRepository operationLogRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.operationLogRepository = operationLogRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -53,11 +59,14 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
     @Override
     public Mono<Page<OperationLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, OperationLog.class);
 
-        return operationLogRepository.findAllBy(pageable)
-                .map(o -> convertToVO(o, OperationLogVO.class))
+        return r2dbcEntityTemplate.select(OperationLog.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(log -> convertToVO(log, OperationLogVO.class))
                 .collectList()
-                .zipWith(operationLogRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), OperationLog.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

@@ -25,6 +25,9 @@ import io.leafage.assets.vo.TagVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -41,14 +44,16 @@ import javax.naming.NotContextException;
 public class TagServiceImpl extends DomainConverter implements TagService {
 
     private final TagRepository tagRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for CategoryServiceImpl.</p>
      *
      * @param tagRepository a {@link TagRepository} object
      */
-    public TagServiceImpl(TagRepository tagRepository) {
+    public TagServiceImpl(TagRepository tagRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.tagRepository = tagRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -57,11 +62,14 @@ public class TagServiceImpl extends DomainConverter implements TagService {
     @Override
     public Mono<Page<TagVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Tag.class);
 
-        return tagRepository.findAllBy(pageable)
-                .map(c -> convertToVO(c, TagVO.class))
+        return r2dbcEntityTemplate.select(Tag.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(tag -> convertToVO(tag, TagVO.class))
                 .collectList()
-                .zipWith(tagRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Tag.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

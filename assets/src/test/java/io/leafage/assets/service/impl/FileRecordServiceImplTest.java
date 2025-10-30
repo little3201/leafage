@@ -20,19 +20,24 @@ package io.leafage.assets.service.impl;
 import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.repository.FileRecordRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation;
+import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * tag service test
@@ -45,59 +50,76 @@ class FileRecordServiceImplTest {
     @Mock
     private FileRecordRepository fileRecordRepository;
 
+    @Mock
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
+
     @InjectMocks
     private FileRecordServiceImpl fileRecordService;
 
     private FileRecordDTO dto;
+    private FileRecord entity;
 
     @BeforeEach
     void setUp() {
         dto = new FileRecordDTO();
         dto.setName("test");
+
+        entity = new FileRecord();
+        entity.setName("test");
     }
 
     @Test
     void retrieve() {
-        given(this.fileRecordRepository.findAllBy(Mockito.any(PageRequest.class))).willReturn(Flux.just(Mockito.mock(FileRecord.class)));
+        ReactiveSelectOperation.ReactiveSelect<FileRecord> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<FileRecord> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(this.fileRecordRepository.count()).willReturn(Mono.just(Mockito.anyLong()));
+        given(r2dbcEntityTemplate.select(FileRecord.class)).willReturn(select);
+        given(select.matching(any(Query.class))).willReturn(terminating);
+        given(terminating.all()).willReturn(Flux.just(entity));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(FileRecord.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(this.fileRecordService.retrieve(0, 2, "id", true, "name:like:a")).expectNextCount(1).verifyComplete();
+        StepVerifier.create(fileRecordService.retrieve(0, 2, "id", true, "name:like:a"))
+                .assertNext(page -> {
+                    assertThat(page.getContent()).hasSize(1);
+                    AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
+                    AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
+                    AssertionsForClassTypes.assertThat(page.getSize()).isEqualTo(2);
+                }).verifyComplete();
     }
 
     @Test
     void fetch() {
-        given(this.fileRecordRepository.findById(Mockito.anyLong()))
-                .willReturn(Mono.just(Mockito.mock(FileRecord.class)));
+        given(this.fileRecordRepository.findById(anyLong()))
+                .willReturn(Mono.just(mock(FileRecord.class)));
 
-        StepVerifier.create(fileRecordService.fetch(Mockito.anyLong())).expectNextCount(1).verifyComplete();
+        StepVerifier.create(fileRecordService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void exists() {
-        given(this.fileRecordRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.fileRecordRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(fileRecordService.exists("test.xlsx", 1L)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
     void exists_id_null() {
-        given(this.fileRecordRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.fileRecordRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(fileRecordService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test
     void create() {
-        given(this.fileRecordRepository.save(Mockito.any(FileRecord.class))).willReturn(Mono.just(Mockito.mock(FileRecord.class)));
+        given(this.fileRecordRepository.save(any(FileRecord.class))).willReturn(Mono.just(mock(FileRecord.class)));
 
         StepVerifier.create(fileRecordService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void remove() {
-        given(this.fileRecordRepository.deleteById(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.fileRecordRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
-        StepVerifier.create(fileRecordService.remove(Mockito.anyLong())).verifyComplete();
+        StepVerifier.create(fileRecordService.remove(anyLong())).verifyComplete();
     }
 }

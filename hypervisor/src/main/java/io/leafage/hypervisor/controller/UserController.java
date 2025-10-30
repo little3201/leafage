@@ -183,6 +183,7 @@ public class UserController {
                 .doOnSuccess(result -> logger.debug("User unlocked, id: {}, result: {}", id, result))
                 .doOnError(e -> logger.error("Unlock user error, id: {}", id, e));
     }
+
     /**
      * Import the records.
      *

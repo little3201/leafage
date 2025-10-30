@@ -22,11 +22,12 @@ import io.leafage.assets.dto.FileRecordDTO;
 import io.leafage.assets.repository.FileRecordRepository;
 import io.leafage.assets.service.FileRecordService;
 import io.leafage.assets.vo.FileRecordVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -40,12 +41,12 @@ import top.leafage.common.DomainConverter;
 @Service
 public class FileRecordServiceImpl extends DomainConverter implements FileRecordService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileRecordServiceImpl.class);
-
     private final FileRecordRepository fileRecordRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
-    public FileRecordServiceImpl(FileRecordRepository fileRecordRepository) {
+    public FileRecordServiceImpl(FileRecordRepository fileRecordRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.fileRecordRepository = fileRecordRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -54,11 +55,14 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
     @Override
     public Mono<Page<FileRecordVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, FileRecord.class);
 
-        return fileRecordRepository.findAllBy(pageable)
-                .map(f -> convertToVO(f, FileRecordVO.class))
+        return r2dbcEntityTemplate.select(FileRecord.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(record -> convertToVO(record, FileRecordVO.class))
                 .collectList()
-                .zipWith(fileRecordRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), FileRecord.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

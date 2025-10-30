@@ -27,6 +27,9 @@ import io.leafage.hypervisor.vo.PrivilegeVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -51,16 +54,18 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
     private final PrivilegeRepository privilegeRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
     private final GroupMembersRepository groupMembersRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for PrivilegeServiceImpl.</p>
      *
      * @param privilegeRepository a {@link PrivilegeRepository} object
      */
-    public PrivilegeServiceImpl(PrivilegeRepository privilegeRepository, GroupPrivilegesRepository groupPrivilegesRepository, GroupMembersRepository groupMembersRepository) {
+    public PrivilegeServiceImpl(PrivilegeRepository privilegeRepository, GroupPrivilegesRepository groupPrivilegesRepository, GroupMembersRepository groupMembersRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.privilegeRepository = privilegeRepository;
         this.groupPrivilegesRepository = groupPrivilegesRepository;
         this.groupMembersRepository = groupMembersRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -69,16 +74,15 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
     @Override
     public Mono<Page<PrivilegeVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Privilege.class);
 
-        return privilegeRepository.findAllBySuperiorIdIsNull(pageable)
-                .flatMap(p -> privilegeRepository.countBySuperiorId(p.getId())
-                        .map(count -> {
-                            PrivilegeVO vo = convertToVO(p, PrivilegeVO.class);
-                            vo.setCount(count);
-                            return vo;
-                        }))
+        return r2dbcEntityTemplate.select(Privilege.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(privilege -> convertToVO(privilege, PrivilegeVO.class))
                 .collectList()
-                .map(voList -> new PageImpl<>(voList, pageable, voList.size()));
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Privilege.class))
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
     /**

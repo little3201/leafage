@@ -24,6 +24,9 @@ import io.leafage.hypervisor.vo.GroupVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -43,14 +46,16 @@ import java.util.NoSuchElementException;
 public class GroupServiceImpl extends DomainConverter implements GroupService {
 
     private final GroupRepository groupRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for GroupServiceImpl.</p>
      *
      * @param groupRepository a {@link GroupRepository} object
      */
-    public GroupServiceImpl(GroupRepository groupRepository) {
+    public GroupServiceImpl(GroupRepository groupRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.groupRepository = groupRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -59,11 +64,14 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
     @Override
     public Mono<Page<GroupVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Group.class);
 
-        return groupRepository.findAllBy(pageable)
-                .map(g -> convertToVO(g, GroupVO.class))
+        return r2dbcEntityTemplate.select(Group.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(group -> convertToVO(group, GroupVO.class))
                 .collectList()
-                .zipWith(groupRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Group.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

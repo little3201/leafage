@@ -17,12 +17,9 @@
 
 package io.leafage.hypervisor.repository;
 
-import io.leafage.hypervisor.domain.AccessLog;
 import io.leafage.hypervisor.domain.OperationLog;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 
 /**
  * operation log repository
@@ -32,11 +29,4 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface OperationLogRepository extends R2dbcRepository<OperationLog, Long> {
 
-    /**
-     * 查询
-     *
-     * @param pageable a {@link Pageable} object
-     * @return 有效帖子
-     */
-    Flux<OperationLog> findAllBy(Pageable pageable);
 }

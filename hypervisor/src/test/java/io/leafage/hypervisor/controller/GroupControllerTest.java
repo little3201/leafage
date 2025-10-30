@@ -27,7 +27,6 @@ import io.leafage.hypervisor.vo.GroupVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,9 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 /**
@@ -92,8 +93,8 @@ class GroupControllerTest {
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
         Page<GroupVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(Mono.just(voPage));
+        given(this.groupService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/groups")
                         .queryParam("page", 0)
@@ -107,8 +108,8 @@ class GroupControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.groupService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.groupService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/groups")
                         .queryParam("page", 0)
@@ -123,7 +124,7 @@ class GroupControllerTest {
 
     @Test
     void fetch() {
-        given(this.groupService.fetch(Mockito.anyLong())).willReturn(Mono.just(vo));
+        given(this.groupService.fetch(anyLong())).willReturn(Mono.just(vo));
 
         webTestClient.get().uri("/groups/{id}", 1L).exchange()
                 .expectStatus().isOk().expectBody().jsonPath("$.name").isEqualTo("test");
@@ -131,14 +132,14 @@ class GroupControllerTest {
 
     @Test
     void fetch_error() {
-        given(this.groupService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.groupService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/groups/{id}", 1L).exchange().expectStatus().is5xxServerError();
     }
 
     @Test
     void exists() {
-        given(this.groupService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.groupService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/groups/exists")
                         .queryParam("name", "test")
@@ -150,7 +151,7 @@ class GroupControllerTest {
 
     @Test
     void exist_error() {
-        given(this.groupService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.groupService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/groups/exists")
                         .queryParam("name", "test")
@@ -162,7 +163,7 @@ class GroupControllerTest {
 
     @Test
     void create() {
-        given(this.groupService.create(Mockito.any(GroupDTO.class))).willReturn(Mono.just(vo));
+        given(this.groupService.create(any(GroupDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/groups").bodyValue(dto).exchange()
                 .expectStatus().isOk()
@@ -171,7 +172,7 @@ class GroupControllerTest {
 
     @Test
     void create_error() {
-        given(this.groupService.create(Mockito.any(GroupDTO.class))).willThrow(new RuntimeException());
+        given(this.groupService.create(any(GroupDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/groups").bodyValue(dto).exchange()
                 .expectStatus().is5xxServerError();
@@ -179,7 +180,7 @@ class GroupControllerTest {
 
     @Test
     void modify() {
-        given(this.groupService.modify(Mockito.anyLong(), Mockito.any(GroupDTO.class))).willReturn(Mono.just(vo));
+        given(this.groupService.modify(anyLong(), any(GroupDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/groups/{id}", 1L).bodyValue(dto).exchange()
                 .expectStatus().isOk()
@@ -188,7 +189,7 @@ class GroupControllerTest {
 
     @Test
     void modify_error() {
-        given(this.groupService.modify(Mockito.anyLong(), Mockito.any(GroupDTO.class))).willThrow(new RuntimeException());
+        given(this.groupService.modify(anyLong(), any(GroupDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/groups/{id}", 1L).bodyValue(dto).exchange()
                 .expectStatus().is5xxServerError();
@@ -196,7 +197,7 @@ class GroupControllerTest {
 
     @Test
     void remove() {
-        given(this.groupService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.groupService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/groups/{id}", 1L).exchange()
                 .expectStatus().isOk();
@@ -204,7 +205,7 @@ class GroupControllerTest {
 
     @Test
     void remove_error() {
-        given(this.groupService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.groupService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).delete().uri("/groups/{id}", 1L).exchange()
                 .expectStatus().is5xxServerError();
@@ -212,7 +213,7 @@ class GroupControllerTest {
 
     @Test
     void members() {
-        given(this.groupMembersService.members(Mockito.anyLong())).willReturn(Flux.just(groupMembers));
+        given(this.groupMembersService.members(anyLong())).willReturn(Flux.just(groupMembers));
 
         webTestClient.get().uri("/groups/{id}/members", 1L).exchange()
                 .expectStatus().isOk()
@@ -221,7 +222,7 @@ class GroupControllerTest {
 
     @Test
     void members_error() {
-        given(this.groupMembersService.members(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.groupMembersService.members(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/groups/{id}/members", 1L).exchange()
                 .expectStatus().is5xxServerError();
@@ -229,8 +230,8 @@ class GroupControllerTest {
 
     @Test
     void relation() {
-        given(this.groupPrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anySet()))
-                .willReturn(Mono.just(Mockito.mock(GroupPrivileges.class)));
+        given(this.groupPrivilegesService.relation(anyLong(), anyLong(), anySet()))
+                .willReturn(Mono.just(mock(GroupPrivileges.class)));
 
         webTestClient.mutateWith(csrf()).patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 2L)
                 .bodyValue(Set.of("test"))

@@ -24,7 +24,6 @@ import io.leafage.assets.vo.TagVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
@@ -35,6 +34,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -71,7 +72,7 @@ class CommentControllerTest {
 
     @Test
     void comments() {
-        given(this.commentService.comments(Mockito.anyLong())).willReturn(Flux.just(vo));
+        given(this.commentService.comments(anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/comments/{id}", 1)
                 .exchange()
@@ -81,7 +82,7 @@ class CommentControllerTest {
 
     @Test
     void comments_error() {
-        given(this.commentService.comments(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.commentService.comments(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/comments/{id}", 1)
                 .exchange()
@@ -90,7 +91,7 @@ class CommentControllerTest {
 
     @Test
     void replies() {
-        given(this.commentService.replies(Mockito.anyLong())).willReturn(Flux.just(vo));
+        given(this.commentService.replies(anyLong())).willReturn(Flux.just(vo));
 
         webTestClient.get().uri("/comments/{id}/replies", 1)
                 .exchange()
@@ -99,7 +100,7 @@ class CommentControllerTest {
 
     @Test
     void repliers_error() {
-        given(this.commentService.replies(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.commentService.replies(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/comments/{id}/replies", 1)
                 .exchange()
@@ -108,7 +109,7 @@ class CommentControllerTest {
 
     @Test
     void create() {
-        given(this.commentService.create(Mockito.any(CommentDTO.class))).willReturn(Mono.just(vo));
+        given(this.commentService.create(any(CommentDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/comments")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +121,7 @@ class CommentControllerTest {
 
     @Test
     void create_error() {
-        given(this.commentService.create(Mockito.any(CommentDTO.class))).willThrow(new RuntimeException());
+        given(this.commentService.create(any(CommentDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/comments")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +131,7 @@ class CommentControllerTest {
 
     @Test
     void remove() {
-        given(this.commentService.remove(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.commentService.remove(anyLong())).willReturn(Mono.empty());
 
         webTestClient.mutateWith(csrf()).delete().uri("/comments/{id}", 1)
                 .exchange()
@@ -139,7 +140,7 @@ class CommentControllerTest {
 
     @Test
     void remove_error() {
-        given(this.commentService.remove(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.commentService.remove(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).delete().uri("/comments/{id}", 1)
                 .exchange()

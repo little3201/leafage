@@ -20,19 +20,24 @@ package io.leafage.hypervisor.service.impl;
 import io.leafage.hypervisor.domain.Message;
 import io.leafage.hypervisor.dto.MessageDTO;
 import io.leafage.hypervisor.repository.MessageRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation;
+import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * message service test
@@ -48,7 +53,11 @@ class MessageServiceImplTest {
     @InjectMocks
     private MessageServiceImpl messageService;
 
+    @Mock
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
+
     private MessageDTO dto;
+    private Message entity;
 
     @BeforeEach
     void setUp() {
@@ -57,37 +66,51 @@ class MessageServiceImplTest {
         dto.setSummary("这个是摘要内容");
         dto.setBody("这个是正文内容");
         dto.setReceiver("test");
+
+        entity = new Message();
+        entity.setTitle("标题");
+        entity.setSummary("这个是摘要内容");
+        entity.setBody("这个是正文内容");
+        entity.setReceiver("test");
     }
 
     @Test
     void retrieve() {
-        given(this.messageRepository.findByReceiver(Mockito.anyString(), Mockito.any(PageRequest.class)))
-                .willReturn(Flux.just(Mockito.mock(Message.class)));
+        ReactiveSelectOperation.ReactiveSelect<Message> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<Message> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(this.messageRepository.countByReceiver(Mockito.anyString())).willReturn(Mono.just(2L));
+        given(r2dbcEntityTemplate.select(Message.class)).willReturn(select);
+        given(select.matching(any(Query.class))).willReturn(terminating);
+        given(terminating.all()).willReturn(Flux.just(entity));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(Message.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(messageService.retrieve(0, 2, "id", true, "test")).expectNextCount(1).verifyComplete();
+        StepVerifier.create(messageService.retrieve(0, 2, "id", true, "test")).assertNext(page -> {
+            assertThat(page.getContent()).hasSize(1);
+            AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
+            AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
+            AssertionsForClassTypes.assertThat(page.getSize()).isEqualTo(2);
+        }).verifyComplete();
     }
 
     @Test
     void fetch() {
-        given(this.messageRepository.findById(Mockito.anyLong())).willReturn(Mono.just(Mockito.mock(Message.class)));
+        given(this.messageRepository.findById(anyLong())).willReturn(Mono.just(mock(Message.class)));
 
-        given(this.messageRepository.save(Mockito.any(Message.class))).willReturn(Mono.just(Mockito.mock(Message.class)));
+        given(this.messageRepository.save(any(Message.class))).willReturn(Mono.just(mock(Message.class)));
 
         StepVerifier.create(messageService.fetch(1L)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void create() {
-        given(this.messageRepository.save(Mockito.any(Message.class))).willReturn(Mono.just(Mockito.mock(Message.class)));
+        given(this.messageRepository.save(any(Message.class))).willReturn(Mono.just(mock(Message.class)));
 
         StepVerifier.create(messageService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void remove() {
-        given(this.messageRepository.deleteById(Mockito.anyLong())).willReturn(Mono.empty());
+        given(this.messageRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
         StepVerifier.create(messageService.remove(1L)).verifyComplete();
     }

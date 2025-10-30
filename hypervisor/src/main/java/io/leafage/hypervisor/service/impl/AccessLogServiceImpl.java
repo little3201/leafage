@@ -17,12 +17,16 @@
 
 package io.leafage.hypervisor.service.impl;
 
+import io.leafage.hypervisor.domain.AccessLog;
 import io.leafage.hypervisor.repository.AccessLogRepository;
 import io.leafage.hypervisor.service.AccessLogService;
 import io.leafage.hypervisor.vo.AccessLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -37,14 +41,16 @@ import top.leafage.common.DomainConverter;
 public class AccessLogServiceImpl extends DomainConverter implements AccessLogService {
 
     private final AccessLogRepository accessLogRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
      * <p>Constructor for AccessLogServiceImpl.</p>
      *
      * @param accessLogRepository a {@link AccessLogRepository} object
      */
-    public AccessLogServiceImpl(AccessLogRepository accessLogRepository) {
+    public AccessLogServiceImpl(AccessLogRepository accessLogRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.accessLogRepository = accessLogRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
     /**
@@ -53,11 +59,14 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
     @Override
     public Mono<Page<AccessLogVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, AccessLog.class);
 
-        return accessLogRepository.findAllBy(pageable)
-                .map(a -> convertToVO(a, AccessLogVO.class))
+        return r2dbcEntityTemplate.select(AccessLog.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(log -> convertToVO(log, AccessLogVO.class))
                 .collectList()
-                .zipWith(accessLogRepository.count())
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), AccessLog.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 

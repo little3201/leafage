@@ -19,18 +19,25 @@ package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.AccessLog;
 import io.leafage.hypervisor.repository.AccessLogRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.ReactiveSelectOperation;
+import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * access log service test
@@ -46,13 +53,36 @@ class AccessLogServiceImplTest {
     @InjectMocks
     private AccessLogServiceImpl recordService;
 
+    @Mock
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
+
+    private AccessLog entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new AccessLog();
+        entity.setUrl("test");
+        entity.setParams("test");
+        entity.setBody("test");
+    }
+
     @Test
     void retrieve() {
-        given(this.accessLogRepository.findAllBy(Mockito.any(PageRequest.class))).willReturn(Flux.just(Mockito.mock(AccessLog.class)));
+        ReactiveSelectOperation.ReactiveSelect<AccessLog> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<AccessLog> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(this.accessLogRepository.count()).willReturn(Mono.just(Mockito.anyLong()));
+        given(r2dbcEntityTemplate.select(AccessLog.class)).willReturn(select);
+        given(select.matching(any(Query.class))).willReturn(terminating);
+        given(terminating.all()).willReturn(Flux.just(entity));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(AccessLog.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(recordService.retrieve(0, 2, "id", true, "url:like:a")).expectNextCount(1).verifyComplete();
+        StepVerifier.create(recordService.retrieve(0, 2, "id", true, "url:like:a"))
+                .assertNext(page -> {
+                    assertThat(page.getContent()).hasSize(1);
+                    AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
+                    AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
+                    AssertionsForClassTypes.assertThat(page.getSize()).isEqualTo(2);
+                }).verifyComplete();
     }
 
 }
