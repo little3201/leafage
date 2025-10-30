@@ -24,10 +24,13 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.poi.ExcelReader;
 
 /**
  * dictionary controller
@@ -139,4 +142,19 @@ public class DictionaryController {
                 .doOnError(e -> logger.error("Remove dictionary error: ", e));
     }
 
+    /**
+     * Import the records.
+     *
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_dictionaries:import')")
+    @PostMapping("/import")
+    public Flux<DictionaryVO> importFromFile(FilePart file) {
+        return ExcelReader.read(file, DictionaryDTO.class)
+                .flatMapMany(dictionaryService::createAll)
+                .onErrorMap(e -> {
+                    logger.error("Failed import from file: ", e);
+                    return new RuntimeException("Failed import from file", e);
+                });
+    }
 }

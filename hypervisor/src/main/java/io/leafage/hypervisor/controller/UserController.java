@@ -23,8 +23,6 @@ import io.leafage.hypervisor.vo.UserVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
@@ -36,8 +34,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.ExcelReader;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.Principal;
 
 /**
@@ -187,7 +183,6 @@ public class UserController {
                 .doOnSuccess(result -> logger.debug("User unlocked, id: {}, result: {}", id, result))
                 .doOnError(e -> logger.error("Unlock user error, id: {}", id, e));
     }
-
     /**
      * Import the records.
      *
@@ -196,32 +191,12 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_users:import')")
     @PostMapping("/import")
     public Flux<UserVO> importFromFile(FilePart file) {
-        return file.content()
-                .collectList()
-                .map(dataBuffers -> {
-                    // 将 DataBuffer 列表转换为字节数组
-                    byte[] bytes = new byte[dataBuffers.stream().mapToInt(DataBuffer::readableByteCount).sum()];
-                    int offset = 0;
-                    for (DataBuffer buffer : dataBuffers) {
-                        int length = buffer.readableByteCount();
-                        buffer.read(bytes, offset, length);
-                        offset += length;
-                        DataBufferUtils.release(buffer); // 释放资源
-                    }
-                    return bytes;
-                })
-                .map(bytes -> {
-                    try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
-                        return ExcelReader.read(inputStream, UserDTO.class);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to read Excel file", e);
-                    }
-                })
-                .onErrorMap(e -> {
-                    logger.error("Failed to read Excel file: ", e);
-                    return new RuntimeException("Failed to process Excel file", e);
-                })
+        return ExcelReader.read(file, UserDTO.class)
                 .flatMapMany(userService::createAll)
-                .doOnError(e -> logger.error("Import user error: ", e));
+                .onErrorMap(e -> {
+                    logger.error("Failed import from file: ", e);
+                    return new RuntimeException("Failed import from file", e);
+                });
     }
+
 }
