@@ -131,26 +131,6 @@ public class GroupController {
     }
 
     /**
-     * 是否存在
-     *
-     * @param name 名称
-     * @param id   主键
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
-        boolean exists;
-        try {
-            exists = groupService.exists(name, id);
-        } catch (Exception e) {
-            logger.info("Check group exists error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 添加信息
      *
      * @param dto 要添加的数据
@@ -161,6 +141,10 @@ public class GroupController {
     public ResponseEntity<GroupVO> create(@Valid @RequestBody GroupDTO dto) {
         GroupVO groupVO;
         try {
+            boolean existed = groupService.exists(dto.getName(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             groupVO = groupService.create(dto);
         } catch (Exception e) {
             logger.error("Create group error: ", e);
@@ -181,6 +165,10 @@ public class GroupController {
     public ResponseEntity<GroupVO> modify(@PathVariable Long id, @RequestBody GroupDTO dto) {
         GroupVO groupVO;
         try {
+            boolean existed = groupService.exists(dto.getName(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             groupVO = groupService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify group error: ", e);

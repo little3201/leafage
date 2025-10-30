@@ -94,25 +94,6 @@ public class RegionController {
     }
 
     /**
-     * 是否存在
-     *
-     * @param name 名称
-     * @param id   主键
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
-        boolean exists;
-        try {
-            exists = regionService.exists(name, id);
-        } catch (Exception e) {
-            logger.info("Check region exists error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 添加信息
      *
      * @param dto 要添加的数据
@@ -122,6 +103,10 @@ public class RegionController {
     public ResponseEntity<RegionVO> create(@Valid @RequestBody RegionDTO dto) {
         RegionVO vo;
         try {
+            boolean existed = regionService.exists(dto.getName(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = regionService.create(dto);
         } catch (Exception e) {
             logger.error("Create region error: ", e);
@@ -139,14 +124,18 @@ public class RegionController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<RegionVO> modify(@PathVariable Long id, @RequestBody RegionDTO dto) {
-        RegionVO regionVO;
+        RegionVO vo;
         try {
-            regionVO = regionService.modify(id, dto);
+            boolean existed = regionService.exists(dto.getName(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            vo = regionService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify region error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
-        return ResponseEntity.accepted().body(regionVO);
+        return ResponseEntity.accepted().body(vo);
     }
 
     /**

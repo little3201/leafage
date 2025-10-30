@@ -22,7 +22,6 @@ import io.leafage.hypervisor.vo.DictionaryVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -36,8 +35,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -83,10 +83,10 @@ class DictionaryControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<DictionaryVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<DictionaryVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.dictionaryService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/dictionaries")
                         .queryParam("page", "0")
@@ -103,8 +103,8 @@ class DictionaryControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.dictionaryService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.dictionaryService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/dictionaries")
                         .queryParam("page", "0")
@@ -120,18 +120,18 @@ class DictionaryControllerTest {
 
     @Test
     void subset() throws Exception {
-        given(this.dictionaryService.subset(Mockito.anyLong())).willReturn(List.of(vo));
+        given(this.dictionaryService.subset(anyLong())).willReturn(List.of(vo));
 
-        mvc.perform(get("/dictionaries/{id}/subset", Mockito.anyLong()))
+        mvc.perform(get("/dictionaries/{id}/subset", anyLong()))
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void fetch() throws Exception {
-        given(this.dictionaryService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.dictionaryService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/dictionaries/{id}", Mockito.anyLong()))
+        mvc.perform(get("/dictionaries/{id}", anyLong()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("gender"))
                 .andDo(print()).andReturn();
@@ -139,9 +139,9 @@ class DictionaryControllerTest {
 
     @Test
     void fetch_error() throws Exception {
-        given(this.dictionaryService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.dictionaryService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/dictionaries/{id}", Mockito.anyLong()))
+        mvc.perform(get("/dictionaries/{id}", anyLong()))
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
@@ -149,7 +149,7 @@ class DictionaryControllerTest {
 
     @Test
     void modify() throws Exception {
-        given(this.dictionaryService.modify(Mockito.anyLong(), Mockito.any(DictionaryDTO.class))).willReturn(vo);
+        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willReturn(vo);
 
         mvc.perform(put("/dictionaries/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -159,9 +159,9 @@ class DictionaryControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.dictionaryService.modify(Mockito.anyLong(), Mockito.any(DictionaryDTO.class))).willThrow(new RuntimeException());
+        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
-        mvc.perform(put("/dictionaries/{id}", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(put("/dictionaries/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isNotModified())
                 .andDo(print()).andReturn();
@@ -169,46 +169,25 @@ class DictionaryControllerTest {
 
     @Test
     void remove() throws Exception {
-        this.dictionaryService.remove(Mockito.anyLong());
+        this.dictionaryService.remove(anyLong());
 
-        mvc.perform(delete("/dictionaries/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void enable() throws Exception {
-        given(this.dictionaryService.enable(Mockito.anyLong())).willReturn(true);
+        given(this.dictionaryService.enable(anyLong())).willReturn(true);
 
-        mvc.perform(patch("/dictionaries/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(patch("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
 
     @Test
-    void exists() throws Exception {
-        given(this.dictionaryService.exists(Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong())).willReturn(true);
-
-        mvc.perform(get("/dictionaries/{superiorId}/exists", "1")
-                        .queryParam("name", "test"))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exist_error() throws Exception {
-        given(this.dictionaryService.exists(Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
-
-        mvc.perform(get("/dictionaries/{superiorId}/exists", "1")
-                        .queryParam("name", "test")
-                        .queryParam("id", "2"))
-                .andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
     void subset_error() throws Exception {
-        given(this.dictionaryService.subset(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.dictionaryService.subset(anyLong())).willThrow(new RuntimeException());
 
         mvc.perform(get("/dictionaries/{id}/subset", "1"))
                 .andExpect(status().isNoContent())
@@ -217,7 +196,7 @@ class DictionaryControllerTest {
 
     @Test
     void create() throws Exception {
-        given(this.dictionaryService.create(Mockito.any(DictionaryDTO.class))).willReturn(vo);
+        given(this.dictionaryService.create(any(DictionaryDTO.class))).willReturn(vo);
 
         mvc.perform(post("/dictionaries").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -228,7 +207,7 @@ class DictionaryControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(this.dictionaryService.create(Mockito.any(DictionaryDTO.class))).willThrow(new RuntimeException());
+        given(this.dictionaryService.create(any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/dictionaries").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))

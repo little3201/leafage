@@ -22,7 +22,6 @@ import io.leafage.assets.vo.CommentVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -37,8 +36,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -84,9 +84,9 @@ class CommentControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<CommentVO> page = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<CommentVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"), Mockito.anyBoolean(), Mockito.anyString())).willReturn(page);
+        given(commentService.retrieve(anyInt(), anyInt(), eq("id"), anyBoolean(), anyString())).willReturn(page);
 
         mvc.perform(get("/comments")
                         .queryParam("page", "0")
@@ -96,7 +96,7 @@ class CommentControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(commentService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString())).willThrow(new NoSuchElementException());
+        given(commentService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willThrow(new NoSuchElementException());
 
         mvc.perform(get("/comments")
                         .queryParam("page", "0")
@@ -110,35 +110,35 @@ class CommentControllerTest {
 
     @Test
     void relation() throws Exception {
-        given(commentService.relation(Mockito.anyLong())).willReturn(List.of(vo));
+        given(commentService.relation(anyLong())).willReturn(List.of(vo));
 
-        mvc.perform(get("/comments/{id}", Mockito.anyLong())).andExpect(status().isOk()).andDo(print()).andReturn();
+        mvc.perform(get("/comments/{id}", anyLong())).andExpect(status().isOk()).andDo(print()).andReturn();
     }
 
     @Test
     void relation_error() throws Exception {
-        given(commentService.relation(Mockito.anyLong())).willThrow(new NoSuchElementException());
+        given(commentService.relation(anyLong())).willThrow(new NoSuchElementException());
 
-        mvc.perform(get("/comments/{id}", Mockito.anyLong())).andExpect(status().isNoContent()).andDo(print()).andReturn();
+        mvc.perform(get("/comments/{id}", anyLong())).andExpect(status().isNoContent()).andDo(print()).andReturn();
     }
 
     @Test
     void replies() throws Exception {
-        given(commentService.replies(Mockito.anyLong())).willReturn(List.of(vo));
+        given(commentService.replies(anyLong())).willReturn(List.of(vo));
 
         mvc.perform(get("/comments/{id}/replies", 1L)).andExpect(status().isOk()).andDo(print()).andReturn();
     }
 
     @Test
     void replies_error() throws Exception {
-        given(commentService.replies(Mockito.anyLong())).willThrow(new NoSuchElementException());
+        given(commentService.replies(anyLong())).willThrow(new NoSuchElementException());
 
         mvc.perform(get("/comments/{id}/replies", 1L)).andExpect(status().isNoContent()).andDo(print()).andReturn();
     }
 
     @Test
     void create() throws Exception {
-        given(commentService.create(Mockito.any(CommentDTO.class))).willReturn(vo);
+        given(commentService.create(any(CommentDTO.class))).willReturn(vo);
 
         mvc.perform(post("/comments").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status().isCreated())
@@ -147,7 +147,7 @@ class CommentControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(commentService.create(Mockito.any(CommentDTO.class))).willThrow(new NoSuchElementException());
+        given(commentService.create(any(CommentDTO.class))).willThrow(new NoSuchElementException());
 
         mvc.perform(post("/comments").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status()

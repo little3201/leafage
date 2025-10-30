@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +34,12 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * scheduler log service test
@@ -55,10 +57,10 @@ class SchedulerLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<SchedulerLog> page = new PageImpl<>(List.of(Mockito.mock(SchedulerLog.class)));
+        Page<SchedulerLog> page = new PageImpl<>(List.of(mock(SchedulerLog.class)));
 
         given(this.schedulerLogRepository.findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<SchedulerLogVO> voPage = schedulerLogService.retrieve(0, 2, "id", true, "test");
 
@@ -67,20 +69,20 @@ class SchedulerLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.schedulerLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(SchedulerLog.class)));
+        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(SchedulerLog.class)));
 
-        SchedulerLogVO vo = schedulerLogService.fetch(Mockito.anyLong());
+        SchedulerLogVO vo = schedulerLogService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void create() {
-        given(this.schedulerLogRepository.saveAndFlush(Mockito.any(SchedulerLog.class))).willReturn(Mockito.mock(SchedulerLog.class));
+        given(this.schedulerLogRepository.saveAndFlush(any(SchedulerLog.class))).willReturn(mock(SchedulerLog.class));
 
-        SchedulerLogVO vo = schedulerLogService.create(Mockito.mock(SchedulerLogDTO.class));
+        SchedulerLogVO vo = schedulerLogService.create(mock(SchedulerLogDTO.class));
 
-        verify(this.schedulerLogRepository, times(1)).saveAndFlush(Mockito.any(SchedulerLog.class));
+        verify(this.schedulerLogRepository, times(1)).saveAndFlush(any(SchedulerLog.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -88,7 +90,7 @@ class SchedulerLogServiceImplTest {
     void remove() {
         schedulerLogService.remove(1L);
 
-        verify(this.schedulerLogRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.schedulerLogRepository, times(1)).deleteById(anyLong());
     }
 
     @Test

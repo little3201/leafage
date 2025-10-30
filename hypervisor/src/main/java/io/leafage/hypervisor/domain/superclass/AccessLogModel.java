@@ -52,7 +52,6 @@ public abstract class AccessLogModel {
     private String responseMessage;
 
 
-
     public String getUrl() {
         return url;
     }

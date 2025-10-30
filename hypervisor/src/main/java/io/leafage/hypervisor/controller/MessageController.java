@@ -100,6 +100,10 @@ public class MessageController {
     public ResponseEntity<MessageVO> create(@Valid @RequestBody MessageDTO dto) {
         MessageVO vo;
         try {
+            boolean existed = messageService.exists(dto.getTitle(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = messageService.create(dto);
         } catch (Exception e) {
             logger.info("Create message error: ", e);

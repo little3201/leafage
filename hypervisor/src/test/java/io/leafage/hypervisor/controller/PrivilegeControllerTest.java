@@ -23,7 +23,6 @@ import io.leafage.hypervisor.vo.PrivilegeVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -39,7 +38,9 @@ import top.leafage.common.TreeNode;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -93,10 +94,10 @@ class PrivilegeControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.privilegeService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/privileges")
                         .queryParam("page", "0")
@@ -113,8 +114,8 @@ class PrivilegeControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.privilegeService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.privilegeService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/privileges")
                         .queryParam("page", "0")
@@ -130,23 +131,23 @@ class PrivilegeControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.privilegeService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.privilegeService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/privileges/{id}", Mockito.anyLong())).andExpect(status().isOk())
+        mvc.perform(get("/privileges/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.privilegeService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.privilegeService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/privileges/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/privileges/{id}", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void modify() throws Exception {
-        given(this.privilegeService.modify(Mockito.anyLong(), Mockito.any(PrivilegeDTO.class))).willReturn(vo);
+        given(this.privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).willReturn(vo);
 
         mvc.perform(put("/privileges/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -156,9 +157,9 @@ class PrivilegeControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.privilegeService.modify(Mockito.anyLong(), Mockito.any(PrivilegeDTO.class))).willThrow(new RuntimeException());
+        given(this.privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).willThrow(new RuntimeException());
 
-        mvc.perform(put("/privileges/{id}", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(put("/privileges/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isNotModified())
                 .andDo(print()).andReturn();
@@ -167,7 +168,7 @@ class PrivilegeControllerTest {
     @Test
     void tree() throws Exception {
         TreeNode<Long> treeNode = TreeNode.withId(1L).name("test").build();
-        given(this.privilegeService.tree(Mockito.anyString())).willReturn(Collections.singletonList(treeNode));
+        given(this.privilegeService.tree(anyString())).willReturn(Collections.singletonList(treeNode));
 
         mvc.perform(get("/privileges/tree"))
                 .andExpect(status().isOk())
@@ -177,7 +178,7 @@ class PrivilegeControllerTest {
 
     @Test
     void tree_error() throws Exception {
-        given(this.privilegeService.tree(Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.privilegeService.tree(anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/privileges/tree"))
                 .andExpect(status().isNoContent())
@@ -187,9 +188,9 @@ class PrivilegeControllerTest {
 
     @Test
     void enable() throws Exception {
-        given(this.privilegeService.enable(Mockito.anyLong())).willReturn(true);
+        given(this.privilegeService.enable(anyLong())).willReturn(true);
 
-        mvc.perform(patch("/privileges/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(patch("/privileges/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }

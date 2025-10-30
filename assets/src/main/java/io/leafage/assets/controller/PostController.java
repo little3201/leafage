@@ -95,25 +95,6 @@ public class PostController {
     }
 
     /**
-     * 查询帖子是否存在
-     *
-     * @param title 标题
-     * @param id    主键
-     * @return 帖子是否已存在
-     */
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam String title, Long id) {
-        boolean exists;
-        try {
-            exists = postService.exists(title, id);
-        } catch (Exception e) {
-            logger.info("Check posts exists error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 保存文章信息
      *
      * @param dto 文章内容
@@ -124,6 +105,10 @@ public class PostController {
     public ResponseEntity<PostVO> create(@Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
+            boolean existed = postService.exists(dto.getTitle(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = postService.create(dto);
         } catch (Exception e) {
             logger.error("Save posts error: ", e);
@@ -144,6 +129,10 @@ public class PostController {
     public ResponseEntity<PostVO> modify(@PathVariable Long id, @Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
+            boolean existed = postService.exists(dto.getTitle(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = postService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify posts error: ", e);

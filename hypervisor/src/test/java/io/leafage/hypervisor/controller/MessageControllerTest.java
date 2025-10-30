@@ -22,7 +22,6 @@ import io.leafage.hypervisor.vo.MessageVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -36,8 +35,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -84,10 +84,10 @@ class MessageControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<MessageVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<MessageVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.messageService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/messages")
                         .queryParam("page", "0")
@@ -104,8 +104,8 @@ class MessageControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.messageService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.messageService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/messages")
                         .queryParam("page", "0")
@@ -121,23 +121,23 @@ class MessageControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.messageService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.messageService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/messages/{id}", Mockito.anyLong())).andExpect(status().isOk())
+        mvc.perform(get("/messages/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("content")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.messageService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.messageService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/messages/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/messages/{id}", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void create() throws Exception {
-        given(this.messageService.create(Mockito.any(MessageDTO.class))).willReturn(vo);
+        given(this.messageService.create(any(MessageDTO.class))).willReturn(vo);
 
         mvc.perform(post("/messages").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -148,7 +148,7 @@ class MessageControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(this.messageService.create(Mockito.any(MessageDTO.class))).willThrow(new RuntimeException());
+        given(this.messageService.create(any(MessageDTO.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/messages").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))

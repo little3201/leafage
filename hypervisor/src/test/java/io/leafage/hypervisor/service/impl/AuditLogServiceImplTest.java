@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +34,12 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * audit log service test
@@ -55,10 +57,10 @@ class AuditLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<AuditLog> page = new PageImpl<>(List.of(Mockito.mock(AuditLog.class)));
+        Page<AuditLog> page = new PageImpl<>(List.of(mock(AuditLog.class)));
 
         given(this.auditLogRepository.findAll(ArgumentMatchers.<Specification<AuditLog>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<AuditLogVO> voPage = auditLogService.retrieve(0, 2, "id", true, "test");
 
@@ -67,20 +69,20 @@ class AuditLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.auditLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(AuditLog.class)));
+        given(this.auditLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(AuditLog.class)));
 
-        AuditLogVO vo = auditLogService.fetch(Mockito.anyLong());
+        AuditLogVO vo = auditLogService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void create() {
-        given(this.auditLogRepository.saveAndFlush(Mockito.any(AuditLog.class))).willReturn(Mockito.mock(AuditLog.class));
+        given(this.auditLogRepository.saveAndFlush(any(AuditLog.class))).willReturn(mock(AuditLog.class));
 
-        AuditLogVO vo = auditLogService.create(Mockito.mock(AuditLogDTO.class));
+        AuditLogVO vo = auditLogService.create(mock(AuditLogDTO.class));
 
-        verify(this.auditLogRepository, times(1)).saveAndFlush(Mockito.any(AuditLog.class));
+        verify(this.auditLogRepository, times(1)).saveAndFlush(any(AuditLog.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -88,7 +90,7 @@ class AuditLogServiceImplTest {
     void remove() {
         auditLogService.remove(1L);
 
-        verify(this.auditLogRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.auditLogRepository, times(1)).deleteById(anyLong());
     }
 
 }

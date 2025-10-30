@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,7 +34,9 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 /**
  * comment 接口测试
@@ -53,10 +54,10 @@ class CommentServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Comment> page = new PageImpl<>(List.of(Mockito.mock(Comment.class)));
+        Page<Comment> page = new PageImpl<>(List.of(mock(Comment.class)));
 
         given(commentRepository.findAll(ArgumentMatchers.<Specification<Comment>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
         Assertions.assertNotNull(voPage.getContent());
@@ -64,7 +65,7 @@ class CommentServiceImplTest {
 
     @Test
     void relation() {
-        given(commentRepository.findAllByPostIdAndReplierIsNull(Mockito.anyLong())).willReturn(Mockito.anyList());
+        given(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).willReturn(anyList());
 
         List<CommentVO> voList = commentService.relation(1L);
         Assertions.assertNotNull(voList);
@@ -72,9 +73,9 @@ class CommentServiceImplTest {
 
     @Test
     void relation_empty() {
-        given(commentRepository.findAllByPostIdAndReplierIsNull(Mockito.anyLong())).willReturn(Collections.emptyList());
+        given(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).willReturn(Collections.emptyList());
 
-        List<CommentVO> voList = commentService.relation(Mockito.anyLong());
+        List<CommentVO> voList = commentService.relation(anyLong());
         Assertions.assertTrue(voList.isEmpty());
     }
 
@@ -88,23 +89,23 @@ class CommentServiceImplTest {
         comm.setContent("评论信息2222");
         comm.setPostId(1L);
         comm.setReplier(comment.getReplier());
-        given(commentRepository.findAllByReplier(Mockito.anyLong())).willReturn(List.of(comment, comm));
+        given(commentRepository.findAllByReplier(anyLong())).willReturn(List.of(comment, comm));
 
-        List<CommentVO> voList = commentService.replies(Mockito.anyLong());
+        List<CommentVO> voList = commentService.replies(anyLong());
         Assertions.assertNotNull(voList);
     }
 
     @Test
     void replies_empty() {
-        List<CommentVO> voList = commentService.replies(Mockito.anyLong());
+        List<CommentVO> voList = commentService.replies(anyLong());
         Assertions.assertTrue(voList.isEmpty());
     }
 
     @Test
     void create() {
-        given(commentRepository.saveAndFlush(Mockito.any(Comment.class))).willReturn(Mockito.mock(Comment.class));
+        given(commentRepository.saveAndFlush(any(Comment.class))).willReturn(mock(Comment.class));
 
-        CommentVO vo = commentService.create(Mockito.mock(CommentDTO.class));
+        CommentVO vo = commentService.create(mock(CommentDTO.class));
         Assertions.assertNotNull(vo);
     }
 

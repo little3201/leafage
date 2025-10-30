@@ -20,7 +20,6 @@ import io.leafage.hypervisor.vo.SchedulerLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -35,9 +34,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -75,10 +75,10 @@ class SchedulerLogControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.schedulerLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.schedulerLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/scheduler-logs")
                         .queryParam("page", "0")
@@ -95,8 +95,8 @@ class SchedulerLogControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.schedulerLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/scheduler-logs")
                         .queryParam("page", "0")
@@ -112,33 +112,33 @@ class SchedulerLogControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.schedulerLogService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.schedulerLogService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/scheduler-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
+        mvc.perform(get("/scheduler-logs/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.schedulerLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.schedulerLogService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/scheduler-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/scheduler-logs/{id}", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove() throws Exception {
-        this.schedulerLogService.remove(Mockito.anyLong());
+        this.schedulerLogService.remove(anyLong());
 
-        mvc.perform(delete("/scheduler-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
+        mvc.perform(delete("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.schedulerLogService).remove(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.schedulerLogService).remove(anyLong());
 
-        mvc.perform(delete("/scheduler-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

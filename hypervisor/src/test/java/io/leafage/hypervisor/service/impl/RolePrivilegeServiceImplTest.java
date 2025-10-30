@@ -29,15 +29,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * role privileges service test
@@ -78,17 +79,17 @@ class RolePrivilegeServiceImplTest {
 
     @Test
     void privileges() {
-        given(this.rolePrivilegesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(RolePrivileges.class)));
+        given(this.rolePrivilegesRepository.findAllByRoleId(anyLong())).willReturn(List.of(mock(RolePrivileges.class)));
 
-        List<RolePrivileges> privileges = rolePrivilegesService.privileges(Mockito.anyLong());
+        List<RolePrivileges> privileges = rolePrivilegesService.privileges(anyLong());
         Assertions.assertNotNull(privileges);
     }
 
     @Test
     void roles() {
-        given(this.rolePrivilegesRepository.findAllByPrivilegeId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(RolePrivileges.class)));
+        given(this.rolePrivilegesRepository.findAllByPrivilegeId(anyLong())).willReturn(List.of(mock(RolePrivileges.class)));
 
-        List<RolePrivileges> roles = rolePrivilegesService.roles(Mockito.anyLong());
+        List<RolePrivileges> roles = rolePrivilegesService.roles(anyLong());
         Assertions.assertNotNull(roles);
     }
 
@@ -98,19 +99,19 @@ class RolePrivilegeServiceImplTest {
         rolePrivilege.setId(1L);
         rolePrivilege.setPrivilegeId(1L);
         rolePrivilege.setRoleId(1L);
-        given(this.rolePrivilegesRepository.findByRoleIdAndPrivilegeId(Mockito.anyLong(), Mockito.anyLong())).willReturn(Optional.of(rolePrivilege));
+        given(this.rolePrivilegesRepository.findByRoleIdAndPrivilegeId(anyLong(), anyLong())).willReturn(Optional.of(rolePrivilege));
 
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(privilege));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(privilege));
 
-        given(this.groupRolesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(groupRoles));
+        given(this.groupRolesRepository.findAllByRoleId(anyLong())).willReturn(List.of(groupRoles));
 
-        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(Mockito.anyLong(), Mockito.anyString())).willReturn(Optional.ofNullable(Mockito.mock(GroupAuthorities.class)));
+        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).willReturn(Optional.ofNullable(mock(GroupAuthorities.class)));
 
-        given(this.rolePrivilegesRepository.saveAndFlush(Mockito.any(RolePrivileges.class))).willReturn(rolePrivilege);
+        given(this.rolePrivilegesRepository.saveAndFlush(any(RolePrivileges.class))).willReturn(rolePrivilege);
         RolePrivileges relation = rolePrivilegesService.relation(1L, 1L, "");
 
-        verify(this.rolePrivilegesRepository, times(1)).saveAndFlush(Mockito.any(RolePrivileges.class));
-        verify(this.groupAuthoritiesRepository, times(1)).saveAll(Mockito.anyList());
+        verify(this.rolePrivilegesRepository, times(1)).saveAndFlush(any(RolePrivileges.class));
+        verify(this.groupAuthoritiesRepository, times(1)).saveAll(anyList());
 
         Assertions.assertNotNull(relation);
     }

@@ -20,7 +20,6 @@ import io.leafage.hypervisor.vo.AuditLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -35,9 +34,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -77,10 +77,10 @@ class AuditLogControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<AuditLogVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<AuditLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.auditLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/audit-logs")
                         .queryParam("page", "0")
@@ -97,8 +97,8 @@ class AuditLogControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.auditLogService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/audit-logs")
                         .queryParam("page", "0")
@@ -114,33 +114,33 @@ class AuditLogControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.auditLogService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.auditLogService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/audit-logs/{id}", Mockito.anyLong())).andExpect(status().isOk())
+        mvc.perform(get("/audit-logs/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.operation").value("test")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.auditLogService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.auditLogService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/audit-logs/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/audit-logs/{id}", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove() throws Exception {
-        this.auditLogService.remove(Mockito.anyLong());
+        this.auditLogService.remove(anyLong());
 
-        mvc.perform(delete("/audit-logs/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
+        mvc.perform(delete("/audit-logs/{id}", anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.auditLogService).remove(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.auditLogService).remove(anyLong());
 
-        mvc.perform(delete("/audit-logs/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

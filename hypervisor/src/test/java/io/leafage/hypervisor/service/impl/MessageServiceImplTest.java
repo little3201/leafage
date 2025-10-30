@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +34,13 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * message service test
@@ -56,10 +59,10 @@ class MessageServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Message> page = new PageImpl<>(List.of(Mockito.mock(Message.class)));
+        Page<Message> page = new PageImpl<>(List.of(mock(Message.class)));
 
         given(this.messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<MessageVO> voPage = messageService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
@@ -67,9 +70,9 @@ class MessageServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.messageRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Message.class)));
+        given(this.messageRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Message.class)));
 
-        MessageVO vo = messageService.fetch(Mockito.anyLong());
+        MessageVO vo = messageService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
@@ -77,11 +80,11 @@ class MessageServiceImplTest {
 
     @Test
     void create() {
-        given(this.messageRepository.saveAndFlush(Mockito.any(Message.class))).willReturn(Mockito.mock(Message.class));
+        given(this.messageRepository.saveAndFlush(any(Message.class))).willReturn(mock(Message.class));
 
-        MessageVO vo = messageService.create(Mockito.mock(MessageDTO.class));
+        MessageVO vo = messageService.create(mock(MessageDTO.class));
 
-        verify(this.messageRepository, times(1)).saveAndFlush(Mockito.any(Message.class));
+        verify(this.messageRepository, times(1)).saveAndFlush(any(Message.class));
         Assertions.assertNotNull(vo);
     }
 }

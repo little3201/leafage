@@ -22,15 +22,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * group members service test
@@ -48,7 +50,7 @@ class GroupMembersServiceImplTest {
 
     @Test
     void members() {
-        given(this.groupMembersRepository.findAllByGroupId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(GroupMembers.class)));
+        given(this.groupMembersRepository.findAllByGroupId(anyLong())).willReturn(List.of(mock(GroupMembers.class)));
 
         List<GroupMembers> members = groupMembersService.members(1L);
         Assertions.assertNotNull(members);
@@ -56,7 +58,7 @@ class GroupMembersServiceImplTest {
 
     @Test
     void groups() {
-        given(this.groupMembersRepository.findAllByUsername(Mockito.anyString())).willReturn(List.of(Mockito.mock(GroupMembers.class)));
+        given(this.groupMembersRepository.findAllByUsername(anyString())).willReturn(List.of(mock(GroupMembers.class)));
 
         List<GroupMembers> groups = groupMembersService.groups("test");
         Assertions.assertNotNull(groups);
@@ -65,11 +67,11 @@ class GroupMembersServiceImplTest {
     @Test
     void relation() {
 
-        given(this.groupMembersRepository.saveAllAndFlush(Mockito.anyCollection())).willReturn(Mockito.anyList());
+        given(this.groupMembersRepository.saveAllAndFlush(anyCollection())).willReturn(anyList());
 
         List<GroupMembers> relation = groupMembersService.relation(1L, Set.of("test"));
 
-        verify(this.groupMembersRepository, times(1)).saveAllAndFlush(Mockito.anyList());
+        verify(this.groupMembersRepository, times(1)).saveAllAndFlush(anyList());
         Assertions.assertNotNull(relation);
     }
 }

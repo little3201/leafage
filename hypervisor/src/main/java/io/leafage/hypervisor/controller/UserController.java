@@ -98,26 +98,6 @@ public class UserController {
     }
 
     /**
-     * 是否存在
-     *
-     * @param username 名称
-     * @param id       主键
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users')")
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam String username, Long id) {
-        boolean exists;
-        try {
-            exists = userService.exists(username, id);
-        } catch (Exception e) {
-            logger.info("Check user exists error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 查询当前用户
      *
      * @param principal 当前用户
@@ -146,6 +126,10 @@ public class UserController {
     public ResponseEntity<UserVO> create(@Valid @RequestBody UserDTO dto) {
         UserVO vo;
         try {
+            boolean existed = userService.exists(dto.getUsername(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = userService.create(dto);
         } catch (Exception e) {
             logger.error("Create user error: ", e);
@@ -167,6 +151,10 @@ public class UserController {
                                          @Valid @RequestBody UserDTO dto) {
         UserVO vo;
         try {
+            boolean existed = userService.exists(dto.getUsername(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = userService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify user error: ", e);

@@ -65,11 +65,8 @@ public class TagServiceImpl extends DomainConverter implements TagService {
     @Override
     public TagVO fetch(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-        Tag tag = tagRepository.findById(id).orElse(null);
-        if (tag == null) {
-            return null;
-        }
-        return convertToVO(tag, TagVO.class);
+
+        return tagRepository.findById(id).map(tag -> convertToVO(tag, TagVO.class)).orElse(null);
     }
 
     /**
@@ -78,6 +75,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
     @Override
     public boolean exists(String name, Long id) {
         Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
+
         if (id == null) {
             return tagRepository.existsByName(name);
         }

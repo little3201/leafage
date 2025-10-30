@@ -22,15 +22,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * group roles service test
@@ -48,7 +50,7 @@ class GroupRolesServiceImplTest {
 
     @Test
     void roles() {
-        given(this.groupRolesRepository.findAllByGroupId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(GroupRoles.class)));
+        given(this.groupRolesRepository.findAllByGroupId(anyLong())).willReturn(List.of(mock(GroupRoles.class)));
 
         List<GroupRoles> members = groupRolesService.roles(1L);
         Assertions.assertNotNull(members);
@@ -56,7 +58,7 @@ class GroupRolesServiceImplTest {
 
     @Test
     void groups() {
-        given(this.groupRolesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(GroupRoles.class)));
+        given(this.groupRolesRepository.findAllByRoleId(anyLong())).willReturn(List.of(mock(GroupRoles.class)));
 
         List<GroupRoles> groups = groupRolesService.groups(1L);
         Assertions.assertNotNull(groups);
@@ -64,11 +66,11 @@ class GroupRolesServiceImplTest {
 
     @Test
     void relation() {
-        given(this.groupRolesRepository.saveAllAndFlush(Mockito.anyCollection())).willReturn(Mockito.anyList());
+        given(this.groupRolesRepository.saveAllAndFlush(anyCollection())).willReturn(anyList());
 
         List<GroupRoles> relation = groupRolesService.relation(1L, Set.of(1L));
 
-        verify(this.groupRolesRepository, times(1)).saveAllAndFlush(Mockito.anyList());
+        verify(this.groupRolesRepository, times(1)).saveAllAndFlush(anyList());
         Assertions.assertNotNull(relation);
     }
 }

@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,9 +35,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * region service test
@@ -67,10 +68,10 @@ class RegionServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Region> page = new PageImpl<>(List.of(Mockito.mock(Region.class)));
+        Page<Region> page = new PageImpl<>(List.of(mock(Region.class)));
 
         given(this.regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
         Assertions.assertNotNull(voPage.getContent());
@@ -78,16 +79,16 @@ class RegionServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.regionRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Region.class)));
+        given(this.regionRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Region.class)));
 
-        RegionVO vo = regionService.fetch(Mockito.anyLong());
+        RegionVO vo = regionService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(this.regionRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
+        given(this.regionRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(true);
 
         boolean exists = regionService.exists("test", 1L);
 
@@ -96,7 +97,7 @@ class RegionServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(this.regionRepository.existsByName(Mockito.anyString())).willReturn(true);
+        given(this.regionRepository.existsByName(anyString())).willReturn(true);
 
         boolean exists = regionService.exists("test", null);
 
@@ -105,23 +106,23 @@ class RegionServiceImplTest {
 
     @Test
     void create() {
-        given(this.regionRepository.saveAndFlush(Mockito.any(Region.class))).willReturn(Mockito.mock(Region.class));
+        given(this.regionRepository.saveAndFlush(any(Region.class))).willReturn(mock(Region.class));
 
-        RegionVO vo = regionService.create(Mockito.mock(RegionDTO.class));
+        RegionVO vo = regionService.create(mock(RegionDTO.class));
 
-        verify(this.regionRepository, times(1)).saveAndFlush(Mockito.any(Region.class));
+        verify(this.regionRepository, times(1)).saveAndFlush(any(Region.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(this.regionRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Region.class)));
+        given(this.regionRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Region.class)));
 
-        given(this.regionRepository.save(Mockito.any(Region.class))).willReturn(Mockito.mock(Region.class));
+        given(this.regionRepository.save(any(Region.class))).willReturn(mock(Region.class));
 
-        RegionVO vo = regionService.modify(Mockito.anyLong(), dto);
+        RegionVO vo = regionService.modify(anyLong(), dto);
 
-        verify(this.regionRepository, times(1)).save(Mockito.any(Region.class));
+        verify(this.regionRepository, times(1)).save(any(Region.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -129,6 +130,6 @@ class RegionServiceImplTest {
     void remove() {
         regionService.remove(11L);
 
-        verify(this.regionRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.regionRepository, times(1)).deleteById(anyLong());
     }
 }

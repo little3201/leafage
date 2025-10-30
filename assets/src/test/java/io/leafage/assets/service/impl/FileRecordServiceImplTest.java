@@ -24,7 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,9 +35,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * file record service test
@@ -57,10 +58,10 @@ class FileRecordServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<FileRecord> page = new PageImpl<>(List.of(Mockito.mock(FileRecord.class)));
+        Page<FileRecord> page = new PageImpl<>(List.of(mock(FileRecord.class)));
 
         given(this.fileRecordRepository.findAll(ArgumentMatchers.<Specification<FileRecord>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
@@ -68,16 +69,16 @@ class FileRecordServiceImplTest {
 
     @Test
     void fetch() {
-        given(fileRecordRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(FileRecord.class)));
+        given(fileRecordRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(FileRecord.class)));
 
-        FileRecordVO vo = fileRecordService.fetch(Mockito.anyLong());
+        FileRecordVO vo = fileRecordService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(fileRecordRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
+        given(fileRecordRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(true);
 
         boolean exists = fileRecordService.exists("test", 1L);
 
@@ -86,7 +87,7 @@ class FileRecordServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(fileRecordRepository.existsByName(Mockito.anyString())).willReturn(true);
+        given(fileRecordRepository.existsByName(anyString())).willReturn(true);
 
         boolean exists = fileRecordService.exists("test", null);
 
@@ -95,12 +96,12 @@ class FileRecordServiceImplTest {
 
     @Test
     void upload() {
-        given(fileRecordRepository.saveAndFlush(Mockito.any(FileRecord.class))).willReturn(Mockito.mock(FileRecord.class));
+        given(fileRecordRepository.saveAndFlush(any(FileRecord.class))).willReturn(mock(FileRecord.class));
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
         FileRecordVO vo = fileRecordService.upload(file);
 
-        verify(fileRecordRepository, times(1)).saveAndFlush(Mockito.any(FileRecord.class));
+        verify(fileRecordRepository, times(1)).saveAndFlush(any(FileRecord.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -109,7 +110,7 @@ class FileRecordServiceImplTest {
         FileRecord fileRecord = new FileRecord();
         fileRecord.setName("test.jpg");
         fileRecord.setPath("/text.jpg");
-        given(fileRecordRepository.findById(Mockito.anyLong())).willReturn(Optional.of(fileRecord));
+        given(fileRecordRepository.findById(anyLong())).willReturn(Optional.of(fileRecord));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String fileName = fileRecordService.download(1L, out);
@@ -120,6 +121,6 @@ class FileRecordServiceImplTest {
     void remove() {
         fileRecordService.remove(11L);
 
-        verify(this.fileRecordRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.fileRecordRepository, times(1)).deleteById(anyLong());
     }
 }

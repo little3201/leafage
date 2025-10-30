@@ -25,7 +25,6 @@ import io.leafage.hypervisor.vo.RoleVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -39,9 +38,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -91,10 +91,10 @@ class RoleControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<RoleVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<RoleVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.roleService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.roleService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/roles")
                         .queryParam("page", "0")
@@ -111,8 +111,8 @@ class RoleControllerTest {
 
     @Test
     void retrieve_error() throws Exception {
-        given(this.roleService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willThrow(new RuntimeException());
+        given(this.roleService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         mvc.perform(get("/roles")
                         .queryParam("page", "0")
@@ -128,44 +128,23 @@ class RoleControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.roleService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.roleService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/roles/{id}", Mockito.anyLong())).andExpect(status().isOk())
+        mvc.perform(get("/roles/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.roleService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.roleService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/roles/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exists() throws Exception {
-        given(this.roleService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
-
-        mvc.perform(get("/roles/exists")
-                        .queryParam("name", "test"))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exist_error() throws Exception {
-        given(this.roleService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
-
-        mvc.perform(get("/roles/exists")
-                        .queryParam("name", "test")
-                        .queryParam("id", "1"))
-                .andExpect(status().isNoContent())
+        mvc.perform(get("/roles/{id}", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void create() throws Exception {
-        given(this.roleService.create(Mockito.any(RoleDTO.class))).willReturn(vo);
+        given(this.roleService.create(any(RoleDTO.class))).willReturn(vo);
 
         mvc.perform(post("/roles").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status().isCreated())
@@ -175,7 +154,7 @@ class RoleControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(this.roleService.create(Mockito.any(RoleDTO.class))).willThrow(new RuntimeException());
+        given(this.roleService.create(any(RoleDTO.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/roles").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -185,7 +164,7 @@ class RoleControllerTest {
 
     @Test
     void modify() throws Exception {
-        given(this.roleService.modify(Mockito.anyLong(), Mockito.any(RoleDTO.class))).willReturn(vo);
+        given(this.roleService.modify(anyLong(), any(RoleDTO.class))).willReturn(vo);
 
         mvc.perform(put("/roles/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -195,9 +174,9 @@ class RoleControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.roleService.modify(Mockito.anyLong(), Mockito.any(RoleDTO.class))).willThrow(new RuntimeException());
+        given(this.roleService.modify(anyLong(), any(RoleDTO.class))).willThrow(new RuntimeException());
 
-        mvc.perform(put("/roles/{id}", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(put("/roles/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isNotModified())
                 .andDo(print()).andReturn();
@@ -205,33 +184,33 @@ class RoleControllerTest {
 
     @Test
     void remove() throws Exception {
-        this.roleService.remove(Mockito.anyLong());
+        this.roleService.remove(anyLong());
 
-        mvc.perform(delete("/roles/{id}", Mockito.anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
+        mvc.perform(delete("/roles/{id}", anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.roleService).remove(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.roleService).remove(anyLong());
 
-        mvc.perform(delete("/roles/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/roles/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void enable() throws Exception {
-        given(this.roleService.enable(Mockito.anyLong())).willReturn(true);
+        given(this.roleService.enable(anyLong())).willReturn(true);
 
-        mvc.perform(patch("/roles/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(patch("/roles/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void members() throws Exception {
-        given(this.roleMembersService.members(Mockito.anyLong())).willReturn(Mockito.anyList());
+        given(this.roleMembersService.members(anyLong())).willReturn(anyList());
 
         mvc.perform(get("/roles/{id}/members", 1L)).andExpect(status().isOk())
                 .andDo(print()).andReturn();
@@ -239,15 +218,15 @@ class RoleControllerTest {
 
     @Test
     void members_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.roleMembersService).members(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.roleMembersService).members(anyLong());
 
-        mvc.perform(get("/roles/{id}/members", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/roles/{id}/members", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void privileges() throws Exception {
-        given(this.rolePrivilegesService.privileges(Mockito.anyLong())).willReturn(Mockito.anyList());
+        given(this.rolePrivilegesService.privileges(anyLong())).willReturn(anyList());
 
         mvc.perform(get("/roles/{id}/privileges", 1L)).andExpect(status().isOk())
                 .andDo(print()).andReturn();
@@ -255,16 +234,16 @@ class RoleControllerTest {
 
     @Test
     void authorities_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).privileges(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.rolePrivilegesService).privileges(anyLong());
 
-        mvc.perform(get("/roles/{id}/privileges", Mockito.anyLong())).andExpect(status().isNoContent())
+        mvc.perform(get("/roles/{id}/privileges", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void relation() throws Exception {
-        given(this.rolePrivilegesService.relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString()))
-                .willReturn(Mockito.mock(RolePrivileges.class));
+        given(this.rolePrivilegesService.relation(anyLong(), anyLong(), anyString()))
+                .willReturn(mock(RolePrivileges.class));
 
         mvc.perform(patch("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
                         .queryParam("action", "create")
@@ -276,7 +255,7 @@ class RoleControllerTest {
 
     @Test
     void relation_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString());
+        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(anyLong(), anyLong(), anyString());
 
         mvc.perform(patch("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
                         .queryParam("action", "create")

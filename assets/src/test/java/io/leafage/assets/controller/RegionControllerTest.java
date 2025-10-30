@@ -22,7 +22,6 @@ import io.leafage.assets.vo.RegionVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -36,8 +35,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -86,11 +87,11 @@ class RegionControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<RegionVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<RegionVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         // 使用 eq() 准确匹配参数
-        given(this.regionService.retrieve(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.regionService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         // 调用接口并验证结果
         mvc.perform(get("/regions")
@@ -108,47 +109,25 @@ class RegionControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.regionService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.regionService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/regions/{id}", Mockito.anyLong())).andExpect(status().isOk())
+        mvc.perform(get("/regions/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test"))
                 .andDo(print()).andReturn();
     }
 
     @Test
     void fetch_error() throws Exception {
-        given(this.regionService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.regionService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/regions/{id}", Mockito.anyLong()))
-                .andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exists() throws Exception {
-        given(this.regionService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
-
-        mvc.perform(get("/regions/exists")
-                        .queryParam("name", "text")
-                        .queryParam("id", "1"))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exist_error() throws Exception {
-        given(this.regionService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
-
-        mvc.perform(get("/regions/exists", "test")
-                        .queryParam("name", "text")
-                        .queryParam("id", "1"))
+        mvc.perform(get("/regions/{id}", anyLong()))
                 .andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void create() throws Exception {
-        given(this.regionService.create(Mockito.any(RegionDTO.class))).willReturn(vo);
+        given(this.regionService.create(any(RegionDTO.class))).willReturn(vo);
 
         mvc.perform(post("/regions").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -159,7 +138,7 @@ class RegionControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(this.regionService.create(Mockito.any(RegionDTO.class))).willThrow(new RuntimeException());
+        given(this.regionService.create(any(RegionDTO.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/regions").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -169,7 +148,7 @@ class RegionControllerTest {
 
     @Test
     void modify() throws Exception {
-        given(this.regionService.modify(Mockito.anyLong(), Mockito.any(RegionDTO.class))).willReturn(vo);
+        given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willReturn(vo);
 
         mvc.perform(put("/regions/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -179,9 +158,9 @@ class RegionControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.regionService.modify(Mockito.anyLong(), Mockito.any(RegionDTO.class))).willThrow(new RuntimeException());
+        given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willThrow(new RuntimeException());
 
-        mvc.perform(put("/regions/{id}", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(put("/regions/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isNotModified())
                 .andDo(print()).andReturn();
@@ -189,18 +168,18 @@ class RegionControllerTest {
 
     @Test
     void remove() throws Exception {
-        this.regionService.remove(Mockito.anyLong());
+        this.regionService.remove(anyLong());
 
-        mvc.perform(delete("/regions/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/regions/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isOk())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void remove_error() throws Exception {
-        doThrow(new RuntimeException()).when(this.regionService).remove(Mockito.anyLong());
+        doThrow(new RuntimeException()).when(this.regionService).remove(anyLong());
 
-        mvc.perform(delete("/regions/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(delete("/regions/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isExpectationFailed())
                 .andDo(print()).andReturn();
     }

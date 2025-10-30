@@ -21,7 +21,6 @@ import io.leafage.hypervisor.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -35,8 +34,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -70,8 +70,7 @@ class UserControllerTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setFirstname("John");
-        dto.setLastname("Mark");
+        dto.setFullname("John");
         dto.setAvatar("steven.jpg");
 
         vo = new UserVO();
@@ -82,10 +81,10 @@ class UserControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<UserVO> voPage = new PageImpl<>(List.of(vo), Mockito.mock(PageRequest.class), 2L);
+        Page<UserVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.userService.retrieve(Mockito.anyInt(), Mockito.anyInt(), eq("id"),
-                Mockito.anyBoolean(), Mockito.anyString())).willReturn(voPage);
+        given(this.userService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).willReturn(voPage);
 
         mvc.perform(get("/users")
                         .queryParam("page", "0")
@@ -102,9 +101,9 @@ class UserControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.userService.fetch(Mockito.anyLong())).willReturn(vo);
+        given(this.userService.fetch(anyLong())).willReturn(vo);
 
-        mvc.perform(get("/users/{id}", Mockito.anyLong()))
+        mvc.perform(get("/users/{id}", anyLong()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("test"))
                 .andDo(print())
@@ -113,36 +112,15 @@ class UserControllerTest {
 
     @Test
     void fetch_error() throws Exception {
-        given(this.userService.fetch(Mockito.anyLong())).willThrow(new RuntimeException());
+        given(this.userService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        mvc.perform(get("/users/{id}", Mockito.anyLong())).andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exists() throws Exception {
-        given(this.userService.exists(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
-
-        mvc.perform(get("/users/exists")
-                        .queryParam("username", "test"))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void exist_error() throws Exception {
-        given(this.userService.exists(Mockito.anyString(), Mockito.anyLong())).willThrow(new RuntimeException());
-
-        mvc.perform(get("/users/exists")
-                        .queryParam("username", "test")
-                        .queryParam("id", "1"))
-                .andExpect(status().isNoContent())
+        mvc.perform(get("/users/{id}", anyLong())).andExpect(status().isNoContent())
                 .andDo(print()).andReturn();
     }
 
     @Test
     void create() throws Exception {
-        given(this.userService.create(Mockito.any(UserDTO.class))).willReturn(vo);
+        given(this.userService.create(any(UserDTO.class))).willReturn(vo);
 
         mvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status().isCreated())
@@ -152,7 +130,7 @@ class UserControllerTest {
 
     @Test
     void modify() throws Exception {
-        given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willReturn(vo);
+        given(this.userService.modify(anyLong(), any(UserDTO.class))).willReturn(vo);
 
         mvc.perform(put("/users/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -162,9 +140,9 @@ class UserControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.userService.modify(Mockito.anyLong(), Mockito.any(UserDTO.class))).willThrow(new RuntimeException());
+        given(this.userService.modify(anyLong(), any(UserDTO.class))).willThrow(new RuntimeException());
 
-        mvc.perform(put("/users/{id}", Mockito.anyLong()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(put("/users/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .andExpect(status().isNotModified())
                 .andDo(print()).andReturn();
@@ -172,9 +150,9 @@ class UserControllerTest {
 
     @Test
     void enable() throws Exception {
-        given(this.userService.enable(Mockito.anyLong())).willReturn(true);
+        given(this.userService.enable(anyLong())).willReturn(true);
 
-        mvc.perform(patch("/users/{id}", Mockito.anyLong()).with(csrf().asHeader()))
+        mvc.perform(patch("/users/{id}", anyLong()).with(csrf().asHeader()))
                 .andExpect(status().isAccepted())
                 .andDo(print()).andReturn();
     }

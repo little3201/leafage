@@ -146,6 +146,10 @@ public class PrivilegeController {
     public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @Valid @RequestBody PrivilegeDTO dto) {
         PrivilegeVO vo;
         try {
+            boolean existed = privilegeService.exists(dto.getName(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = privilegeService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify privilege error: ", e);

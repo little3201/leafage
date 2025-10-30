@@ -22,15 +22,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * role members service test
@@ -48,15 +49,15 @@ class RoleMembersServiceImplTest {
 
     @Test
     void members() {
-        given(this.roleMembersRepository.findAllByRoleId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(RoleMembers.class)));
+        given(this.roleMembersRepository.findAllByRoleId(anyLong())).willReturn(List.of(mock(RoleMembers.class)));
 
-        List<RoleMembers> members = roleMembersService.members(Mockito.anyLong());
+        List<RoleMembers> members = roleMembersService.members(anyLong());
         Assertions.assertNotNull(members);
     }
 
     @Test
     void roles() {
-        given(this.roleMembersRepository.findAllByUsername(Mockito.anyString())).willReturn(List.of(Mockito.mock(RoleMembers.class)));
+        given(this.roleMembersRepository.findAllByUsername(anyString())).willReturn(List.of(mock(RoleMembers.class)));
 
         List<RoleMembers> roles = roleMembersService.roles("test");
         Assertions.assertNotNull(roles);
@@ -64,11 +65,11 @@ class RoleMembersServiceImplTest {
 
     @Test
     void relation() {
-        given(this.roleMembersRepository.saveAllAndFlush(Mockito.anyIterable())).willReturn(Mockito.anyList());
+        given(this.roleMembersRepository.saveAllAndFlush(anyIterable())).willReturn(anyList());
 
         List<RoleMembers> relation = roleMembersService.relation(1L, Set.of("test"));
 
-        verify(this.roleMembersRepository, times(1)).saveAllAndFlush(Mockito.anyList());
+        verify(this.roleMembersRepository, times(1)).saveAllAndFlush(anyList());
         Assertions.assertNotNull(relation);
     }
 }

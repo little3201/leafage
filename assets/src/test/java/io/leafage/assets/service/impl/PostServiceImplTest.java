@@ -28,7 +28,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,9 +38,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * 帖子接口测试
@@ -73,10 +74,10 @@ class PostServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Post> page = new PageImpl<>(List.of(Mockito.mock(Post.class)));
+        Page<Post> page = new PageImpl<>(List.of(mock(Post.class)));
 
         given(postRepository.findAll(ArgumentMatchers.<Specification<Post>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
         Assertions.assertNotNull(voPage.getContent());
@@ -84,25 +85,25 @@ class PostServiceImplTest {
 
     @Test
     void fetch() {
-        given(postRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Post.class)));
+        given(postRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Post.class)));
 
-        PostVO vo = postsService.fetch(Mockito.anyLong());
+        PostVO vo = postsService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void fetch_posts_null() {
-        given(postRepository.findById(Mockito.anyLong())).willReturn(Optional.empty());
+        given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
-        PostVO vo = postsService.fetch(Mockito.anyLong());
+        PostVO vo = postsService.fetch(anyLong());
 
         Assertions.assertNull(vo);
     }
 
     @Test
     void exists() {
-        given(postRepository.existsByTitleAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
+        given(postRepository.existsByTitleAndIdNot(anyString(), anyLong())).willReturn(true);
 
         boolean exists = postsService.exists("test", 1L);
 
@@ -111,7 +112,7 @@ class PostServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(postRepository.existsByTitle(Mockito.anyString())).willReturn(true);
+        given(postRepository.existsByTitle(anyString())).willReturn(true);
 
         boolean exists = postsService.exists("test", null);
 
@@ -120,41 +121,41 @@ class PostServiceImplTest {
 
     @Test
     void create() {
-        given(postRepository.saveAndFlush(Mockito.any(Post.class))).willReturn(Mockito.mock(Post.class));
+        given(postRepository.saveAndFlush(any(Post.class))).willReturn(mock(Post.class));
 
-        given(postContentRepository.getByPostId(Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(PostContent.class)));
+        given(postContentRepository.getByPostId(anyLong())).willReturn(Optional.of(mock(PostContent.class)));
 
-        given(postContentRepository.saveAndFlush(Mockito.any(PostContent.class))).willReturn(Mockito.mock(PostContent.class));
+        given(postContentRepository.saveAndFlush(any(PostContent.class))).willReturn(mock(PostContent.class));
 
         PostVO vo = postsService.create(dto);
 
-        verify(postRepository, times(1)).saveAndFlush(Mockito.any(Post.class));
-        verify(postContentRepository, times(1)).saveAndFlush(Mockito.any(PostContent.class));
+        verify(postRepository, times(1)).saveAndFlush(any(Post.class));
+        verify(postContentRepository, times(1)).saveAndFlush(any(PostContent.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(postRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Post.class)));
+        given(postRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Post.class)));
 
-        given(postRepository.save(Mockito.any(Post.class))).willReturn(Mockito.mock(Post.class));
+        given(postRepository.save(any(Post.class))).willReturn(mock(Post.class));
 
-        given(postContentRepository.getByPostId(Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(PostContent.class)));
+        given(postContentRepository.getByPostId(anyLong())).willReturn(Optional.of(mock(PostContent.class)));
 
-        given(postContentRepository.save(Mockito.any(PostContent.class))).willReturn(Mockito.mock(PostContent.class));
+        given(postContentRepository.save(any(PostContent.class))).willReturn(mock(PostContent.class));
 
         PostVO vo = postsService.modify(1L, dto);
 
-        verify(postRepository, times(1)).save(Mockito.any(Post.class));
-        verify(postContentRepository, times(1)).save(Mockito.any(PostContent.class));
+        verify(postRepository, times(1)).save(any(Post.class));
+        verify(postContentRepository, times(1)).save(any(PostContent.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void remove() {
-        postsService.remove(Mockito.anyLong());
+        postsService.remove(anyLong());
 
-        verify(postRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(postRepository, times(1)).deleteById(anyLong());
     }
 
 }

@@ -117,27 +117,6 @@ public class DictionaryController {
     }
 
     /**
-     * 是否存在
-     *
-     * @param superiorId superior id
-     * @param name       名称
-     * @param id         主键
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
-    @GetMapping("/{superiorId}/exists")
-    public ResponseEntity<Boolean> exists(@PathVariable Long superiorId, @RequestParam String name, Long id) {
-        boolean exists;
-        try {
-            exists = dictionaryService.exists(superiorId, name, id);
-        } catch (Exception e) {
-            logger.info("Check dictionary exists error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 添加信息
      *
      * @param dto 要添加的数据
@@ -148,6 +127,10 @@ public class DictionaryController {
     public ResponseEntity<DictionaryVO> create(@Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
         try {
+            boolean existed = dictionaryService.exists(dto.getName(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = dictionaryService.create(dto);
         } catch (Exception e) {
             logger.error("Create dictionary error: ", e);
@@ -168,6 +151,10 @@ public class DictionaryController {
     public ResponseEntity<DictionaryVO> modify(@PathVariable Long id, @Valid @RequestBody DictionaryDTO dto) {
         DictionaryVO vo;
         try {
+            boolean existed = dictionaryService.exists(dto.getName(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             vo = dictionaryService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify dictionary error: ", e);

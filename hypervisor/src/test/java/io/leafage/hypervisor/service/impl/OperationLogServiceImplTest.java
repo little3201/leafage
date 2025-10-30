@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +34,13 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * operation log service test
@@ -55,10 +58,10 @@ class OperationLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<OperationLog> page = new PageImpl<>(List.of(Mockito.mock(OperationLog.class)));
+        Page<OperationLog> page = new PageImpl<>(List.of(mock(OperationLog.class)));
 
         given(this.operationLogRepository.findAll(ArgumentMatchers.<Specification<OperationLog>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<OperationLogVO> voPage = operationLogService.retrieve(0, 2, "id", true, "test");
 
@@ -67,20 +70,20 @@ class OperationLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.operationLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(OperationLog.class)));
+        given(this.operationLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(OperationLog.class)));
 
-        OperationLogVO vo = operationLogService.fetch(Mockito.anyLong());
+        OperationLogVO vo = operationLogService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void create() {
-        given(this.operationLogRepository.saveAndFlush(Mockito.any(OperationLog.class))).willReturn(Mockito.mock(OperationLog.class));
+        given(this.operationLogRepository.saveAndFlush(any(OperationLog.class))).willReturn(mock(OperationLog.class));
 
-        OperationLogVO vo = operationLogService.create(Mockito.mock(OperationLogDTO.class));
+        OperationLogVO vo = operationLogService.create(mock(OperationLogDTO.class));
 
-        verify(this.operationLogRepository, times(1)).saveAndFlush(Mockito.any(OperationLog.class));
+        verify(this.operationLogRepository, times(1)).saveAndFlush(any(OperationLog.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -88,7 +91,7 @@ class OperationLogServiceImplTest {
     void remove() {
         operationLogService.remove(1L);
 
-        verify(this.operationLogRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.operationLogRepository, times(1)).deleteById(anyLong());
     }
 
     @Test

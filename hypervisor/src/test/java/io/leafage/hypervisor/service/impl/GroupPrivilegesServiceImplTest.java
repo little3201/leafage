@@ -26,16 +26,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * group privileges service test
@@ -59,7 +61,7 @@ class GroupPrivilegesServiceImplTest {
 
     @Test
     void privileges() {
-        given(this.groupPrivilegesRepository.findAllByGroupId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(GroupPrivileges.class)));
+        given(this.groupPrivilegesRepository.findAllByGroupId(anyLong())).willReturn(List.of(mock(GroupPrivileges.class)));
 
         List<GroupPrivileges> members = groupPrivilegesService.privileges(1L);
         Assertions.assertNotNull(members);
@@ -67,7 +69,7 @@ class GroupPrivilegesServiceImplTest {
 
     @Test
     void groups() {
-        given(this.groupPrivilegesRepository.findAllByPrivilegeId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(GroupPrivileges.class)));
+        given(this.groupPrivilegesRepository.findAllByPrivilegeId(anyLong())).willReturn(List.of(mock(GroupPrivileges.class)));
 
         List<GroupPrivileges> groups = groupPrivilegesService.groups(1L);
         Assertions.assertNotNull(groups);
@@ -75,26 +77,26 @@ class GroupPrivilegesServiceImplTest {
 
     @Test
     void relation() {
-        given(this.groupPrivilegesRepository.findByGroupIdAndPrivilegeId(Mockito.anyLong(), Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(GroupPrivileges.class)));
+        given(this.groupPrivilegesRepository.findByGroupIdAndPrivilegeId(anyLong(), anyLong())).willReturn(Optional.of(mock(GroupPrivileges.class)));
 
         Privilege privilege = new Privilege();
         privilege.setId(2L);
         privilege.setName("test");
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(privilege));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(privilege));
 
         GroupAuthorities groupAuthority = new GroupAuthorities();
         groupAuthority.setId(1L);
         groupAuthority.setGroupId(1L);
         groupAuthority.setAuthority("test");
-        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(Mockito.anyLong(), Mockito.anyString())).willReturn(Optional.of(groupAuthority));
+        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).willReturn(Optional.of(groupAuthority));
 
-        given(this.groupAuthoritiesRepository.saveAll(Mockito.anyCollection())).willReturn(Collections.singletonList(groupAuthority));
+        given(this.groupAuthoritiesRepository.saveAll(anyCollection())).willReturn(Collections.singletonList(groupAuthority));
 
-        given(this.groupPrivilegesRepository.saveAndFlush(Mockito.any(GroupPrivileges.class))).willReturn(Mockito.mock(GroupPrivileges.class));
+        given(this.groupPrivilegesRepository.saveAndFlush(any(GroupPrivileges.class))).willReturn(mock(GroupPrivileges.class));
 
         GroupPrivileges relation = groupPrivilegesService.relation(1L, 2L, "test");
 
-        verify(this.groupPrivilegesRepository, times(1)).saveAndFlush(Mockito.any());
+        verify(this.groupPrivilegesRepository, times(1)).saveAndFlush(any());
         Assertions.assertNotNull(relation);
     }
 }

@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +34,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * 类目接口测试
@@ -63,10 +64,10 @@ class TagServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Tag> page = new PageImpl<>(List.of(Mockito.mock(Tag.class)));
+        Page<Tag> page = new PageImpl<>(List.of(mock(Tag.class)));
 
         given(tagRepository.findAll(ArgumentMatchers.<Specification<Tag>>any(),
-                Mockito.any(PageRequest.class))).willReturn(page);
+                any(PageRequest.class))).willReturn(page);
 
         Page<TagVO> voPage = tagService.retrieve(0, 2, "id", true, "");
 
@@ -75,16 +76,16 @@ class TagServiceImplTest {
 
     @Test
     void fetch() {
-        given(tagRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Tag.class)));
+        given(tagRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Tag.class)));
 
-        TagVO vo = tagService.fetch(Mockito.anyLong());
+        TagVO vo = tagService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(this.tagRepository.existsByNameAndIdNot(Mockito.anyString(), Mockito.anyLong())).willReturn(true);
+        given(this.tagRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(true);
 
         boolean exists = tagService.exists("test", 1L);
 
@@ -93,7 +94,7 @@ class TagServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(this.tagRepository.existsByName(Mockito.anyString())).willReturn(true);
+        given(this.tagRepository.existsByName(anyString())).willReturn(true);
 
         boolean exists = tagService.exists("test", null);
 
@@ -102,30 +103,30 @@ class TagServiceImplTest {
 
     @Test
     void create() {
-        given(tagRepository.saveAndFlush(Mockito.any(Tag.class))).willReturn(Mockito.mock(Tag.class));
+        given(tagRepository.saveAndFlush(any(Tag.class))).willReturn(mock(Tag.class));
 
-        TagVO vo = tagService.create(Mockito.mock(TagDTO.class));
+        TagVO vo = tagService.create(mock(TagDTO.class));
 
-        verify(tagRepository, times(1)).saveAndFlush(Mockito.any(Tag.class));
+        verify(tagRepository, times(1)).saveAndFlush(any(Tag.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(tagRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Tag.class)));
+        given(tagRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Tag.class)));
 
-        given(tagRepository.save(Mockito.any(Tag.class))).willReturn(Mockito.mock(Tag.class));
+        given(tagRepository.save(any(Tag.class))).willReturn(mock(Tag.class));
 
         TagVO vo = tagService.modify(1L, dto);
 
-        verify(tagRepository, times(1)).save(Mockito.any(Tag.class));
+        verify(tagRepository, times(1)).save(any(Tag.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void remove() {
-        tagService.remove(Mockito.anyLong());
+        tagService.remove(anyLong());
 
-        verify(tagRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(tagRepository, times(1)).deleteById(anyLong());
     }
 }

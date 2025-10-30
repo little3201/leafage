@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,9 +35,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * role service test
@@ -65,10 +66,10 @@ class RoleServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Role> page = new PageImpl<>(List.of(Mockito.mock(Role.class)));
+        Page<Role> page = new PageImpl<>(List.of(mock(Role.class)));
 
         given(this.roleRepository.findAll(ArgumentMatchers.<Specification<Role>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<RoleVO> voPage = roleService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
@@ -76,17 +77,17 @@ class RoleServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.roleRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Role.class)));
+        given(this.roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Role.class)));
 
-        RoleVO vo = roleService.fetch(Mockito.anyLong());
+        RoleVO vo = roleService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(this.roleRepository.existsByNameAndIdNot(Mockito.anyString(),
-                Mockito.anyLong())).willReturn(true);
+        given(this.roleRepository.existsByNameAndIdNot(anyString(),
+                anyLong())).willReturn(true);
 
         boolean exists = roleService.exists("test", 2L);
 
@@ -95,7 +96,7 @@ class RoleServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(this.roleRepository.existsByName(Mockito.anyString())).willReturn(true);
+        given(this.roleRepository.existsByName(anyString())).willReturn(true);
 
         boolean exists = roleService.exists("test", null);
 
@@ -104,36 +105,36 @@ class RoleServiceImplTest {
 
     @Test
     void create() {
-        given(this.roleRepository.saveAndFlush(Mockito.any(Role.class))).willReturn(Mockito.mock(Role.class));
+        given(this.roleRepository.saveAndFlush(any(Role.class))).willReturn(mock(Role.class));
 
-        RoleVO vo = roleService.create(Mockito.mock(RoleDTO.class));
+        RoleVO vo = roleService.create(mock(RoleDTO.class));
 
-        verify(this.roleRepository, times(1)).saveAndFlush(Mockito.any(Role.class));
+        verify(this.roleRepository, times(1)).saveAndFlush(any(Role.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(this.roleRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Role.class)));
+        given(this.roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Role.class)));
 
-        given(this.roleRepository.save(Mockito.any(Role.class))).willReturn(Mockito.mock(Role.class));
+        given(this.roleRepository.save(any(Role.class))).willReturn(mock(Role.class));
 
         RoleVO vo = roleService.modify(1L, dto);
 
-        verify(this.roleRepository, times(1)).save(Mockito.any(Role.class));
+        verify(this.roleRepository, times(1)).save(any(Role.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void remove() {
-        roleService.remove(Mockito.anyLong());
+        roleService.remove(anyLong());
 
-        verify(this.roleRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.roleRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
     void enable() {
-        given(this.roleRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+        given(this.roleRepository.updateEnabledById(anyLong())).willReturn(1);
 
         boolean enabled = roleService.enable(1L);
 

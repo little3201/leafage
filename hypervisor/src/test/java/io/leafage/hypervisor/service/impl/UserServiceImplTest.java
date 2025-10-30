@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,8 +34,11 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * user service test
@@ -58,18 +60,17 @@ class UserServiceImplTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setMiddleName("middle");
-        dto.setLastname("zhang");
+        dto.setFullname("zhangsan");
         dto.setAvatar("a.jpg");
         dto.setEmail("zhang@test.com");
     }
 
     @Test
     void retrieve() {
-        Page<User> page = new PageImpl<>(List.of(Mockito.mock(User.class)));
+        Page<User> page = new PageImpl<>(List.of(mock(User.class)));
 
         given(this.userRepository.findAll(ArgumentMatchers.<Specification<User>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<UserVO> voPage = userService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
@@ -77,17 +78,17 @@ class UserServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.userRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(User.class)));
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(User.class)));
 
-        UserVO vo = userService.fetch(Mockito.anyLong());
+        UserVO vo = userService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(this.userRepository.existsByUsernameAndIdNot(Mockito.anyString(),
-                Mockito.anyLong())).willReturn(true);
+        given(this.userRepository.existsByUsernameAndIdNot(anyString(),
+                anyLong())).willReturn(true);
 
         boolean exists = userService.exists("test", 2L);
 
@@ -96,7 +97,7 @@ class UserServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(this.userRepository.existsByUsername(Mockito.anyString())).willReturn(true);
+        given(this.userRepository.existsByUsername(anyString())).willReturn(true);
 
         boolean exists = userService.exists("test", null);
 
@@ -105,38 +106,38 @@ class UserServiceImplTest {
 
     @Test
     void create() {
-        given(this.userRepository.saveAndFlush(Mockito.any(User.class))).willReturn(Mockito.mock(User.class));
+        given(this.userRepository.saveAndFlush(any(User.class))).willReturn(mock(User.class));
 
         UserVO vo = userService.create(dto);
 
-        verify(userRepository, Mockito.times(1)).saveAndFlush(Mockito.any(User.class));
+        verify(userRepository, times(1)).saveAndFlush(any(User.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void modify() {
         // 根据id查询信息
-        given(this.userRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(User.class)));
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(User.class)));
 
         // 保存更新信息
-        given(this.userRepository.save(Mockito.any(User.class))).willReturn(Mockito.mock(User.class));
+        given(this.userRepository.save(any(User.class))).willReturn(mock(User.class));
 
         UserVO vo = userService.modify(1L, dto);
 
-        verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
+        verify(userRepository, times(1)).save(any(User.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void remove() {
-        userService.remove(Mockito.anyLong());
+        userService.remove(anyLong());
 
-        verify(userRepository, Mockito.times(1)).deleteById(Mockito.anyLong());
+        verify(userRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
     void enable() {
-        given(this.userRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+        given(this.userRepository.updateEnabledById(anyLong())).willReturn(1);
 
         boolean enabled = userService.enable(1L);
 

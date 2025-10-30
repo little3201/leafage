@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,9 +36,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * dictionary controller test
@@ -66,10 +67,10 @@ class DictionaryServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Dictionary> page = new PageImpl<>(List.of(Mockito.mock(Dictionary.class)));
+        Page<Dictionary> page = new PageImpl<>(List.of(mock(Dictionary.class)));
 
         given(this.dictionaryRepository.findAll(ArgumentMatchers.<Specification<Dictionary>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<DictionaryVO> voPage = dictionaryService.retrieve(0, 2, "id", true, "test");
 
@@ -78,7 +79,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.dictionaryRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Dictionary.class)));
 
         DictionaryVO vo = dictionaryService.fetch(1L);
 
@@ -87,7 +88,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void subset() {
-        given(this.dictionaryRepository.findAllBySuperiorId(Mockito.anyLong())).willReturn(List.of(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(List.of(mock(Dictionary.class)));
 
         List<DictionaryVO> dictionaryVOS = dictionaryService.subset(1L);
 
@@ -96,7 +97,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void subset_empty() {
-        given(this.dictionaryRepository.findAllBySuperiorId(Mockito.anyLong())).willReturn(Collections.emptyList());
+        given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(Collections.emptyList());
 
         List<DictionaryVO> dictionaryVOS = dictionaryService.subset(1L);
 
@@ -105,8 +106,8 @@ class DictionaryServiceImplTest {
 
     @Test
     void exists() {
-        given(this.dictionaryRepository.existsBySuperiorIdAndNameAndIdNot(Mockito.anyLong(), Mockito.anyString(),
-                Mockito.anyLong())).willReturn(true);
+        given(this.dictionaryRepository.existsBySuperiorIdAndNameAndIdNot(anyLong(), anyString(),
+                anyLong())).willReturn(true);
 
         boolean exists = dictionaryService.exists(1L, "test", 2L);
 
@@ -115,7 +116,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(this.dictionaryRepository.existsBySuperiorIdAndName(Mockito.anyLong(), Mockito.anyString())).willReturn(true);
+        given(this.dictionaryRepository.existsBySuperiorIdAndName(anyLong(), anyString())).willReturn(true);
 
         boolean exists = dictionaryService.exists(1L, "test", null);
 
@@ -124,23 +125,23 @@ class DictionaryServiceImplTest {
 
     @Test
     void create() {
-        given(this.dictionaryRepository.saveAndFlush(Mockito.any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
+        given(this.dictionaryRepository.saveAndFlush(any(Dictionary.class))).willReturn(mock(Dictionary.class));
 
-        DictionaryVO vo = dictionaryService.create(Mockito.mock(DictionaryDTO.class));
+        DictionaryVO vo = dictionaryService.create(mock(DictionaryDTO.class));
 
-        verify(this.dictionaryRepository, times(1)).saveAndFlush(Mockito.any(Dictionary.class));
+        verify(this.dictionaryRepository, times(1)).saveAndFlush(any(Dictionary.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(this.dictionaryRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Dictionary.class)));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Dictionary.class)));
 
-        given(this.dictionaryRepository.save(Mockito.any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
+        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(mock(Dictionary.class));
 
         DictionaryVO vo = dictionaryService.modify(1L, dto);
 
-        verify(this.dictionaryRepository, times(1)).save(Mockito.any(Dictionary.class));
+        verify(this.dictionaryRepository, times(1)).save(any(Dictionary.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -148,12 +149,12 @@ class DictionaryServiceImplTest {
     void remove() {
         dictionaryService.remove(1L);
 
-        verify(this.dictionaryRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.dictionaryRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
     void enable() {
-        given(this.dictionaryRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+        given(this.dictionaryRepository.updateEnabledById(anyLong())).willReturn(1);
 
         boolean enabled = dictionaryService.enable(1L);
 

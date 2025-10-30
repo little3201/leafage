@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,9 +37,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * group service test
@@ -66,10 +68,10 @@ class GroupServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Group> page = new PageImpl<>(List.of(Mockito.mock(Group.class)));
+        Page<Group> page = new PageImpl<>(List.of(mock(Group.class)));
 
         given(this.groupRepository.findAll(ArgumentMatchers.<Specification<Group>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<GroupVO> voPage = groupService.retrieve(0, 2, "id", true, "filter_superiorId:=:2L,filter_name:like:test");
         Assertions.assertNotNull(voPage.getContent());
@@ -77,7 +79,7 @@ class GroupServiceImplTest {
 
     @Test
     void tree() {
-        given(this.groupRepository.findAll()).willReturn(Arrays.asList(Mockito.mock(Group.class), Mockito.mock(Group.class)));
+        given(this.groupRepository.findAll()).willReturn(Arrays.asList(mock(Group.class), mock(Group.class)));
 
         List<TreeNode<Long>> nodes = groupService.tree();
         Assertions.assertNotNull(nodes);
@@ -85,17 +87,17 @@ class GroupServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.groupRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Group.class)));
+        given(this.groupRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Group.class)));
 
-        GroupVO vo = groupService.fetch(Mockito.anyLong());
+        GroupVO vo = groupService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(this.groupRepository.existsByNameAndIdNot(Mockito.anyString(),
-                Mockito.anyLong())).willReturn(true);
+        given(this.groupRepository.existsByNameAndIdNot(anyString(),
+                anyLong())).willReturn(true);
 
         boolean exists = groupService.exists("test", 2L);
 
@@ -104,7 +106,7 @@ class GroupServiceImplTest {
 
     @Test
     void exists_id_null() {
-        given(this.groupRepository.existsByName(Mockito.anyString())).willReturn(true);
+        given(this.groupRepository.existsByName(anyString())).willReturn(true);
 
         boolean exists = groupService.exists("test", null);
 
@@ -113,30 +115,30 @@ class GroupServiceImplTest {
 
     @Test
     void create() {
-        given(this.groupRepository.saveAndFlush(Mockito.any(Group.class))).willReturn(Mockito.mock(Group.class));
+        given(this.groupRepository.saveAndFlush(any(Group.class))).willReturn(mock(Group.class));
 
-        GroupVO vo = groupService.create(Mockito.mock(GroupDTO.class));
+        GroupVO vo = groupService.create(mock(GroupDTO.class));
 
-        verify(this.groupRepository, times(1)).saveAndFlush(Mockito.any(Group.class));
+        verify(this.groupRepository, times(1)).saveAndFlush(any(Group.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void create_error() {
-        given(this.groupRepository.saveAndFlush(Mockito.any(Group.class))).willThrow(new RuntimeException());
+        given(this.groupRepository.saveAndFlush(any(Group.class))).willThrow(new RuntimeException());
 
-        Assertions.assertThrows(RuntimeException.class, () -> groupService.create(Mockito.mock(GroupDTO.class)));
+        Assertions.assertThrows(RuntimeException.class, () -> groupService.create(mock(GroupDTO.class)));
     }
 
     @Test
     void modify() {
-        given(this.groupRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Group.class)));
+        given(this.groupRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Group.class)));
 
-        given(this.groupRepository.save(Mockito.any(Group.class))).willReturn(Mockito.mock(Group.class));
+        given(this.groupRepository.save(any(Group.class))).willReturn(mock(Group.class));
 
         GroupVO vo = groupService.modify(1L, dto);
 
-        verify(this.groupRepository, times(1)).save(Mockito.any(Group.class));
+        verify(this.groupRepository, times(1)).save(any(Group.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -144,12 +146,12 @@ class GroupServiceImplTest {
     void remove() {
         groupService.remove(1L);
 
-        verify(this.groupRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.groupRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
     void enable() {
-        given(this.groupRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+        given(this.groupRepository.updateEnabledById(anyLong())).willReturn(1);
 
         boolean enabled = groupService.enable(1L);
 

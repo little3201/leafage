@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,9 +37,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+
 
 /**
  * privilege service test
@@ -87,7 +89,7 @@ class PrivilegeServiceImplTest {
         Page<Privilege> page = new PageImpl<>(List.of(new Privilege()));
 
         given(this.privilegeRepository.findAll(ArgumentMatchers.<Specification<Privilege>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<PrivilegeVO> voPage = privilegeService.retrieve(0, 2, "id", true, null);
         Assertions.assertNotNull(voPage.getContent());
@@ -95,7 +97,7 @@ class PrivilegeServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Privilege.class)));
 
         PrivilegeVO vo = privilegeService.fetch(1L);
 
@@ -104,29 +106,29 @@ class PrivilegeServiceImplTest {
 
     @Test
     void modify() {
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Privilege.class)));
 
-        given(this.privilegeRepository.save(Mockito.any(Privilege.class))).willReturn(Mockito.mock(Privilege.class));
+        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(mock(Privilege.class));
 
-        PrivilegeVO vo = privilegeService.modify(Mockito.anyLong(), privilegeDTO);
+        PrivilegeVO vo = privilegeService.modify(anyLong(), privilegeDTO);
 
-        verify(this.privilegeRepository, times(1)).save(Mockito.any(Privilege.class));
+        verify(this.privilegeRepository, times(1)).save(any(Privilege.class));
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void tree() {
-        given(this.groupMembersRepository.findAllByUsername(Mockito.anyString())).willReturn(Collections.singletonList(Mockito.mock(GroupMembers.class)));
+        given(this.groupMembersRepository.findAllByUsername(anyString())).willReturn(Collections.singletonList(mock(GroupMembers.class)));
 
-        given(this.groupRolesRepository.findAllByGroupId(Mockito.anyLong())).willReturn(Collections.singletonList(Mockito.mock(GroupRoles.class)));
+        given(this.groupRolesRepository.findAllByGroupId(anyLong())).willReturn(Collections.singletonList(mock(GroupRoles.class)));
 
-        given(this.groupPrivilegesRepository.findAllByGroupId(Mockito.anyLong())).willReturn(Collections.singletonList(Mockito.mock(GroupPrivileges.class)));
+        given(this.groupPrivilegesRepository.findAllByGroupId(anyLong())).willReturn(Collections.singletonList(mock(GroupPrivileges.class)));
 
-        given(this.roleMembersRepository.findAllByUsername(Mockito.anyString())).willReturn(Collections.singletonList(Mockito.mock(RoleMembers.class)));
+        given(this.roleMembersRepository.findAllByUsername(anyString())).willReturn(Collections.singletonList(mock(RoleMembers.class)));
 
-        given(this.rolePrivilegesRepository.findAllByRoleId(Mockito.anyLong())).willReturn(Collections.singletonList(Mockito.mock(RolePrivileges.class)));
+        given(this.rolePrivilegesRepository.findAllByRoleId(anyLong())).willReturn(Collections.singletonList(mock(RolePrivileges.class)));
 
-        given(this.privilegeRepository.findById(Mockito.anyLong())).willReturn(Optional.of(Mockito.mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(mock(Privilege.class)));
 
         List<TreeNode<Long>> nodes = privilegeService.tree("test");
         Assertions.assertNotNull(nodes);
@@ -134,7 +136,7 @@ class PrivilegeServiceImplTest {
 
     @Test
     void enable() {
-        given(this.privilegeRepository.updateEnabledById(Mockito.anyLong())).willReturn(1);
+        given(this.privilegeRepository.updateEnabledById(anyLong())).willReturn(1);
 
         boolean enabled = privilegeService.enable(1L);
 

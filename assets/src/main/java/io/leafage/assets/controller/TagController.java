@@ -88,25 +88,6 @@ public class TagController {
     }
 
     /**
-     * 是否存在
-     *
-     * @param name 名称
-     * @param id   主键
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> exists(@RequestParam String name, Long id) {
-        boolean exists;
-        try {
-            exists = tagService.exists(name, id);
-        } catch (Exception e) {
-            logger.info("Check file exists error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(exists);
-    }
-
-    /**
      * 保存tag信息
      *
      * @param dto tag信息
@@ -114,33 +95,41 @@ public class TagController {
      */
     @PostMapping
     public ResponseEntity<TagVO> create(@Valid @RequestBody TagDTO dto) {
-        TagVO categoryVO;
+        TagVO vo;
         try {
-            categoryVO = tagService.create(dto);
+            boolean existed = tagService.exists(dto.getName(), null);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            vo = tagService.create(dto);
         } catch (Exception e) {
             logger.error("Save tag error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryVO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
     /**
      * 修改tag信息
      *
-     * @param id          主键
-     * @param categoryDTO tag信息
+     * @param id  主键
+     * @param dto tag信息
      * @return 修改后的tag信息
      */
     @PutMapping("/{id}")
-    public ResponseEntity<TagVO> modify(@PathVariable Long id, @Valid @RequestBody TagDTO categoryDTO) {
-        TagVO categoryVO;
+    public ResponseEntity<TagVO> modify(@PathVariable Long id, @Valid @RequestBody TagDTO dto) {
+        TagVO vo;
         try {
-            categoryVO = tagService.modify(id, categoryDTO);
+            boolean existed = tagService.exists(dto.getName(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            vo = tagService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify tag error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
-        return ResponseEntity.accepted().body(categoryVO);
+        return ResponseEntity.accepted().body(vo);
     }
 
     /**

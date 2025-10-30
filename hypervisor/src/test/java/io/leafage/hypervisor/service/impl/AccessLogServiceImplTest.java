@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,9 +34,12 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * access log service test
@@ -55,10 +57,10 @@ class AccessLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<AccessLog> page = new PageImpl<>(List.of(Mockito.mock(AccessLog.class)));
+        Page<AccessLog> page = new PageImpl<>(List.of(mock(AccessLog.class)));
 
         given(this.accessLogRepository.findAll(ArgumentMatchers.<Specification<AccessLog>>any(),
-                Mockito.any(Pageable.class))).willReturn(page);
+                any(Pageable.class))).willReturn(page);
 
         Page<AccessLogVO> voPage = accessLogService.retrieve(0, 2, "id", true, "test");
 
@@ -67,20 +69,20 @@ class AccessLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.accessLogRepository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(Mockito.mock(AccessLog.class)));
+        given(this.accessLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(AccessLog.class)));
 
-        AccessLogVO vo = accessLogService.fetch(Mockito.anyLong());
+        AccessLogVO vo = accessLogService.fetch(anyLong());
 
         Assertions.assertNotNull(vo);
     }
 
     @Test
     void create() {
-        given(this.accessLogRepository.saveAndFlush(Mockito.any(AccessLog.class))).willReturn(Mockito.mock(AccessLog.class));
+        given(this.accessLogRepository.saveAndFlush(any(AccessLog.class))).willReturn(mock(AccessLog.class));
 
-        AccessLogVO vo = accessLogService.create(Mockito.mock(AccessLogDTO.class));
+        AccessLogVO vo = accessLogService.create(mock(AccessLogDTO.class));
 
-        verify(this.accessLogRepository, times(1)).saveAndFlush(Mockito.any(AccessLog.class));
+        verify(this.accessLogRepository, times(1)).saveAndFlush(any(AccessLog.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -88,7 +90,7 @@ class AccessLogServiceImplTest {
     void remove() {
         accessLogService.remove(1L);
 
-        verify(this.accessLogRepository, times(1)).deleteById(Mockito.anyLong());
+        verify(this.accessLogRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
