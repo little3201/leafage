@@ -30,7 +30,7 @@
     <packaging>jar</packaging>
 
     <name>hypervisor</name>
-    <description>hypervisor of leafage basic</description>
+    <description>hypervisor of leafage</description>
 
     <dependencies>
         <dependency>

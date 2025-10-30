@@ -91,8 +91,10 @@ public class UserServiceImpl extends DomainConverter implements UserService {
     @Override
     public Mono<Boolean> exists(String username, Long id) {
         Assert.hasText(username, "username must not be empty.");
-
-        return userRepository.existsByUsername(username);
+        if (id == null) {
+            return userRepository.existsByUsername(username);
+        }
+        return userRepository.existsByUsernameAndIdNot(username, id);
     }
 
     /**

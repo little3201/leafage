@@ -84,7 +84,7 @@ class FileRecordServiceImplTest {
     void exists_id_null() {
         given(this.fileRecordRepository.existsByName(Mockito.anyString())).willReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(fileRecordService.exists("test", Mockito.isNull())).expectNext(Boolean.TRUE).verifyComplete();
+        StepVerifier.create(fileRecordService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test

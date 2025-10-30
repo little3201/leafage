@@ -54,6 +54,7 @@
         <module>auth</module>
         <module>hypervisor</module>
         <module>assets</module>
+        <module>exploiter</module>
     </modules>
 
     <dependencyManagement>

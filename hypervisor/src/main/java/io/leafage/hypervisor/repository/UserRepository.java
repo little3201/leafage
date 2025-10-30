@@ -59,6 +59,14 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
     Mono<Boolean> existsByUsername(String username);
 
     /**
+     * 是否已存在
+     *
+     * @param username user
+     * @return true-是，false-否
+     */
+    Mono<Boolean> existsByUsernameAndIdNot(String username, Long id);
+
+    /**
      * Toggles the enabled status of a record by its ID.
      *
      * @param id The ID of the record.
