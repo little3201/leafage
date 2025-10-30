@@ -74,7 +74,7 @@ class OperationLogControllerTest {
         vo.setBrowser("Edge");
         vo.setOs("Mac OS");
         vo.setReferer("test");
-        vo.setContent("content");
+        vo.setBody("content");
         vo.setSessionId("sessionId");
         vo.setStatusCode(200);
         vo.setOperation("test");

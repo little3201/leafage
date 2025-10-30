@@ -79,7 +79,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
             return null;
         }
         // 获取内容详情
-        postContentRepository.getByPostId(id).ifPresent(postContent -> vo.setContent(postContent.getContent()));
+        postContentRepository.getByPostId(id).ifPresent(postContent -> vo.setContent(postContent.getBody()));
         return vo;
     }
 
@@ -116,7 +116,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
             postContent = new PostContent();
             postContent.setPostId(post.getId());
         }
-        postContent.setContent(dto.getContent());
+        postContent.setBody(dto.getContent());
         postContentRepository.saveAndFlush(postContent);
 
         return convertToVO(post, PostVO.class);
@@ -147,7 +147,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
             postContent = new PostContent();
             postContent.setPostId(id);
         }
-        postContent.setContent(dto.getContent());
+        postContent.setBody(dto.getContent());
         postContentRepository.save(postContent);
 
         return convertToVO(post, PostVO.class);

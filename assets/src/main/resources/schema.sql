@@ -115,7 +115,7 @@ CREATE TABLE post_content
 (
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     post_id            bigint    NOT NULL UNIQUE,
-    content            text,
+    body            text,
     enabled            boolean   NOT NULL DEFAULT true,
     created_by         varchar(50),
     created_date       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -132,7 +132,7 @@ ON COLUMN post_content.id IS '主键';
 COMMENT
 ON COLUMN post_content.post_id IS '帖子ID';
 COMMENT
-ON COLUMN post_content.content IS '内容';
+ON COLUMN post_content.body IS '内容';
 COMMENT
 ON COLUMN posts.enabled IS '是否启用';
 COMMENT
@@ -154,7 +154,7 @@ CREATE TABLE comments
     id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     post_id            bigint    NOT NULL,
     location           varchar(255),
-    content            varchar(512),
+    body            varchar(512),
     created_by         varchar(50),
     created_date       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_by   varchar(50),
@@ -172,7 +172,7 @@ ON COLUMN comments.post_id IS '帖子ID';
 COMMENT
 ON COLUMN comments.location IS '位置';
 COMMENT
-ON COLUMN comments.content IS '内容';
+ON COLUMN comments.body IS '内容';
 COMMENT
 ON COLUMN comments.created_by IS '创建者';
 COMMENT

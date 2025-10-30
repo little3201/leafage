@@ -73,12 +73,12 @@ class CommentControllerTest {
     void setUp() {
         vo = new CommentVO();
         vo.setId(1L);
-        vo.setContent("content");
+        vo.setBody("content");
         vo.setPostId(1L);
 
         dto = new CommentDTO();
         dto.setPostId(1L);
-        dto.setContent("content");
+        dto.setBody("content");
         dto.setReplier(1L);
     }
 

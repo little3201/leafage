@@ -82,11 +82,11 @@ class CommentServiceImplTest {
     @Test
     void replies() {
         Comment comment = new Comment();
-        comment.setContent("评论信息");
+        comment.setBody("评论信息");
         comment.setPostId(1L);
 
         Comment comm = new Comment();
-        comm.setContent("评论信息2222");
+        comm.setBody("评论信息2222");
         comm.setPostId(1L);
         comm.setReplier(comment.getReplier());
         given(commentRepository.findAllByReplier(anyLong())).willReturn(List.of(comment, comm));

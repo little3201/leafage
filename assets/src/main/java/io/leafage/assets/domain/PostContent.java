@@ -35,7 +35,7 @@ public class PostContent {
     @Column(name = "post_id", nullable = false, unique = true)
     private Long postId;
 
-    private String content;
+    private String body;
 
 
     public Long getId() {
@@ -54,11 +54,11 @@ public class PostContent {
         this.postId = postId;
     }
 
-    public String getContent() {
-        return content;
+    public String getBody() {
+        return body;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setBody(String body) {
+        this.body = body;
     }
 }

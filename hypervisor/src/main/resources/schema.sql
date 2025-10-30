@@ -355,7 +355,7 @@ CREATE TABLE "public"."messages"
 (
     "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "title"              varchar(64)  NOT NULL,
-    "content"            text,
+    "body"            text,
     "unread"             bool         NOT NULL DEFAULT false,
     "receiver"           varchar(64)  NOT NULL,
     "description"        varchar(255),
@@ -371,7 +371,7 @@ ON COLUMN "public"."messages"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."messages"."title" IS '标题';
 COMMENT
-ON COLUMN "public"."messages"."content" IS '内容';
+ON COLUMN "public"."messages"."body" IS '内容';
 COMMENT
 ON COLUMN "public"."messages"."unread" IS '是否未读';
 COMMENT
@@ -403,7 +403,7 @@ CREATE TABLE "public"."operation_logs"
     "browser"            varchar(50),
     "ip"                 inet,
     "location"           varchar(50),
-    "content"            varchar(1000),
+    "body"            varchar(1000),
     "user_agent"         varchar(255),
     "status_code"        int4,
     "response_message"   varchar(255),
@@ -431,7 +431,7 @@ ON COLUMN "public"."operation_logs"."ip" IS 'IP地址';
 COMMENT
 ON COLUMN "public"."operation_logs"."location" IS '位置';
 COMMENT
-ON COLUMN "public"."operation_logs"."content" IS '内容';
+ON COLUMN "public"."operation_logs"."body" IS '内容';
 COMMENT
 ON COLUMN "public"."operation_logs"."user_agent" IS '用户代理信息';
 COMMENT

@@ -74,12 +74,12 @@ class MessageControllerTest {
         vo.setId(1L);
         vo.setTitle("test");
         vo.setReceiver("23234");
-        vo.setContent("content");
+        vo.setBody("content");
 
         dto = new MessageDTO();
         dto.setTitle("test");
         dto.setReceiver("23234");
-        dto.setContent("content");
+        dto.setBody("content");
     }
 
     @Test
