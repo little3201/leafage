@@ -64,6 +64,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
     public Mono<Page<DictionaryVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, Dictionary.class);
+        criteria = criteria.and("superiorId").isNull();
 
         return r2dbcEntityTemplate.select(Dictionary.class)
                 .matching(Query.query(criteria).with(pageable))
@@ -79,7 +80,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public Flux<DictionaryVO> subset(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return dictionaryRepository.findBySuperiorId(id)
                 .map(d -> convertToVO(d, DictionaryVO.class));
@@ -90,7 +91,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public Mono<DictionaryVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return dictionaryRepository.findById(id)
                 .map(d -> convertToVO(d, DictionaryVO.class));
@@ -101,9 +102,12 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
 
-        return dictionaryRepository.existsByName(name);
+        if (id == null) {
+            return dictionaryRepository.existsByName(name);
+        }
+        return dictionaryRepository.existsByNameAndIdNot(name, id);
     }
 
     /**
@@ -120,7 +124,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
      */
     @Override
     public Mono<DictionaryVO> modify(Long id, DictionaryDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return dictionaryRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
@@ -131,7 +135,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
 
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return dictionaryRepository.deleteById(id);
     }

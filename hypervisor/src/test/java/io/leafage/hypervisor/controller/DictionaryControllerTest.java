@@ -29,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -161,6 +162,47 @@ class DictionaryControllerTest {
         given(this.dictionaryService.create(any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void modify() {
+        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willReturn(Mono.just(vo));
+
+        webTestClient.mutateWith(csrf()).put().uri("/dictionaries/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.name").isEqualTo("test");
+    }
+
+    @Test
+    void modify_error() {
+        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willThrow(new RuntimeException());
+
+        webTestClient.mutateWith(csrf()).put().uri("/dictionaries/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void remove() {
+        given(this.dictionaryService.remove(anyLong())).willReturn(Mono.empty());
+
+        webTestClient.mutateWith(csrf()).delete().uri("/dictionaries/{id}", 1)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void remove_error() {
+        given(this.dictionaryService.remove(anyLong())).willThrow(new RuntimeException());
+
+        webTestClient.mutateWith(csrf()).delete().uri("/dictionaries/{id}", 1)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

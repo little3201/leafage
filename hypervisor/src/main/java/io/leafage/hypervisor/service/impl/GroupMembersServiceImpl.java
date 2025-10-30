@@ -63,7 +63,7 @@ public class GroupMembersServiceImpl extends DomainConverter implements GroupMem
      */
     @Override
     public Mono<List<GroupMembers>> groups(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         return groupMembersRepository.findByUsername(username).collectList();
     }

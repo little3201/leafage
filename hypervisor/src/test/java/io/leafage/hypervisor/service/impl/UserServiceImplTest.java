@@ -115,7 +115,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void exists_null() {
+    void exists_id_null() {
         given(this.userRepository.existsByUsername(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(userService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();

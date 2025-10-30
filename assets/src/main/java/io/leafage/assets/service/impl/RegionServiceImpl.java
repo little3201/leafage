@@ -64,6 +64,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
     public Mono<Page<RegionVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, Region.class);
+        criteria = criteria.and("superiorId").isNull();
 
         return r2dbcEntityTemplate.select(Region.class)
                 .matching(Query.query(criteria).with(pageable))
@@ -79,7 +80,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public Mono<RegionVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return regionRepository.findById(id)
                 .map(r -> convertToVO(r, RegionVO.class));
@@ -90,7 +91,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
 
         if (id == null) {
             return regionRepository.existsByName(name);
@@ -123,7 +124,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public Mono<RegionVO> modify(Long id, RegionDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return regionRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
                 .map(region -> convert(dto, region))
@@ -136,7 +137,7 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return regionRepository.deleteById(id);
     }
 

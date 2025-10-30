@@ -33,14 +33,6 @@ import reactor.core.publisher.Mono;
 public interface RegionRepository extends R2dbcRepository<Region, Long> {
 
     /**
-     * 分页查询
-     *
-     * @param pageable 分页参数
-     * @return 有效数据集
-     */
-    Flux<Region> findAllBySuperiorIdIsNull(Pageable pageable);
-
-    /**
      * 是否已存在
      *
      * @param name 名称

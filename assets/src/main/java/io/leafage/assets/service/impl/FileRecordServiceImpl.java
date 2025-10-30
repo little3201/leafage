@@ -71,7 +71,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
      */
     @Override
     public Mono<FileRecordVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return fileRecordRepository.findById(id)
                 .map(f -> convertToVO(f, FileRecordVO.class));
@@ -82,7 +82,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
      */
     @Override
     public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
         if (id == null) {
             return fileRecordRepository.existsByName(name);
         }
@@ -100,7 +100,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return fileRecordRepository.deleteById(id);
     }
 

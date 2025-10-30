@@ -33,14 +33,6 @@ import reactor.core.publisher.Mono;
 public interface TagRepository extends R2dbcRepository<Tag, Long> {
 
     /**
-     * 分页查询类别
-     *
-     * @param pageable 分页参数
-     * @return 有效类别
-     */
-    Flux<Tag> findAllBy(Pageable pageable);
-
-    /**
      * 是否已存在
      *
      * @param name 名称

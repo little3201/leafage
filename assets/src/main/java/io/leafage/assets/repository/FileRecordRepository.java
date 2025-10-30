@@ -31,14 +31,6 @@ import reactor.core.publisher.Mono;
 public interface FileRecordRepository extends R2dbcRepository<FileRecord, Long> {
 
     /**
-     * 分页查询
-     *
-     * @param pageable 分页参数
-     * @return 有效数据集
-     */
-    Flux<FileRecord> findAllBy(Pageable pageable);
-
-    /**
      * 是否已存在
      *
      * @param name 名称

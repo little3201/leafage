@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
+
 /**
  * region controller
  *
@@ -79,18 +81,6 @@ public class RegionController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param title 标题
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String title, Long id) {
-        return regionService.exists(title, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 查询下级数据
      *
      * @param id a {@link java.lang.Long} object
@@ -110,8 +100,13 @@ public class RegionController {
      */
     @PostMapping
     public Mono<RegionVO> create(@RequestBody @Valid RegionDTO dto) {
-        return regionService.create(dto)
-                .doOnError(e -> logger.error("Create region occurred an error: ", e));
+        return regionService.exists(dto.getName(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return regionService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create region occurred an error: ", e));
     }
 
     /**
@@ -123,8 +118,13 @@ public class RegionController {
      */
     @PutMapping("/{id}")
     public Mono<RegionVO> modify(@PathVariable Long id, @RequestBody @Valid RegionDTO dto) {
-        return regionService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify region occurred an error: ", e));
+        return regionService.exists(dto.getName(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return regionService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify region occurred an error: ", e));
     }
 
     /**

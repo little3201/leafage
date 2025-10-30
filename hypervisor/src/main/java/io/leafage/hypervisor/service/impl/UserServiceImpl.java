@@ -76,7 +76,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
 
     @Override
     public Mono<UserVO> findByUsername(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         return userRepository.findByUsername(username)
                 .map(user -> convertToVO(user, UserVO.class));
@@ -87,7 +87,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public Mono<UserVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.findById(id)
                 .map(u -> convertToVO(u, UserVO.class));
@@ -98,7 +98,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public Mono<Boolean> exists(String username, Long id) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
         if (id == null) {
             return userRepository.existsByUsername(username);
         }
@@ -119,7 +119,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public Mono<UserVO> modify(Long id, UserDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
@@ -133,7 +133,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.deleteById(id);
     }

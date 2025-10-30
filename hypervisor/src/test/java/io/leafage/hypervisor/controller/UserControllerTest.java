@@ -144,29 +144,6 @@ class UserControllerTest {
     }
 
     @Test
-    void exists() {
-        given(this.userService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users/exists")
-                        .queryParam("username", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange().expectStatus().isOk();
-    }
-
-    @Test
-    void exist_error() {
-        given(this.userService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/users/exists")
-                        .queryParam("username", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void created() {
         given(this.userService.create(any(UserDTO.class))).willReturn(Mono.just(vo));
 

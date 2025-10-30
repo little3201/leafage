@@ -72,7 +72,7 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
 
     @Override
     public Mono<AccessLogVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return accessLogRepository.findById(id)
                 .map(a -> convertToVO(a, AccessLogVO.class));

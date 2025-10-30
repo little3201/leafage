@@ -32,6 +32,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.ExcelReader;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
+
 /**
  * dictionary controller
  *
@@ -82,18 +84,6 @@ public class DictionaryController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param title 标题
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String title, Long id) {
-        return dictionaryService.exists(title, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 查询下级数据
      *
      * @param id 主键
@@ -113,21 +103,31 @@ public class DictionaryController {
      */
     @PostMapping
     public Mono<DictionaryVO> create(@RequestBody @Valid DictionaryDTO dto) {
-        return dictionaryService.create(dto)
-                .doOnError(e -> logger.error("Create dictionary occurred an error: ", e));
+        return dictionaryService.exists(dto.getName(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return dictionaryService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create dictionary occurred an error: ", e));
     }
 
     /**
      * 修改信息
      *
-     * @param id  user 主键
+     * @param id  dictionary 主键
      * @param dto 要修改的数据
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
     public Mono<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
-        return dictionaryService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify user occurred an error: ", e));
+        return dictionaryService.exists(dto.getName(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return dictionaryService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify dictionary occurred an error: ", e));
     }
 
     /**

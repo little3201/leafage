@@ -17,6 +17,7 @@
 
 package io.leafage.assets.controller;
 
+import io.leafage.assets.dto.RegionDTO;
 import io.leafage.assets.service.RegionService;
 import io.leafage.assets.vo.RegionVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,6 +41,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 /**
  * region api test
@@ -57,6 +60,7 @@ class RegionControllerTest {
     private WebTestClient webTestClient;
 
     private RegionVO vo;
+    private RegionDTO dto;
 
     @BeforeEach
     void setUp() {
@@ -66,6 +70,12 @@ class RegionControllerTest {
         vo.setAreaCode("023333");
         vo.setPostalCode(232);
         vo.setDescription("region");
+
+        dto = new RegionDTO();
+        dto.setName("test");
+        dto.setAreaCode("023333");
+        dto.setPostalCode(232);
+        dto.setDescription("region");
     }
 
     @Test
@@ -141,4 +151,67 @@ class RegionControllerTest {
                 .expectStatus().is5xxServerError();
     }
 
+    @Test
+    void create() {
+        given(this.regionService.create(any(RegionDTO.class))).willReturn(Mono.just(vo));
+
+        webTestClient.mutateWith(csrf()).post().uri("/regions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.name").isEqualTo("test");
+    }
+
+    @Test
+    void create_error() {
+        given(this.regionService.create(any(RegionDTO.class))).willThrow(new RuntimeException());
+
+        webTestClient.mutateWith(csrf()).post().uri("/regions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void modify() {
+        given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willReturn(Mono.just(vo));
+
+        webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.name").isEqualTo("test");
+    }
+
+    @Test
+    void modify_error() {
+        given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willThrow(new RuntimeException());
+
+        webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(dto)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void remove() {
+        given(this.regionService.remove(anyLong())).willReturn(Mono.empty());
+
+        webTestClient.mutateWith(csrf()).delete().uri("/regions/{id}", 1)
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void remove_error() {
+        given(this.regionService.remove(anyLong())).willThrow(new RuntimeException());
+
+        webTestClient.mutateWith(csrf()).delete().uri("/regions/{id}", 1)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
 }

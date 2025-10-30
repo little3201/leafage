@@ -79,12 +79,12 @@ public class CommentController {
     /**
      * 添加信息
      *
-     * @param commentDTO 要添加的数据
+     * @param dto 要添加的数据
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<CommentVO> create(@RequestBody @Valid CommentDTO commentDTO) {
-        return commentService.create(commentDTO)
+    public Mono<CommentVO> create(@RequestBody @Valid CommentDTO dto) {
+        return commentService.create(dto)
                 .doOnError(e -> logger.error("Create comment occurred an error: ", e));
     }
 

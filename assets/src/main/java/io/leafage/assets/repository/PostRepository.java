@@ -33,14 +33,6 @@ import reactor.core.publisher.Mono;
 public interface PostRepository extends R2dbcRepository<Post, Long> {
 
     /**
-     * 分页查询
-     *
-     * @param pageable 分页参数
-     * @return 有效帖子
-     */
-    Flux<Post> findAllBy(Pageable pageable);
-
-    /**
      * 关键词查询
      *
      * @param keyword 关键词

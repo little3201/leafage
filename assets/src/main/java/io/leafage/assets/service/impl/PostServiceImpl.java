@@ -86,7 +86,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
      */
     @Override
     public Mono<PostVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return postRepository.findById(id)
                 .flatMap(post -> postBodyRepository.getByPostId(post.getId())
@@ -120,7 +120,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<PostVO> modify(Long id, PostDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return postRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
@@ -142,7 +142,7 @@ public class PostServiceImpl extends DomainConverter implements PostService {
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return postBodyRepository.getByPostId(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))

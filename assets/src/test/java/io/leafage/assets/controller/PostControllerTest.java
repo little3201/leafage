@@ -157,30 +157,6 @@ class PostControllerTest {
     }
 
     @Test
-    void exists() {
-        given(this.postService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/exists")
-                        .queryParam("title", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void exist_error() {
-        given(this.postService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/exists")
-                        .queryParam("title", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void create() {
         given(this.postService.create(any(PostDTO.class))).willReturn(Mono.just(vo));
 

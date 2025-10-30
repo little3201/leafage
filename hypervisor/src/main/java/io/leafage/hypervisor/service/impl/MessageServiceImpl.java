@@ -78,13 +78,23 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
      */
     @Override
     public Mono<MessageVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return messageRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
                 .doOnNext(message -> message.setUnread(Boolean.TRUE))
                 .flatMap(messageRepository::save)
                 .map(m -> convertToVO(m, MessageVO.class));
+    }
+
+    @Override
+    public Mono<Boolean> exists(String title, Long id) {
+        Assert.hasText(title, String.format(_MUST_NOT_BE_EMPTY, "title"));
+
+        if (id == null) {
+            return messageRepository.existsByTitle(title);
+        }
+        return messageRepository.existsByTitleAndIdNot(title, id);
     }
 
     /**
@@ -101,7 +111,7 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return messageRepository.deleteById(id);
     }
 

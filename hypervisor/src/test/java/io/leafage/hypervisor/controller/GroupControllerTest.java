@@ -138,30 +138,6 @@ class GroupControllerTest {
     }
 
     @Test
-    void exists() {
-        given(this.groupService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/groups/exists")
-                        .queryParam("name", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void exist_error() {
-        given(this.groupService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/groups/exists")
-                        .queryParam("name", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void create() {
         given(this.groupService.create(any(GroupDTO.class))).willReturn(Mono.just(vo));
 

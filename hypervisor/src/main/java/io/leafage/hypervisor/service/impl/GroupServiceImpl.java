@@ -77,13 +77,10 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
 
     @Override
     public Flux<GroupVO> retrieve(List<Long> ids) {
-        Flux<Group> flux;
         if (CollectionUtils.isEmpty(ids)) {
-            flux = groupRepository.findAll();
-        } else {
-            flux = groupRepository.findAllById(ids);
+            return groupRepository.findAll().map(g -> convertToVO(g, GroupVO.class));
         }
-        return flux.map(g -> convertToVO(g, GroupVO.class));
+        return groupRepository.findAllById(ids).map(g -> convertToVO(g, GroupVO.class));
     }
 
     /**
@@ -91,10 +88,9 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
      */
     @Override
     public Mono<GroupVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        return groupRepository.findById(id)
-                .map(g -> convertToVO(g, GroupVO.class));
+        return groupRepository.findById(id).map(g -> convertToVO(g, GroupVO.class));
     }
 
     /**
@@ -102,9 +98,12 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
      */
     @Override
     public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
 
-        return groupRepository.existsByName(name);
+        if (id == null) {
+            return groupRepository.existsByName(name);
+        }
+        return groupRepository.existsByNameAndIdNot(name, id);
     }
 
     /**
@@ -121,7 +120,7 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
      */
     @Override
     public Mono<GroupVO> modify(Long id, GroupDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return groupRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
@@ -135,7 +134,7 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return groupRepository.deleteById(id);
     }

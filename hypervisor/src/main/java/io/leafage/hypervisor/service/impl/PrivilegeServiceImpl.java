@@ -75,11 +75,17 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
     public Mono<Page<PrivilegeVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, Privilege.class);
+        criteria = criteria.and("superiorId").isNull();
 
         return r2dbcEntityTemplate.select(Privilege.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()
-                .map(privilege -> convertToVO(privilege, PrivilegeVO.class))
+                .flatMap(privilege -> privilegeRepository.countBySuperiorId(privilege.getId())
+                        .map(count -> {
+                            PrivilegeVO vo = convertToVO(privilege, PrivilegeVO.class);
+                            vo.setCount(count);
+                            return vo;
+                        }))
                 .collectList()
                 .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Privilege.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
@@ -90,7 +96,7 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
      */
     @Override
     public Mono<List<TreeNode<Long>>> tree(String username) {
-        Assert.hasText(username, "username must not be empty.");
+        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         Flux<Privilege> privilegeFlux = groupMembersRepository.findByUsername(username)
                 .flatMap(groupMember -> groupPrivilegesRepository.findByGroupId(groupMember.getGroupId())
@@ -125,7 +131,7 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
      */
     @Override
     public Mono<PrivilegeVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return privilegeRepository.findById(id)
                 .map(p -> convertToVO(p, PrivilegeVO.class));
     }
@@ -135,8 +141,12 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
      */
     @Override
     public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
-        return privilegeRepository.existsByName(name);
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
+
+        if (id == null) {
+            return privilegeRepository.existsByName(name);
+        }
+        return privilegeRepository.existsByNameAndIdNot(name, id);
     }
 
     /**
@@ -153,7 +163,7 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
      */
     @Override
     public Mono<PrivilegeVO> modify(Long id, PrivilegeDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return privilegeRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))

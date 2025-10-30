@@ -72,7 +72,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
 
     @Override
     public Mono<SchedulerLogVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return schedulerLogRepository.findById(id)
                 .map(s -> convertToVO(s, SchedulerLogVO.class));

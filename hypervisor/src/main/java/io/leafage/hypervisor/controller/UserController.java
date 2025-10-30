@@ -34,6 +34,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.ExcelReader;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.Principal;
 
 /**
@@ -127,8 +129,13 @@ public class UserController {
      */
     @PostMapping
     public Mono<UserVO> create(@RequestBody @Valid UserDTO dto) {
-        return userService.create(dto)
-                .doOnError(e -> logger.error("Create user error: ", e));
+        return userService.exists(dto.getUsername(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getUsername()));
+            } else {
+                return userService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create user error: ", e));
     }
 
     /**
@@ -140,8 +147,13 @@ public class UserController {
      */
     @PutMapping("/{id}")
     public Mono<UserVO> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
-        return userService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify user error, id: {}", id, e));
+        return userService.exists(dto.getUsername(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getUsername()));
+            } else {
+                return userService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify user error: ", e));
     }
 
     /**

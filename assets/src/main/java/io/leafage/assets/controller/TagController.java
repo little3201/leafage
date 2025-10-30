@@ -28,6 +28,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
+
 
 /**
  * tag controller
@@ -79,18 +81,6 @@ public class TagController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param name 名称
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String name, Long id) {
-        return tagService.exists(name, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 添加信息
      *
      * @param dto 要添加的数据
@@ -98,8 +88,13 @@ public class TagController {
      */
     @PostMapping
     public Mono<TagVO> create(@RequestBody @Valid TagDTO dto) {
-        return tagService.create(dto)
-                .doOnError(e -> logger.error("Create tag occurred an error: ", e));
+        return tagService.exists(dto.getName(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return tagService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create tag occurred an error: ", e));
     }
 
     /**
@@ -111,8 +106,13 @@ public class TagController {
      */
     @PutMapping("/{id}")
     public Mono<TagVO> modify(@PathVariable Long id, @RequestBody @Valid TagDTO dto) {
-        return tagService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify tag occurred an error: ", e));
+        return tagService.exists(dto.getName(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return tagService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify tag occurred an error: ", e));
     }
 
     /**

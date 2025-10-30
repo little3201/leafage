@@ -40,14 +40,6 @@ public interface CommentRepository extends R2dbcRepository<Comment, Long> {
     Flux<Comment> findByPostIdAndReplierIsNull(Long postId);
 
     /**
-     * 统计回复
-     *
-     * @param replier 关联代码
-     * @return 关联的数据记录数
-     */
-    Mono<Long> countByReplier(Long replier);
-
-    /**
      * 查询回复
      *
      * @param replier 关联代码

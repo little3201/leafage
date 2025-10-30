@@ -40,17 +40,19 @@ public interface DictionaryRepository extends R2dbcRepository<Dictionary, Long> 
     Mono<Boolean> existsByName(String name);
 
     /**
+     * 是否已存在
+     *
+     * @param name 名称
+     * @param id   主键
+     * @return true-是，false-否
+     */
+    Mono<Boolean> existsByNameAndIdNot(String name, Long id);
+
+    /**
      * 查询下级
      *
      * @param superiorId a {@link java.lang.Long} object
      * @return 结果信息
      */
     Flux<Dictionary> findBySuperiorId(Long superiorId);
-
-    /**
-     * 查询上级
-     *
-     * @return 结果信息
-     */
-    Flux<Dictionary> findBySuperiorIdIsNull();
 }

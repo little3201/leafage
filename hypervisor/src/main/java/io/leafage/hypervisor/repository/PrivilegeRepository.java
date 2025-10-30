@@ -48,6 +48,15 @@ public interface PrivilegeRepository extends R2dbcRepository<Privilege, Long> {
     Mono<Boolean> existsByName(String name);
 
     /**
+     * 是否已存在
+     *
+     * @param name 名称
+     * @param id   主键
+     * @return true-是，false-否
+     */
+    Mono<Boolean> existsByNameAndIdNot(String name, Long id);
+
+    /**
      * 统计
      *
      * @param superiorId 上级

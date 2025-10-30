@@ -78,7 +78,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public Mono<TagVO> fetch(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return tagRepository.findById(id)
                 .map(c -> convertToVO(c, TagVO.class));
@@ -89,7 +89,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, "name must not be empty.");
+        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
         if (id == null) {
             return tagRepository.existsByName(name);
         }
@@ -110,7 +110,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public Mono<TagVO> modify(Long id, TagDTO dto) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return tagRepository.findById(id)
                 .switchIfEmpty(Mono.error(NotContextException::new))
@@ -124,7 +124,7 @@ public class TagServiceImpl extends DomainConverter implements TagService {
      */
     @Override
     public Mono<Void> remove(Long id) {
-        Assert.notNull(id, "id must not be null.");
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return tagRepository.deleteById(id);
     }

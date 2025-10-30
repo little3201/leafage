@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
+
 
 /**
  * posts controller
@@ -95,40 +97,38 @@ public class PostController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param title 标题
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String title, Long id) {
-        return postService.exists(title, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 添加信息
      *
-     * @param postDTO 要添加的数据
+     * @param dto 要添加的数据
      * @return 添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public Mono<PostVO> create(@RequestBody @Valid PostDTO postDTO) {
-        return postService.create(postDTO)
-                .doOnError(e -> logger.error("Create post occurred an error: ", e));
+    public Mono<PostVO> create(@RequestBody @Valid PostDTO dto) {
+        return postService.exists(dto.getTitle(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getTitle()));
+            } else {
+                return postService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create post occurred an error: ", e));
     }
 
     /**
      * 修改信息
      *
-     * @param id      主键
-     * @param postDTO 要修改的数据
+     * @param id  主键
+     * @param dto 要修改的数据
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO postDTO) {
-        return postService.modify(id, postDTO)
-                .doOnError(e -> logger.error("Modify post occurred an error: ", e));
+    public Mono<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO dto) {
+        return postService.exists(dto.getTitle(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getTitle()));
+            } else {
+                return postService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify post occurred an error: ", e));
     }
 
 

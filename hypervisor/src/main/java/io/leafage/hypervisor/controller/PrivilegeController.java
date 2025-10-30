@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
 import top.leafage.common.poi.ExcelReader;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import java.security.Principal;
 import java.util.List;
 
@@ -97,18 +98,6 @@ public class PrivilegeController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param name 名称
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String name, Long id) {
-        return privilegeService.exists(name, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 查询
      *
      * @return 查询到的数据，否则返回空
@@ -127,8 +116,13 @@ public class PrivilegeController {
      */
     @PostMapping
     public Mono<PrivilegeVO> create(@RequestBody @Valid PrivilegeDTO dto) {
-        return privilegeService.create(dto)
-                .doOnError(e -> logger.error("Create privilege occurred an error: ", e));
+        return privilegeService.exists(dto.getName(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return privilegeService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create privilege occurred an error: ", e));
     }
 
     /**
@@ -140,8 +134,13 @@ public class PrivilegeController {
      */
     @PutMapping("/{id}")
     public Mono<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
-        return privilegeService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify privilege occurred an error: ", e));
+        return privilegeService.exists(dto.getName(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return privilegeService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify privilege occurred an error: ", e));
     }
 
     /**

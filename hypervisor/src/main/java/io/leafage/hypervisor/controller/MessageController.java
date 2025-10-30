@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import java.security.Principal;
 
 /**
@@ -63,7 +64,7 @@ public class MessageController {
     @GetMapping
     public Mono<Page<MessageVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                           String sortBy, boolean descending, Principal principal) {
-        return messageService.retrieve(page, size, sortBy, descending, principal.getName())
+        return messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()))
                 .doOnError(e -> logger.error("Retrieve messages error: ", e));
     }
 
@@ -80,18 +81,6 @@ public class MessageController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param title 标题
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String title, Long id) {
-        return messageService.exists(title, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 添加
      *
      * @param dto 要添加的数据
@@ -99,8 +88,13 @@ public class MessageController {
      */
     @PostMapping
     public Mono<MessageVO> create(@RequestBody @Valid MessageDTO dto) {
-        return messageService.create(dto)
-                .doOnError(e -> logger.error("Create message occurred an error: ", e));
+        return messageService.exists(dto.getTitle(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getTitle()));
+            } else {
+                return messageService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create message occurred an error: ", e));
     }
 
     /**

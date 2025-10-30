@@ -36,6 +36,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.ExcelReader;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.Set;
 
 /**
@@ -94,18 +95,6 @@ public class GroupController {
     }
 
     /**
-     * 是否已存在
-     *
-     * @param name 名称
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String name, Long id) {
-        return groupService.exists(name, id)
-                .doOnError(e -> logger.error("Check is exists error: ", e));
-    }
-
-    /**
      * 添加
      *
      * @param dto 要添加的数据
@@ -113,8 +102,13 @@ public class GroupController {
      */
     @PostMapping
     public Mono<GroupVO> create(@RequestBody @Valid GroupDTO dto) {
-        return groupService.create(dto)
-                .doOnError(e -> logger.error("Create group occurred an error: ", e));
+        return groupService.exists(dto.getName(), null).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return groupService.create(dto);
+            }
+        }).doOnError(e -> logger.error("Create group occurred an error: ", e));
     }
 
     /**
@@ -126,8 +120,13 @@ public class GroupController {
      */
     @PutMapping("/{id}")
     public Mono<GroupVO> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO dto) {
-        return groupService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify group occurred an error: ", e));
+        return groupService.exists(dto.getName(), id).flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
+            } else {
+                return groupService.modify(id, dto);
+            }
+        }).doOnError(e -> logger.error("Modify group occurred an error: ", e));
     }
 
     /**

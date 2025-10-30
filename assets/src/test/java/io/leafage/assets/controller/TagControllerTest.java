@@ -127,30 +127,6 @@ class TagControllerTest {
     }
 
     @Test
-    void exists() {
-        given(this.tagService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/tags/exists")
-                        .queryParam("name", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void exist_error() {
-        given(this.tagService.exists(anyString(), anyLong())).willThrow(new RuntimeException());
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/tags/exists")
-                        .queryParam("name", "test")
-                        .queryParam("id", 1L)
-                        .build())
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void create() {
         given(this.tagService.create(any(TagDTO.class))).willReturn(Mono.just(vo));
 
