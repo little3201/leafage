@@ -53,8 +53,8 @@
         <module>gateway</module>
         <module>auth</module>
         <module>hypervisor</module>
-        <module>assets</module>
         <module>exploiter</module>
+        <module>assets</module>
     </modules>
 
     <dependencyManagement>
