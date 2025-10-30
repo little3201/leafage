@@ -16,7 +16,6 @@
 package io.leafage.system.domain.superclass;
 
 
-
 import org.springframework.data.relational.core.mapping.Column;
 
 import java.net.InetAddress;
@@ -34,7 +33,7 @@ public abstract class OperationLogModel {
 
     private String location;
 
-    private String content;
+    private String body;
 
     @Column(value = "user_agent")
     private String userAgent;
@@ -82,12 +81,12 @@ public abstract class OperationLogModel {
         this.userAgent = userAgent;
     }
 
-    public String getContent() {
-        return content;
+    public String getBody() {
+        return body;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public String getOperation() {
