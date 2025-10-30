@@ -85,6 +85,7 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         accessLogRepository.deleteById(id);
     }
 

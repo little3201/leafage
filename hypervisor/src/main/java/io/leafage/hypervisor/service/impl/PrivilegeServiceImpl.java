@@ -19,7 +19,6 @@ import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.repository.*;
 import io.leafage.hypervisor.service.PrivilegeService;
 import io.leafage.hypervisor.vo.PrivilegeVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -68,16 +67,9 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Privilege> spec = (root, query, cb) -> {
-            Predicate filterPredicate = buildPredicate(filters, cb, root).orElse(null);
-            Predicate superiorIsNull = cb.isNull(root.get("superiorId"));
-
-            if (filterPredicate == null) {
-                return superiorIsNull; // 只有 superiorId is null 条件
-            } else {
-                return cb.and(filterPredicate, superiorIsNull);
-            }
-        };
+        Specification<Privilege> spec = (root, query, cb) ->
+                buildPredicate(filters, cb, root).orElse(null);
+        spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
 
         return privilegeRepository.findAll(spec, pageable)
                 .map(privilege -> {
@@ -128,6 +120,8 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public List<PrivilegeVO> subset(Long superiorId) {
+        Assert.notNull(superiorId, String.format(_MUST_NOT_BE_NULL,"superiorId"));
+
         return privilegeRepository.findAllBySuperiorId(superiorId).stream()
                 .map(privilege -> {
                     PrivilegeVO vo = convertToVO(privilege, PrivilegeVO.class);

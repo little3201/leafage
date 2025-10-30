@@ -80,11 +80,15 @@ public class UserServiceImpl extends DomainConverter implements UserService {
 
     @Override
     public boolean enable(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return userRepository.updateEnabledById(id) > 0;
     }
 
     @Override
     public boolean unlock(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return userRepository.updateAccountNonLockedById(id) > 0;
     }
 
@@ -94,6 +98,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
     @Override
     public boolean exists(String username, Long id) {
         Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
+
         if (id == null) {
             return userRepository.existsByUsername(username);
         }
@@ -132,6 +137,7 @@ public class UserServiceImpl extends DomainConverter implements UserService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         userRepository.deleteById(id);
     }
 

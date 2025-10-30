@@ -26,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 /**
  * messages controller.
  *
@@ -56,15 +58,15 @@ public class MessageController {
      * @param size       The number of records per page.
      * @param sortBy     The field to sort by.
      * @param descending Whether sorting should be in descending order.
-     * @param filters    The filters.
+     * @param principal  The principal.
      * @return A paginated list of records, or 204 status code if an error occurs.
      */
     @GetMapping
     public ResponseEntity<Page<MessageVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                                    String sortBy, boolean descending, String filters) {
+                                                    String sortBy, boolean descending, Principal principal) {
         Page<MessageVO> voPage;
         try {
-            voPage = messageService.retrieve(page, size, sortBy, descending, filters);
+            voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()));
         } catch (Exception e) {
             logger.info("Retrieve message error: ", e);
             return ResponseEntity.noContent().build();

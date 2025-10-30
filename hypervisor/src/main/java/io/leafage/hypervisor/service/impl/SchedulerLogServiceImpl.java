@@ -54,6 +54,8 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
 
     @Override
     public SchedulerLogVO fetch(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return schedulerLogRepository.findById(id)
                 .map(schedulerLog -> convertToVO(schedulerLog, SchedulerLogVO.class)).orElse(null);
     }
@@ -61,6 +63,7 @@ public class SchedulerLogServiceImpl extends DomainConverter implements Schedule
     @Override
     public boolean exists(String name, Long id) {
         Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
+
         if (id == null) {
             return schedulerLogRepository.existsByName(name);
         }

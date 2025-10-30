@@ -20,7 +20,6 @@ import io.leafage.assets.dto.RegionDTO;
 import io.leafage.assets.repository.RegionRepository;
 import io.leafage.assets.service.RegionService;
 import io.leafage.assets.vo.RegionVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,16 +54,9 @@ public class RegionServiceImpl extends DomainConverter implements RegionService 
     public Page<RegionVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Region> spec = (root, query, cb) -> {
-            Predicate filterPredicate = buildPredicate(filters, cb, root).orElse(null);
-            Predicate superiorIsNull = cb.isNull(root.get("superiorId"));
-
-            if (filterPredicate == null) {
-                return superiorIsNull; // 只有 superiorId is null 条件
-            } else {
-                return cb.and(filterPredicate, superiorIsNull);
-            }
-        };
+        Specification<Region> spec = (root, query, cb) ->
+                buildPredicate(filters, cb, root).orElse(null);
+        spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
 
         return regionRepository.findAll(spec, pageable)
                 .map(region -> convertToVO(region, RegionVO.class));

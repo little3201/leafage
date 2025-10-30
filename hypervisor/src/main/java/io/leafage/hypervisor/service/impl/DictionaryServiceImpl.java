@@ -20,7 +20,6 @@ import io.leafage.hypervisor.dto.DictionaryDTO;
 import io.leafage.hypervisor.repository.DictionaryRepository;
 import io.leafage.hypervisor.service.DictionaryService;
 import io.leafage.hypervisor.vo.DictionaryVO;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -56,16 +55,9 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
     public Page<DictionaryVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Dictionary> spec = (root, query, cb) -> {
-            Predicate filterPredicate = buildPredicate(filters, cb, root).orElse(null);
-            Predicate superiorIsNull = cb.isNull(root.get("superiorId"));
-
-            if (filterPredicate == null) {
-                return superiorIsNull; // 只有 superiorId is null 条件
-            } else {
-                return cb.and(filterPredicate, superiorIsNull);
-            }
-        };
+        Specification<Dictionary> spec = (root, query, cb) ->
+                buildPredicate(filters, cb, root).orElse(null);
+        spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
 
         return dictionaryRepository.findAll(spec, pageable)
                 .map(dictionary -> convertToVO(dictionary, DictionaryVO.class));
@@ -84,6 +76,8 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
 
     @Override
     public boolean enable(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return dictionaryRepository.updateEnabledById(id) > 0;
     }
 
@@ -128,6 +122,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
     @Override
     public DictionaryVO modify(Long id, DictionaryDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return dictionaryRepository.findById(id).map(existing -> {
             Dictionary dictionary = convert(dto, existing);
             dictionary = dictionaryRepository.save(dictionary);
@@ -141,6 +136,7 @@ public class DictionaryServiceImpl extends DomainConverter implements Dictionary
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         dictionaryRepository.deleteById(id);
     }
 

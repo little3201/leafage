@@ -85,6 +85,9 @@ public class RoleMembersServiceImpl implements RoleMembersService {
 
     @Override
     public void removeRelation(Long roleId, Set<String> usernames) {
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
+        Assert.notEmpty(usernames, String.format(_MUST_NOT_BE_EMPTY, "usernames"));
+        
         List<RoleMembers> roleMembers = roleMembersRepository.findAllByRoleId(roleId);
         List<Long> filteredIds = roleMembers.stream()
                 .filter(roleMember -> usernames.contains(roleMember.getUsername()))

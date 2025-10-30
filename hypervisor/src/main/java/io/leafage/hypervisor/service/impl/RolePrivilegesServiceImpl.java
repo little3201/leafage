@@ -86,6 +86,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
     @Override
     public RolePrivileges relation(Long roleId, Long privilegeId, String action) {
         Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
+        Assert.notNull(privilegeId, String.format(_MUST_NOT_BE_NULL, "privilegeId"));
 
         RolePrivileges rolePrivilege = new RolePrivileges(roleId, privilegeId,
                 StringUtils.hasText(action) ? Set.of(action) : Collections.emptySet());
@@ -102,6 +103,9 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
 
     @Override
     public void removeRelation(Long roleId, Long privilegeId, String action) {
+        Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
+        Assert.notNull(privilegeId, String.format(_MUST_NOT_BE_NULL, "privilegeId"));
+
         rolePrivilegesRepository.findByRoleIdAndPrivilegeId(roleId, privilegeId)
                 .ifPresent(rolePrivilege -> {
                     // actions为空，删除菜单

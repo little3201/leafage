@@ -83,6 +83,7 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         operationLogRepository.deleteById(id);
     }
 
