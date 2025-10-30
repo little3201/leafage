@@ -53,9 +53,7 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
      */
     @Override
     public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String operation) {
-        Sort sort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC,
-                StringUtils.hasText(sortBy) ? sortBy : "id");
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = pageable(page, size, sortBy, descending);
 
         return operationLogRepository.findAll(pageable)
                 .map(operationLog -> convertToVO(operationLog, OperationLogVO.class));

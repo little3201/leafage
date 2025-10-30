@@ -49,7 +49,7 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
      * {@inheritDoc}
      */
     @Override
-    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String url) {
+    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
         return accessLogRepository.findAll(pageable).map(accessLog ->

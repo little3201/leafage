@@ -66,9 +66,7 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
-        Sort sort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC,
-                StringUtils.hasText(sortBy) ? sortBy : "id");
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = pageable(page, size, sortBy, descending);
 
         return privilegeRepository.findAllBySuperiorIdIsNull(pageable)
                 .map(privilege -> {

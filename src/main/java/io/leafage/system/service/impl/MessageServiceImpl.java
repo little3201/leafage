@@ -21,12 +21,9 @@ import io.leafage.system.repository.MessageRepository;
 import io.leafage.system.service.MessageService;
 import io.leafage.system.vo.MessageVO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import top.leafage.common.DomainConverter;
 
 /**
@@ -53,9 +50,7 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
      */
     @Override
     public Page<MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String title) {
-        Sort sort = Sort.by(descending ? Sort.Direction.DESC : Sort.Direction.ASC,
-                StringUtils.hasText(sortBy) ? sortBy : "id");
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = pageable(page, size, sortBy, descending);
 
         return messageRepository.findAll(pageable)
                 .map(message -> convertToVO(message, MessageVO.class));

@@ -37,7 +37,7 @@
         <sonar.organization>little3201</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-        <leafage-common.version>0.3.5</leafage-common.version>
+        <leafage-common.version>0.3.6</leafage-common.version>
         <mybatis.version>3.5.14</mybatis.version>
         <mybatis-spring.version>3.0.4</mybatis-spring.version>
     </properties>

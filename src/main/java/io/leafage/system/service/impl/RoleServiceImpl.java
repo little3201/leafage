@@ -51,6 +51,7 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
     @Override
     public Page<RoleVO> retrieve(int page, int size, String sortBy, boolean descending, String name) {
         Pageable pageable = pageable(page, size, sortBy, descending);
+
         if (StringUtils.hasText(name)) {
             return roleRepository.findAllByNameContaining(name, pageable)
                     .map(role -> convertToVO(role, RoleVO.class));
