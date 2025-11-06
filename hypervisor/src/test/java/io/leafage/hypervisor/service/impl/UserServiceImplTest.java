@@ -60,7 +60,7 @@ class UserServiceImplTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setFullname("zhangsan");
+        dto.setName("zhangsan");
         dto.setAvatar("a.jpg");
         dto.setEmail("zhang@test.com");
     }

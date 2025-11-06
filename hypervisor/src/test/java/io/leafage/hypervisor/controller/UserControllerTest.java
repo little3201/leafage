@@ -70,7 +70,7 @@ class UserControllerTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setFullname("John");
+        dto.setName("John");
         dto.setAvatar("steven.jpg");
 
         vo = new UserVO();
