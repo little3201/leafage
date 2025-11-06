@@ -59,14 +59,6 @@ public class UserServiceImpl extends DomainConverter implements UserService {
                 .map(user -> convertToVO(user, UserVO.class));
     }
 
-    @Override
-    public UserVO findByUsername(String username) {
-        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
-
-        return userRepository.findByUsername(username)
-                .map(user -> convertToVO(user, UserVO.class)).orElse(null);
-    }
-
     /**
      * {@inheritDoc}
      */

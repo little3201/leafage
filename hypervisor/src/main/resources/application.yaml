@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: hypervisor
-
   profiles:
     active: dev
 
@@ -15,7 +14,7 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://127.0.0.1:8761
+          jwk-set-uri: http://localhost:8761/oauth2/jwks
 
 management:
   endpoints:

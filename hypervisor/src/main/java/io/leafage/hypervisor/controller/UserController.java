@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.poi.ExcelReader;
 
-import java.security.Principal;
 import java.util.List;
 
 /**
@@ -92,24 +91,6 @@ public class UserController {
             vo = userService.fetch(id);
         } catch (Exception e) {
             logger.info("Fetch user error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(vo);
-    }
-
-    /**
-     * 查询当前用户
-     *
-     * @param principal 当前用户
-     * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
-     */
-    @GetMapping("/me")
-    public ResponseEntity<UserVO> fetchMe(Principal principal) {
-        UserVO vo;
-        try {
-            vo = userService.findByUsername(principal.getName());
-        } catch (Exception e) {
-            logger.info("Fetch me error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);

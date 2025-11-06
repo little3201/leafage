@@ -33,14 +33,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     /**
-     * find user by username
-     *
-     * @param username username
-     * @return Record data
-     */
-    Optional<User> findByUsername(String username);
-
-    /**
      * 是否存在
      *
      * @param username 用户名

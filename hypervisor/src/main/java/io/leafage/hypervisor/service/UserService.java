@@ -26,14 +26,6 @@ import top.leafage.common.jpa.JpaCrudService;
 public interface UserService extends JpaCrudService<UserDTO, UserVO> {
 
     /**
-     * Fetch user
-     *
-     * @param username username
-     * @return Record
-     */
-    UserVO findByUsername(String username);
-
-    /**
      * Update accountNonLocked.
      *
      * @param id 主键

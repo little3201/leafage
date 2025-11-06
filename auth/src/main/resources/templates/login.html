@@ -1,38 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Login</title>
     <meta charset="UTF-8"/>
-    <meta content="initial-scale=1, width=device-width" name="viewport"/>
-    <link href="/favicon.ico" rel="icon" type="image/ico"/>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <meta name="viewport" content="initial-scale=1, width=device-width"/>
+    <title>Login</title>
+    <link rel="icon" type="image/ico" href="/favicon.ico"  th:href="@{favicon.ico}"/>
+    <link rel="stylesheet" href="/assets/css/login.css" th:href="@{/assets/css/login.css}">
 </head>
 <body class="min-h-screen">
-<!-- 背景图 -->
 <div class="h-screen">
     <div class="hidden xl:block absolute inset-0 z-0"
-         style="background-image: url('/svgs/background.svg'); background-repeat: no-repeat; background-size: cover;">
+         style="background-image: url('/assets/svgs/background.svg'); background-repeat: no-repeat; background-size: cover;">
     </div>
     <div class="flex h-screen items-center justify-center">
         <div class=" h-2/3 grid grid-cols-2 gap-8 z-10">
-            <!-- 左侧插图区（仅 XL 显示） -->
             <div class="flex items-center justify-center">
                 <figure>
-                    <img alt="leafage illustration" height="100%" th:src="@{/svgs/illustration.svg}" width="560">
+                    <img alt="leafage illustration" src="/assets/svgs/illustration.svg" th:src="@{/assets/svgs/illustration.svg}" height="100%"  width="560">
                 </figure>
             </div>
-
-            <!-- 右侧表单内容区 -->
             <div class="flex items-center justify-center">
                 <div class="max-w-xs m-auto px-4 py-8 xl:p-0 rounded-md shadow-sm xl:shadow-none w-full">
                     <div class="text-xl text-center mb-6">
                         <figure class="text-center">
-                            <img alt="logo" height="64" style="display: inline-block" th:src="@{/svgs/logo.svg}"
+                            <img alt="logo" height="64" style="display: inline-block" src="/assets/svgs/logo.svg" th:src="@{/assets/svgs/logo.svg}"
                                  width="64">
                         </figure>
                         登录您的帐户
                     </div>
-                    <!-- 登录表单区域 -->
                     <form class="space-y-4" method="post" th:action="@{/login}">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="username">用户名</label>

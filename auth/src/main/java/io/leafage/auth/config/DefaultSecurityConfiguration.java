@@ -17,7 +17,6 @@ package io.leafage.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
@@ -37,11 +36,11 @@ public class DefaultSecurityConfiguration {
     public SecurityFilterChain standardSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/actuator/**", "/css/**", "/svgs/**", "/login").permitAll()
+                        authorize.requestMatchers("/actuator/**", "/assets/**", "/login").permitAll()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login"));
 
-        return http.cors(Customizer.withDefaults()).build();
+        return http.build();
     }
 
     @Bean

@@ -24,7 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * resource server config.
+ * resource server configuration.
  *
  * @author wq li
  */

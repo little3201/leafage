@@ -29,7 +29,7 @@ import java.util.Optional;
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 /**
- * audit config.
+ * audit configuration.
  *
  * @author wq li
  */
