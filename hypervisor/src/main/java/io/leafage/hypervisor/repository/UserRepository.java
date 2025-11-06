@@ -33,14 +33,6 @@ import reactor.core.publisher.Mono;
 public interface UserRepository extends R2dbcRepository<User, Long> {
 
     /**
-     * 根据user查
-     *
-     * @param username user
-     * @return user
-     */
-    Mono<User> findByUsername(String username);
-
-    /**
      * 是否已存在
      *
      * @param username user

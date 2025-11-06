@@ -74,7 +74,7 @@ class CommentControllerTest {
     void comments() {
         given(this.commentService.comments(anyLong())).willReturn(Flux.just(vo));
 
-        webTestClient.get().uri("/comments/{id}", 1)
+        webTestClient.get().uri("/comments/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(TagVO.class);
@@ -84,7 +84,7 @@ class CommentControllerTest {
     void comments_error() {
         given(this.commentService.comments(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/comments/{id}", 1)
+        webTestClient.get().uri("/comments/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -93,7 +93,7 @@ class CommentControllerTest {
     void replies() {
         given(this.commentService.replies(anyLong())).willReturn(Flux.just(vo));
 
-        webTestClient.get().uri("/comments/{id}/replies", 1)
+        webTestClient.get().uri("/comments/{id}/replies", 1L)
                 .exchange()
                 .expectStatus().isOk().expectBodyList(TagVO.class);
     }
@@ -102,7 +102,7 @@ class CommentControllerTest {
     void repliers_error() {
         given(this.commentService.replies(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/comments/{id}/replies", 1)
+        webTestClient.get().uri("/comments/{id}/replies", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -133,7 +133,7 @@ class CommentControllerTest {
     void remove() {
         given(this.commentService.remove(anyLong())).willReturn(Mono.empty());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/comments/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/comments/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -142,7 +142,7 @@ class CommentControllerTest {
     void remove_error() {
         given(this.commentService.remove(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/comments/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/comments/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

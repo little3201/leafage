@@ -80,7 +80,7 @@ class DictionaryServiceImplTest {
         given(terminating.all()).willReturn(Flux.just(entity));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(Dictionary.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(dictionaryService.retrieve(0, 2, "id", true, "name:like:a"))
+        StepVerifier.create(dictionaryService.retrieve(0, 2, "id", true, "name:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
@@ -121,8 +121,22 @@ class DictionaryServiceImplTest {
 
     @Test
     void exists() {
+        given(this.dictionaryRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(dictionaryService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void exists_id_null() {
         given(this.dictionaryRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(dictionaryService.exists("vip", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+        StepVerifier.create(dictionaryService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void remove() {
+        given(this.dictionaryRepository.deleteById(anyLong())).willReturn(Mono.empty());
+
+        StepVerifier.create(dictionaryService.remove(anyLong())).verifyComplete();
     }
 }

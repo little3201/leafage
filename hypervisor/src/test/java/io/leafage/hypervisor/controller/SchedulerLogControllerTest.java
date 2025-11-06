@@ -17,8 +17,9 @@
 
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.service.SchedulerLogService;
+import io.leafage.hypervisor.vo.SchedulerLogVO;
+import io.leafage.hypervisor.vo.SchedulerLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,8 +35,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -43,40 +44,40 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 /**
- * record controller test
+ * audit log controller test
  *
  * @author wq li
  */
 @WithMockUser
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(AccessLogController.class)
-class AccessLogControllerTest {
+@WebFluxTest(SchedulerLogController.class)
+class SchedulerLogControllerTest {
 
     @MockitoBean
-    private AccessLogService accessLogService;
+    private SchedulerLogService schedulerLogService;
 
     @Autowired
     private WebTestClient webTestClient;
 
-    private AccessLogVO vo;
+    private SchedulerLogVO vo;
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new AccessLogVO();
+        vo = new SchedulerLogVO();
         vo.setId(1L);
-        vo.setIp(InetAddress.getByName("12.1.2.1"));
-        vo.setLocation("某国某城市");
-        vo.setBody("更新个人资料");
-        vo.setParams("test");
+        vo.setName("test");
+        vo.setRecord("test");
+        vo.setNextExecuteTime(Instant.now());
+        vo.setExecutedTimes(12);
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<AccessLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
-        given(this.accessLogService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willReturn(Mono.just(page));
+        Page<SchedulerLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willReturn(Mono.just(page));
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/scheduler-logs")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
@@ -85,20 +86,20 @@ class AccessLogControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(AccessLogVO.class);
+                .expectBodyList(SchedulerLogVO.class);
     }
 
     @Test
     void retrieve_error() {
-        given(this.accessLogService.retrieve(anyInt(), anyInt(), anyString(),
+        given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willThrow(new NoSuchElementException());
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/scheduler-logs")
                         .queryParam("page", 0)
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "url:like:test")
+                        .queryParam("filters", "operation:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -106,19 +107,19 @@ class AccessLogControllerTest {
 
     @Test
     void fetch() {
-        given(this.accessLogService.fetch(anyLong())).willReturn(Mono.just(vo));
+        given(this.schedulerLogService.fetch(anyLong())).willReturn(Mono.just(vo));
 
-        webTestClient.get().uri("/access-logs/{id}", 1L)
+        webTestClient.get().uri("/scheduler-logs/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.params").isEqualTo("test");
+                .expectBody().jsonPath("$.name").isEqualTo("test");
     }
 
     @Test
     void fetch_error() {
-        given(this.accessLogService.fetch(anyLong())).willThrow(new RuntimeException());
+        given(this.schedulerLogService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/access-logs/{id}", 1L)
+        webTestClient.get().uri("/scheduler-logs/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

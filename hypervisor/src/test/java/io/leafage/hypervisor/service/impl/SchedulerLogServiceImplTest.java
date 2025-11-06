@@ -17,8 +17,8 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.AccessLog;
-import io.leafage.hypervisor.repository.AccessLogRepository;
+import io.leafage.hypervisor.domain.SchedulerLog;
+import io.leafage.hypervisor.repository.SchedulerLogRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,38 +44,38 @@ import static org.mockito.Mockito.mock;
  * @author wq li
  */
 @ExtendWith(MockitoExtension.class)
-class AccessLogServiceImplTest {
+class SchedulerLogServiceImplTest {
 
     @Mock
-    private AccessLogRepository accessLogRepository;
+    private SchedulerLogRepository schedulerLogRepository;
 
     @InjectMocks
-    private AccessLogServiceImpl accessLogService;
+    private SchedulerLogServiceImpl schedulerLogService;
 
     @Mock
     private R2dbcEntityTemplate r2dbcEntityTemplate;
 
-    private AccessLog entity;
+    private SchedulerLog entity;
 
     @BeforeEach
     void setUp() {
-        entity = new AccessLog();
-        entity.setUrl("test");
-        entity.setParams("test");
-        entity.setBody("test");
+        entity = new SchedulerLog();
+        entity.setName("test");
+        entity.setRecord("test");
+        entity.setExecutedTimes(12);
     }
 
     @Test
     void retrieve() {
-        ReactiveSelectOperation.ReactiveSelect<AccessLog> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
-        ReactiveSelectOperation.TerminatingSelect<AccessLog> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
+        ReactiveSelectOperation.ReactiveSelect<SchedulerLog> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<SchedulerLog> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(r2dbcEntityTemplate.select(AccessLog.class)).willReturn(select);
+        given(r2dbcEntityTemplate.select(SchedulerLog.class)).willReturn(select);
         given(select.matching(any(Query.class))).willReturn(terminating);
         given(terminating.all()).willReturn(Flux.just(entity));
-        given(r2dbcEntityTemplate.count(any(Query.class), eq(AccessLog.class))).willReturn(Mono.just(1L));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(SchedulerLog.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(accessLogService.retrieve(0, 2, "id", true, "url:like:test"))
+        StepVerifier.create(schedulerLogService.retrieve(0, 2, "id", true, "url:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
@@ -86,8 +86,8 @@ class AccessLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.accessLogRepository.findById(anyLong())).willReturn(Mono.just(mock(AccessLog.class)));
-        StepVerifier.create(accessLogService.fetch(anyLong())).expectNextCount(1).verifyComplete();
+        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Mono.just(mock(SchedulerLog.class)));
+        StepVerifier.create(schedulerLogService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
 }

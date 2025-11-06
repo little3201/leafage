@@ -78,7 +78,7 @@ class TagServiceImplTest {
         given(terminating.all()).willReturn(Flux.just(entity));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(Tag.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(tagService.retrieve(0, 2, "id", true, "name:like:a"))
+        StepVerifier.create(tagService.retrieve(0, 2, "id", true, "name:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);

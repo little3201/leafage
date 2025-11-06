@@ -102,6 +102,20 @@ class MessageServiceImplTest {
     }
 
     @Test
+    void exists() {
+        given(this.messageRepository.existsByTitleAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(messageService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void exists_id_null() {
+        given(this.messageRepository.existsByTitle(anyString())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(messageService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
     void create() {
         given(this.messageRepository.save(any(Message.class))).willReturn(Mono.just(mock(Message.class)));
 

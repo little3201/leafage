@@ -30,14 +30,6 @@ import top.leafage.common.r2dbc.R2dbcCrudService;
 public interface UserService extends R2dbcCrudService<UserDTO, UserVO> {
 
     /**
-     * 根据用户名查询
-     *
-     * @param username 用户名
-     * @return 查询结果
-     */
-    Mono<UserVO> findByUsername(String username);
-
-    /**
      * Update accountNonLocked.
      *
      * @param id 主键

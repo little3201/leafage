@@ -111,7 +111,7 @@ class UserControllerTest {
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "username:like:a")
+                        .queryParam("filters", "username:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -135,16 +135,24 @@ class UserControllerTest {
     }
 
     @Test
-    void fetchMe() {
-        given(this.userService.findByUsername(anyString())).willReturn(Mono.just(vo));
+    void enable() {
+        given(this.userService.enable(anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
-        webTestClient.get().uri("/users/me").exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.username").isNotEmpty();
+        webTestClient.mutateWith(csrf()).patch().uri("/users/{id}", 1L).exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void unlock() {
+        given(this.userService.unlock(anyLong())).willReturn(Mono.just(Boolean.TRUE));
+
+        webTestClient.mutateWith(csrf()).patch().uri("/users/{id}/unlock", 1L).exchange()
+                .expectStatus().isOk();
     }
 
     @Test
     void created() {
+        given(this.userService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.userService.create(any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/users").bodyValue(dto).exchange()
@@ -154,6 +162,7 @@ class UserControllerTest {
 
     @Test
     void modify() {
+        given(this.userService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.userService.modify(anyLong(), any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
@@ -163,6 +172,7 @@ class UserControllerTest {
 
     @Test
     void modify_error() {
+        given(this.userService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.userService.modify(anyLong(), any(UserDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()

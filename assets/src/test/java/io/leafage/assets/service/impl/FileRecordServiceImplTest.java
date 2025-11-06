@@ -78,7 +78,7 @@ class FileRecordServiceImplTest {
         given(terminating.all()).willReturn(Flux.just(entity));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(FileRecord.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(fileRecordService.retrieve(0, 2, "id", true, "name:like:a"))
+        StepVerifier.create(fileRecordService.retrieve(0, 2, "id", true, "name:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);

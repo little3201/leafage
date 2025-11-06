@@ -35,8 +35,6 @@ import reactor.core.publisher.Mono;
 import top.leafage.common.poi.ExcelReader;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
-import java.nio.file.FileAlreadyExistsException;
-import java.security.Principal;
 
 /**
  * user controller
@@ -88,35 +86,6 @@ public class UserController {
                 .doOnError(e -> {
                     if (!(e instanceof ResponseStatusException)) {
                         logger.error("Fetch user error, id: {}", id, e);
-                    }
-                });
-    }
-
-    /**
-     * 是否已存在
-     *
-     * @param username 用户名
-     * @return true-是，false-否
-     */
-    @GetMapping("/exists")
-    public Mono<Boolean> exists(@RequestParam String username, Long id) {
-        return userService.exists(username, id)
-                .doOnError(e -> logger.error("Check user exists error, username: {}", username, e));
-    }
-
-    /**
-     * 查询当前用户
-     *
-     * @param principal 当前用户
-     * @return 查询的数据
-     */
-    @GetMapping("/me")
-    public Mono<UserVO> fetchMe(Principal principal) {
-        return userService.findByUsername(principal.getName())
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Current user not found")))
-                .doOnError(e -> {
-                    if (!(e instanceof ResponseStatusException)) {
-                        logger.error("Fetch me error: ", e);
                     }
                 });
     }

@@ -17,8 +17,9 @@
 
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.AccessLog;
-import io.leafage.hypervisor.repository.AccessLogRepository;
+import io.leafage.hypervisor.domain.OperationLog;
+import io.leafage.hypervisor.domain.User;
+import io.leafage.hypervisor.repository.OperationLogRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -44,38 +46,38 @@ import static org.mockito.Mockito.mock;
  * @author wq li
  */
 @ExtendWith(MockitoExtension.class)
-class AccessLogServiceImplTest {
+class OperationLogServiceImplTest {
 
     @Mock
-    private AccessLogRepository accessLogRepository;
+    private OperationLogRepository operationLogRepository;
 
     @InjectMocks
-    private AccessLogServiceImpl accessLogService;
+    private OperationLogServiceImpl operationLogService;
 
     @Mock
     private R2dbcEntityTemplate r2dbcEntityTemplate;
 
-    private AccessLog entity;
+    private OperationLog entity;
 
     @BeforeEach
     void setUp() {
-        entity = new AccessLog();
-        entity.setUrl("test");
-        entity.setParams("test");
+        entity = new OperationLog();
         entity.setBody("test");
+        entity.setBrowser("test");
+        entity.setOperation("test");
     }
 
     @Test
     void retrieve() {
-        ReactiveSelectOperation.ReactiveSelect<AccessLog> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
-        ReactiveSelectOperation.TerminatingSelect<AccessLog> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
+        ReactiveSelectOperation.ReactiveSelect<OperationLog> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect<OperationLog> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
-        given(r2dbcEntityTemplate.select(AccessLog.class)).willReturn(select);
+        given(r2dbcEntityTemplate.select(OperationLog.class)).willReturn(select);
         given(select.matching(any(Query.class))).willReturn(terminating);
         given(terminating.all()).willReturn(Flux.just(entity));
-        given(r2dbcEntityTemplate.count(any(Query.class), eq(AccessLog.class))).willReturn(Mono.just(1L));
+        given(r2dbcEntityTemplate.count(any(Query.class), eq(OperationLog.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(accessLogService.retrieve(0, 2, "id", true, "url:like:test"))
+        StepVerifier.create(operationLogService.retrieve(0, 2, "id", true, "url:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
@@ -86,8 +88,8 @@ class AccessLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.accessLogRepository.findById(anyLong())).willReturn(Mono.just(mock(AccessLog.class)));
-        StepVerifier.create(accessLogService.fetch(anyLong())).expectNextCount(1).verifyComplete();
+        given(this.operationLogRepository.findById(anyLong())).willReturn(Mono.just(mock(OperationLog.class)));
+        StepVerifier.create(operationLogService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
 }

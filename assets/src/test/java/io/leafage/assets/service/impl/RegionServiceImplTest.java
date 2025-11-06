@@ -86,7 +86,7 @@ class RegionServiceImplTest {
         given(terminating.all()).willReturn(Flux.just(entity));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(Region.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(regionService.retrieve(0, 2, "id", true, "name:like:a"))
+        StepVerifier.create(regionService.retrieve(0, 2, "id", true, "name:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);

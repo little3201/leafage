@@ -77,20 +77,22 @@ class PrivilegeServiceImplTest {
         dto.setName("test");
 
         entity = new Privilege();
+        entity.setId(1L);
         entity.setName("test");
     }
 
     @Test
     void retrieve_page() {
-        ReactiveSelectOperation.ReactiveSelect<Privilege> select = mock(ReactiveSelectOperation.ReactiveSelect.class);
-        ReactiveSelectOperation.TerminatingSelect<Privilege> terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
+        ReactiveSelectOperation.ReactiveSelect select = mock(ReactiveSelectOperation.ReactiveSelect.class);
+        ReactiveSelectOperation.TerminatingSelect terminating = mock(ReactiveSelectOperation.TerminatingSelect.class);
 
         given(r2dbcEntityTemplate.select(Privilege.class)).willReturn(select);
         given(select.matching(any(Query.class))).willReturn(terminating);
         given(terminating.all()).willReturn(Flux.just(entity));
+        given(this.privilegeRepository.countBySuperiorId(anyLong())).willReturn(Mono.just(0L));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(Privilege.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(privilegeService.retrieve(0, 2, "id", true, "name:like:a"))
+        StepVerifier.create(privilegeService.retrieve(0, 2, "id", true, "name:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
@@ -126,6 +128,13 @@ class PrivilegeServiceImplTest {
         given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(mock(Privilege.class)));
 
         StepVerifier.create(privilegeService.fetch(1L)).expectNextCount(1).verifyComplete();
+    }
+
+    @Test
+    void subset() {
+        given(this.privilegeRepository.findAllBySuperiorId(anyLong())).willReturn(Flux.just(mock(Privilege.class)));
+
+        StepVerifier.create(privilegeService.subset(1L)).expectNextCount(1).verifyComplete();
     }
 
     @Test
@@ -165,8 +174,15 @@ class PrivilegeServiceImplTest {
 
     @Test
     void exists() {
-        given(this.privilegeRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
+        given(this.privilegeRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
 
         StepVerifier.create(privilegeService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void exists_id_null() {
+        given(this.privilegeRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(privilegeService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 }

@@ -20,6 +20,7 @@ package io.leafage.hypervisor.controller;
 import io.leafage.hypervisor.dto.PrivilegeDTO;
 import io.leafage.hypervisor.service.PrivilegeService;
 import io.leafage.hypervisor.vo.PrivilegeVO;
+import io.leafage.hypervisor.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,10 +30,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
 
@@ -104,7 +109,7 @@ class PrivilegeControllerTest {
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "name:like:a")
+                        .queryParam("filters", "name:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -150,7 +155,18 @@ class PrivilegeControllerTest {
     }
 
     @Test
+    void subset() {
+        given(this.privilegeService.subset(anyLong())).willReturn(Flux.just(vo));
+
+        webTestClient.get().uri("/privileges/{id}/subset", 1L)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(PrivilegeVO.class);
+    }
+
+    @Test
     void create() {
+        given(this.privilegeService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.privilegeService.create(any(PrivilegeDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(dto)
@@ -161,6 +177,7 @@ class PrivilegeControllerTest {
 
     @Test
     void create_error() {
+        given(this.privilegeService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.privilegeService.create(any(PrivilegeDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/privileges").bodyValue(dto)
@@ -170,6 +187,7 @@ class PrivilegeControllerTest {
 
     @Test
     void modify() {
+        given(this.privilegeService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(dto)
@@ -180,6 +198,7 @@ class PrivilegeControllerTest {
 
     @Test
     void modify_error() {
+        given(this.privilegeService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/privileges/{id}", 1L).bodyValue(dto)
@@ -187,4 +206,17 @@ class PrivilegeControllerTest {
                 .expectStatus().is5xxServerError();
     }
 
+    @Test
+    void importFromFile() {
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        given(this.privilegeService.createAll(anyIterable())).willReturn(Flux.just(vo));
+
+        webTestClient.mutateWith(csrf()).post().uri("/privileges/import")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file.getResource()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserVO.class);
+    }
 }

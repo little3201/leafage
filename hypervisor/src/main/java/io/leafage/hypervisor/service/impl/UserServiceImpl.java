@@ -74,14 +74,6 @@ public class UserServiceImpl extends DomainConverter implements UserService {
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
-    @Override
-    public Mono<UserVO> findByUsername(String username) {
-        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
-
-        return userRepository.findByUsername(username)
-                .map(user -> convertToVO(user, UserVO.class));
-    }
-
     /**
      * {@inheritDoc}
      */

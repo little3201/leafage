@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,10 +42,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 /**
@@ -77,6 +81,7 @@ class FileControllerTest {
         vo = new FileRecordVO();
         vo.setId(1L);
         vo.setName(dto.getName());
+        vo.setPath("src/test/resources/test.txt");
     }
 
     @Test
@@ -108,7 +113,7 @@ class FileControllerTest {
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "name:like:a")
+                        .queryParam("filters", "name:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -118,7 +123,7 @@ class FileControllerTest {
     void fetch() {
         given(this.fileRecordService.fetch(anyLong())).willReturn(Mono.just(vo));
 
-        webTestClient.get().uri("/files/{id}", 1)
+        webTestClient.get().uri("/files/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
@@ -128,7 +133,7 @@ class FileControllerTest {
     void fetch_error() {
         given(this.fileRecordService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/files/{id}", 1)
+        webTestClient.get().uri("/files/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -167,10 +172,29 @@ class FileControllerTest {
     }
 
     @Test
+    void download() throws IOException {
+        given(this.fileRecordService.fetch(anyLong())).willReturn(Mono.just(vo));
+
+        webTestClient.get().uri("/files/{id}/download", 1L)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM);
+    }
+
+    @Test
+    void download_file_not_found() {
+        given(this.fileRecordService.fetch(anyLong())).willReturn(Mono.empty());
+
+        webTestClient.get().uri("/files/{id}/download", 1L)
+                .exchange()
+                .expectStatus().is5xxServerError();
+    }
+
+    @Test
     void remove() {
         given(this.fileRecordService.remove(anyLong())).willReturn(Mono.empty());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/files/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/files/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -179,7 +203,7 @@ class FileControllerTest {
     void remove_error() {
         given(this.fileRecordService.remove(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.delete().uri("/files/{id}", 1)
+        webTestClient.delete().uri("/files/{id}", 1L)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }

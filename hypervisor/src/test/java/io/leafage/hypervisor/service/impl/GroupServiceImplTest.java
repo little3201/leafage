@@ -80,7 +80,7 @@ class GroupServiceImplTest {
         given(terminating.all()).willReturn(Flux.just(entity));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(Group.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(groupService.retrieve(0, 2, "id", true, "name:like:a")).assertNext(page -> {
+        StepVerifier.create(groupService.retrieve(0, 2, "id", true, "name:like:test")).assertNext(page -> {
             assertThat(page.getContent()).hasSize(1);
             AssertionsForClassTypes.assertThat(page.getTotalElements()).isEqualTo(1);
             AssertionsForClassTypes.assertThat(page.getNumber()).isEqualTo(0);
@@ -134,8 +134,15 @@ class GroupServiceImplTest {
 
     @Test
     void exists() {
+        given(this.groupRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
+
+        StepVerifier.create(groupService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+    }
+
+    @Test
+    void exists_id_null() {
         given(this.groupRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
 
-        StepVerifier.create(groupService.exists("vip", 1L)).expectNext(Boolean.TRUE).verifyComplete();
+        StepVerifier.create(groupService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 }

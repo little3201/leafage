@@ -83,7 +83,7 @@ class UserServiceImplTest {
         given(terminating.all()).willReturn(Flux.just(entity));
         given(r2dbcEntityTemplate.count(any(Query.class), eq(User.class))).willReturn(Mono.just(1L));
 
-        StepVerifier.create(userService.retrieve(0, 2, "id", true, "username:like:a"))
+        StepVerifier.create(userService.retrieve(0, 2, "id", true, "username:like:test"))
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
                     assertThat(page.getTotalElements()).isEqualTo(1);
@@ -98,12 +98,24 @@ class UserServiceImplTest {
         StepVerifier.create(userService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
-    /**
-     * 测试新增user
-     */
+    @Test
+    void enable() {
+        given(this.userRepository.updateEnabledById(anyLong())).willReturn(Mono.just(1));
+
+        StepVerifier.create(userService.enable(anyLong())).expectNextCount(1).verifyComplete();
+    }
+
+    @Test
+    void unlock() {
+        given(this.userRepository.updateAccountNonLockedById(anyLong())).willReturn(Mono.just(1));
+
+        StepVerifier.create(userService.unlock(anyLong())).expectNextCount(1).verifyComplete();
+    }
+
     @Test
     void create() {
         given(this.userRepository.save(any(User.class))).willReturn(Mono.just(mock(User.class)));
+
         StepVerifier.create(userService.create(mock(UserDTO.class))).expectNextCount(1).verifyComplete();
     }
 

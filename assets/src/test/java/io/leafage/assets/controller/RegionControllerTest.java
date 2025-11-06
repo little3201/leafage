@@ -107,7 +107,7 @@ class RegionControllerTest {
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "name:like:a")
+                        .queryParam("filters", "name:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -153,6 +153,7 @@ class RegionControllerTest {
 
     @Test
     void create() {
+        given(this.regionService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.create(any(RegionDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/regions")
@@ -165,6 +166,7 @@ class RegionControllerTest {
 
     @Test
     void create_error() {
+        given(this.regionService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.create(any(RegionDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/regions")
@@ -176,9 +178,10 @@ class RegionControllerTest {
 
     @Test
     void modify() {
+        given(this.regionService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1)
+        webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
@@ -188,9 +191,10 @@ class RegionControllerTest {
 
     @Test
     void modify_error() {
+        given(this.regionService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1)
+        webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
@@ -201,7 +205,7 @@ class RegionControllerTest {
     void remove() {
         given(this.regionService.remove(anyLong())).willReturn(Mono.empty());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/regions/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/regions/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -210,7 +214,7 @@ class RegionControllerTest {
     void remove_error() {
         given(this.regionService.remove(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/regions/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/regions/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

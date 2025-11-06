@@ -108,7 +108,7 @@ class PostControllerTest {
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "title:like:a")
+                        .queryParam("filters", "title:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -118,7 +118,7 @@ class PostControllerTest {
     void fetch() {
         given(this.postService.fetch(anyLong())).willReturn(Mono.just(vo));
 
-        webTestClient.get().uri("/posts/{id}", 1)
+        webTestClient.get().uri("/posts/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().jsonPath("$.title").isEqualTo("test");
@@ -128,7 +128,7 @@ class PostControllerTest {
     void fetch_error() {
         given(this.postService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/posts/{id}", 1)
+        webTestClient.get().uri("/posts/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
@@ -158,6 +158,7 @@ class PostControllerTest {
 
     @Test
     void create() {
+        given(this.postService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.create(any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
@@ -170,6 +171,7 @@ class PostControllerTest {
 
     @Test
     void create_error() {
+        given(this.postService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.create(any(PostDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
@@ -181,9 +183,10 @@ class PostControllerTest {
 
     @Test
     void modify() {
+        given(this.postService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.modify(anyLong(), any(PostDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1)
+        webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
@@ -193,9 +196,10 @@ class PostControllerTest {
 
     @Test
     void modify_error() {
+        given(this.postService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.modify(anyLong(), any(PostDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1)
+        webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
@@ -206,7 +210,7 @@ class PostControllerTest {
     void remove() {
         given(this.postService.remove(anyLong())).willReturn(Mono.empty());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -215,7 +219,7 @@ class PostControllerTest {
     void remove_error() {
         given(this.postService.remove(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/posts/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

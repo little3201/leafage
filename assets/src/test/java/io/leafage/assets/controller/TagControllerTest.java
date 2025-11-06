@@ -101,7 +101,7 @@ class TagControllerTest {
                         .queryParam("size", 2)
                         .queryParam("sortBy", "id")
                         .queryParam("descending", "false")
-                        .queryParam("filters", "name:like:a")
+                        .queryParam("filters", "name:like:test")
                         .build())
                 .exchange()
                 .expectStatus().is5xxServerError();
@@ -111,7 +111,7 @@ class TagControllerTest {
     void fetch() {
         given(this.tagService.fetch(anyLong())).willReturn(Mono.just(vo));
 
-        webTestClient.get().uri("/tags/{id}", 1)
+        webTestClient.get().uri("/tags/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().jsonPath("$.name").isEqualTo("test");
@@ -121,13 +121,14 @@ class TagControllerTest {
     void fetch_error() {
         given(this.tagService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.get().uri("/tags/{id}", 1)
+        webTestClient.get().uri("/tags/{id}", 1L)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }
 
     @Test
     void create() {
+        given(this.tagService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.tagService.create(any(TagDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/tags")
@@ -140,6 +141,7 @@ class TagControllerTest {
 
     @Test
     void create_error() {
+        given(this.tagService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.tagService.create(any(TagDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/tags")
@@ -151,9 +153,10 @@ class TagControllerTest {
 
     @Test
     void modify() {
+        given(this.tagService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.tagService.modify(anyLong(), any(TagDTO.class))).willReturn(Mono.just(vo));
 
-        webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1)
+        webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
@@ -163,9 +166,10 @@ class TagControllerTest {
 
     @Test
     void modify_error() {
+        given(this.tagService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.tagService.modify(anyLong(), any(TagDTO.class))).willThrow(new RuntimeException());
 
-        webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1)
+        webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
@@ -176,7 +180,7 @@ class TagControllerTest {
     void remove() {
         given(this.tagService.remove(anyLong())).willReturn(Mono.empty());
 
-        webTestClient.mutateWith(csrf()).delete().uri("/tags/{id}", 1)
+        webTestClient.mutateWith(csrf()).delete().uri("/tags/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -185,7 +189,7 @@ class TagControllerTest {
     void remove_error() {
         given(this.tagService.remove(anyLong())).willThrow(new RuntimeException());
 
-        webTestClient.delete().uri("/tags/{id}", 1)
+        webTestClient.delete().uri("/tags/{id}", 1L)
                 .exchange()
                 .expectStatus().is4xxClientError();
     }

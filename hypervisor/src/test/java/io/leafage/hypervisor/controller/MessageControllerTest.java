@@ -130,6 +130,7 @@ class MessageControllerTest {
 
     @Test
     void create() {
+        given(this.messageService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.messageService.create(any(MessageDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
@@ -140,6 +141,7 @@ class MessageControllerTest {
 
     @Test
     void create_error() {
+        given(this.messageService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.messageService.create(any(MessageDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
