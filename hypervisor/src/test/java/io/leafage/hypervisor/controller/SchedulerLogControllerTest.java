@@ -19,7 +19,6 @@ package io.leafage.hypervisor.controller;
 
 import io.leafage.hypervisor.service.SchedulerLogService;
 import io.leafage.hypervisor.vo.SchedulerLogVO;
-import io.leafage.hypervisor.vo.SchedulerLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +37,6 @@ import reactor.core.publisher.Mono;
 import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -92,7 +90,7 @@ class SchedulerLogControllerTest {
     @Test
     void retrieve_error() {
         given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new NoSuchElementException());
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/scheduler-logs")
                         .queryParam("page", 0)

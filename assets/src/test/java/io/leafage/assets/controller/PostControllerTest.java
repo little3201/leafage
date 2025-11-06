@@ -99,8 +99,7 @@ class PostControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.postService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString()))
+        given(this.postService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString()))
                 .willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts")

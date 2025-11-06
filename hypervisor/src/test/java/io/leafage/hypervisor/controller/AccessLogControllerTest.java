@@ -37,7 +37,6 @@ import reactor.core.publisher.Mono;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -91,7 +90,7 @@ class AccessLogControllerTest {
     @Test
     void retrieve_error() {
         given(this.accessLogService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new NoSuchElementException());
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")
                         .queryParam("page", 0)
