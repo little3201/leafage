@@ -103,7 +103,13 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
                         .flatMap(groupPrivilege -> addSuperior(groupPrivilege.getPrivilegeId(), new HashSet<>())))
                 .distinct(Privilege::getId); // 统一去重
 
-        return this.buildTree(privilegeFlux);
+        Set<String> meta = new HashSet<>();
+        meta.add("path");
+        meta.add("redirect");
+        meta.add("component");
+        meta.add("icon");
+        meta.add("actions");
+        return convertToTree(privilegeFlux, meta);
     }
 
     @Override
@@ -186,22 +192,6 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
                     return addSuperior(privilege.getSuperiorId(), visited)
                             .concatWithValues(privilege); // 先上级，再自己
                 });
-    }
-
-    /**
-     * convert to TreeNode
-     *
-     * @param privileges privilege集合
-     * @return TreeNode of Flux
-     */
-    private Mono<List<TreeNode<Long>>> buildTree(Flux<Privilege> privileges) {
-        Set<String> meta = new HashSet<>();
-        meta.add("path");
-        meta.add("redirect");
-        meta.add("component");
-        meta.add("icon");
-        meta.add("actions");
-        return convertToTree(privileges, meta);
     }
 
 }
