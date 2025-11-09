@@ -28,6 +28,8 @@ import top.leafage.common.TreeNode;
 import top.leafage.common.jdbc.JdbcTreeAndDomainConverter;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * privilege service impl.
@@ -87,32 +89,46 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public List<TreeNode<Long>> tree(String username) {
         Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
-        Map<Long, Privilege> privilegeMap = new HashMap<>();
-
-        // group
-        groupMembersRepository.findAllByUsername(username).forEach(groupMember ->
-                groupRolesRepository.findAllByGroupId(groupMember.getGroupId()).forEach(groupRole -> {
-                    groupPrivilegesRepository.findAllByGroupId(groupRole.getGroupId()).forEach(groupPrivilege ->
-                            privileges(groupPrivilege.getPrivilegeId(), groupPrivilege.getActions(), privilegeMap));
-                    rolePrivilegesRepository.findAllByRoleId(groupRole.getRoleId()).forEach(rolePrivilege ->
-                            privileges(rolePrivilege.getPrivilegeId(), rolePrivilege.getActions(), privilegeMap));
+        Map<Long, Set<String>> privilegeActionsMap = new HashMap<>();
+        // Group
+        groupMembersRepository.findAllByUsername(username).forEach(gm ->
+                groupRolesRepository.findAllByGroupId(gm.getGroupId()).forEach(gr -> {
+                    // GroupPrivileges
+                    groupPrivilegesRepository.findAllByGroupId(gr.getGroupId())
+                            .forEach(gp -> mergeActions(gp.getPrivilegeId(), gp.getActions(), privilegeActionsMap));
+                    // RolePrivileges (from GroupRole)
+                    rolePrivilegesRepository.findAllByRoleId(gr.getRoleId())
+                            .forEach(rp -> mergeActions(rp.getPrivilegeId(), rp.getActions(), privilegeActionsMap));
                 })
         );
 
-        // role
-        roleMembersRepository.findAllByUsername(username).forEach(roleMember ->
-                rolePrivilegesRepository.findAllByRoleId(roleMember.getRoleId()).forEach(rolePrivilege ->
-                        privileges(rolePrivilege.getPrivilegeId(), rolePrivilege.getActions(), privilegeMap))
+        // Role
+        roleMembersRepository.findAllByUsername(username).forEach(rm ->
+                rolePrivilegesRepository.findAllByRoleId(rm.getRoleId())
+                        .forEach(rp -> mergeActions(rp.getPrivilegeId(), rp.getActions(), privilegeActionsMap))
         );
 
-        List<Privilege> privileges = new ArrayList<>(privilegeMap.values());
-        Set<String> meta = new HashSet<>();
-        meta.add("path");
-        meta.add("redirect");
-        meta.add("component");
-        meta.add("icon");
-        meta.add("actions");
-        return convertToTree(privileges, meta);
+        if (privilegeActionsMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Privilege> directPrivileges = privilegeRepository.findAllById(privilegeActionsMap.keySet());
+        Map<Long, Privilege> privilegeMap = directPrivileges.stream()
+                .filter(Privilege::isEnabled)
+                .collect(Collectors.toMap(Privilege::getId, Function.identity(), (a, b) -> a));
+
+        // 设置 actions
+        privilegeActionsMap.forEach((id, actions) -> {
+            Privilege p = privilegeMap.get(id);
+            if (p != null) {
+                p.setActions(actions);
+            }
+        });
+
+        expandPrivileges(privilegeMap);
+
+        List<Privilege> allPrivileges = new ArrayList<>(privilegeMap.values());
+        Set<String> meta = Set.of("path", "redirect", "component", "icon", "actions");
+        return convertToTree(allPrivileges, meta);
     }
 
     /**
@@ -120,7 +136,7 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      */
     @Override
     public List<PrivilegeVO> subset(Long superiorId) {
-        Assert.notNull(superiorId, String.format(_MUST_NOT_BE_NULL,"superiorId"));
+        Assert.notNull(superiorId, String.format(_MUST_NOT_BE_NULL, "superiorId"));
 
         return privilegeRepository.findAllBySuperiorId(superiorId).stream()
                 .map(privilege -> {
@@ -165,27 +181,29 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
                 .orElseThrow();
     }
 
-    private void privileges(Long privilegeId, Set<String> actions, Map<Long, Privilege> privilegeMap) {
-        privilegeRepository.findById(privilegeId).ifPresent(privilege -> {
-            if (privilege.isEnabled() && !privilegeMap.containsKey(privilege.getId())) {
-                privilege.setActions(actions);
-                privilegeMap.put(privilege.getId(), privilege);
-                // 处理没有勾选父级的数据（递归查找父级数据）
-                addSuperior(privilege.getSuperiorId(), privilegeMap);
-            }
-        });
+    private void mergeActions(Long privilegeId, Set<String> actions, Map<Long, Set<String>> map) {
+        map.computeIfAbsent(privilegeId, k -> new HashSet<>()).addAll(actions);
     }
 
-    private void addSuperior(Long superiorId, Map<Long, Privilege> privilegeMap) {
-        if (superiorId != null && !privilegeMap.containsKey(superiorId)) {
-            privilegeRepository.findById(superiorId).ifPresent(superior -> {
-                if (superior.isEnabled()) {
-                    privilegeMap.put(superior.getId(), superior);
-                    // 递归，添加上级
-                    addSuperior(superior.getSuperiorId(), privilegeMap);
-                }
-            });
-        }
+    private Set<Long> collectMissingSuperiorIds(Map<Long, Privilege> privilegeMap) {
+        return privilegeMap.values().stream()
+                .map(Privilege::getSuperiorId)
+                .filter(Objects::nonNull)
+                .filter(id -> !privilegeMap.containsKey(id))
+                .collect(Collectors.toSet());
+    }
+
+    private void expandPrivileges(Map<Long, Privilege> privilegeMap) {
+        Set<Long> toLoad;
+        do {
+            toLoad = collectMissingSuperiorIds(privilegeMap);
+            if (toLoad.isEmpty()) break;
+
+            privilegeRepository.findAllById(toLoad).stream()
+                    .filter(Privilege::isEnabled)
+                    .forEach(sup -> privilegeMap.putIfAbsent(sup.getId(), sup));
+
+        } while (true);
     }
 
 }
