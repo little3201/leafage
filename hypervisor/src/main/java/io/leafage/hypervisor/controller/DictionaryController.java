@@ -30,7 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.poi.ExcelReader;
+import top.leafage.common.poi.reactive.ReactiveExcelReader;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 
@@ -150,7 +150,7 @@ public class DictionaryController {
     @PreAuthorize("hasAuthority('SCOPE_dictionaries:import')")
     @PostMapping("/import")
     public Flux<DictionaryVO> importFromFile(FilePart file) {
-        return ExcelReader.read(file, DictionaryDTO.class)
+        return ReactiveExcelReader.read(file, DictionaryDTO.class)
                 .flatMapMany(dictionaryService::createAll)
                 .onErrorMap(e -> {
                     logger.error("Failed import from file: ", e);

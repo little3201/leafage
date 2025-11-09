@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.poi.ExcelReader;
+import top.leafage.common.poi.reactive.ReactiveExcelReader;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 
@@ -173,7 +173,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('SCOPE_users:import')")
     @PostMapping("/import")
     public Flux<UserVO> importFromFile(FilePart file) {
-        return ExcelReader.read(file, UserDTO.class)
+        return ReactiveExcelReader.read(file, UserDTO.class)
                 .flatMapMany(userService::createAll)
                 .onErrorMap(e -> {
                     logger.error("Failed import from file: ", e);

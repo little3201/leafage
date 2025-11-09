@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
-import top.leafage.common.poi.ExcelReader;
+import top.leafage.common.poi.reactive.ReactiveExcelReader;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 import java.security.Principal;
@@ -151,7 +151,7 @@ public class PrivilegeController {
     @PreAuthorize("hasAuthority('SCOPE_privileges:import')")
     @PostMapping("/import")
     public Flux<PrivilegeVO> importFromFile(FilePart file) {
-        return ExcelReader.read(file, PrivilegeDTO.class)
+        return ReactiveExcelReader.read(file, PrivilegeDTO.class)
                 .flatMapMany(privilegeService::createAll)
                 .onErrorMap(e -> {
                     logger.error("Failed import from file: ", e);

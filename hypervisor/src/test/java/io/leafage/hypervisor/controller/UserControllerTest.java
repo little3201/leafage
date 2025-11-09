@@ -71,7 +71,7 @@ class UserControllerTest {
         dto = new UserDTO();
         dto.setUsername("test");
         dto.setAvatar("avatar.jpg");
-        dto.setFullname("john steven");
+        dto.setName("john steven");
         dto.setAccountExpiresAt(Instant.now());
         dto.setCredentialsExpiresAt(Instant.now());
 
@@ -79,7 +79,7 @@ class UserControllerTest {
         vo.setId(1L);
         vo.setUsername("test");
         vo.setAccountExpiresAt(Instant.now());
-        vo.setFullname("john steven");
+        vo.setName("john steven");
     }
 
 

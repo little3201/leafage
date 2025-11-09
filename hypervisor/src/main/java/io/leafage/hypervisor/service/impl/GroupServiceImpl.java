@@ -17,7 +17,9 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Group;
+import io.leafage.hypervisor.domain.GroupMembers;
 import io.leafage.hypervisor.dto.GroupDTO;
+import io.leafage.hypervisor.repository.GroupMembersRepository;
 import io.leafage.hypervisor.repository.GroupRepository;
 import io.leafage.hypervisor.service.GroupService;
 import io.leafage.hypervisor.vo.GroupVO;
@@ -34,6 +36,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.DomainConverter;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -46,6 +49,7 @@ import java.util.NoSuchElementException;
 public class GroupServiceImpl extends DomainConverter implements GroupService {
 
     private final GroupRepository groupRepository;
+    private final GroupMembersRepository groupMembersRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
@@ -53,8 +57,9 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
      *
      * @param groupRepository a {@link GroupRepository} object
      */
-    public GroupServiceImpl(GroupRepository groupRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
+    public GroupServiceImpl(GroupRepository groupRepository, GroupMembersRepository groupMembersRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.groupRepository = groupRepository;
+        this.groupMembersRepository = groupMembersRepository;
         this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
@@ -69,7 +74,12 @@ public class GroupServiceImpl extends DomainConverter implements GroupService {
         return r2dbcEntityTemplate.select(Group.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()
-                .map(group -> convertToVO(group, GroupVO.class))
+                .flatMap(group -> groupMembersRepository.findByGroupId(group.getId())
+                        .map(GroupMembers::getUsername).collectList().map(members -> {
+                            GroupVO vo = convertToVO(group, GroupVO.class);
+                            vo.setMembers(new HashSet<>(members));
+                            return vo;
+                        }))
                 .collectList()
                 .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Group.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));

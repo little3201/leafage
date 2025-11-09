@@ -34,7 +34,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.leafage.common.poi.ExcelReader;
+import top.leafage.common.poi.reactive.ReactiveExcelReader;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.Set;
@@ -185,7 +185,7 @@ public class GroupController {
     @PreAuthorize("hasAuthority('SCOPE_groups:import')")
     @PostMapping("/import")
     public Flux<GroupVO> importFromFile(FilePart file) {
-        return ExcelReader.read(file, GroupDTO.class)
+        return ReactiveExcelReader.read(file, GroupDTO.class)
                 .flatMapMany(groupService::createAll)
                 .onErrorMap(e -> {
                     logger.error("Failed import from file: ", e);

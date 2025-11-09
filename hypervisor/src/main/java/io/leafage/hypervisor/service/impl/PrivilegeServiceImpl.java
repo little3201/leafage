@@ -38,10 +38,7 @@ import reactor.core.publisher.Mono;
 import top.leafage.common.TreeNode;
 import top.leafage.common.r2dbc.R2dbcTreeAndDomainConverter;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * privilege service impl
@@ -97,19 +94,26 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
     @Override
     public Mono<List<TreeNode<Long>>> tree(String username) {
         Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
+        Map<Long, Privilege> privilegeMap = new HashMap<>();
 
-        Flux<Privilege> privilegeFlux = groupMembersRepository.findByUsername(username)
+        return groupMembersRepository.findByUsername(username)
                 .flatMap(groupMember -> groupPrivilegesRepository.findByGroupId(groupMember.getGroupId())
-                        .flatMap(groupPrivilege -> addSuperior(groupPrivilege.getPrivilegeId(), new HashSet<>())))
-                .distinct(Privilege::getId); // 统一去重
+                        .flatMap(groupPrivilege ->
+                                addSuperior(groupPrivilege.getPrivilegeId(), privilegeMap).thenReturn(groupPrivilege)
+                        )
+                )
+                .then(Mono.defer(() -> {
+                    // 权限信息已经存储在 privilegeMap 中，构建权限树
+                    Set<String> meta = new HashSet<>();
+                    meta.add("path");
+                    meta.add("redirect");
+                    meta.add("component");
+                    meta.add("icon");
+                    meta.add("actions");
 
-        Set<String> meta = new HashSet<>();
-        meta.add("path");
-        meta.add("redirect");
-        meta.add("component");
-        meta.add("icon");
-        meta.add("actions");
-        return convertToTree(privilegeFlux, meta);
+                    // 根据 privilegeMap 转换为树形结构
+                    return convertToTree(Flux.fromIterable(privilegeMap.values()), meta);
+                }));
     }
 
     @Override
@@ -178,19 +182,19 @@ public class PrivilegeServiceImpl extends R2dbcTreeAndDomainConverter<Privilege,
                 .map(p -> convertToVO(p, PrivilegeVO.class));
     }
 
-    private Flux<Privilege> addSuperior(Long privilegeId, Set<Long> visited) {
-        if (!visited.add(privilegeId)) {
-            return Flux.empty(); // 已访问，防止死循环
+    private Mono<Void> addSuperior(Long superiorId, Map<Long, Privilege> privilegeMap) {
+        if (superiorId == null || privilegeMap.containsKey(superiorId)) {
+            return Mono.empty();
         }
 
-        return privilegeRepository.findById(privilegeId)
+        return privilegeRepository.findById(superiorId)
                 .filter(Privilege::isEnabled)
-                .flatMapMany(privilege -> {
-                    if (privilege.getSuperiorId() == null) {
-                        return Flux.just(privilege);
+                .flatMap(superior -> {
+                    privilegeMap.put(superior.getId(), superior);
+                    if (superior.getSuperiorId() == null) {
+                        return Mono.empty();
                     }
-                    return addSuperior(privilege.getSuperiorId(), visited)
-                            .concatWithValues(privilege); // 先上级，再自己
+                    return addSuperior(superior.getSuperiorId(), privilegeMap);
                 });
     }
 

@@ -64,12 +64,12 @@ class UserServiceImplTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setFullname("john steven");
+        dto.setName("john steven");
         dto.setCredentialsExpiresAt(Instant.now());
 
         entity = new User();
         entity.setUsername("test");
-        entity.setFullname("john steven");
+        entity.setName("john steven");
         entity.setCredentialsExpiresAt(Instant.now());
     }
 

@@ -30,7 +30,7 @@ public abstract class UserModel {
     @Column(value = "username")
     private String username;
 
-    private String fullname;
+    private String name;
 
     private String email;
 
@@ -53,12 +53,12 @@ public abstract class UserModel {
         this.username = username;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getName() {
+        return name;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {

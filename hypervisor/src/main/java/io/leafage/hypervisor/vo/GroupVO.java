@@ -16,6 +16,8 @@ package io.leafage.hypervisor.vo;
 
 import io.leafage.hypervisor.domain.superclass.GroupModel;
 
+import java.util.Set;
+
 /**
  * vo class for group.
  *
@@ -25,6 +27,8 @@ public class GroupVO extends GroupModel {
 
     private Long id;
 
+    private Set<String> members;
+
 
     public Long getId() {
         return id;
@@ -32,5 +36,13 @@ public class GroupVO extends GroupModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<String> members) {
+        this.members = members;
     }
 }

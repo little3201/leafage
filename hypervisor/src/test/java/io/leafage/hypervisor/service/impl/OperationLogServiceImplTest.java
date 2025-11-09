@@ -18,7 +18,6 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.OperationLog;
-import io.leafage.hypervisor.domain.User;
 import io.leafage.hypervisor.repository.OperationLogRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +35,6 @@ import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
