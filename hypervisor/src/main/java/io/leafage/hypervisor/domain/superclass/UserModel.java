@@ -34,8 +34,6 @@ public abstract class UserModel {
 
     private String email;
 
-    private String avatar;
-
     @Column(value = "account_expires_at")
     private Instant accountExpiresAt;
 
@@ -67,14 +65,6 @@ public abstract class UserModel {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
     }
 
     public Instant getAccountExpiresAt() {
