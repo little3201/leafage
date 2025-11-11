@@ -57,8 +57,7 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
 
         Specification<Group> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
-        spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
-
+        
         return groupRepository.findAll(spec, pageable)
                 .map(group -> convertToVO(group, GroupVO.class));
     }

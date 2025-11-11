@@ -39,7 +39,6 @@ public class DefaultSecurityConfiguration {
                         authorize.requestMatchers("/actuator/**", "/assets/**", "/login").permitAll()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login"));
-
         return http.build();
     }
 
