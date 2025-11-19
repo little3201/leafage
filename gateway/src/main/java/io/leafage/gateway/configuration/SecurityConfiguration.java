@@ -28,7 +28,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.util.LinkedHashMap;
 
 /**
- * @author Joe Grandja
+ * @author wq li
  * @since 1.4
  */
 @Configuration(proxyBeanMethods = false)
