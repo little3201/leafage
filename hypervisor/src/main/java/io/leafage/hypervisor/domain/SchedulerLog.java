@@ -16,6 +16,7 @@
 package io.leafage.hypervisor.domain;
 
 import jakarta.persistence.*;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
