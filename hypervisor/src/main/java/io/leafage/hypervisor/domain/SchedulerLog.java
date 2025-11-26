@@ -15,10 +15,11 @@
 
 package io.leafage.hypervisor.domain;
 
-import io.leafage.hypervisor.domain.superclass.SchedulerLogModel;
 import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+
+import java.time.Instant;
 
 /**
  * entity class for scheduler log.
@@ -28,36 +29,60 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "scheduler_logs")
-public class SchedulerLog extends SchedulerLogModel {
+public class SchedulerLog extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String name;
+
+    private Instant startTime;
+
+    private Integer executedTimes;
+
+    private Instant nextExecuteTime;
+
+    private String description;
 
     @Enumerated(EnumType.STRING)
     private ScheduleStatus status;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
 
-
-    public Long getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public Instant getStartTime() {
+        return startTime;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Integer getExecutedTimes() {
+        return executedTimes;
+    }
+
+    public void setExecutedTimes(Integer executedTimes) {
+        this.executedTimes = executedTimes;
+    }
+
+    public Instant getNextExecuteTime() {
+        return nextExecuteTime;
+    }
+
+    public void setNextExecuteTime(Instant nextExecuteTime) {
+        this.nextExecuteTime = nextExecuteTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public ScheduleStatus getStatus() {

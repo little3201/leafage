@@ -16,10 +16,15 @@
 package io.leafage.hypervisor.domain;
 
 
-import io.leafage.hypervisor.domain.superclass.AccessLogModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
+
+import java.net.InetAddress;
 
 /**
  * entity class for access log.
@@ -29,32 +34,96 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "access_logs")
-public class AccessLog extends AccessLogModel {
+public class AccessLog extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String url;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
+    private String httpMethod;
+
+    private InetAddress ip;
+
+    private String location;
+
+    private String params;
+
+    private String body;
+
+    private Integer statusCode;
+
+    private Long responseTimes;
+
+    private String responseMessage;
 
 
-    public Long getId() {
-        return id;
+    public String getUrl() {
+        return url;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getHttpMethod() {
+        return httpMethod;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setHttpMethod(String httpMethod) {
+        this.httpMethod = httpMethod;
+    }
+
+    public InetAddress getIp() {
+        return ip;
+    }
+
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getParams() {
+        return params;
+    }
+
+    public void setParams(String params) {
+        this.params = params;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public Long getResponseTimes() {
+        return responseTimes;
+    }
+
+    public void setResponseTimes(Long responseTimes) {
+        this.responseTimes = responseTimes;
+    }
+
+    public String getResponseMessage() {
+        return responseMessage;
+    }
+
+    public void setResponseMessage(String responseMessage) {
+        this.responseMessage = responseMessage;
     }
 }

@@ -14,12 +14,14 @@
  */
 package io.leafage.assets.domain;
 
-import io.leafage.assets.domain.superclass.PostModel;
 import jakarta.persistence.*;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
 
 import java.time.Instant;
+import java.util.Set;
 
 /**
  * entity class for posts.
@@ -29,28 +31,62 @@ import java.time.Instant;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "posts")
-public class Post extends PostModel {
+public class Post extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(unique = true, nullable = false)
+    private String title;
 
-    @Column(name = "published_at")
+    private String summary;
+
+    private String body;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "post_tags", joinColumns = @JoinColumn(name = "post_id"))
+    private Set<String> tags;
+
     private Instant publishedAt;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
 
-
-    public Long getId() {
-        return id;
+    public Post() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Post(String title, String summary, String body, Set<String> tags) {
+        this.title = title;
+        this.summary = summary;
+        this.body = body;
+        this.tags = tags;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     public Instant getPublishedAt() {
@@ -59,13 +95,5 @@ public class Post extends PostModel {
 
     public void setPublishedAt(Instant publishedAt) {
         this.publishedAt = publishedAt;
-    }
-
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
-    }
-
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
     }
 }

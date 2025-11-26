@@ -16,9 +16,10 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Region;
-import io.leafage.assets.dto.RegionDTO;
+import io.leafage.assets.domain.dto.RegionDTO;
+import io.leafage.assets.domain.vo.RegionVO;
 import io.leafage.assets.repository.RegionRepository;
-import io.leafage.assets.vo.RegionVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,12 +69,12 @@ class RegionServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Region> page = new PageImpl<>(List.of(mock(Region.class)));
+        Page<@NonNull Region> page = new PageImpl<>(List.of(mock(Region.class)));
 
-        given(this.regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(),
+        given(this.regionRepository.findAll(ArgumentMatchers.<Specification<@NonNull Region>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
+        Page<@NonNull RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
         Assertions.assertNotNull(voPage.getContent());
     }
 

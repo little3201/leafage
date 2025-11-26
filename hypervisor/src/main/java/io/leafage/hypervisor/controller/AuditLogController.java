@@ -15,8 +15,8 @@
 
 package io.leafage.hypervisor.controller;
 
+import io.leafage.hypervisor.domain.vo.AuditLogVO;
 import io.leafage.hypervisor.service.AuditLogService;
-import io.leafage.hypervisor.vo.AuditLogVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * audit log controller.
@@ -64,7 +66,8 @@ public class AuditLogController {
                                                      String sortBy, boolean descending, String filters) {
         Page<AuditLogVO> voPage;
         try {
-            voPage = auditLogService.retrieve(page, size, sortBy, descending, filters);
+            voPage = auditLogService.retrieve(page, size, sortBy, descending, filters)
+                    .map(entity -> toVO(entity, AuditLogVO.class));
         } catch (Exception e) {
             logger.error("Retrieve record error: ", e);
             return ResponseEntity.noContent().build();
@@ -83,7 +86,9 @@ public class AuditLogController {
     public ResponseEntity<AuditLogVO> fetch(@PathVariable Long id) {
         AuditLogVO vo;
         try {
-            vo = auditLogService.fetch(id);
+            vo = auditLogService.fetch(id)
+                    .map(entity -> toVO(entity, AuditLogVO.class))
+                    .orElse(null);
         } catch (Exception e) {
             logger.info("Fetch audit log error: ", e);
             return ResponseEntity.noContent().build();

@@ -15,9 +15,9 @@
 
 package io.leafage.assets.controller;
 
-import io.leafage.assets.dto.CommentDTO;
+import io.leafage.assets.domain.dto.CommentDTO;
 import io.leafage.assets.service.CommentService;
-import io.leafage.assets.vo.CommentVO;
+import io.leafage.assets.domain.vo.CommentVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

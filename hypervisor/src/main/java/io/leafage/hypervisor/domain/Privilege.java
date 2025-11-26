@@ -14,10 +14,13 @@
  */
 package io.leafage.hypervisor.domain;
 
-import io.leafage.hypervisor.domain.superclass.PrivilegeModel;
 import jakarta.persistence.*;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
+
+import java.util.Set;
 
 /**
  * entity class for privilege.
@@ -27,32 +30,113 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "privileges")
-public class Privilege extends PrivilegeModel {
+public class Privilege extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "name", unique = true, nullable = false)
+    private String name;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
+    private Long superiorId;
+
+    private String path;
+
+    private String redirect;
+
+    private String component;
+
+    private String icon;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "privilege_actions", joinColumns = @JoinColumn(name = "privilege_id"))
+    private Set<String> actions;
+
+    private String description;
+
+    private boolean enabled = true;
 
 
-    public Long getId() {
-        return id;
+    public Privilege() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Privilege(String name, Long superiorId, String path, String redirect, String component, String icon, Set<String> actions, String description) {
+        this.name = name;
+        this.superiorId = superiorId;
+        this.path = path;
+        this.redirect = redirect;
+        this.component = component;
+        this.icon = icon;
+        this.actions = actions;
+        this.description = description;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getName() {
+        return name;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getSuperiorId() {
+        return superiorId;
+    }
+
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
+    }
+
+    public String getComponent() {
+        return component;
+    }
+
+    public void setComponent(String component) {
+        this.component = component;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public Set<String> getActions() {
+        return actions;
+    }
+
+    public void setActions(Set<String> actions) {
+        this.actions = actions;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -16,18 +16,17 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Comment;
-import io.leafage.assets.dto.CommentDTO;
+import io.leafage.assets.domain.dto.CommentDTO;
+import io.leafage.assets.domain.vo.CommentVO;
 import io.leafage.assets.repository.CommentRepository;
 import io.leafage.assets.service.CommentService;
-import io.leafage.assets.vo.CommentVO;
-import org.springframework.cglib.beans.BeanCopier;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class CommentServiceImpl extends DomainConverter implements CommentService {
+public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
@@ -54,17 +53,15 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
      * {@inheritDoc}
      */
     @Override
-    public Page<CommentVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull CommentVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Comment> spec = (root, query, cb) ->
+        Specification<@NonNull Comment> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return commentRepository.findAll(spec, pageable).map(comment -> {
-            CommentVO vo = convertToVO(comment, CommentVO.class);
             Long count = commentRepository.countByReplier(comment.getId());
-            vo.setCount(count);
-            return vo;
+            return CommentVO.from(comment, count);
         });
     }
 
@@ -75,7 +72,8 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
     public List<CommentVO> relation(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return commentRepository.findAllByPostIdAndReplierIsNull(id)
-                .stream().map(comment -> convertToVO(comment, CommentVO.class)).toList();
+                .stream().map(CommentVO::from)
+                .toList();
     }
 
     /**
@@ -84,11 +82,9 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
     @Override
     public List<CommentVO> replies(Long replier) {
         return commentRepository.findAllByReplier(replier)
-                .stream().map(comment -> {
-                    CommentVO vo = convertToVO(comment, CommentVO.class);
-                    Long count = commentRepository.countByReplier(comment.getId());
-                    vo.setCount(count);
-                    return vo;
+                .stream().map(entity -> {
+                    Long count = commentRepository.countByReplier(entity.getId());
+                    return CommentVO.from(entity, count);
                 }).toList();
     }
 
@@ -98,12 +94,8 @@ public class CommentServiceImpl extends DomainConverter implements CommentServic
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommentVO create(CommentDTO dto) {
-        Comment comment = new Comment();
-        BeanCopier copier = BeanCopier.create(CommentDTO.class, Comment.class, false);
-        copier.copy(dto, comment, null);
-
-        comment = commentRepository.saveAndFlush(comment);
-        return convertToVO(comment, CommentVO.class);
+        Comment entity = commentRepository.saveAndFlush(CommentDTO.toEntity(dto));
+        return CommentVO.from(entity);
     }
 
 }

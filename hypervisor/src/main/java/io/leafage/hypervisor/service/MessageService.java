@@ -15,9 +15,9 @@
 
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.MessageDTO;
-import io.leafage.hypervisor.vo.MessageVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.dto.MessageDTO;
+import io.leafage.hypervisor.domain.vo.MessageVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * message service.

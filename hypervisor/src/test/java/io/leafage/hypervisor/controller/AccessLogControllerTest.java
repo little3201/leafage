@@ -15,11 +15,13 @@
 
 package io.leafage.hypervisor.controller;
 
+import io.leafage.hypervisor.domain.AccessLog;
+import io.leafage.hypervisor.domain.vo.AccessLogVO;
 import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -65,21 +68,12 @@ class AccessLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new AccessLogVO();
-        vo.setId(1L);
-        vo.setIp(InetAddress.getByName("12.1.3.2"));
-        vo.setLocation("test");
-        vo.setHttpMethod("POST");
-        vo.setResponseTimes(232L);
-        vo.setResponseMessage("sessionId");
-        vo.setStatusCode(200);
-        vo.setUrl("test");
-        vo.setParams("xxx");
+        vo = new AccessLogVO(1L, "/users", "POST", InetAddress.getByName("12.1.3.2"), "", "", 200, 230L, "");
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<AccessLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<AccessLog> voPage = new PageImpl<>(List.of(Mockito.mock(AccessLog.class)), mock(PageRequest.class), 2L);
 
         given(this.accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
@@ -116,7 +110,7 @@ class AccessLogControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.accessLogService.fetch(anyLong())).willReturn(vo);
+        given(this.accessLogService.fetch(anyLong())).willReturn(Optional.ofNullable(Mockito.mock(AccessLog.class)));
 
         mvc.perform(get("/access-logs/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value("test")).andDo(print()).andReturn();

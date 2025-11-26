@@ -16,16 +16,17 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Message;
-import io.leafage.hypervisor.dto.MessageDTO;
+import io.leafage.hypervisor.domain.dto.MessageDTO;
+import io.leafage.hypervisor.domain.vo.MessageVO;
 import io.leafage.hypervisor.repository.MessageRepository;
 import io.leafage.hypervisor.service.MessageService;
-import io.leafage.hypervisor.vo.MessageVO;
+import org.jspecify.annotations.NonNull;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
 /**
  * message service impl.
@@ -33,9 +34,10 @@ import top.leafage.common.DomainConverter;
  * @author wq li
  */
 @Service
-public class MessageServiceImpl extends DomainConverter implements MessageService {
+public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
+    private static final BeanCopier copier = BeanCopier.create(MessageDTO.class, Message.class, false);
 
     /**
      * <p>Constructor for MessageServiceImpl.</p>
@@ -50,14 +52,14 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
      * {@inheritDoc}
      */
     @Override
-    public Page<MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Message> spec = (root, query, cb) ->
+        Specification<@NonNull Message> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return messageRepository.findAll(spec, pageable)
-                .map(message -> convertToVO(message, MessageVO.class));
+                .map(MessageVO::from);
     }
 
     /**
@@ -68,7 +70,8 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return messageRepository.findById(id)
-                .map(message -> convertToVO(message, MessageVO.class)).orElse(null);
+                .map(MessageVO::from)
+                .orElse(null);
     }
 
     /**
@@ -76,10 +79,30 @@ public class MessageServiceImpl extends DomainConverter implements MessageServic
      */
     @Override
     public MessageVO create(MessageDTO dto) {
-        Message message = convertToDomain(dto, Message.class);
-
-        messageRepository.saveAndFlush(message);
-        return convertToVO(message, MessageVO.class);
+        Message entity = messageRepository.saveAndFlush(MessageDTO.toEntity(dto));
+        return MessageVO.from(entity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessageVO modify(Long id, MessageDTO dto) {
+        Message entity = messageRepository.findById(id).map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return messageRepository.save(existing);
+                })
+                .orElseThrow();
+        return MessageVO.from(entity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void remove(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        messageRepository.deleteById(id);
+    }
 }

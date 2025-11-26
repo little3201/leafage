@@ -15,9 +15,10 @@
 
 package io.leafage.assets.service;
 
-import io.leafage.assets.dto.CommentDTO;
-import io.leafage.assets.vo.CommentVO;
-import top.leafage.common.jpa.JpaCrudService;
+
+import io.leafage.assets.domain.dto.CommentDTO;
+import io.leafage.assets.domain.vo.CommentVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 import java.util.List;
 

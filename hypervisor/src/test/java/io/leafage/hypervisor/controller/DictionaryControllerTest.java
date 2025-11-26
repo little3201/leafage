@@ -15,13 +15,15 @@
 
 package io.leafage.hypervisor.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.leafage.hypervisor.dto.DictionaryDTO;
+import tools.jackson.databind.ObjectMapper;
+import io.leafage.hypervisor.domain.Dictionary;
+import io.leafage.hypervisor.domain.dto.DictionaryDTO;
+import io.leafage.hypervisor.domain.vo.DictionaryVO;
 import io.leafage.hypervisor.service.DictionaryService;
-import io.leafage.hypervisor.vo.DictionaryVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -34,6 +36,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -70,10 +73,7 @@ class DictionaryControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new DictionaryVO();
-        vo.setId(1L);
-        vo.setName("gender");
-        vo.setDescription("description");
+        vo = new DictionaryVO(1L, "test", null, "desctiption", true);
 
         dto = new DictionaryDTO();
         dto.setName("gender");
@@ -83,7 +83,7 @@ class DictionaryControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<DictionaryVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<Dictionary> voPage = new PageImpl<>(List.of(Mockito.mock(Dictionary.class)), mock(PageRequest.class), 2L);
 
         given(this.dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(voPage);
@@ -120,7 +120,7 @@ class DictionaryControllerTest {
 
     @Test
     void subset() throws Exception {
-        given(this.dictionaryService.subset(anyLong())).willReturn(List.of(vo));
+        given(this.dictionaryService.subset(anyLong())).willReturn(List.of(Mockito.mock(Dictionary.class)));
 
         mvc.perform(get("/dictionaries/{id}/subset", anyLong()))
                 .andExpect(status().isOk())
@@ -129,7 +129,7 @@ class DictionaryControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.dictionaryService.fetch(anyLong())).willReturn(vo);
+        given(this.dictionaryService.fetch(anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Dictionary.class)));
 
         mvc.perform(get("/dictionaries/{id}", anyLong()))
                 .andExpect(status().isOk())
@@ -149,7 +149,7 @@ class DictionaryControllerTest {
 
     @Test
     void modify() throws Exception {
-        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willReturn(vo);
+        given(this.dictionaryService.modify(anyLong(), any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
 
         mvc.perform(put("/dictionaries/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -159,7 +159,7 @@ class DictionaryControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willThrow(new RuntimeException());
+        given(this.dictionaryService.modify(anyLong(), any(Dictionary.class))).willThrow(new RuntimeException());
 
         mvc.perform(put("/dictionaries/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -196,7 +196,7 @@ class DictionaryControllerTest {
 
     @Test
     void create() throws Exception {
-        given(this.dictionaryService.create(any(DictionaryDTO.class))).willReturn(vo);
+        given(this.dictionaryService.create(any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
 
         mvc.perform(post("/dictionaries").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -207,7 +207,7 @@ class DictionaryControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(this.dictionaryService.create(any(DictionaryDTO.class))).willThrow(new RuntimeException());
+        given(this.dictionaryService.create(any(Dictionary.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/dictionaries").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))

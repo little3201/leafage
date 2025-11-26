@@ -16,16 +16,15 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.OperationLog;
-import io.leafage.hypervisor.dto.OperationLogDTO;
+import io.leafage.hypervisor.domain.vo.OperationLogVO;
 import io.leafage.hypervisor.repository.OperationLogRepository;
 import io.leafage.hypervisor.service.OperationLogService;
-import io.leafage.hypervisor.vo.OperationLogVO;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
 /**
  * operation log service impl.
@@ -33,7 +32,7 @@ import top.leafage.common.DomainConverter;
  * @author wq li
  */
 @Service
-public class OperationLogServiceImpl extends DomainConverter implements OperationLogService {
+public class OperationLogServiceImpl implements OperationLogService {
 
     private final OperationLogRepository operationLogRepository;
 
@@ -50,14 +49,14 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
      * {@inheritDoc}
      */
     @Override
-    public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<OperationLog> spec = (root, query, cb) ->
+        Specification<@NonNull OperationLog> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return operationLogRepository.findAll(spec, pageable)
-                .map(operationLog -> convertToVO(operationLog, OperationLogVO.class));
+                .map(OperationLogVO::from);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return operationLogRepository.findById(id)
-                .map(operationLog -> convertToVO(operationLog, OperationLogVO.class))
+                .map(OperationLogVO::from)
                 .orElse(null);
     }
 
@@ -73,20 +72,15 @@ public class OperationLogServiceImpl extends DomainConverter implements Operatio
      * {@inheritDoc}
      */
     @Override
-    public OperationLogVO create(OperationLogDTO dto) {
-        OperationLog operationLog = convertToDomain(dto, OperationLog.class);
-
-        operationLogRepository.saveAndFlush(operationLog);
-        return convertToVO(operationLog, OperationLogVO.class);
-    }
-
-    @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         operationLogRepository.deleteById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         operationLogRepository.deleteAll();

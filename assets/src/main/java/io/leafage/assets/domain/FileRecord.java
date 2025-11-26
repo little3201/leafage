@@ -15,10 +15,14 @@
 
 package io.leafage.assets.domain;
 
-import io.leafage.assets.domain.superclass.FileRecordModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
 
 /**
  * entity class for file record.
@@ -28,32 +32,47 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "file_records")
-public class FileRecord extends FileRecordModel {
+public class FileRecord extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(unique = true, nullable = false, length = 50)
+    private String name;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
+    private String path;
+
+    private String mimeType;
+
+    private float size;
 
 
-    public Long getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getPath() {
+        return path;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public float getSize() {
+        return size;
+    }
+
+    public void setSize(float size) {
+        this.size = size;
     }
 }

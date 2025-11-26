@@ -15,16 +15,17 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Role;
-import io.leafage.hypervisor.dto.RoleDTO;
+import io.leafage.hypervisor.domain.dto.RoleDTO;
+import io.leafage.hypervisor.domain.vo.RoleVO;
 import io.leafage.hypervisor.repository.RoleRepository;
 import io.leafage.hypervisor.service.RoleService;
-import io.leafage.hypervisor.vo.RoleVO;
+import org.jspecify.annotations.NonNull;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
 /**
  * role service impl.
@@ -32,9 +33,10 @@ import top.leafage.common.DomainConverter;
  * @author wq li
  */
 @Service
-public class RoleServiceImpl extends DomainConverter implements RoleService {
+public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
+    private static final BeanCopier copier = BeanCopier.create(RoleDTO.class, Role.class, false);
 
     /**
      * <p>Constructor for RoleServiceImpl.</p>
@@ -49,14 +51,14 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public Page<RoleVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull RoleVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Role> spec = (root, query, cb) ->
+        Specification<@NonNull Role> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return roleRepository.findAll(spec, pageable)
-                .map(role -> convertToVO(role, RoleVO.class));
+                .map(RoleVO::from);
     }
 
     /**
@@ -67,7 +69,8 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return roleRepository.findById(id)
-                .map(role -> convertToVO(role, RoleVO.class)).orElse(null);
+                .map(RoleVO::from)
+                .orElse(null);
     }
 
     @Override
@@ -92,10 +95,8 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
      */
     @Override
     public RoleVO create(RoleDTO dto) {
-        Role role = convertToDomain(dto, Role.class);
-
-        roleRepository.saveAndFlush(role);
-        return convertToVO(role, RoleVO.class);
+        Role entity = roleRepository.saveAndFlush(RoleDTO.toEntity(dto));
+        return RoleVO.from(entity);
     }
 
     /**
@@ -104,11 +105,13 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
     @Override
     public RoleVO modify(Long id, RoleDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-        return roleRepository.findById(id).map(existing -> {
-            Role role = convert(dto, existing);
-            role = roleRepository.save(role);
-            return convertToVO(role, RoleVO.class);
-        }).orElseThrow();
+
+        Role entity = roleRepository.findById(id).map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return roleRepository.save(existing);
+                })
+                .orElseThrow();
+        return RoleVO.from(entity);
     }
 
     /**
@@ -117,6 +120,7 @@ public class RoleServiceImpl extends DomainConverter implements RoleService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         roleRepository.deleteById(id);
     }
 

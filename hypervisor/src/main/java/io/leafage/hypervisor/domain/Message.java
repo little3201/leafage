@@ -15,9 +15,13 @@
 
 package io.leafage.hypervisor.domain;
 
-import io.leafage.hypervisor.domain.superclass.MessageModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.data.jpa.domain.User;
 
 /**
  * entity class for message.
@@ -27,24 +31,47 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "messages")
-public class Message extends MessageModel {
+public class Message extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String title;
+
+    private String body;
+
+    private String receiver;
 
     private boolean unread = true;
 
-
-    public Long getId() {
-        return id;
+    public Message() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Message(String title, String body, String receiver) {
+        this.title = title;
+        this.body = body;
+        this.receiver = receiver;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 
     public boolean isUnread() {
@@ -54,5 +81,4 @@ public class Message extends MessageModel {
     public void setUnread(boolean unread) {
         this.unread = unread;
     }
-
 }

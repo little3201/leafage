@@ -15,9 +15,10 @@
 
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.AuditLogDTO;
-import io.leafage.hypervisor.vo.AuditLogVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.AuditLog;
+import io.leafage.hypervisor.domain.dto.AuditLogDTO;
+import io.leafage.hypervisor.domain.vo.AuditLogVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * audit log service.

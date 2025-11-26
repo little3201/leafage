@@ -15,9 +15,9 @@
 
 package io.leafage.assets.controller;
 
-import io.leafage.assets.dto.RegionDTO;
+import io.leafage.assets.domain.dto.RegionDTO;
 import io.leafage.assets.service.RegionService;
-import io.leafage.assets.vo.RegionVO;
+import io.leafage.assets.domain.vo.RegionVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

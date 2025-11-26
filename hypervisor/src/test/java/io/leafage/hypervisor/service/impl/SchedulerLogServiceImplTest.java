@@ -16,9 +16,8 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.SchedulerLog;
-import io.leafage.hypervisor.dto.SchedulerLogDTO;
 import io.leafage.hypervisor.repository.SchedulerLogRepository;
-import io.leafage.hypervisor.vo.SchedulerLogVO;
+import io.leafage.hypervisor.domain.vo.SchedulerLogVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

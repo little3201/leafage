@@ -17,7 +17,8 @@ package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.FileRecord;
 import io.leafage.assets.repository.FileRecordRepository;
-import io.leafage.assets.vo.FileRecordVO;
+import io.leafage.assets.domain.vo.FileRecordVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,12 +59,12 @@ class FileRecordServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<FileRecord> page = new PageImpl<>(List.of(mock(FileRecord.class)));
+        Page<@NonNull FileRecord> page = new PageImpl<>(List.of(mock(FileRecord.class)));
 
-        given(this.fileRecordRepository.findAll(ArgumentMatchers.<Specification<FileRecord>>any(),
+        given(this.fileRecordRepository.findAll(ArgumentMatchers.<Specification<@NonNull FileRecord>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
+        Page<@NonNull FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
         Assertions.assertNotNull(voPage.getContent());
     }
 

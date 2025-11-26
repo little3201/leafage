@@ -14,9 +14,10 @@
  */
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.Privilege;
+import io.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.vo.PrivilegeVO;
 import io.leafage.hypervisor.service.PrivilegeService;
-import io.leafage.hypervisor.vo.PrivilegeVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.TreeNode;
+import top.leafage.common.data.TreeNode;
 import top.leafage.common.poi.ExcelReader;
 
 import java.security.Principal;
 import java.util.List;
+
+import static top.leafage.common.data.ObjectConverter.toEntity;
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * privilege controller.
@@ -71,7 +75,8 @@ public class PrivilegeController {
                                                       String sortBy, boolean descending, String filters) {
         Page<PrivilegeVO> voPage;
         try {
-            voPage = privilegeService.retrieve(page, size, sortBy, descending, filters);
+            voPage = privilegeService.retrieve(page, size, sortBy, descending, filters)
+                    .map(entity -> toVO(entity, PrivilegeVO.class));
         } catch (Exception e) {
             logger.info("Retrieve privilege error: ", e);
             return ResponseEntity.noContent().build();
@@ -107,7 +112,9 @@ public class PrivilegeController {
     public ResponseEntity<List<PrivilegeVO>> subset(@PathVariable Long superiorId) {
         List<PrivilegeVO> voList;
         try {
-            voList = privilegeService.subset(superiorId);
+            voList = privilegeService.subset(superiorId)
+                    .stream().map(entity -> toVO(entity, PrivilegeVO.class))
+                    .toList();
         } catch (Exception e) {
             logger.info("Retrieve privilege subset error: ", e);
             return ResponseEntity.noContent().build();
@@ -126,7 +133,9 @@ public class PrivilegeController {
     public ResponseEntity<PrivilegeVO> fetch(@PathVariable Long id) {
         PrivilegeVO vo;
         try {
-            vo = privilegeService.fetch(id);
+            vo = privilegeService.fetch(id)
+                    .map(entity -> toVO(entity, PrivilegeVO.class))
+                    .orElse(null);
         } catch (Exception e) {
             logger.info("Fetch privilege error: ", e);
             return ResponseEntity.noContent().build();
@@ -150,7 +159,8 @@ public class PrivilegeController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            vo = privilegeService.modify(id, dto);
+            Privilege entity = privilegeService.modify(id, toEntity(dto, Privilege.class));
+            vo = toVO(entity, PrivilegeVO.class);
         } catch (Exception e) {
             logger.error("Modify privilege error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -187,8 +197,12 @@ public class PrivilegeController {
     public ResponseEntity<List<PrivilegeVO>> importFromFile(MultipartFile file) {
         List<PrivilegeVO> voList;
         try {
-            List<PrivilegeDTO> dtoList = ExcelReader.read(file.getInputStream(), PrivilegeDTO.class);
-            voList = privilegeService.createAll(dtoList);
+            List<Privilege> list = ExcelReader.read(file.getInputStream(), PrivilegeDTO.class)
+                    .stream().map(dto -> toEntity(dto, Privilege.class))
+                    .toList();
+            voList = privilegeService.createAll(list)
+                    .stream().map(entity -> toVO(entity, PrivilegeVO.class))
+                    .toList();
         } catch (Exception e) {
             logger.error("Import privilege error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

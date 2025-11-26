@@ -15,6 +15,7 @@
 
 package io.leafage.assets.config;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -44,8 +45,8 @@ public class AuditingConfiguration {
      * @return a {@link AuditorAware} object
      */
     @Bean
-    public AuditorAware<String> auditorProvider() {
-        return () -> Optional.ofNullable(SecurityContextHolder.getContext())
+    public AuditorAware<@NonNull String> auditorProvider() {
+        return () -> Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getName);

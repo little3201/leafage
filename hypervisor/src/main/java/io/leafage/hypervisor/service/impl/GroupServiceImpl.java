@@ -15,19 +15,23 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Group;
-import io.leafage.hypervisor.dto.GroupDTO;
+import io.leafage.hypervisor.domain.dto.GroupDTO;
+import io.leafage.hypervisor.domain.vo.GroupVO;
 import io.leafage.hypervisor.repository.GroupRepository;
 import io.leafage.hypervisor.service.GroupService;
-import io.leafage.hypervisor.vo.GroupVO;
+import org.jspecify.annotations.NonNull;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.TreeNode;
-import top.leafage.common.jdbc.JdbcTreeAndDomainConverter;
+import top.leafage.common.data.domain.TreeNode;
 
 import java.util.List;
+
+import static top.leafage.common.data.converter.ModelToTreeNodeConverter.convertToTree;
+
 
 /**
  * group service impl.
@@ -35,9 +39,10 @@ import java.util.List;
  * @author wq li
  */
 @Service
-public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> implements GroupService {
+public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
+    private static final BeanCopier copier = BeanCopier.create(GroupDTO.class, Group.class, false);
 
     /**
      * <p>Constructor for GroupServiceImpl.</p>
@@ -52,21 +57,21 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
      * {@inheritDoc}
      */
     @Override
-    public Page<GroupVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull GroupVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Group> spec = (root, query, cb) ->
+        Specification<@NonNull Group> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
-        
+
         return groupRepository.findAll(spec, pageable)
-                .map(group -> convertToVO(group, GroupVO.class));
+                .map(GroupVO::from);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<TreeNode<Long>> tree() {
+    public List<TreeNode<@NonNull Long>> tree() {
         List<Group> groups = groupRepository.findAll();
         return convertToTree(groups);
     }
@@ -79,7 +84,8 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return groupRepository.findById(id)
-                .map(group -> convertToVO(group, GroupVO.class)).orElse(null);
+                .map(GroupVO::from)
+                .orElse(null);
     }
 
     @Override
@@ -102,10 +108,8 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
      */
     @Override
     public GroupVO create(GroupDTO dto) {
-        Group group = convertToDomain(dto, Group.class);
-
-        groupRepository.saveAndFlush(group);
-        return convertToVO(group, GroupVO.class);
+        Group entity = groupRepository.saveAndFlush(GroupDTO.toEntity(dto));
+        return GroupVO.from(entity);
     }
 
     /**
@@ -115,12 +119,12 @@ public class GroupServiceImpl extends JdbcTreeAndDomainConverter<Group, Long> im
     public GroupVO modify(Long id, GroupDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        return groupRepository.findById(id).map(existing -> {
-                    Group group = convert(dto, existing);
-                    group = groupRepository.save(group);
-                    return convertToVO(group, GroupVO.class);
+        Group entity = groupRepository.findById(id).map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return groupRepository.save(existing);
                 })
                 .orElseThrow();
+        return GroupVO.from(entity);
     }
 
     /**

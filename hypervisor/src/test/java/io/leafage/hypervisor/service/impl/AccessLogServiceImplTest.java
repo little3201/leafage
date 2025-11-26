@@ -16,9 +16,8 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.AccessLog;
-import io.leafage.hypervisor.dto.AccessLogDTO;
 import io.leafage.hypervisor.repository.AccessLogRepository;
-import io.leafage.hypervisor.vo.AccessLogVO;
+import io.leafage.hypervisor.domain.vo.AccessLogVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

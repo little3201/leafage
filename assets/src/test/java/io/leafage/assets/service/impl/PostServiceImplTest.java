@@ -16,11 +16,10 @@ package io.leafage.assets.service.impl;
 
 
 import io.leafage.assets.domain.Post;
-import io.leafage.assets.domain.PostContent;
-import io.leafage.assets.dto.PostDTO;
-import io.leafage.assets.repository.PostContentRepository;
+import io.leafage.assets.domain.dto.PostDTO;
+import io.leafage.assets.domain.vo.PostVO;
 import io.leafage.assets.repository.PostRepository;
-import io.leafage.assets.vo.PostVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,9 +54,6 @@ class PostServiceImplTest {
     @Mock
     private PostRepository postRepository;
 
-    @Mock
-    private PostContentRepository postContentRepository;
-
     @InjectMocks
     private PostServiceImpl postsService;
 
@@ -68,18 +64,18 @@ class PostServiceImplTest {
         dto = new PostDTO();
         dto.setTitle("title");
         dto.setSummary("excerpt");
-        dto.setContent("content");
+        dto.setBody("body");
         dto.setTags(Set.of("code"));
     }
 
     @Test
     void retrieve() {
-        Page<Post> page = new PageImpl<>(List.of(mock(Post.class)));
+        Page<@NonNull Post> page = new PageImpl<>(List.of(mock(Post.class)));
 
-        given(postRepository.findAll(ArgumentMatchers.<Specification<Post>>any(),
+        given(postRepository.findAll(ArgumentMatchers.<Specification<@NonNull Post>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
+        Page<@NonNull PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
         Assertions.assertNotNull(voPage.getContent());
     }
 
@@ -123,14 +119,9 @@ class PostServiceImplTest {
     void create() {
         given(postRepository.saveAndFlush(any(Post.class))).willReturn(mock(Post.class));
 
-        given(postContentRepository.getByPostId(anyLong())).willReturn(Optional.of(mock(PostContent.class)));
-
-        given(postContentRepository.saveAndFlush(any(PostContent.class))).willReturn(mock(PostContent.class));
-
         PostVO vo = postsService.create(dto);
 
         verify(postRepository, times(1)).saveAndFlush(any(Post.class));
-        verify(postContentRepository, times(1)).saveAndFlush(any(PostContent.class));
         Assertions.assertNotNull(vo);
     }
 
@@ -140,14 +131,9 @@ class PostServiceImplTest {
 
         given(postRepository.save(any(Post.class))).willReturn(mock(Post.class));
 
-        given(postContentRepository.getByPostId(anyLong())).willReturn(Optional.of(mock(PostContent.class)));
-
-        given(postContentRepository.save(any(PostContent.class))).willReturn(mock(PostContent.class));
-
         PostVO vo = postsService.modify(1L, dto);
 
         verify(postRepository, times(1)).save(any(Post.class));
-        verify(postContentRepository, times(1)).save(any(PostContent.class));
         Assertions.assertNotNull(vo);
     }
 

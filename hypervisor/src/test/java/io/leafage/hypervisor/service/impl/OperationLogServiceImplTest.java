@@ -16,9 +16,8 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.OperationLog;
-import io.leafage.hypervisor.dto.OperationLogDTO;
 import io.leafage.hypervisor.repository.OperationLogRepository;
-import io.leafage.hypervisor.vo.OperationLogVO;
+import io.leafage.hypervisor.domain.vo.OperationLogVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -14,9 +14,9 @@
  */
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.UserDTO;
-import io.leafage.hypervisor.vo.UserVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.dto.UserDTO;
+import io.leafage.hypervisor.domain.vo.UserVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * user service.

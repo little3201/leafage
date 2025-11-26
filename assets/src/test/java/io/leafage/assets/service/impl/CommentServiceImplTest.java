@@ -16,9 +16,10 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Comment;
-import io.leafage.assets.dto.CommentDTO;
+import io.leafage.assets.domain.dto.CommentDTO;
+import io.leafage.assets.domain.vo.CommentVO;
 import io.leafage.assets.repository.CommentRepository;
-import io.leafage.assets.vo.CommentVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,12 +55,12 @@ class CommentServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Comment> page = new PageImpl<>(List.of(mock(Comment.class)));
+        Page<@NonNull Comment> page = new PageImpl<>(List.of(mock(Comment.class)));
 
-        given(commentRepository.findAll(ArgumentMatchers.<Specification<Comment>>any(),
+        given(commentRepository.findAll(ArgumentMatchers.<Specification<@NonNull Comment>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
+        Page<@NonNull CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
         Assertions.assertNotNull(voPage.getContent());
     }
 

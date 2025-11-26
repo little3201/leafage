@@ -15,17 +15,19 @@
 
 package io.leafage.hypervisor.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import io.leafage.hypervisor.domain.Group;
 import io.leafage.hypervisor.domain.GroupPrivileges;
-import io.leafage.hypervisor.dto.GroupDTO;
+import io.leafage.hypervisor.domain.dto.GroupDTO;
+import io.leafage.hypervisor.domain.vo.GroupVO;
 import io.leafage.hypervisor.service.GroupMembersService;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
 import io.leafage.hypervisor.service.GroupRolesService;
 import io.leafage.hypervisor.service.GroupService;
-import io.leafage.hypervisor.vo.GroupVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -36,10 +38,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import top.leafage.common.TreeNode;
+import top.leafage.common.data.TreeNode;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -85,9 +88,7 @@ class GroupControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new GroupVO();
-        vo.setId(1L);
-        vo.setName("test");
+        vo = new GroupVO(1L, "test", "description", true);
 
         dto = new GroupDTO();
         dto.setName("test");
@@ -97,7 +98,7 @@ class GroupControllerTest {
 
     @Test
     void retrieve() throws Exception {
-        Page<GroupVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<Group> voPage = new PageImpl<>(List.of(Mockito.mock(Group.class)), mock(PageRequest.class), 2L);
 
         given(this.groupService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
@@ -142,7 +143,7 @@ class GroupControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.groupService.fetch(anyLong())).willReturn(vo);
+        given(this.groupService.fetch(anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Group.class)));
 
         mvc.perform(get("/groups/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
@@ -158,7 +159,7 @@ class GroupControllerTest {
 
     @Test
     void create() throws Exception {
-        given(this.groupService.create(any(GroupDTO.class))).willReturn(vo);
+        given(this.groupService.create(any(Group.class))).willReturn(Mockito.mock(Group.class));
 
         mvc.perform(post("/groups").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -169,7 +170,7 @@ class GroupControllerTest {
 
     @Test
     void create_error() throws Exception {
-        given(this.groupService.create(any(GroupDTO.class))).willThrow(new RuntimeException());
+        given(this.groupService.create(any(Group.class))).willThrow(new RuntimeException());
 
         mvc.perform(post("/groups").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -179,7 +180,7 @@ class GroupControllerTest {
 
     @Test
     void modify() throws Exception {
-        given(this.groupService.modify(anyLong(), any(GroupDTO.class))).willReturn(vo);
+        given(this.groupService.modify(anyLong(), any(Group.class))).willReturn(Mockito.mock(Group.class));
 
         mvc.perform(put("/groups/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
@@ -189,7 +190,7 @@ class GroupControllerTest {
 
     @Test
     void modify_error() throws Exception {
-        given(this.groupService.modify(anyLong(), any(GroupDTO.class))).willThrow(new RuntimeException());
+        given(this.groupService.modify(anyLong(), any(Group.class))).willThrow(new RuntimeException());
 
         mvc.perform(put("/groups/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))

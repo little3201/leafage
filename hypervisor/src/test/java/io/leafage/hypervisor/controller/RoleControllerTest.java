@@ -15,13 +15,13 @@
 package io.leafage.hypervisor.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.leafage.hypervisor.domain.RolePrivileges;
-import io.leafage.hypervisor.dto.RoleDTO;
+import io.leafage.hypervisor.domain.dto.RoleDTO;
 import io.leafage.hypervisor.service.RoleMembersService;
 import io.leafage.hypervisor.service.RolePrivilegesService;
 import io.leafage.hypervisor.service.RoleService;
-import io.leafage.hypervisor.vo.RoleVO;
+import io.leafage.hypervisor.domain.vo.RoleVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

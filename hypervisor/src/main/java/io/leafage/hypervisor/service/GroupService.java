@@ -14,10 +14,11 @@
  */
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.GroupDTO;
-import io.leafage.hypervisor.vo.GroupVO;
-import top.leafage.common.TreeNode;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.dto.GroupDTO;
+import io.leafage.hypervisor.domain.vo.GroupVO;
+import org.jspecify.annotations.NonNull;
+import top.leafage.common.data.domain.TreeNode;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 import java.util.List;
 
@@ -28,5 +29,5 @@ import java.util.List;
  */
 public interface GroupService extends JpaCrudService<GroupDTO, GroupVO> {
 
-    List<TreeNode<Long>> tree();
+    List<TreeNode<@NonNull Long>> tree();
 }

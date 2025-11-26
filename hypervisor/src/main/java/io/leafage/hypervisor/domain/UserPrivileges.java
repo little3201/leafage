@@ -15,6 +15,8 @@
 package io.leafage.hypervisor.domain;
 
 import jakarta.persistence.*;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.util.Set;
 
@@ -25,31 +27,18 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "user_privileges")
-public class UserPrivileges {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserPrivileges extends AbstractPersistable<@NonNull Long> {
 
     @Column(nullable = false)
     private String username;
 
-    @Column(name = "privilege_id", nullable = false)
+    @Column(nullable = false)
     private Long privilegeId;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_privilege_actions", joinColumns = @JoinColumn(name = "user_privilege_id"))
-    @Column(name = "action")
     private Set<String> actions;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;

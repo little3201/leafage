@@ -15,14 +15,14 @@
 
 package io.leafage.assets.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.leafage.assets.domain.vo.FileRecordVO;
 import io.leafage.assets.service.FileRecordService;
-import io.leafage.assets.vo.FileRecordVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +32,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -68,15 +69,12 @@ class FileControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new FileRecordVO();
-        vo.setId(1L);
-        vo.setName("test");
-        vo.setSize(21232);
+        vo = new FileRecordVO(1L, "test", "", "", 3121.23f);
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<FileRecordVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<@NonNull FileRecordVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(page);

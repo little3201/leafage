@@ -14,9 +14,9 @@
  */
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.dto.UserDTO;
+import io.leafage.hypervisor.domain.dto.UserDTO;
+import io.leafage.hypervisor.domain.vo.UserVO;
 import io.leafage.hypervisor.service.UserService;
-import io.leafage.hypervisor.vo.UserVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +29,9 @@ import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
+
+import static top.leafage.common.data.ObjectConverter.toEntity;
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * user controller.
@@ -69,10 +72,11 @@ public class UserController {
                                                  String sortBy, boolean descending, String filters) {
         Page<UserVO> voPage;
         try {
-            voPage = userService.retrieve(page, size, sortBy, descending, filters);
+            voPage = userService.retrieve(page, size, sortBy, descending, filters)
+                    .map(entity -> toVO(entity, UserVO.class));
         } catch (Exception e) {
             logger.info("Retrieve user error: ", e);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(voPage);
     }
@@ -88,10 +92,12 @@ public class UserController {
     public ResponseEntity<UserVO> fetch(@PathVariable Long id) {
         UserVO vo;
         try {
-            vo = userService.fetch(id);
+            vo = userService.fetch(id)
+                    .map(entity -> toVO(entity, UserVO.class))
+                    .orElse(null);
         } catch (Exception e) {
             logger.info("Fetch user error: ", e);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(vo);
     }
@@ -111,7 +117,9 @@ public class UserController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            vo = userService.create(dto);
+
+            User entity = userService.create(toEntity(dto, User.class));
+            vo = toVO(entity, UserVO.class);
         } catch (Exception e) {
             logger.error("Create user error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -136,7 +144,8 @@ public class UserController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            vo = userService.modify(id, dto);
+            User entity = userService.modify(id, toEntity(dto, User.class));
+            vo = toVO(entity, UserVO.class);
         } catch (Exception e) {
             logger.error("Modify user error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -192,8 +201,10 @@ public class UserController {
     public ResponseEntity<List<UserVO>> importFromFile(MultipartFile file) {
         List<UserVO> voList;
         try {
-            List<UserDTO> dtoList = ExcelReader.read(file.getInputStream(), UserDTO.class);
-            voList = userService.createAll(dtoList);
+            List<User> list = ExcelReader.read(file.getInputStream(), UserDTO.class)
+                    .stream().map(dto -> toEntity(dto, User.class)).toList();
+            voList = userService.createAll(list)
+                    .stream().map(entity -> toVO(entity, UserVO.class)).toList();
         } catch (Exception e) {
             logger.error("Import user error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

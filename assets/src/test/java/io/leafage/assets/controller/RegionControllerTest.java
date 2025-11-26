@@ -15,15 +15,15 @@
 
 package io.leafage.assets.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.leafage.assets.dto.RegionDTO;
+import io.leafage.assets.domain.dto.RegionDTO;
+import io.leafage.assets.domain.vo.RegionVO;
 import io.leafage.assets.service.RegionService;
-import io.leafage.assets.vo.RegionVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +32,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -64,30 +65,24 @@ class RegionControllerTest {
     @MockitoBean
     private RegionService regionService;
 
-    private RegionVO vo;
-
     private RegionDTO dto;
+    private RegionVO vo;
 
     @BeforeEach
     void setUp() {
-        vo = new RegionVO();
-        vo.setId(1L);
-        vo.setName("test");
-        vo.setAreaCode("23234");
-        vo.setPostalCode(1212);
-        vo.setDescription("description");
-
         dto = new RegionDTO();
         dto.setName("test");
         dto.setAreaCode("23234");
         dto.setPostalCode(1212);
         dto.setSuperiorId(1L);
         dto.setDescription("description");
+
+        vo = new RegionVO(1L, "test", "029", 712000, "");
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<RegionVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<@NonNull RegionVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         // 使用 eq() 准确匹配参数
         given(this.regionService.retrieve(anyInt(), anyInt(), anyString(),

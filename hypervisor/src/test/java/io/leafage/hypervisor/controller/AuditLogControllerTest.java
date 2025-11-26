@@ -15,11 +15,13 @@
 
 package io.leafage.hypervisor.controller;
 
+import io.leafage.hypervisor.domain.AuditLog;
+import io.leafage.hypervisor.domain.vo.AuditLogVO;
 import io.leafage.hypervisor.service.AuditLogService;
-import io.leafage.hypervisor.vo.AuditLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -65,19 +68,12 @@ class AuditLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new AuditLogVO();
-        vo.setId(1L);
-        vo.setIp(InetAddress.getByName("12.1.3.2"));
-        vo.setLocation("test");
-        vo.setOldValue("test");
-        vo.setNewValue("test");
-        vo.setOperation("test");
-        vo.setStatusCode(200);
+        vo = new AuditLogVO(1L, "", "", "", "", InetAddress.getByName("12.1.3.2"), 200, 2132L);
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<AuditLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<AuditLog> voPage = new PageImpl<>(List.of(Mockito.mock(AuditLog.class)), mock(PageRequest.class), 2L);
 
         given(this.auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
@@ -114,7 +110,7 @@ class AuditLogControllerTest {
 
     @Test
     void fetch() throws Exception {
-        given(this.auditLogService.fetch(anyLong())).willReturn(vo);
+        given(this.auditLogService.fetch(anyLong())).willReturn(Optional.ofNullable(Mockito.mock(AuditLog.class)));
 
         mvc.perform(get("/audit-logs/{id}", anyLong())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.operation").value("test")).andDo(print()).andReturn();

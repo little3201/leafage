@@ -16,9 +16,9 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.*;
-import io.leafage.hypervisor.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.vo.PrivilegeVO;
 import io.leafage.hypervisor.repository.*;
-import io.leafage.hypervisor.vo.PrivilegeVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,6 +102,24 @@ class PrivilegeServiceImplTest {
         PrivilegeVO vo = privilegeService.fetch(1L);
 
         Assertions.assertNotNull(vo);
+    }
+
+    @Test
+    void subset() {
+        given(this.privilegeRepository.findAllBySuperiorId(anyLong())).willReturn(List.of(mock(Privilege.class)));
+
+        List<Privilege> list = privilegeService.subset(1L);
+
+        Assertions.assertNotNull(list);
+    }
+
+    @Test
+    void subset_empty() {
+        given(this.privilegeRepository.findAllBySuperiorId(anyLong())).willReturn(Collections.emptyList());
+
+        List<Privilege> list = privilegeService.subset(1L);
+
+        Assertions.assertEquals(Collections.emptyList(), list);
     }
 
     @Test

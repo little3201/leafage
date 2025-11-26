@@ -14,7 +14,11 @@
  */
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * entity class for role members.
@@ -23,27 +27,14 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "role_members")
-public class RoleMembers {
+public class RoleMembers extends AbstractPersistable<@NonNull Long> {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "role_id", nullable = false)
+    @Column(nullable = false)
     private Long roleId;
 
-    @Column(name = "username", nullable = false)
+    @Column(nullable = false)
     private String username;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getRoleId() {
         return roleId;

@@ -14,7 +14,12 @@
  */
 package io.leafage.hypervisor.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
@@ -25,27 +30,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "group_roles")
-public class GroupRoles {
+public class GroupRoles extends AbstractPersistable<@NonNull Long> {
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "group_id", nullable = false)
+    @Column(nullable = false)
     private Long groupId;
 
-    @Column(name = "role_id", nullable = false)
+    @Column(nullable = false)
     private Long roleId;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getGroupId() {
         return groupId;

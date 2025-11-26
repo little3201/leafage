@@ -16,9 +16,9 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Dictionary;
-import io.leafage.hypervisor.dto.DictionaryDTO;
+import io.leafage.hypervisor.domain.dto.DictionaryDTO;
+import io.leafage.hypervisor.domain.vo.DictionaryVO;
 import io.leafage.hypervisor.repository.DictionaryRepository;
-import io.leafage.hypervisor.vo.DictionaryVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,18 +90,18 @@ class DictionaryServiceImplTest {
     void subset() {
         given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(List.of(mock(Dictionary.class)));
 
-        List<DictionaryVO> dictionaryVOS = dictionaryService.subset(1L);
+        List<Dictionary> list = dictionaryService.subset(1L);
 
-        Assertions.assertNotNull(dictionaryVOS);
+        Assertions.assertNotNull(list);
     }
 
     @Test
     void subset_empty() {
         given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(Collections.emptyList());
 
-        List<DictionaryVO> dictionaryVOS = dictionaryService.subset(1L);
+        List<Dictionary> list = dictionaryService.subset(1L);
 
-        Assertions.assertEquals(Collections.emptyList(), dictionaryVOS);
+        Assertions.assertEquals(Collections.emptyList(), list);
     }
 
     @Test

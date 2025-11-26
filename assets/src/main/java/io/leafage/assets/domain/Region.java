@@ -15,9 +15,14 @@
 
 package io.leafage.assets.domain;
 
-import io.leafage.assets.domain.superclass.RegionModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import top.leafage.common.data.jpa.domain.User;
 
 /**
  * entity class for region.
@@ -27,22 +32,77 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "regions")
-public class Region extends RegionModel {
+public class Region extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false, length = 50)
+    private String name;
 
+    private Long superiorId;
 
-    public Long getId() {
-        return id;
+    private String areaCode;
+
+    private Integer postalCode;
+
+    private String description;
+
+    private boolean enabled = true;
+
+    public Region() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Region(String name, Long superiorId, String areaCode, Integer postalCode, String description) {
+        this.name = name;
+        this.superiorId = superiorId;
+        this.areaCode = areaCode;
+        this.postalCode = postalCode;
+        this.description = description;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getSuperiorId() {
+        return superiorId;
+    }
+
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
+    }
+
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
+
+    public Integer getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(Integer postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 }

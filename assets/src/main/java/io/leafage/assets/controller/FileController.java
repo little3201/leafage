@@ -16,7 +16,7 @@
 package io.leafage.assets.controller;
 
 import io.leafage.assets.service.FileRecordService;
-import io.leafage.assets.vo.FileRecordVO;
+import io.leafage.assets.domain.vo.FileRecordVO;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

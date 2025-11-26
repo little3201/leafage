@@ -1,9 +1,7 @@
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.dto.SchedulerLogDTO;
+import io.leafage.hypervisor.domain.vo.SchedulerLogVO;
 import io.leafage.hypervisor.service.SchedulerLogService;
-import io.leafage.hypervisor.vo.SchedulerLogVO;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -11,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * controller for scheduler_logs.
@@ -45,7 +45,8 @@ public class SchedulerLogController {
                                                          String sortBy, boolean descending, String filters) {
         Page<SchedulerLogVO> voPage;
         try {
-            voPage = schedulerLogService.retrieve(page, size, sortBy, descending, filters);
+            voPage = schedulerLogService.retrieve(page, size, sortBy, descending, filters)
+                    .map(entity -> toVO(entity, SchedulerLogVO.class));
         } catch (Exception e) {
             logger.error("Retrieve schedulerlogs occurred an error: ", e);
             return ResponseEntity.noContent().build();
@@ -64,9 +65,11 @@ public class SchedulerLogController {
     public ResponseEntity<SchedulerLogVO> fetch(@PathVariable Long id) {
         SchedulerLogVO vo;
         try {
-            vo = schedulerLogService.fetch(id);
+            vo = schedulerLogService.fetch(id)
+                    .map(entity -> toVO(entity, SchedulerLogVO.class))
+                    .orElse(null);
         } catch (Exception e) {
-            logger.error("Fetch schedulerlogs occurred an error: ", e);
+            logger.error("Fetch scheduler logs occurred an error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(vo);
@@ -86,49 +89,10 @@ public class SchedulerLogController {
         try {
             exist = schedulerLogService.exists(name, id);
         } catch (Exception e) {
-            logger.info("Query schedulerlogs exist occurred an error: ", e);
+            logger.info("Query scheduler logs exist occurred an error: ", e);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(exist);
-    }
-
-    /**
-     * Creates a new record.
-     *
-     * @param dto The record data transfer object.
-     * @return The created record, or 417 status code if an error occurs.
-     */
-    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:create')")
-    @PostMapping
-    public ResponseEntity<SchedulerLogVO> create(@RequestBody @Valid SchedulerLogDTO dto) {
-        SchedulerLogVO vo;
-        try {
-            vo = schedulerLogService.create(dto);
-        } catch (Exception e) {
-            logger.error("Create schedulerlogs occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
-    }
-
-    /**
-     * Modifies an existing record.
-     *
-     * @param id  The record ID.
-     * @param dto The record data transfer object.
-     * @return The modified record, or 417 status code if an error occurs.
-     */
-    @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:modify')")
-    @PutMapping("/{id}")
-    public ResponseEntity<SchedulerLogVO> modify(@PathVariable Long id, @RequestBody @Valid SchedulerLogDTO dto) {
-        SchedulerLogVO vo;
-        try {
-            vo = schedulerLogService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify schedulerlogs occurred an error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(vo);
     }
 
     /**
@@ -143,7 +107,7 @@ public class SchedulerLogController {
         try {
             schedulerLogService.remove(id);
         } catch (Exception e) {
-            logger.error("Remove schedulerlogs occurred an error: ", e);
+            logger.error("Remove scheduler logs occurred an error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.ok().build();

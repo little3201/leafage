@@ -16,9 +16,9 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Group;
-import io.leafage.hypervisor.dto.GroupDTO;
+import io.leafage.hypervisor.domain.dto.GroupDTO;
 import io.leafage.hypervisor.repository.GroupRepository;
-import io.leafage.hypervisor.vo.GroupVO;
+import io.leafage.hypervisor.domain.vo.GroupVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -16,9 +16,9 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Message;
-import io.leafage.hypervisor.dto.MessageDTO;
+import io.leafage.hypervisor.domain.dto.MessageDTO;
 import io.leafage.hypervisor.repository.MessageRepository;
-import io.leafage.hypervisor.vo.MessageVO;
+import io.leafage.hypervisor.domain.vo.MessageVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

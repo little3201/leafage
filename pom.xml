@@ -20,13 +20,13 @@
     <parent>
         <groupId>top.leafage</groupId>
         <artifactId>leafage-starter-parent</artifactId>
-        <version>0.3.6</version>
+        <version>0.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>io.leafage</groupId>
     <artifactId>leafage</artifactId>
-    <version>0.1.1</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
 
     <name>leafage</name>
@@ -37,7 +37,7 @@
         <sonar.organization>little3201</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-        <leafage-common.version>0.3.7</leafage-common.version>
+        <leafage-common.version>0.4.0</leafage-common.version>
     </properties>
 
     <developers>

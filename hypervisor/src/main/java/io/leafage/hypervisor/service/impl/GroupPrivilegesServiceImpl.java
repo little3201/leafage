@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+import static top.leafage.common.data.AbstractService._MUST_NOT_BE_NULL;
 
 @Service
 public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
@@ -63,9 +63,6 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
 
         GroupPrivileges groupPrivilege = new GroupPrivileges(groupId, privilegeId,
                 StringUtils.hasText(action) ? Set.of(action) : Collections.emptySet());
-        // 如果已存在，更新
-        groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId)
-                .ifPresent(r -> groupPrivilege.setId(r.getId()));
 
         privilegeRepository.findById(privilegeId).ifPresent(privilege ->
                 addGroupAuthority(groupId, privilege.getName(),

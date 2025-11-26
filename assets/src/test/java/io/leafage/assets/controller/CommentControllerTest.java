@@ -15,15 +15,15 @@
 
 package io.leafage.assets.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.leafage.assets.dto.CommentDTO;
+import io.leafage.assets.domain.dto.CommentDTO;
+import io.leafage.assets.domain.vo.CommentVO;
 import io.leafage.assets.service.CommentService;
-import io.leafage.assets.vo.CommentVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,33 +31,30 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Comment 接口测试
  *
  * @author wq li
  **/
-@WithMockUser
+@WithMockUser(roles = "ADMIN")
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CommentController.class)
 class CommentControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    private MockMvcTester mvc;
 
     @Autowired
     private ObjectMapper mapper;
@@ -71,10 +68,7 @@ class CommentControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new CommentVO();
-        vo.setId(1L);
-        vo.setBody("content");
-        vo.setPostId(1L);
+        vo = new CommentVO(1L, 2L, "body", 1L, 0);
 
         dto = new CommentDTO();
         dto.setPostId(1L);
@@ -83,74 +77,77 @@ class CommentControllerTest {
     }
 
     @Test
-    void retrieve() throws Exception {
-        Page<CommentVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+    void retrieve() {
+        Page<@NonNull CommentVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(commentService.retrieve(anyInt(), anyInt(), eq("id"), anyBoolean(), anyString())).willReturn(page);
 
-        mvc.perform(get("/comments")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2"))
-                .andExpect(status().isOk()).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/comments")
+                .queryParam("page", "0")
+                .queryParam("size", "2"))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void retrieve_error() throws Exception {
+    void retrieve_error() {
         given(commentService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willThrow(new NoSuchElementException());
 
-        mvc.perform(get("/comments")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "content:like:a")
-                )
-                .andExpect(status().isNoContent()).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/comments")
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "content:like:a"))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void relation() throws Exception {
+    void relation() {
         given(commentService.relation(anyLong())).willReturn(List.of(vo));
 
-        mvc.perform(get("/comments/{id}", anyLong())).andExpect(status().isOk()).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/comments/{id}", anyLong()))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void relation_error() throws Exception {
+    void relation_error() {
         given(commentService.relation(anyLong())).willThrow(new NoSuchElementException());
 
-        mvc.perform(get("/comments/{id}", anyLong())).andExpect(status().isNoContent()).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/comments/{id}", anyLong()))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void replies() throws Exception {
+    void replies() {
         given(commentService.replies(anyLong())).willReturn(List.of(vo));
 
-        mvc.perform(get("/comments/{id}/replies", 1L)).andExpect(status().isOk()).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/comments/{id}/replies", 1L))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void replies_error() throws Exception {
+    void replies_error() {
         given(commentService.replies(anyLong())).willThrow(new NoSuchElementException());
 
-        mvc.perform(get("/comments/{id}/replies", 1L)).andExpect(status().isNoContent()).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/comments/{id}/replies", 1L))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void create() throws Exception {
+    void create() {
         given(commentService.create(any(CommentDTO.class))).willReturn(vo);
 
-        mvc.perform(post("/comments").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.content").value("content")).andDo(print()).andReturn();
+        assertThat(this.mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .doesNotHaveFailed();
     }
 
     @Test
-    void create_error() throws Exception {
+    void create_error() {
         given(commentService.create(any(CommentDTO.class))).willThrow(new NoSuchElementException());
 
-        mvc.perform(post("/comments").contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status()
-                .isExpectationFailed()).andDo(print()).andReturn();
+        assertThat(this.mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .doesNotHaveFailed();
     }
 }

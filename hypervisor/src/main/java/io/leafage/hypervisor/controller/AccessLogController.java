@@ -15,8 +15,8 @@
 
 package io.leafage.hypervisor.controller;
 
+import io.leafage.hypervisor.domain.vo.AccessLogVO;
 import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * access log controller.
@@ -64,7 +66,8 @@ public class AccessLogController {
                                                       String sortBy, boolean descending, String filters) {
         Page<AccessLogVO> voPage;
         try {
-            voPage = accessLogService.retrieve(page, size, sortBy, descending, filters);
+            voPage = accessLogService.retrieve(page, size, sortBy, descending, filters)
+                    .map(entity -> toVO(entity, AccessLogVO.class));
         } catch (Exception e) {
             logger.error("Retrieve record error: ", e);
             return ResponseEntity.noContent().build();
@@ -83,7 +86,8 @@ public class AccessLogController {
     public ResponseEntity<AccessLogVO> fetch(@PathVariable Long id) {
         AccessLogVO vo;
         try {
-            vo = accessLogService.fetch(id);
+            vo = accessLogService.fetch(id)
+                    .map(entity -> toVO(entity, AccessLogVO.class)).orElse(null);
         } catch (Exception e) {
             logger.info("Fetch access log error: ", e);
             return ResponseEntity.noContent().build();

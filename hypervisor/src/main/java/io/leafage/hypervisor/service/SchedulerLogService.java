@@ -1,8 +1,8 @@
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.SchedulerLogDTO;
-import io.leafage.hypervisor.vo.SchedulerLogVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.dto.SchedulerLogDTO;
+import io.leafage.hypervisor.domain.vo.SchedulerLogVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * service for scheduler_logs.

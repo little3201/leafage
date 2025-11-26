@@ -14,15 +14,15 @@
  */
 package io.leafage.assets.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.leafage.assets.dto.PostDTO;
+import io.leafage.assets.domain.dto.PostDTO;
+import io.leafage.assets.domain.vo.PostVO;
 import io.leafage.assets.service.PostService;
-import io.leafage.assets.vo.PostVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,8 +31,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
-import java.util.Collections;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -73,21 +74,16 @@ class PostControllerTest {
         // 构造请求对象
         dto = new PostDTO();
         dto.setTitle("test");
+        dto.setBody("body");
+        dto.setSummary("summary");
         dto.setTags(Set.of("Code"));
-        dto.setTags(Collections.singleton("java"));
-        dto.setContent("content");
 
-        vo = new PostVO();
-        vo.setId(1L);
-        vo.setSummary("excerpt");
-        vo.setTitle(dto.getTitle());
-        vo.setTags(dto.getTags());
-
+        vo = new PostVO(1L, "test", "summary", "body", Set.of("Code"), Instant.now());
     }
 
     @Test
     void retrieve() throws Exception {
-        Page<PostVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<@NonNull PostVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(postService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(page);

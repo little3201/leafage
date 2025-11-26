@@ -14,17 +14,18 @@
  */
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.User;
-import io.leafage.hypervisor.dto.UserDTO;
+import io.leafage.hypervisor.domain.dto.UserDTO;
+import io.leafage.hypervisor.domain.vo.UserVO;
 import io.leafage.hypervisor.repository.UserRepository;
 import io.leafage.hypervisor.service.UserService;
-import io.leafage.hypervisor.vo.UserVO;
+import org.jspecify.annotations.NonNull;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
+import top.leafage.common.data.jpa.domain.User;
 
 /**
  * user service impl.
@@ -32,9 +33,10 @@ import top.leafage.common.DomainConverter;
  * @author wq li
  */
 @Service
-public class UserServiceImpl extends DomainConverter implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private static final BeanCopier copier = BeanCopier.create(UserDTO.class, User.class, false);
 
     /**
      * <p>Constructor for UserServiceImpl.</p>
@@ -49,14 +51,14 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public Page<UserVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull UserVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<User> spec = (root, query, cb) ->
+        Specification<@NonNull User> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return userRepository.findAll(spec, pageable)
-                .map(user -> convertToVO(user, UserVO.class));
+                .map(UserVO::from);
     }
 
     /**
@@ -67,7 +69,8 @@ public class UserServiceImpl extends DomainConverter implements UserService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.findById(id)
-                .map(user -> convertToVO(user, UserVO.class)).orElse(null);
+                .map(UserVO::from)
+                .orElse(null);
     }
 
     @Override
@@ -102,11 +105,8 @@ public class UserServiceImpl extends DomainConverter implements UserService {
      */
     @Override
     public UserVO create(UserDTO dto) {
-        User user = convertToDomain(dto, User.class);
-        user.setPassword("{noop}123456");
-
-        userRepository.saveAndFlush(user);
-        return convertToVO(user, UserVO.class);
+        User entity = userRepository.saveAndFlush(UserDTO.toEntity(dto, "{noop}123456"));
+        return UserVO.from(entity);
     }
 
     /**
@@ -116,11 +116,12 @@ public class UserServiceImpl extends DomainConverter implements UserService {
     public UserVO modify(Long id, UserDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        return userRepository.findById(id).map(existing -> {
-            User user = convert(dto, existing);
-            user = userRepository.save(user);
-            return convertToVO(user, UserVO.class);
-        }).orElseThrow();
+        User entity = userRepository.findById(id).map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return userRepository.save(existing);
+                })
+                .orElseThrow();
+        return UserVO.from(entity);
     }
 
     /**

@@ -16,10 +16,16 @@
 package io.leafage.hypervisor.domain;
 
 
-import io.leafage.hypervisor.domain.superclass.OperationLogModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
+
+import java.net.InetAddress;
 
 /**
  * entity class for operation log.
@@ -29,32 +35,86 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "operation_logs")
-public class OperationLog extends OperationLogModel {
+public class OperationLog extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String module;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
+    private String action;
+
+    private String params;
+
+    private String body;
+
+    private InetAddress ip;
+
+    private String sessionId;
+
+    private String userAgent;
+
+    private Integer statusCode;
 
 
-    public Long getId() {
-        return id;
+    public String getModule() {
+        return module;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setModule(String module) {
+        this.module = module;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getAction() {
+        return action;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getParams() {
+        return params;
+    }
+
+    public void setParams(String params) {
+        this.params = params;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public InetAddress getIp() {
+        return ip;
+    }
+
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
     }
 }

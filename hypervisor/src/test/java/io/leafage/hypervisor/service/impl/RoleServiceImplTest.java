@@ -16,9 +16,9 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Role;
-import io.leafage.hypervisor.dto.RoleDTO;
+import io.leafage.hypervisor.domain.dto.RoleDTO;
 import io.leafage.hypervisor.repository.RoleRepository;
-import io.leafage.hypervisor.vo.RoleVO;
+import io.leafage.hypervisor.domain.vo.RoleVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

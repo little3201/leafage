@@ -15,21 +15,24 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.Privilege;
-import io.leafage.hypervisor.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.vo.PrivilegeVO;
 import io.leafage.hypervisor.repository.*;
 import io.leafage.hypervisor.service.PrivilegeService;
-import io.leafage.hypervisor.vo.PrivilegeVO;
+import org.jspecify.annotations.NonNull;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.TreeNode;
-import top.leafage.common.jdbc.JdbcTreeAndDomainConverter;
+import top.leafage.common.data.domain.TreeNode;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static top.leafage.common.data.converter.ModelToTreeNodeConverter.convertToTree;
 
 /**
  * privilege service impl.
@@ -37,7 +40,7 @@ import java.util.stream.Collectors;
  * @author wq li
  */
 @Service
-public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, Long> implements PrivilegeService {
+public class PrivilegeServiceImpl implements PrivilegeService {
 
     public final RoleMembersRepository roleMembersRepository;
     public final RolePrivilegesRepository rolePrivilegesRepository;
@@ -45,6 +48,7 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     private final GroupMembersRepository groupMembersRepository;
     private final GroupRolesRepository groupRolesRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
+    private static final BeanCopier copier = BeanCopier.create(PrivilegeDTO.class, Privilege.class, false);
 
     /**
      * <p>Constructor for PrivilegeServiceImpl.</p>
@@ -66,27 +70,22 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
      * {@inheritDoc}
      */
     @Override
-    public Page<PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull PrivilegeVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Privilege> spec = (root, query, cb) ->
+        Specification<@NonNull Privilege> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
         spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
 
         return privilegeRepository.findAll(spec, pageable)
-                .map(privilege -> {
-                    PrivilegeVO vo = convertToVO(privilege, PrivilegeVO.class);
-                    long count = privilegeRepository.countBySuperiorId(privilege.getId());
-                    vo.setCount(count);
-                    return vo;
-                });
+                .map(PrivilegeVO::from);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<TreeNode<Long>> tree(String username) {
+    public List<TreeNode<@NonNull Long>> tree(String username) {
         Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         Map<Long, Set<String>> privilegeActionsMap = new HashMap<>();
@@ -138,13 +137,16 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public List<PrivilegeVO> subset(Long superiorId) {
         Assert.notNull(superiorId, String.format(_MUST_NOT_BE_NULL, "superiorId"));
 
-        return privilegeRepository.findAllBySuperiorId(superiorId).stream()
-                .map(privilege -> {
-                    PrivilegeVO vo = convertToVO(privilege, PrivilegeVO.class);
-                    long count = privilegeRepository.countBySuperiorId(privilege.getId());
-                    vo.setCount(count);
-                    return vo;
-                }).toList();
+        return privilegeRepository.findAllBySuperiorId(superiorId)
+                .stream().map(PrivilegeVO::from)
+                .toList();
+    }
+
+    @Override
+    public Long countBySuperiorId(Long superiorId) {
+        Assert.notNull(superiorId, String.format(_MUST_NOT_BE_NULL, "superiorId"));
+
+        return privilegeRepository.countBySuperiorId(superiorId);
     }
 
     /**
@@ -155,10 +157,13 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return privilegeRepository.findById(id)
-                .map(privilege -> convertToVO(privilege, PrivilegeVO.class))
+                .map(PrivilegeVO::from)
                 .orElse(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -173,12 +178,12 @@ public class PrivilegeServiceImpl extends JdbcTreeAndDomainConverter<Privilege, 
     public PrivilegeVO modify(Long id, PrivilegeDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        return privilegeRepository.findById(id).map(existing -> {
-                    Privilege privilege = convert(dto, existing);
-                    privilege = privilegeRepository.save(privilege);
-                    return convertToVO(privilege, PrivilegeVO.class);
+        Privilege entity = privilegeRepository.findById(id).map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return privilegeRepository.save(existing);
                 })
                 .orElseThrow();
+        return PrivilegeVO.from(entity);
     }
 
     private void mergeActions(Long privilegeId, Set<String> actions, Map<Long, Set<String>> map) {

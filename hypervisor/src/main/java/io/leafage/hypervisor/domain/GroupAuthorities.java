@@ -15,7 +15,11 @@
 package io.leafage.hypervisor.domain;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * entity class for group roles.
@@ -24,16 +28,12 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "group_authorities")
-public class GroupAuthorities {
+public class GroupAuthorities extends AbstractPersistable<@NonNull Long> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "group_id", nullable = false)
+    @Column(nullable = false)
     private Long groupId;
 
-    @Column(name = "authority", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String authority;
 
 
@@ -45,13 +45,6 @@ public class GroupAuthorities {
         this.authority = authority;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getGroupId() {
         return groupId;

@@ -16,17 +16,15 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.AccessLog;
-import io.leafage.hypervisor.dto.AccessLogDTO;
+import io.leafage.hypervisor.domain.vo.AccessLogVO;
 import io.leafage.hypervisor.repository.AccessLogRepository;
 import io.leafage.hypervisor.service.AccessLogService;
-import io.leafage.hypervisor.vo.AccessLogVO;
-import org.springframework.cglib.beans.BeanCopier;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
 /**
  * access log service impl.
@@ -34,7 +32,7 @@ import top.leafage.common.DomainConverter;
  * @author wq li
  */
 @Service
-public class AccessLogServiceImpl extends DomainConverter implements AccessLogService {
+public class AccessLogServiceImpl implements AccessLogService {
 
     private final AccessLogRepository accessLogRepository;
 
@@ -51,14 +49,13 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
      * {@inheritDoc}
      */
     @Override
-    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<AccessLog> spec = (root, query, cb) ->
+        Specification<@NonNull AccessLog> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
-        return accessLogRepository.findAll(spec, pageable)
-                .map(accessLog -> convertToVO(accessLog, AccessLogVO.class));
+        return accessLogRepository.findAll(spec, pageable).map(AccessLogVO::from);
     }
 
     @Override
@@ -66,20 +63,8 @@ public class AccessLogServiceImpl extends DomainConverter implements AccessLogSe
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return accessLogRepository.findById(id)
-                .map(accessLog -> convertToVO(accessLog, AccessLogVO.class)).orElse(null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AccessLogVO create(AccessLogDTO dto) {
-        AccessLog accessLog = new AccessLog();
-        BeanCopier copier = BeanCopier.create(AccessLogDTO.class, AccessLog.class, false);
-        copier.copy(dto, accessLog, null);
-
-        accessLogRepository.saveAndFlush(accessLog);
-        return convertToVO(accessLog, AccessLogVO.class);
+                .map(AccessLogVO::from)
+                .orElse(null);
     }
 
     @Override

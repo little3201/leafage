@@ -15,10 +15,15 @@
 
 package io.leafage.hypervisor.domain;
 
-import io.leafage.hypervisor.domain.superclass.DictionaryModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
 
 /**
  * entity class for dictionary.
@@ -28,32 +33,58 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "dictionaries")
-public class Dictionary extends DictionaryModel {
+public class Dictionary extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @NotBlank
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
+    @Column(name = "superior_id")
+    private Long superiorId;
+
+    private String description;
+
+    private boolean enabled = true;
 
 
-    public Long getId() {
-        return id;
+    public Dictionary() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Dictionary(String name, Long superiorId, String description) {
+        this.name = name;
+        this.superiorId = superiorId;
+        this.description = description;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getName() {
+        return name;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getSuperiorId() {
+        return superiorId;
+    }
+
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

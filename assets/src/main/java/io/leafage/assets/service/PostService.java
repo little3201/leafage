@@ -14,9 +14,9 @@
  */
 package io.leafage.assets.service;
 
-import io.leafage.assets.dto.PostDTO;
-import io.leafage.assets.vo.PostVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.assets.domain.dto.PostDTO;
+import io.leafage.assets.domain.vo.PostVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * posts service.

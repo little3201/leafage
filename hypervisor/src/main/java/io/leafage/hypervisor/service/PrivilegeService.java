@@ -14,10 +14,11 @@
  */
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.PrivilegeDTO;
-import io.leafage.hypervisor.vo.PrivilegeVO;
-import top.leafage.common.TreeNode;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import io.leafage.hypervisor.domain.vo.PrivilegeVO;
+import org.jspecify.annotations.NonNull;
+import top.leafage.common.data.domain.TreeNode;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public interface PrivilegeService extends JpaCrudService<PrivilegeDTO, Privilege
      * @param username username
      * @return 树结构数据集
      */
-    List<TreeNode<Long>> tree(String username);
+    List<TreeNode<@NonNull Long>> tree(String username);
 
     /**
      * get subset
@@ -43,4 +44,7 @@ public interface PrivilegeService extends JpaCrudService<PrivilegeDTO, Privilege
      * @return 结果
      */
     List<PrivilegeVO> subset(Long superiorId);
+
+
+    Long countBySuperiorId(Long superiorId);
 }

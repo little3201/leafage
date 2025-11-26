@@ -15,9 +15,9 @@
 
 package io.leafage.assets.service;
 
-import io.leafage.assets.dto.RegionDTO;
-import io.leafage.assets.vo.RegionVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.assets.domain.dto.RegionDTO;
+import io.leafage.assets.domain.vo.RegionVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * region service.

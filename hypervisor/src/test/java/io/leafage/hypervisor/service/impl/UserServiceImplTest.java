@@ -14,10 +14,9 @@
  */
 package io.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.User;
-import io.leafage.hypervisor.dto.UserDTO;
+import io.leafage.hypervisor.domain.dto.UserDTO;
 import io.leafage.hypervisor.repository.UserRepository;
-import io.leafage.hypervisor.vo.UserVO;
+import io.leafage.hypervisor.domain.vo.UserVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

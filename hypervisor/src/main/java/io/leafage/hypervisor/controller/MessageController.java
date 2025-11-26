@@ -15,9 +15,10 @@
 
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.dto.MessageDTO;
+import io.leafage.hypervisor.domain.Message;
+import io.leafage.hypervisor.domain.dto.MessageDTO;
+import io.leafage.hypervisor.domain.vo.MessageVO;
 import io.leafage.hypervisor.service.MessageService;
-import io.leafage.hypervisor.vo.MessageVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+
+import static top.leafage.common.data.ObjectConverter.toEntity;
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * messages controller.
@@ -66,7 +70,8 @@ public class MessageController {
                                                     String sortBy, boolean descending, Principal principal) {
         Page<MessageVO> voPage;
         try {
-            voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()));
+            voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()))
+                    .map(entity -> toVO(entity, MessageVO.class));
         } catch (Exception e) {
             logger.info("Retrieve message error: ", e);
             return ResponseEntity.noContent().build();
@@ -84,7 +89,9 @@ public class MessageController {
     public ResponseEntity<MessageVO> fetch(@PathVariable Long id) {
         MessageVO vo;
         try {
-            vo = messageService.fetch(id);
+            vo = messageService.fetch(id)
+                    .map(entity -> toVO(entity, MessageVO.class))
+                    .orElse(null);
         } catch (Exception e) {
             logger.info("Fetch message error: ", e);
             return ResponseEntity.noContent().build();
@@ -106,7 +113,8 @@ public class MessageController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            vo = messageService.create(dto);
+            Message entity = messageService.create(toEntity(dto, Message.class));
+            vo = toVO(entity, MessageVO.class);
         } catch (Exception e) {
             logger.info("Create message error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

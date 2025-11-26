@@ -15,10 +15,10 @@
 
 package io.leafage.hypervisor.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.leafage.hypervisor.dto.MessageDTO;
+import tools.jackson.databind.ObjectMapper;
+import io.leafage.hypervisor.domain.dto.MessageDTO;
 import io.leafage.hypervisor.service.MessageService;
-import io.leafage.hypervisor.vo.MessageVO;
+import io.leafage.hypervisor.domain.vo.MessageVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -24,8 +24,9 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Set;
 
-import static top.leafage.common.DomainConverter._MUST_NOT_BE_EMPTY;
-import static top.leafage.common.DomainConverter._MUST_NOT_BE_NULL;
+import static top.leafage.common.data.AbstractService._MUST_NOT_BE_EMPTY;
+import static top.leafage.common.data.AbstractService._MUST_NOT_BE_NULL;
+
 
 /**
  * group members service impl.

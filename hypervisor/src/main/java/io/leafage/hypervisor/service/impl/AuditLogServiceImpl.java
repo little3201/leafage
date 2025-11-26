@@ -16,17 +16,15 @@
 package io.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.AuditLog;
-import io.leafage.hypervisor.dto.AuditLogDTO;
+import io.leafage.hypervisor.domain.vo.AuditLogVO;
 import io.leafage.hypervisor.repository.AuditLogRepository;
 import io.leafage.hypervisor.service.AuditLogService;
-import io.leafage.hypervisor.vo.AuditLogVO;
-import org.springframework.cglib.beans.BeanCopier;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
 /**
  * audit log service impl.
@@ -34,7 +32,7 @@ import top.leafage.common.DomainConverter;
  * @author wq li
  */
 @Service
-public class AuditLogServiceImpl extends DomainConverter implements AuditLogService {
+public class AuditLogServiceImpl implements AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
@@ -51,14 +49,14 @@ public class AuditLogServiceImpl extends DomainConverter implements AuditLogServ
      * {@inheritDoc}
      */
     @Override
-    public Page<AuditLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull AuditLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<AuditLog> spec = (root, query, cb) ->
+        Specification<@NonNull AuditLog> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return auditLogRepository.findAll(spec, pageable)
-                .map(auditLog -> convertToVO(auditLog, AuditLogVO.class));
+                .map(AuditLogVO::from);
     }
 
     @Override
@@ -66,20 +64,8 @@ public class AuditLogServiceImpl extends DomainConverter implements AuditLogServ
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return auditLogRepository.findById(id)
-                .map(auditLog -> convertToVO(auditLog, AuditLogVO.class)).orElse(null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AuditLogVO create(AuditLogDTO dto) {
-        AuditLog auditLog = new AuditLog();
-        BeanCopier copier = BeanCopier.create(AuditLogDTO.class, AuditLog.class, false);
-        copier.copy(dto, auditLog, null);
-
-        auditLogRepository.saveAndFlush(auditLog);
-        return convertToVO(auditLog, AuditLogVO.class);
+                .map(AuditLogVO::from)
+                .orElse(null);
     }
 
     @Override

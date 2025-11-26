@@ -16,7 +16,7 @@
 package io.leafage.hypervisor.controller;
 
 import io.leafage.hypervisor.service.OperationLogService;
-import io.leafage.hypervisor.vo.OperationLogVO;
+import io.leafage.hypervisor.domain.vo.OperationLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

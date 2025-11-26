@@ -16,9 +16,10 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.FileRecord;
+import io.leafage.assets.domain.vo.FileRecordVO;
 import io.leafage.assets.repository.FileRecordRepository;
 import io.leafage.assets.service.FileRecordService;
-import io.leafage.assets.vo.FileRecordVO;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -27,12 +28,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.DomainConverter;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Objects;
 
 /**
  * file service impl.
@@ -40,7 +41,7 @@ import java.nio.file.Files;
  * @author wq li
  */
 @Service
-public class FileRecordServiceImpl extends DomainConverter implements FileRecordService {
+public class FileRecordServiceImpl implements FileRecordService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileRecordServiceImpl.class);
 
@@ -51,14 +52,14 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
     }
 
     @Override
-    public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<FileRecord> spec = (root, query, cb) ->
+        Specification<@NonNull FileRecord> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
         return fileRecordRepository.findAll(spec, pageable)
-                .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class));
+                .map(FileRecordVO::from);
     }
 
     @Override
@@ -66,7 +67,7 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return fileRecordRepository.findById(id)
-                .map(fileRecord -> convertToVO(fileRecord, FileRecordVO.class))
+                .map(FileRecordVO::from)
                 .orElse(null);
     }
 
@@ -83,10 +84,10 @@ public class FileRecordServiceImpl extends DomainConverter implements FileRecord
     public FileRecordVO upload(MultipartFile file) {
         FileRecord fileRecord = new FileRecord();
         fileRecord.setName(file.getName());
-        fileRecord.setMimeType(file.getContentType());
+        fileRecord.setMimeType(Objects.requireNonNull(file.getContentType()));
         fileRecord.setSize(file.getSize());
         fileRecord = fileRecordRepository.saveAndFlush(fileRecord);
-        return convertToVO(fileRecord, FileRecordVO.class);
+        return FileRecordVO.from(fileRecord);
     }
 
     @Override

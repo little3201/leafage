@@ -14,15 +14,16 @@
  */
 package io.leafage.hypervisor.controller;
 
+import io.leafage.hypervisor.domain.Group;
 import io.leafage.hypervisor.domain.GroupMembers;
 import io.leafage.hypervisor.domain.GroupPrivileges;
 import io.leafage.hypervisor.domain.GroupRoles;
-import io.leafage.hypervisor.dto.GroupDTO;
+import io.leafage.hypervisor.domain.dto.GroupDTO;
+import io.leafage.hypervisor.domain.vo.GroupVO;
 import io.leafage.hypervisor.service.GroupMembersService;
 import io.leafage.hypervisor.service.GroupPrivilegesService;
 import io.leafage.hypervisor.service.GroupRolesService;
 import io.leafage.hypervisor.service.GroupService;
-import io.leafage.hypervisor.vo.GroupVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +33,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.TreeNode;
+import top.leafage.common.data.TreeNode;
 import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
+
+import static top.leafage.common.data.ObjectConverter.toEntity;
+import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * group controller.
@@ -85,7 +89,8 @@ public class GroupController {
                                                   String sortBy, boolean descending, String filters) {
         Page<GroupVO> voPage;
         try {
-            voPage = groupService.retrieve(page, size, sortBy, descending, filters);
+            voPage = groupService.retrieve(page, size, sortBy, descending, filters)
+                    .map(entity -> toVO(entity, GroupVO.class));
         } catch (Exception e) {
             logger.info("Retrieve group error: ", e);
             return ResponseEntity.noContent().build();
@@ -122,7 +127,9 @@ public class GroupController {
     public ResponseEntity<GroupVO> fetch(@PathVariable Long id) {
         GroupVO groupVO;
         try {
-            groupVO = groupService.fetch(id);
+            groupVO = groupService.fetch(id)
+                    .map(entity -> toVO(entity, GroupVO.class))
+                    .orElse(null);
         } catch (Exception e) {
             logger.info("Fetch group error: ", e);
             return ResponseEntity.noContent().build();
@@ -139,18 +146,19 @@ public class GroupController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:create')")
     @PostMapping
     public ResponseEntity<GroupVO> create(@Valid @RequestBody GroupDTO dto) {
-        GroupVO groupVO;
+        GroupVO vo;
         try {
             boolean existed = groupService.exists(dto.getName(), null);
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            groupVO = groupService.create(dto);
+            Group entity = groupService.create(toEntity(dto, Group.class));
+            vo = toVO(entity, GroupVO.class);
         } catch (Exception e) {
             logger.error("Create group error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(groupVO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
     /**
@@ -163,18 +171,19 @@ public class GroupController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<GroupVO> modify(@PathVariable Long id, @RequestBody GroupDTO dto) {
-        GroupVO groupVO;
+        GroupVO vo;
         try {
             boolean existed = groupService.exists(dto.getName(), id);
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            groupVO = groupService.modify(id, dto);
+            Group entity = groupService.modify(id, toEntity(dto, Group.class));
+            vo = toVO(entity, GroupVO.class);
         } catch (Exception e) {
             logger.error("Modify group error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
-        return ResponseEntity.accepted().body(groupVO);
+        return ResponseEntity.accepted().body(vo);
     }
 
     /**
@@ -224,8 +233,12 @@ public class GroupController {
     public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) {
         List<GroupVO> voList;
         try {
-            List<GroupDTO> dtoList = ExcelReader.read(file.getInputStream(), GroupDTO.class);
-            voList = groupService.createAll(dtoList);
+            List<Group> list = ExcelReader.read(file.getInputStream(), GroupDTO.class)
+                    .stream().map(dto -> toEntity(dto, Group.class))
+                    .toList();
+            voList = groupService.createAll(list)
+                    .stream().map(entity -> toVO(entity, GroupVO.class))
+                    .toList();
         } catch (Exception e) {
             logger.error("Import groups error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

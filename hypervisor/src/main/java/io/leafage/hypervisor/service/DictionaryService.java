@@ -15,9 +15,10 @@
 
 package io.leafage.hypervisor.service;
 
-import io.leafage.hypervisor.dto.DictionaryDTO;
-import io.leafage.hypervisor.vo.DictionaryVO;
-import top.leafage.common.jpa.JpaCrudService;
+import io.leafage.hypervisor.domain.Dictionary;
+import io.leafage.hypervisor.domain.dto.DictionaryDTO;
+import io.leafage.hypervisor.domain.vo.DictionaryVO;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 import java.util.List;
 

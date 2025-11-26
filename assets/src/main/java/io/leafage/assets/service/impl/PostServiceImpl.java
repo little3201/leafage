@@ -15,12 +15,11 @@
 package io.leafage.assets.service.impl;
 
 import io.leafage.assets.domain.Post;
-import io.leafage.assets.domain.PostContent;
-import io.leafage.assets.dto.PostDTO;
-import io.leafage.assets.repository.PostContentRepository;
+import io.leafage.assets.domain.dto.PostDTO;
+import io.leafage.assets.domain.vo.PostVO;
 import io.leafage.assets.repository.PostRepository;
 import io.leafage.assets.service.PostService;
-import io.leafage.assets.vo.PostVO;
+import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import top.leafage.common.DomainConverter;
 
-import java.util.Optional;
 
 /**
  * posts service impl.
@@ -38,33 +35,32 @@ import java.util.Optional;
  * @author wq li
  */
 @Service
-public class PostServiceImpl extends DomainConverter implements PostService {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostContentRepository postContentRepository;
+    private static final BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
 
     /**
      * <p>Constructor for PostsServiceImpl.</p>
      *
-     * @param postRepository        a {@link PostRepository} object
-     * @param postContentRepository a {@link PostContentRepository} object
+     * @param postRepository a {@link PostRepository} object
      */
-    public PostServiceImpl(PostRepository postRepository, PostContentRepository postContentRepository) {
+    public PostServiceImpl(PostRepository postRepository) {
         this.postRepository = postRepository;
-        this.postContentRepository = postContentRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<PostVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<@NonNull PostVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
 
-        Specification<Post> spec = (root, query, cb) ->
+        Specification<@NonNull Post> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
-        return postRepository.findAll(spec, pageable).map(post -> convertToVO(post, PostVO.class));
+        return postRepository.findAll(spec, pageable)
+                .map(PostVO::from);
     }
 
     /**
@@ -73,14 +69,10 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     @Override
     public PostVO fetch(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-        //查询基本信息
-        PostVO vo = postRepository.findById(id).map(post -> convertToVO(post, PostVO.class)).orElse(null);
-        if (vo == null) {
-            return null;
-        }
-        // 获取内容详情
-        postContentRepository.getByPostId(id).ifPresent(postContent -> vo.setContent(postContent.getBody()));
-        return vo;
+
+        return postRepository.findById(id)
+                .map(PostVO::from)
+                .orElse(null);
     }
 
     /**
@@ -101,25 +93,8 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PostVO create(PostDTO dto) {
-        Post post = new Post();
-        BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
-        copier.copy(dto, post, null);
-
-        // 保存并立即刷盘
-        post = postRepository.saveAndFlush(post);
-        //保存帖子内容
-        Optional<PostContent> optional = postContentRepository.getByPostId(post.getId());
-        PostContent postContent;
-        if (optional.isPresent()) {
-            postContent = optional.get();
-        } else {
-            postContent = new PostContent();
-            postContent.setPostId(post.getId());
-        }
-        postContent.setBody(dto.getContent());
-        postContentRepository.saveAndFlush(postContent);
-
-        return convertToVO(post, PostVO.class);
+        Post entity = postRepository.saveAndFlush(PostDTO.toEntity(dto));
+        return PostVO.from(entity);
     }
 
     /**
@@ -128,29 +103,14 @@ public class PostServiceImpl extends DomainConverter implements PostService {
     @Override
     public PostVO modify(Long id, PostDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-        //查询基本信息
-        Post post = postRepository.findById(id).orElse(null);
-        if (post == null) {
-            return null;
-        }
-        BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
-        copier.copy(dto, post, null);
 
-        post = postRepository.save(post);
-
-        //保存文章内容
-        Optional<PostContent> optional = postContentRepository.getByPostId(id);
-        PostContent postContent;
-        if (optional.isPresent()) {
-            postContent = optional.get();
-        } else {
-            postContent = new PostContent();
-            postContent.setPostId(id);
-        }
-        postContent.setBody(dto.getContent());
-        postContentRepository.save(postContent);
-
-        return convertToVO(post, PostVO.class);
+        return postRepository.findById(id)
+                .map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return postRepository.save(existing);
+                })
+                .map(PostVO::from)
+                .orElseThrow();
     }
 
     /**

@@ -15,10 +15,10 @@
 
 package io.leafage.assets.service;
 
-import io.leafage.assets.dto.FileRecordDTO;
-import io.leafage.assets.vo.FileRecordVO;
+import io.leafage.assets.domain.dto.FileRecordDTO;
+import io.leafage.assets.domain.vo.FileRecordVO;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.jpa.JpaCrudService;
+import top.leafage.common.data.jpa.JpaCrudService;
 
 import java.io.OutputStream;
 

@@ -16,10 +16,15 @@
 package io.leafage.hypervisor.domain;
 
 
-import io.leafage.hypervisor.domain.superclass.AuditLogModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.jpa.domain.AbstractAuditable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import top.leafage.common.jpa.JpaAuditMetadata;
+import top.leafage.common.data.jpa.domain.User;
+
+import java.net.InetAddress;
 
 /**
  * entity class for audit log.
@@ -29,32 +34,86 @@ import top.leafage.common.jpa.JpaAuditMetadata;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "audit_logs")
-public class AuditLog extends AuditLogModel {
+public class AuditLog extends AbstractAuditable<@NonNull User, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String operation;
 
-    @Embedded
-    private JpaAuditMetadata auditMetadata = new JpaAuditMetadata();
+    private String resource;
+
+    private String oldValue;
+
+    private String newValue;
+
+    private InetAddress ip;
+
+    private String location;
+
+    private Integer statusCode;
+
+    private Long operatedTimes;
 
 
-    public Long getId() {
-        return id;
+    public String getOperation() {
+        return operation;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
-    public JpaAuditMetadata getAuditMetadata() {
-        return auditMetadata;
+    public String getResource() {
+        return resource;
     }
 
-    public void setAuditMetadata(JpaAuditMetadata auditMetadata) {
-        this.auditMetadata = auditMetadata;
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
+
+    public String getOldValue() {
+        return oldValue;
+    }
+
+    public void setOldValue(String oldValue) {
+        this.oldValue = oldValue;
+    }
+
+    public String getNewValue() {
+        return newValue;
+    }
+
+    public void setNewValue(String newValue) {
+        this.newValue = newValue;
+    }
+
+    public InetAddress getIp() {
+        return ip;
+    }
+
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public Long getOperatedTimes() {
+        return operatedTimes;
+    }
+
+    public void setOperatedTimes(Long operatedTimes) {
+        this.operatedTimes = operatedTimes;
     }
 }

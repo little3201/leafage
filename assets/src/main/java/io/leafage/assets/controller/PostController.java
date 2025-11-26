@@ -14,9 +14,9 @@
  */
 package io.leafage.assets.controller;
 
-import io.leafage.assets.dto.PostDTO;
+import io.leafage.assets.domain.dto.PostDTO;
 import io.leafage.assets.service.PostService;
-import io.leafage.assets.vo.PostVO;
+import io.leafage.assets.domain.vo.PostVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
