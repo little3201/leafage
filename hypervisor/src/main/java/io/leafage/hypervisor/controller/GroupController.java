@@ -14,7 +14,6 @@
  */
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.domain.Group;
 import io.leafage.hypervisor.domain.GroupMembers;
 import io.leafage.hypervisor.domain.GroupPrivileges;
 import io.leafage.hypervisor.domain.GroupRoles;
@@ -33,14 +32,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.common.data.TreeNode;
+import top.leafage.common.data.domain.TreeNode;
 import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
-
-import static top.leafage.common.data.ObjectConverter.toEntity;
-import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * group controller.
@@ -89,8 +85,7 @@ public class GroupController {
                                                   String sortBy, boolean descending, String filters) {
         Page<GroupVO> voPage;
         try {
-            voPage = groupService.retrieve(page, size, sortBy, descending, filters)
-                    .map(entity -> toVO(entity, GroupVO.class));
+            voPage = groupService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve group error: ", e);
             return ResponseEntity.noContent().build();
@@ -127,9 +122,7 @@ public class GroupController {
     public ResponseEntity<GroupVO> fetch(@PathVariable Long id) {
         GroupVO groupVO;
         try {
-            groupVO = groupService.fetch(id)
-                    .map(entity -> toVO(entity, GroupVO.class))
-                    .orElse(null);
+            groupVO = groupService.fetch(id);
         } catch (Exception e) {
             logger.info("Fetch group error: ", e);
             return ResponseEntity.noContent().build();
@@ -152,8 +145,7 @@ public class GroupController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Group entity = groupService.create(toEntity(dto, Group.class));
-            vo = toVO(entity, GroupVO.class);
+            vo = groupService.create(dto);
         } catch (Exception e) {
             logger.error("Create group error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -177,8 +169,7 @@ public class GroupController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Group entity = groupService.modify(id, toEntity(dto, Group.class));
-            vo = toVO(entity, GroupVO.class);
+            vo = groupService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify group error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -233,12 +224,8 @@ public class GroupController {
     public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) {
         List<GroupVO> voList;
         try {
-            List<Group> list = ExcelReader.read(file.getInputStream(), GroupDTO.class)
-                    .stream().map(dto -> toEntity(dto, Group.class))
-                    .toList();
-            voList = groupService.createAll(list)
-                    .stream().map(entity -> toVO(entity, GroupVO.class))
-                    .toList();
+            List<GroupDTO> dtoList = ExcelReader.read(file.getInputStream(), GroupDTO.class);
+            voList = groupService.createAll(dtoList);
         } catch (Exception e) {
             logger.error("Import groups error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

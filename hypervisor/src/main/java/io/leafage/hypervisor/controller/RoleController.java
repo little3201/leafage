@@ -14,7 +14,6 @@
  */
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.domain.Role;
 import io.leafage.hypervisor.domain.RoleMembers;
 import io.leafage.hypervisor.domain.RolePrivileges;
 import io.leafage.hypervisor.domain.dto.RoleDTO;
@@ -35,9 +34,6 @@ import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 import java.util.Set;
-
-import static top.leafage.common.data.ObjectConverter.toEntity;
-import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * role controller.
@@ -84,8 +80,7 @@ public class RoleController {
                                                  String sortBy, boolean descending, String filters) {
         Page<RoleVO> voPage;
         try {
-            voPage = roleService.retrieve(page, size, sortBy, descending, filters)
-                    .map(entity -> toVO(entity, RoleVO.class));
+            voPage = roleService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve role error: ", e);
             return ResponseEntity.noContent().build();
@@ -104,9 +99,7 @@ public class RoleController {
     public ResponseEntity<RoleVO> fetch(@PathVariable Long id) {
         RoleVO vo;
         try {
-            vo = roleService.fetch(id)
-                    .map(entity -> toVO(entity, RoleVO.class))
-                    .orElse(null);
+            vo = roleService.fetch(id);
         } catch (Exception e) {
             logger.info("Fetch role error: ", e);
             return ResponseEntity.noContent().build();
@@ -129,8 +122,7 @@ public class RoleController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Role entity = roleService.create(toEntity(dto, Role.class));
-            vo = toVO(entity, RoleVO.class);
+            vo = roleService.create(dto);
         } catch (Exception e) {
             logger.error("Create role error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -154,8 +146,7 @@ public class RoleController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Role entity = roleService.modify(id, toEntity(dto, Role.class));
-            vo = toVO(entity, RoleVO.class);
+            vo = roleService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify role error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -210,12 +201,8 @@ public class RoleController {
     public ResponseEntity<List<RoleVO>> importFromFile(MultipartFile file) {
         List<RoleVO> voList;
         try {
-            List<Role> dtoList = ExcelReader.read(file.getInputStream(), RoleDTO.class)
-                    .stream().map(dto -> toEntity(dto, Role.class))
-                    .toList();
-            voList = roleService.createAll(dtoList)
-                    .stream().map(entity -> toVO(entity, RoleVO.class))
-                    .toList();
+            List<RoleDTO> dtoList = ExcelReader.read(file.getInputStream(), RoleDTO.class);
+            voList = roleService.createAll(dtoList);
         } catch (Exception e) {
             logger.error("Import role error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

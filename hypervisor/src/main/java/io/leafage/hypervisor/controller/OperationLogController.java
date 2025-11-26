@@ -25,8 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static top.leafage.common.data.ObjectConverter.toVO;
-
 /**
  * operation log controller.
  *
@@ -66,8 +64,7 @@ public class OperationLogController {
                                                          String sortBy, boolean descending, String filters) {
         Page<OperationLogVO> voPage;
         try {
-            voPage = operationLogService.retrieve(page, size, sortBy, descending, filters)
-                    .map(entity -> toVO(entity, OperationLogVO.class));
+            voPage = operationLogService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve record error: ", e);
             return ResponseEntity.noContent().build();
@@ -86,9 +83,7 @@ public class OperationLogController {
     public ResponseEntity<OperationLogVO> fetch(@PathVariable Long id) {
         OperationLogVO vo;
         try {
-            vo = operationLogService.fetch(id)
-                    .map(entity -> toVO(entity, OperationLogVO.class))
-                    .orElse(null);
+            vo = operationLogService.fetch(id);
         } catch (Exception e) {
             logger.info("Fetch access log error: ", e);
             return ResponseEntity.noContent().build();

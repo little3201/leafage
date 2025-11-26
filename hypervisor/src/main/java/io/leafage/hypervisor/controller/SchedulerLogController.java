@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static top.leafage.common.data.ObjectConverter.toVO;
-
 /**
  * controller for scheduler_logs.
  *
@@ -45,8 +43,7 @@ public class SchedulerLogController {
                                                          String sortBy, boolean descending, String filters) {
         Page<SchedulerLogVO> voPage;
         try {
-            voPage = schedulerLogService.retrieve(page, size, sortBy, descending, filters)
-                    .map(entity -> toVO(entity, SchedulerLogVO.class));
+            voPage = schedulerLogService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve schedulerlogs occurred an error: ", e);
             return ResponseEntity.noContent().build();
@@ -65,9 +62,7 @@ public class SchedulerLogController {
     public ResponseEntity<SchedulerLogVO> fetch(@PathVariable Long id) {
         SchedulerLogVO vo;
         try {
-            vo = schedulerLogService.fetch(id)
-                    .map(entity -> toVO(entity, SchedulerLogVO.class))
-                    .orElse(null);
+            vo = schedulerLogService.fetch(id);
         } catch (Exception e) {
             logger.error("Fetch scheduler logs occurred an error: ", e);
             return ResponseEntity.noContent().build();

@@ -15,7 +15,6 @@
 
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.domain.Dictionary;
 import io.leafage.hypervisor.domain.dto.DictionaryDTO;
 import io.leafage.hypervisor.domain.vo.DictionaryVO;
 import io.leafage.hypervisor.service.DictionaryService;
@@ -31,9 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
-
-import static top.leafage.common.data.ObjectConverter.toEntity;
-import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * dictionary controller.
@@ -74,8 +70,7 @@ public class DictionaryController {
                                                        String sortBy, boolean descending, String filters) {
         Page<DictionaryVO> voPage;
         try {
-            voPage = dictionaryService.retrieve(page, size, sortBy, descending, filters)
-                    .map(entity -> toVO(entity, DictionaryVO.class));
+            voPage = dictionaryService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.error("Retrieve dictionary error: ", e);
             return ResponseEntity.noContent().build();
@@ -94,9 +89,7 @@ public class DictionaryController {
     public ResponseEntity<List<DictionaryVO>> subset(@PathVariable Long id) {
         List<DictionaryVO> voList;
         try {
-            voList = dictionaryService.subset(id)
-                    .stream().map(entity -> toVO(entity, DictionaryVO.class))
-                    .toList();
+            voList = dictionaryService.subset(id);
         } catch (Exception e) {
             logger.info("Retrieve dictionary subset error: ", e);
             return ResponseEntity.noContent().build();
@@ -115,9 +108,7 @@ public class DictionaryController {
     public ResponseEntity<DictionaryVO> fetch(@PathVariable Long id) {
         DictionaryVO vo;
         try {
-            vo = dictionaryService.fetch(id)
-                    .map(entity -> toVO(entity, DictionaryVO.class))
-                    .orElse(null);
+            vo = dictionaryService.fetch(id);
         } catch (Exception e) {
             logger.error("Fetch dictionary error: ", e);
             return ResponseEntity.noContent().build();
@@ -140,8 +131,7 @@ public class DictionaryController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Dictionary entity = dictionaryService.create(toEntity(dto, Dictionary.class));
-            vo = toVO(entity, DictionaryVO.class);
+            vo = dictionaryService.create(dto);
         } catch (Exception e) {
             logger.error("Create dictionary error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -165,8 +155,7 @@ public class DictionaryController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Dictionary entity = dictionaryService.modify(id, toEntity(dto, Dictionary.class));
-            vo = toVO(entity, DictionaryVO.class);
+            vo = dictionaryService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify dictionary error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -221,12 +210,8 @@ public class DictionaryController {
     public ResponseEntity<List<DictionaryVO>> importFromFile(MultipartFile file) {
         List<DictionaryVO> voList;
         try {
-            List<Dictionary> list = ExcelReader.read(file.getInputStream(), DictionaryDTO.class)
-                    .stream().map(dto -> toEntity(dto, Dictionary.class))
-                    .toList();
-            voList = dictionaryService.createAll(list)
-                    .stream().map(entity -> toVO(entity, DictionaryVO.class))
-                    .toList();
+            List<DictionaryDTO> dtoList = ExcelReader.read(file.getInputStream(), DictionaryDTO.class);
+            voList = dictionaryService.createAll(dtoList);
         } catch (Exception e) {
             logger.error("Import dictionary error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

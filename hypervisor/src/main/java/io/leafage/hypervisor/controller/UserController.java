@@ -30,9 +30,6 @@ import top.leafage.common.poi.ExcelReader;
 
 import java.util.List;
 
-import static top.leafage.common.data.ObjectConverter.toEntity;
-import static top.leafage.common.data.ObjectConverter.toVO;
-
 /**
  * user controller.
  *
@@ -72,8 +69,7 @@ public class UserController {
                                                  String sortBy, boolean descending, String filters) {
         Page<UserVO> voPage;
         try {
-            voPage = userService.retrieve(page, size, sortBy, descending, filters)
-                    .map(entity -> toVO(entity, UserVO.class));
+            voPage = userService.retrieve(page, size, sortBy, descending, filters);
         } catch (Exception e) {
             logger.info("Retrieve user error: ", e);
             return ResponseEntity.badRequest().build();
@@ -92,9 +88,7 @@ public class UserController {
     public ResponseEntity<UserVO> fetch(@PathVariable Long id) {
         UserVO vo;
         try {
-            vo = userService.fetch(id)
-                    .map(entity -> toVO(entity, UserVO.class))
-                    .orElse(null);
+            vo = userService.fetch(id);
         } catch (Exception e) {
             logger.info("Fetch user error: ", e);
             return ResponseEntity.badRequest().build();
@@ -117,9 +111,7 @@ public class UserController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-
-            User entity = userService.create(toEntity(dto, User.class));
-            vo = toVO(entity, UserVO.class);
+            vo = userService.create(dto);
         } catch (Exception e) {
             logger.error("Create user error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
@@ -144,8 +136,7 @@ public class UserController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            User entity = userService.modify(id, toEntity(dto, User.class));
-            vo = toVO(entity, UserVO.class);
+            vo = userService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify user error: ", e);
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
@@ -201,10 +192,8 @@ public class UserController {
     public ResponseEntity<List<UserVO>> importFromFile(MultipartFile file) {
         List<UserVO> voList;
         try {
-            List<User> list = ExcelReader.read(file.getInputStream(), UserDTO.class)
-                    .stream().map(dto -> toEntity(dto, User.class)).toList();
-            voList = userService.createAll(list)
-                    .stream().map(entity -> toVO(entity, UserVO.class)).toList();
+            List<UserDTO> dtoList = ExcelReader.read(file.getInputStream(), UserDTO.class);
+            voList = userService.createAll(dtoList);
         } catch (Exception e) {
             logger.error("Import user error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();

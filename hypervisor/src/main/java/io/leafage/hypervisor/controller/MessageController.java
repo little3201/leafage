@@ -15,7 +15,6 @@
 
 package io.leafage.hypervisor.controller;
 
-import io.leafage.hypervisor.domain.Message;
 import io.leafage.hypervisor.domain.dto.MessageDTO;
 import io.leafage.hypervisor.domain.vo.MessageVO;
 import io.leafage.hypervisor.service.MessageService;
@@ -25,12 +24,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-
-import static top.leafage.common.data.ObjectConverter.toEntity;
-import static top.leafage.common.data.ObjectConverter.toVO;
 
 /**
  * messages controller.
@@ -70,8 +67,7 @@ public class MessageController {
                                                     String sortBy, boolean descending, Principal principal) {
         Page<MessageVO> voPage;
         try {
-            voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()))
-                    .map(entity -> toVO(entity, MessageVO.class));
+            voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()));
         } catch (Exception e) {
             logger.info("Retrieve message error: ", e);
             return ResponseEntity.noContent().build();
@@ -89,9 +85,7 @@ public class MessageController {
     public ResponseEntity<MessageVO> fetch(@PathVariable Long id) {
         MessageVO vo;
         try {
-            vo = messageService.fetch(id)
-                    .map(entity -> toVO(entity, MessageVO.class))
-                    .orElse(null);
+            vo = messageService.fetch(id);
         } catch (Exception e) {
             logger.info("Fetch message error: ", e);
             return ResponseEntity.noContent().build();
@@ -113,12 +107,54 @@ public class MessageController {
             if (existed) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
-            Message entity = messageService.create(toEntity(dto, Message.class));
-            vo = toVO(entity, MessageVO.class);
+            vo = messageService.create(dto);
         } catch (Exception e) {
             logger.info("Create message error: ", e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
+
+    /**
+     * 修改信息
+     *
+     * @param id  主键
+     * @param dto 要修改的数据
+     * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:modify')")
+    @PutMapping("/{id}")
+    public ResponseEntity<MessageVO> modify(@PathVariable Long id, @RequestBody MessageDTO dto) {
+        MessageVO vo;
+        try {
+            boolean existed = messageService.exists(dto.getTitle(), id);
+            if (existed) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            vo = messageService.modify(id, dto);
+        } catch (Exception e) {
+            logger.error("Modify message error: ", e);
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        return ResponseEntity.accepted().body(vo);
+    }
+
+    /**
+     * 删除信息
+     *
+     * @param id 主键
+     * @return 如果删除成功，返回200状态码，否则返回417状态码
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:remove')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remove(@PathVariable Long id) {
+        try {
+            messageService.remove(id);
+        } catch (Exception e) {
+            logger.error("Remove message error: ", e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
 }
