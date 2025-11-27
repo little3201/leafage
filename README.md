@@ -6,7 +6,7 @@
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=code_smells" alt="code_smells">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=bugs" alt="bugs">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=ncloc" alt="lines of code"/>
-</p>
+
 
 ## 项目简介
 

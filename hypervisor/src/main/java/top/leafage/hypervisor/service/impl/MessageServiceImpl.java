@@ -1,0 +1,108 @@
+/*
+ * Copyright (c) 2024-2025.  little3201.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package top.leafage.hypervisor.service.impl;
+
+import top.leafage.hypervisor.domain.Message;
+import top.leafage.hypervisor.domain.dto.MessageDTO;
+import top.leafage.hypervisor.domain.vo.MessageVO;
+import top.leafage.hypervisor.repository.MessageRepository;
+import top.leafage.hypervisor.service.MessageService;
+import org.jspecify.annotations.NonNull;
+import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+/**
+ * message service impl.
+ *
+ * @author wq li
+ */
+@Service
+public class MessageServiceImpl implements MessageService {
+
+    private final MessageRepository messageRepository;
+    private static final BeanCopier copier = BeanCopier.create(MessageDTO.class, Message.class, false);
+
+    /**
+     * Constructor for MessageServiceImpl.
+     *
+     * @param messageRepository a {@link MessageRepository} object
+     */
+    public MessageServiceImpl(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<@NonNull MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+        Pageable pageable = pageable(page, size, sortBy, descending);
+
+        Specification<@NonNull Message> spec = (root, query, cb) ->
+                buildPredicate(filters, cb, root).orElse(null);
+
+        return messageRepository.findAll(spec, pageable)
+                .map(MessageVO::from);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessageVO fetch(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        return messageRepository.findById(id)
+                .map(MessageVO::from)
+                .orElse(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessageVO create(MessageDTO dto) {
+        Message entity = messageRepository.saveAndFlush(MessageDTO.toEntity(dto));
+        return MessageVO.from(entity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MessageVO modify(Long id, MessageDTO dto) {
+        Message entity = messageRepository.findById(id).map(existing -> {
+                    copier.copy(dto, existing, null);
+                    return messageRepository.save(existing);
+                })
+                .orElseThrow();
+        return MessageVO.from(entity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void remove(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        messageRepository.deleteById(id);
+    }
+}

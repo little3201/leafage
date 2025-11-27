@@ -1,5 +1,0 @@
-/**
- * Interfaces for JPA specific repositories.
- */
-@org.jspecify.annotations.NullMarked
-package io.leafage.assets.repository;
