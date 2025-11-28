@@ -7,7 +7,6 @@
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=bugs" alt="bugs">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=ncloc" alt="lines of code"/>
 
-
 ## 项目简介
 
 leafage 是一个基于 Spring Boot 构建的通用后台管理系统，适用于各种企业和个人项目的快速开发。

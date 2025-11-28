@@ -14,9 +14,9 @@
  */
 package top.leafage.hypervisor.service;
 
+import top.leafage.common.data.jpa.JpaCrudService;
 import top.leafage.hypervisor.domain.dto.RoleDTO;
 import top.leafage.hypervisor.domain.vo.RoleVO;
-import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * role service.

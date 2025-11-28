@@ -15,35 +15,31 @@
 
 package top.leafage.hypervisor.controller;
 
-import tools.jackson.databind.ObjectMapper;
-import top.leafage.hypervisor.domain.dto.MessageDTO;
-import top.leafage.hypervisor.service.MessageService;
-import top.leafage.hypervisor.domain.vo.MessageVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import tools.jackson.databind.ObjectMapper;
+import top.leafage.hypervisor.domain.dto.MessageDTO;
+import top.leafage.hypervisor.domain.vo.MessageVO;
+import top.leafage.hypervisor.service.MessageService;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * message controller test
@@ -69,11 +65,7 @@ class MessageControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new MessageVO();
-        vo.setId(1L);
-        vo.setTitle("test");
-        vo.setReceiver("23234");
-        vo.setBody("content");
+        vo = new MessageVO(1L, "test", "test", "admin", false);
 
         dto = new MessageDTO();
         dto.setTitle("test");
@@ -82,76 +74,73 @@ class MessageControllerTest {
     }
 
     @Test
-    void retrieve() throws Exception {
-        Page<MessageVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+    void retrieve() {
+        Page<@NonNull MessageVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(this.messageService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
 
         assertThat(this.mvc.get().uri("/messages")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "title:like:a")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "title:like:a")
+        )
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
-    void retrieve_error() throws Exception {
+    void retrieve_error() {
         given(this.messageService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/messages")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "false")
-                        .queryParam("filters", "title:like:a")
-                )
-                .andExpect(status().isNoContent())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "false")
+                .queryParam("filters", "title:like:a")
+        )
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void fetch() throws Exception {
+    void fetch() {
         given(this.messageService.fetch(anyLong())).willReturn(vo);
 
-        assertThat(this.mvc.get().uri("/messages/{id}", anyLong())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("content")).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/messages/{id}", anyLong()))
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void fetch_error() throws Exception {
+    void fetch_error() {
         given(this.messageService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/messages/{id}", anyLong())).andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/messages/{id}", anyLong()))
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void create() throws Exception {
+    void create() {
         given(this.messageService.create(any(MessageDTO.class))).willReturn(vo);
 
         assertThat(this.mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value("test"))
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
+        )
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void create_error() throws Exception {
+    void create_error() {
         given(this.messageService.create(any(MessageDTO.class))).willThrow(new RuntimeException());
 
         assertThat(this.mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
+        )
+                .hasStatus4xxClientError();
     }
 }

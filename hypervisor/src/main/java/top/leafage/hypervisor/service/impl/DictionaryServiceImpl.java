@@ -15,11 +15,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Dictionary;
-import top.leafage.hypervisor.domain.dto.DictionaryDTO;
-import top.leafage.hypervisor.domain.vo.DictionaryVO;
-import top.leafage.hypervisor.repository.DictionaryRepository;
-import top.leafage.hypervisor.service.DictionaryService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -27,6 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.hypervisor.domain.Dictionary;
+import top.leafage.hypervisor.domain.dto.DictionaryDTO;
+import top.leafage.hypervisor.domain.vo.DictionaryVO;
+import top.leafage.hypervisor.repository.DictionaryRepository;
+import top.leafage.hypervisor.service.DictionaryService;
 
 import java.util.List;
 
@@ -38,8 +38,8 @@ import java.util.List;
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
 
-    private final DictionaryRepository dictionaryRepository;
     private static final BeanCopier copier = BeanCopier.create(DictionaryDTO.class, Dictionary.class, false);
+    private final DictionaryRepository dictionaryRepository;
 
     /**
      * Constructor for DictionaryServiceImpl.

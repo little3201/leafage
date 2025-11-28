@@ -14,9 +14,9 @@
  */
 package top.leafage.assets.repository;
 
-import top.leafage.assets.domain.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import top.leafage.assets.domain.Tag;
 
 /**
  * tag repository.

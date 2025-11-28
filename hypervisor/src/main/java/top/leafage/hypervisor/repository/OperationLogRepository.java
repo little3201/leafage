@@ -15,10 +15,10 @@
 
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.OperationLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import top.leafage.hypervisor.domain.OperationLog;
 
 /**
  * OperationLogRepository interface.

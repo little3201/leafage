@@ -14,11 +14,6 @@
  */
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Role;
-import top.leafage.hypervisor.domain.dto.RoleDTO;
-import top.leafage.hypervisor.domain.vo.RoleVO;
-import top.leafage.hypervisor.repository.RoleRepository;
-import top.leafage.hypervisor.service.RoleService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -26,6 +21,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.hypervisor.domain.Role;
+import top.leafage.hypervisor.domain.dto.RoleDTO;
+import top.leafage.hypervisor.domain.vo.RoleVO;
+import top.leafage.hypervisor.repository.RoleRepository;
+import top.leafage.hypervisor.service.RoleService;
 
 /**
  * role service impl.
@@ -35,8 +35,8 @@ import org.springframework.util.Assert;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    private final RoleRepository roleRepository;
     private static final BeanCopier copier = BeanCopier.create(RoleDTO.class, Role.class, false);
+    private final RoleRepository roleRepository;
 
     /**
      * Constructor for RoleServiceImpl.

@@ -89,7 +89,8 @@ class PostControllerTest {
                 .queryParam("descending", "false")
                 .queryParam("filters", "title:like:a")
         )
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
@@ -104,7 +105,7 @@ class PostControllerTest {
                 .queryParam("descending", "false")
                 .queryParam("filters", "title:like:a")
         )
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -112,14 +113,15 @@ class PostControllerTest {
         given(postService.fetch(anyLong())).willReturn(vo);
 
         assertThat(this.mvc.get().uri("/posts/{id}", anyLong()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
         given(postService.fetch(anyLong())).willThrow(new RuntimeException());
         assertThat(this.mvc.get().uri("/posts/{id}", anyLong()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -128,7 +130,8 @@ class PostControllerTest {
 
         assertThat(this.mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -137,7 +140,7 @@ class PostControllerTest {
 
         assertThat(this.mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -146,7 +149,8 @@ class PostControllerTest {
 
         assertThat(this.mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -155,21 +159,21 @@ class PostControllerTest {
 
         assertThat(this.mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
     void remove() {
         postService.remove(anyLong());
         assertThat(this.mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk();
     }
 
     @Test
     void remove_error() {
         doThrow(new RuntimeException()).when(postService).remove(anyLong());
         assertThat(this.mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
 }

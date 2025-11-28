@@ -90,7 +90,22 @@ class RegionControllerTest {
                 .queryParam("descending", "false")
                 .queryParam("filters", "name:like:a")
         )
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
+    }
+
+    @Test
+    void retrieve_error() {
+        given(regionService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willThrow(new RuntimeException());
+
+        assertThat(this.mvc.get().uri("/regions")
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "content:like:a")
+        )
+                .hasStatus2xxSuccessful();
     }
 
     @Test
@@ -98,7 +113,8 @@ class RegionControllerTest {
         given(this.regionService.fetch(anyLong())).willReturn(vo);
 
         assertThat(this.mvc.get().uri("/regions/{id}", anyLong()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -106,7 +122,7 @@ class RegionControllerTest {
         given(this.regionService.fetch(anyLong())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/regions/{id}", anyLong()))
-                .doesNotHaveFailed();
+                .hasStatus2xxSuccessful();
     }
 
     @Test
@@ -115,7 +131,8 @@ class RegionControllerTest {
 
         assertThat(this.mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -124,7 +141,7 @@ class RegionControllerTest {
 
         assertThat(this.mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus4xxClientError();
     }
 
     @Test
@@ -133,7 +150,8 @@ class RegionControllerTest {
 
         assertThat(this.mvc.put().uri("/regions/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -142,7 +160,7 @@ class RegionControllerTest {
 
         assertThat(this.mvc.put().uri("/regions/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus4xxClientError();
     }
 
     @Test
@@ -150,7 +168,7 @@ class RegionControllerTest {
         this.regionService.remove(anyLong());
 
         assertThat(this.mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk();
     }
 
     @Test
@@ -158,6 +176,6 @@ class RegionControllerTest {
         doThrow(new RuntimeException()).when(this.regionService).remove(anyLong());
 
         assertThat(this.mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus4xxClientError();
     }
 }

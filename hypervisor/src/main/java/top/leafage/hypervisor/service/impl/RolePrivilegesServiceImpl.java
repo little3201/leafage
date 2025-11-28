@@ -15,6 +15,9 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import top.leafage.hypervisor.domain.GroupAuthorities;
 import top.leafage.hypervisor.domain.Privilege;
 import top.leafage.hypervisor.domain.RolePrivileges;
@@ -23,9 +26,6 @@ import top.leafage.hypervisor.repository.GroupRolesRepository;
 import top.leafage.hypervisor.repository.PrivilegeRepository;
 import top.leafage.hypervisor.repository.RolePrivilegesRepository;
 import top.leafage.hypervisor.service.RolePrivilegesService;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,9 +1,9 @@
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.SchedulerLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import top.leafage.hypervisor.domain.SchedulerLog;
 
 /**
  * Repository interface for scheduler_logs.

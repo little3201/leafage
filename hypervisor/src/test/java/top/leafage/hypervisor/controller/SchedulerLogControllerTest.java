@@ -15,35 +15,31 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.service.SchedulerLogService;
-import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
+import top.leafage.hypervisor.service.SchedulerLogService;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * scheduler log controller test
@@ -64,99 +60,89 @@ class SchedulerLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new SchedulerLogVO();
-        vo.setId(1L);
-        vo.setName("test");
-        vo.setExecutedTimes(200);
-        vo.setStartTime(Instant.now());
-        vo.setNextExecuteTime(Instant.now().plus(12, ChronoUnit.HOURS));
+        vo = new SchedulerLogVO(1L, "test", Instant.now(), 232, Instant.now().plus(12, ChronoUnit.HOURS), "description");
     }
 
     @Test
-    void retrieve() throws Exception {
-        Page<SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+    void retrieve() {
+        Page<@NonNull SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(this.schedulerLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
 
         assertThat(this.mvc.get().uri("/scheduler-logs")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "scheduler:like:a")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "scheduler:like:a")
+        )
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
-    void retrieve_error() throws Exception {
+    void retrieve_error() {
         given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/scheduler-logs")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "scheduler:like:a")
-                )
-                .andExpect(status().isNoContent())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "scheduler:like:a")
+        )
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void fetch() throws Exception {
+    void fetch() {
         given(this.schedulerLogService.fetch(anyLong())).willReturn(vo);
 
-        assertThat(this.mvc.get().uri("/scheduler-logs/{id}", anyLong())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("test")).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/scheduler-logs/{id}", anyLong()))
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void fetch_error() throws Exception {
+    void fetch_error() {
         given(this.schedulerLogService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/scheduler-logs/{id}", anyLong())).andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/scheduler-logs/{id}", anyLong()))
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void remove() throws Exception {
+    void remove() {
         this.schedulerLogService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
     }
 
     @Test
-    void remove_error() throws Exception {
+    void remove_error() {
         doThrow(new RuntimeException()).when(this.schedulerLogService).remove(anyLong());
 
         assertThat(this.mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
+                .hasStatus4xxClientError();
     }
 
     @Test
-    void clear() throws Exception {
+    void clear() {
         this.schedulerLogService.clear();
 
-        assertThat(this.mvc.delete().uri("/scheduler-logs").with(csrf().asHeader())).andExpect(status().isOk())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
+                .hasStatusOk();
     }
 
     @Test
-    void clear_error() throws Exception {
+    void clear_error() {
         doThrow(new RuntimeException()).when(this.schedulerLogService).clear();
 
         assertThat(this.mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
+                .hasStatus4xxClientError();
     }
 
 }

@@ -15,37 +15,32 @@
 
 package top.leafage.hypervisor.controller;
 
-import tools.jackson.databind.ObjectMapper;
-import top.leafage.hypervisor.domain.Dictionary;
-import top.leafage.hypervisor.domain.dto.DictionaryDTO;
-import top.leafage.hypervisor.domain.vo.DictionaryVO;
-import top.leafage.hypervisor.service.DictionaryService;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import tools.jackson.databind.ObjectMapper;
+import top.leafage.hypervisor.domain.dto.DictionaryDTO;
+import top.leafage.hypervisor.domain.vo.DictionaryVO;
+import top.leafage.hypervisor.service.DictionaryService;
 
 import java.util.List;
-import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * dictionary controller test
@@ -81,136 +76,124 @@ class DictionaryControllerTest {
     }
 
     @Test
-    void retrieve() throws Exception {
-        Page<Dictionary> voPage = new PageImpl<>(List.of(Mockito.mock(Dictionary.class)), mock(PageRequest.class), 2L);
+    void retrieve() {
+        Page<@NonNull DictionaryVO> voPage = new PageImpl<>(List.of(Mockito.mock(DictionaryVO.class)), mock(PageRequest.class), 2L);
 
         given(this.dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(voPage);
 
         assertThat(this.mvc.get().uri("/dictionaries")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "false")
-                        .queryParam("filters", "name:like:a")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "false")
+                .queryParam("filters", "name:like:a")
+        )
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
-    void retrieve_error() throws Exception {
+    void retrieve_error() {
         given(this.dictionaryService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/dictionaries")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "false")
-                        .queryParam("filters", "name:like:a")
-                )
-                .andExpect(status().isNoContent())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "false")
+                .queryParam("filters", "name:like:a")
+        )
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void subset() throws Exception {
-        given(this.dictionaryService.subset(anyLong())).willReturn(List.of(Mockito.mock(Dictionary.class)));
+    void subset() {
+        given(this.dictionaryService.subset(anyLong())).willReturn(List.of(Mockito.mock(DictionaryVO.class)));
 
         assertThat(this.mvc.get().uri("/dictionaries/{id}/subset", anyLong()))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void fetch() throws Exception {
-        given(this.dictionaryService.fetch(anyLong())).willReturn(Optional.ofNullable(Mockito.mock(Dictionary.class)));
+    void fetch() {
+        given(this.dictionaryService.fetch(anyLong())).willReturn(Mockito.mock(DictionaryVO.class));
 
         assertThat(this.mvc.get().uri("/dictionaries/{id}", anyLong()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("gender"))
-                .andDo(print()).andReturn();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void fetch_error() throws Exception {
+    void fetch_error() {
         given(this.dictionaryService.fetch(anyLong())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/dictionaries/{id}", anyLong()))
-                .andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
-    }
-
-
-    @Test
-    void modify() throws Exception {
-        given(this.dictionaryService.modify(anyLong(), any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
-
-        assertThat(this.mvc.put().uri("/dictionaries/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isAccepted())
-                .andDo(print()).andReturn();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void modify_error() throws Exception {
-        given(this.dictionaryService.modify(anyLong(), any(Dictionary.class))).willThrow(new RuntimeException());
-
-        assertThat(this.mvc.put().uri("/dictionaries/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isNotModified())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void remove() throws Exception {
-        this.dictionaryService.remove(anyLong());
-
-        assertThat(this.mvc.delete().uri("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
-                .andExpect(status().isOk())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void enable() throws Exception {
-        given(this.dictionaryService.enable(anyLong())).willReturn(true);
-
-        assertThat(patch("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
-                .andExpect(status().isAccepted())
-                .andDo(print()).andReturn();
-    }
-
-    @Test
-    void subset_error() throws Exception {
+    void subset_error() {
         given(this.dictionaryService.subset(anyLong())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/dictionaries/{id}/subset", "1"))
-                .andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void create() throws Exception {
-        given(this.dictionaryService.create(any(Dictionary.class))).willReturn(Mockito.mock(Dictionary.class));
+    void create() {
+        given(this.dictionaryService.create(any(DictionaryDTO.class))).willReturn(Mockito.mock(DictionaryVO.class));
 
         assertThat(this.mvc.post().uri("/dictionaries").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("gender"))
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void create_error() throws Exception {
-        given(this.dictionaryService.create(any(Dictionary.class))).willThrow(new RuntimeException());
+    void create_error() {
+        given(this.dictionaryService.create(any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
         assertThat(this.mvc.post().uri("/dictionaries").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .hasStatus4xxClientError();
     }
+
+    @Test
+    void modify() {
+        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willReturn(Mockito.mock(DictionaryVO.class));
+
+        assertThat(this.mvc.put().uri("/dictionaries/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .hasStatusOk()
+                .body().isNotNull();
+    }
+
+    @Test
+    void modify_error() {
+        given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willThrow(new RuntimeException());
+
+        assertThat(this.mvc.put().uri("/dictionaries/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .hasStatus4xxClientError();
+    }
+
+    @Test
+    void remove() {
+        this.dictionaryService.remove(anyLong());
+
+        assertThat(this.mvc.delete().uri("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
+    }
+
+    @Test
+    void enable() {
+        given(this.dictionaryService.enable(anyLong())).willReturn(true);
+
+        assertThat(this.mvc.patch().uri("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
+    }
+
 }

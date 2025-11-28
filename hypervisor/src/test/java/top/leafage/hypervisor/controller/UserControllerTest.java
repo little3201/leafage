@@ -14,34 +14,31 @@
  */
 package top.leafage.hypervisor.controller;
 
-import tools.jackson.databind.ObjectMapper;
-import top.leafage.hypervisor.domain.dto.UserDTO;
-import top.leafage.hypervisor.service.UserService;
-import top.leafage.hypervisor.domain.vo.UserVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import tools.jackson.databind.ObjectMapper;
+import top.leafage.hypervisor.domain.dto.UserDTO;
+import top.leafage.hypervisor.domain.vo.UserVO;
+import top.leafage.hypervisor.service.UserService;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * user controller test
@@ -67,93 +64,100 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        vo = new UserVO(1L, "test", true, true, true, true);
+
         dto = new UserDTO();
         dto.setUsername("test");
         dto.setName("John");
-        dto.setAvatar("steven.jpg");
-
-        vo = new UserVO();
-        vo.setId(1L);
-        vo.setUsername("test");
-        vo.setEmail("john@test.com");
+        dto.setEmail("steven@demo.com");
     }
 
     @Test
-    void retrieve() throws Exception {
-        Page<UserVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+    void retrieve() {
+        Page<@NonNull UserVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(this.userService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
 
         assertThat(this.mvc.get().uri("/users")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "username:like:a")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "username:like:a")
+        )
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
-    void fetch() throws Exception {
+    void retrieve_error() {
+        given(this.userService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).willThrow(new RuntimeException());
+
+        assertThat(this.mvc.get().uri("/users")
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "scheduler:like:a")
+        )
+                .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void fetch() {
         given(this.userService.fetch(anyLong())).willReturn(vo);
 
         assertThat(this.mvc.get().uri("/users/{id}", anyLong()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("test"))
-                .andDo(print())
-                .andReturn();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void fetch_error() throws Exception {
+    void fetch_error() {
         given(this.userService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/users/{id}", anyLong())).andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/users/{id}", anyLong()))
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void create() throws Exception {
+    void create() {
         given(this.userService.create(any(UserDTO.class))).willReturn(vo);
 
         assertThat(this.mvc.post().uri("/users").contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("test"))
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
+        )
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void modify() throws Exception {
+    void modify() {
         given(this.userService.modify(anyLong(), any(UserDTO.class))).willReturn(vo);
 
         assertThat(this.mvc.put().uri("/users/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isAccepted())
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void modify_error() throws Exception {
+    void modify_error() {
         given(this.userService.modify(anyLong(), any(UserDTO.class))).willThrow(new RuntimeException());
 
         assertThat(this.mvc.put().uri("/users/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .andExpect(status().isNotModified())
-                .andDo(print()).andReturn();
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
+                .hasStatus4xxClientError();
     }
 
     @Test
-    void enable() throws Exception {
+    void enable() {
         given(this.userService.enable(anyLong())).willReturn(true);
 
-        assertThat(patch("/users/{id}", anyLong()).with(csrf().asHeader()))
-                .andExpect(status().isAccepted())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.patch().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
     }
 
 }

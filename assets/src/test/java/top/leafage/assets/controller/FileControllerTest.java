@@ -80,7 +80,8 @@ class FileControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "name:like:a")
         )
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
@@ -95,7 +96,7 @@ class FileControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "name:like:a")
         )
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -103,7 +104,8 @@ class FileControllerTest {
         given(fileRecordService.fetch(anyLong())).willReturn(vo);
 
         assertThat(this.mvc.get().uri("/files/{id}", 1L))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -111,7 +113,7 @@ class FileControllerTest {
         given(fileRecordService.fetch(anyLong())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/files/{id}", 1L))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -120,8 +122,9 @@ class FileControllerTest {
         given(fileRecordService.upload(any(MultipartFile.class))).willReturn(vo);
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
-        assertThat(this.mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader())).
-                doesNotHaveFailed();
+        assertThat(this.mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -132,7 +135,7 @@ class FileControllerTest {
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
         assertThat(this.mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -140,7 +143,8 @@ class FileControllerTest {
         fileRecordService.remove(anyLong());
 
         assertThat(this.mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
@@ -148,6 +152,6 @@ class FileControllerTest {
         doThrow(new RuntimeException()).when(fileRecordService).remove(anyLong());
 
         assertThat(this.mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 }

@@ -15,11 +15,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Message;
-import top.leafage.hypervisor.domain.dto.MessageDTO;
-import top.leafage.hypervisor.domain.vo.MessageVO;
-import top.leafage.hypervisor.repository.MessageRepository;
-import top.leafage.hypervisor.service.MessageService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -27,6 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.hypervisor.domain.Message;
+import top.leafage.hypervisor.domain.dto.MessageDTO;
+import top.leafage.hypervisor.domain.vo.MessageVO;
+import top.leafage.hypervisor.repository.MessageRepository;
+import top.leafage.hypervisor.service.MessageService;
 
 /**
  * message service impl.
@@ -36,8 +36,8 @@ import org.springframework.util.Assert;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    private final MessageRepository messageRepository;
     private static final BeanCopier copier = BeanCopier.create(MessageDTO.class, Message.class, false);
+    private final MessageRepository messageRepository;
 
     /**
      * Constructor for MessageServiceImpl.

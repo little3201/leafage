@@ -15,10 +15,10 @@
 
 package top.leafage.assets.repository;
 
-import top.leafage.assets.domain.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
+import top.leafage.assets.domain.Comment;
 
 import java.util.List;
 

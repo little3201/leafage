@@ -35,8 +35,8 @@ import top.leafage.hypervisor.service.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
     private static final BeanCopier copier = BeanCopier.create(UserDTO.class, User.class, false);
+    private final UserRepository userRepository;
 
     /**
      * Constructor for UserServiceImpl.

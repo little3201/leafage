@@ -15,8 +15,8 @@
 
 package top.leafage.hypervisor.domain.dto;
 
-import top.leafage.hypervisor.domain.Message;
 import jakarta.validation.constraints.NotBlank;
+import top.leafage.hypervisor.domain.Message;
 
 /**
  * dto class for message.

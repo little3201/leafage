@@ -15,9 +15,9 @@
 
 package top.leafage.assets.domain.dto;
 
-import top.leafage.assets.domain.Comment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import top.leafage.assets.domain.Comment;
 
 /**
  * dto class for comment.

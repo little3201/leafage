@@ -14,9 +14,9 @@
  */
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.RolePrivileges;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import top.leafage.hypervisor.domain.RolePrivileges;
 
 import java.util.List;
 import java.util.Optional;

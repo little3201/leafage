@@ -23,6 +23,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -33,7 +34,6 @@ import top.leafage.assets.domain.vo.CommentVO;
 import top.leafage.assets.service.CommentService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -84,7 +84,8 @@ class CommentControllerTest {
                 .queryParam("size", "2")
         )
                 .hasStatusOk()
-                .bodyJson().isNotNull();
+                .body().isNotNull()
+                .hasSize(1);
     }
 
     @Test
@@ -96,8 +97,9 @@ class CommentControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "content:like:a"))
-                .doesNotHaveFailed();
+                .queryParam("filters", "content:like:a")
+        )
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -105,15 +107,16 @@ class CommentControllerTest {
         given(commentService.relation(anyLong())).willReturn(List.of(vo));
 
         assertThat(this.mvc.get().uri("/comments/{id}", anyLong()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
     void relation_error() {
-        given(commentService.relation(anyLong())).willThrow(new NoSuchElementException());
+        given(commentService.relation(anyLong())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/comments/{id}", anyLong()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -121,15 +124,16 @@ class CommentControllerTest {
         given(commentService.replies(anyLong())).willReturn(List.of(vo));
 
         assertThat(this.mvc.get().uri("/comments/{id}/replies", 1L))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
     void replies_error() {
-        given(commentService.replies(anyLong())).willThrow(new NoSuchElementException());
+        given(commentService.replies(anyLong())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/comments/{id}/replies", 1L))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -138,15 +142,16 @@ class CommentControllerTest {
 
         assertThat(this.mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
     void create_error() {
-        given(commentService.create(any(CommentDTO.class))).willThrow(new NoSuchElementException());
+        given(commentService.create(any(CommentDTO.class))).willThrow(new RuntimeException());
 
         assertThat(this.mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .doesNotHaveFailed();
+                .hasStatus5xxServerError();
     }
 }

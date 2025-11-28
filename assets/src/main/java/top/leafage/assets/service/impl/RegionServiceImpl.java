@@ -15,11 +15,6 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Region;
-import top.leafage.assets.domain.dto.RegionDTO;
-import top.leafage.assets.domain.vo.RegionVO;
-import top.leafage.assets.repository.RegionRepository;
-import top.leafage.assets.service.RegionService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -27,6 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import top.leafage.assets.domain.Region;
+import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.RegionVO;
+import top.leafage.assets.repository.RegionRepository;
+import top.leafage.assets.service.RegionService;
 
 /**
  * region service impl.
@@ -36,8 +36,8 @@ import org.springframework.util.Assert;
 @Service
 public class RegionServiceImpl implements RegionService {
 
-    private final RegionRepository regionRepository;
     private static final BeanCopier copier = BeanCopier.create(RegionDTO.class, Region.class, false);
+    private final RegionRepository regionRepository;
 
     /**
      * Constructor for RegionServiceImpl.

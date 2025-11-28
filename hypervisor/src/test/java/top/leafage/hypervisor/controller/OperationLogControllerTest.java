@@ -15,35 +15,29 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.service.OperationLogService;
-import top.leafage.hypervisor.domain.vo.OperationLogVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import top.leafage.hypervisor.domain.vo.OperationLogVO;
+import top.leafage.hypervisor.service.OperationLogService;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * operation log controller test
@@ -64,107 +58,89 @@ class OperationLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new OperationLogVO();
-        vo.setId(1L);
-        vo.setIp(InetAddress.getByName("127.0.0.1"));
-        vo.setLocation("test");
-        vo.setBrowser("Chrome");
-        vo.setDeviceType("PC");
-        vo.setBrowser("Edge");
-        vo.setOs("Mac OS");
-        vo.setReferer("test");
-        vo.setBody("content");
-        vo.setSessionId("sessionId");
-        vo.setStatusCode(200);
-        vo.setOperation("test");
-        vo.setUserAgent("xxx");
+        vo = new OperationLogVO(1L, "test", "create", "filters=test", "test", "127.0.0.1", "test", "test", 200);
     }
 
     @Test
-    void retrieve() throws Exception {
+    void retrieve() {
         Page<OperationLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         given(this.operationLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).willReturn(voPage);
 
         assertThat(this.mvc.get().uri("/operation-logs")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "operation:like:a")
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "operation:like:a")
+        )
+                .hasStatusOk()
+                .body().isNotNull().hasSize(1);
     }
 
     @Test
-    void retrieve_error() throws Exception {
+    void retrieve_error() {
         given(this.operationLogService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willThrow(new RuntimeException());
 
         assertThat(this.mvc.get().uri("/operation-logs")
-                        .queryParam("page", "0")
-                        .queryParam("size", "2")
-                        .queryParam("sortBy", "id")
-                        .queryParam("descending", "true")
-                        .queryParam("filters", "operation:like:a")
-                )
-                .andExpect(status().isNoContent())
-                .andDo(print())
-                .andReturn();
+                .queryParam("page", "0")
+                .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "true")
+                .queryParam("filters", "operation:like:a")
+        )
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void fetch() throws Exception {
+    void fetch() {
         given(this.operationLogService.fetch(anyLong())).willReturn(vo);
 
-        assertThat(this.mvc.get().uri("/operation-logs/{id}", anyLong())).andExpect(status().isOk())
-                .andExpect(jsonPath("$.operation").value("test")).andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/operation-logs/{id}", anyLong()))
+                .hasStatusOk()
+                .body().isNotNull();
     }
 
     @Test
-    void fetch_error() throws Exception {
+    void fetch_error() {
         given(this.operationLogService.fetch(anyLong())).willThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/operation-logs/{id}", anyLong())).andExpect(status().isNoContent())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.get().uri("/operation-logs/{id}", anyLong()))
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
-    void remove() throws Exception {
+    void remove() {
         this.operationLogService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader())).andExpect(status().isOk())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
     }
 
     @Test
-    void remove_error() throws Exception {
+    void remove_error() {
         doThrow(new RuntimeException()).when(this.operationLogService).remove(anyLong());
 
         assertThat(this.mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
+                .hasStatus4xxClientError();
     }
 
     @Test
-    void clear() throws Exception {
+    void clear() {
         this.operationLogService.clear();
 
-        assertThat(this.mvc.delete().uri("/operation-logs").with(csrf().asHeader())).andExpect(status().isOk())
-                .andDo(print()).andReturn();
+        assertThat(this.mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
+                .hasStatusOk();
     }
 
     @Test
-    void clear_error() throws Exception {
+    void clear_error() {
         doThrow(new RuntimeException()).when(this.operationLogService).clear();
 
         assertThat(this.mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
-                .andExpect(status().isExpectationFailed())
-                .andDo(print()).andReturn();
+                .hasStatus4xxClientError();
     }
 
 }

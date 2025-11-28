@@ -15,10 +15,10 @@
 
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.GroupAuthorities;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import top.leafage.hypervisor.domain.GroupAuthorities;
 
 import java.util.Optional;
 

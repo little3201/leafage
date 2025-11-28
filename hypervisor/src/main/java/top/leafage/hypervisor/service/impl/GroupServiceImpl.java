@@ -14,11 +14,6 @@
  */
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Group;
-import top.leafage.hypervisor.domain.dto.GroupDTO;
-import top.leafage.hypervisor.domain.vo.GroupVO;
-import top.leafage.hypervisor.repository.GroupRepository;
-import top.leafage.hypervisor.service.GroupService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -27,6 +22,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import top.leafage.common.data.domain.TreeNode;
+import top.leafage.hypervisor.domain.Group;
+import top.leafage.hypervisor.domain.dto.GroupDTO;
+import top.leafage.hypervisor.domain.vo.GroupVO;
+import top.leafage.hypervisor.repository.GroupRepository;
+import top.leafage.hypervisor.service.GroupService;
 
 import java.util.List;
 
@@ -41,8 +41,8 @@ import static top.leafage.common.data.converter.ModelToTreeNodeConverter.convert
 @Service
 public class GroupServiceImpl implements GroupService {
 
-    private final GroupRepository groupRepository;
     private static final BeanCopier copier = BeanCopier.create(GroupDTO.class, Group.class, false);
+    private final GroupRepository groupRepository;
 
     /**
      * Constructor for GroupServiceImpl.

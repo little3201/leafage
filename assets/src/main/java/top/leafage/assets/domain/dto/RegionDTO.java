@@ -15,8 +15,8 @@
 
 package top.leafage.assets.domain.dto;
 
-import top.leafage.assets.domain.Region;
 import jakarta.validation.constraints.NotBlank;
+import top.leafage.assets.domain.Region;
 
 /**
  * dto class for region.

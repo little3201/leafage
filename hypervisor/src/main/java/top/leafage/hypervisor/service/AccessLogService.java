@@ -15,9 +15,9 @@
 
 package top.leafage.hypervisor.service;
 
+import top.leafage.common.data.jpa.JpaCrudService;
 import top.leafage.hypervisor.domain.dto.AccessLogDTO;
 import top.leafage.hypervisor.domain.vo.AccessLogVO;
-import top.leafage.common.data.jpa.JpaCrudService;
 
 /**
  * access log service.

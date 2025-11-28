@@ -15,18 +15,18 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.GroupAuthorities;
-import top.leafage.hypervisor.domain.GroupPrivileges;
-import top.leafage.hypervisor.domain.Privilege;
-import top.leafage.hypervisor.repository.GroupAuthoritiesRepository;
-import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
-import top.leafage.hypervisor.repository.PrivilegeRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import top.leafage.hypervisor.domain.GroupAuthorities;
+import top.leafage.hypervisor.domain.GroupPrivileges;
+import top.leafage.hypervisor.domain.Privilege;
+import top.leafage.hypervisor.repository.GroupAuthoritiesRepository;
+import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
+import top.leafage.hypervisor.repository.PrivilegeRepository;
 
 import java.util.Collections;
 import java.util.List;

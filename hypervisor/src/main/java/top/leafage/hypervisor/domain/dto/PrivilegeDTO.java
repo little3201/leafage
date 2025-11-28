@@ -14,8 +14,8 @@
  */
 package top.leafage.hypervisor.domain.dto;
 
-import top.leafage.hypervisor.domain.Privilege;
 import jakarta.validation.constraints.NotBlank;
+import top.leafage.hypervisor.domain.Privilege;
 
 import java.util.Set;
 

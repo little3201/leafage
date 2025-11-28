@@ -42,13 +42,13 @@ import static top.leafage.common.data.converter.ModelToTreeNodeConverter.convert
 @Service
 public class PrivilegeServiceImpl implements PrivilegeService {
 
+    private static final BeanCopier copier = BeanCopier.create(PrivilegeDTO.class, Privilege.class, false);
     public final RoleMembersRepository roleMembersRepository;
     public final RolePrivilegesRepository rolePrivilegesRepository;
     private final PrivilegeRepository privilegeRepository;
     private final GroupMembersRepository groupMembersRepository;
     private final GroupRolesRepository groupRolesRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
-    private static final BeanCopier copier = BeanCopier.create(PrivilegeDTO.class, Privilege.class, false);
 
     /**
      * Constructor for PrivilegeServiceImpl.

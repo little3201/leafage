@@ -14,11 +14,6 @@
  */
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Post;
-import top.leafage.assets.domain.dto.PostDTO;
-import top.leafage.assets.domain.vo.PostVO;
-import top.leafage.assets.repository.PostRepository;
-import top.leafage.assets.service.PostService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -27,6 +22,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import top.leafage.assets.domain.Post;
+import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.domain.vo.PostVO;
+import top.leafage.assets.repository.PostRepository;
+import top.leafage.assets.service.PostService;
 
 
 /**
@@ -37,8 +37,8 @@ import org.springframework.util.Assert;
 @Service
 public class PostServiceImpl implements PostService {
 
-    private final PostRepository postRepository;
     private static final BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
+    private final PostRepository postRepository;
 
     /**
      * Constructor for PostsServiceImpl.

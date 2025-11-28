@@ -16,9 +16,6 @@
 package top.leafage.hypervisor.service.impl;
 
 import io.leafage.hypervisor.domain.*;
-import top.leafage.hypervisor.domain.*;
-import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
-import top.leafage.hypervisor.domain.vo.PrivilegeVO;
 import io.leafage.hypervisor.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +30,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import top.leafage.common.TreeNode;
+import top.leafage.hypervisor.domain.*;
+import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import top.leafage.hypervisor.domain.vo.PrivilegeVO;
 import top.leafage.hypervisor.repository.*;
 
 import java.util.Collections;
