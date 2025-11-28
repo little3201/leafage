@@ -15,7 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,15 +33,14 @@ import top.leafage.hypervisor.domain.dto.GroupDTO;
 import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.repository.GroupRepository;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -59,103 +58,150 @@ class GroupServiceImplTest {
     private GroupServiceImpl groupService;
 
     private GroupDTO dto;
+    private Group entity;
 
     @BeforeEach
     void setUp() {
         dto = new GroupDTO();
-        dto.setName("group");
+        dto.setName("test");
+        dto.setSuperiorId(1L);
+        dto.setDescription("description");
+
+        entity = new Group(1L, "test", null, "description");
     }
 
     @Test
     void retrieve() {
         Page<Group> page = new PageImpl<>(List.of(mock(Group.class)));
 
-        given(this.groupRepository.findAll(ArgumentMatchers.<Specification<Group>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(groupRepository.findAll(ArgumentMatchers.<Specification<Group>>any(),
+                any(Pageable.class))).thenReturn(page);
 
-        Page<GroupVO> voPage = groupService.retrieve(0, 2, "id", true, "filter_superiorId:=:2L,filter_name:like:test");
-        Assertions.assertNotNull(voPage.getContent());
+        Page<GroupVO> voPage = groupService.retrieve(0, 2, "id", true, "name:like:test");
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(groupRepository).findAll(ArgumentMatchers.<Specification<Group>>any(), any(Pageable.class));
     }
 
     @Test
     void tree() {
-        given(this.groupRepository.findAll()).willReturn(Arrays.asList(mock(Group.class), mock(Group.class)));
+        Group child = new Group(2L, "test", 1L, "description");
+        when(groupRepository.findAll()).thenReturn(List.of(entity, child));
 
         List<TreeNode<Long>> nodes = groupService.tree();
-        Assertions.assertNotNull(nodes);
+        assertEquals(1, nodes.size());
+        assertEquals(1, nodes.get(0).getChildren().size());
+        verify(groupRepository).findAll();
     }
 
     @Test
     void fetch() {
-        given(this.groupRepository.findById(anyLong())).willReturn(Optional.of(mock(Group.class)));
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         GroupVO vo = groupService.fetch(anyLong());
-
-        Assertions.assertNotNull(vo);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(groupRepository).findById(anyLong());
     }
 
     @Test
-    void exists() {
-        given(this.groupRepository.existsByNameAndIdNot(anyString(),
-                anyLong())).willReturn(true);
+    void fetch_not_found() {
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        boolean exists = groupService.exists("test", 2L);
-
-        Assertions.assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.groupRepository.existsByName(anyString())).willReturn(true);
-
-        boolean exists = groupService.exists("test", null);
-
-        Assertions.assertTrue(exists);
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> groupService.fetch(anyLong())
+        );
+        assertEquals("group not found: 0", exception.getMessage());
+        verify(groupRepository).findById(anyLong());
     }
 
     @Test
     void create() {
-        given(this.groupRepository.saveAndFlush(any(Group.class))).willReturn(mock(Group.class));
+        when(groupRepository.existsByName("test")).thenReturn(false);
+        when(groupRepository.saveAndFlush(any(Group.class))).thenReturn(entity);
 
-        GroupVO vo = groupService.create(mock(GroupDTO.class));
-
-        verify(this.groupRepository, times(1)).saveAndFlush(any(Group.class));
-        Assertions.assertNotNull(vo);
+        GroupVO vo = groupService.create(dto);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(groupRepository).saveAndFlush(any(Group.class));
     }
 
     @Test
-    void create_error() {
-        given(this.groupRepository.saveAndFlush(any(Group.class))).willThrow(new RuntimeException());
+    void create_name_conflict() {
+        when(groupRepository.existsByName("test")).thenReturn(true);
 
-        Assertions.assertThrows(RuntimeException.class, () -> groupService.create(mock(GroupDTO.class)));
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> groupService.create(dto)
+        );
+        assertEquals("name already exists: test", exception.getMessage());
+        verify(groupRepository, never()).save(any());
     }
 
     @Test
     void modify() {
-        given(this.groupRepository.findById(anyLong())).willReturn(Optional.of(mock(Group.class)));
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(groupRepository.existsByName("demo")).thenReturn(false);
+        when(groupRepository.save(any(Group.class))).thenReturn(entity);
 
-        given(this.groupRepository.save(any(Group.class))).willReturn(mock(Group.class));
-
+        dto.setName("demo");
         GroupVO vo = groupService.modify(1L, dto);
+        assertNotNull(vo);
+        assertEquals("demo", vo.name());
+        verify(groupRepository).save(any(Group.class));
+    }
 
-        verify(this.groupRepository, times(1)).save(any(Group.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void modify_username_conflict() {
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(groupRepository.existsByName("demo")).thenReturn(true);
+
+        dto.setName("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> groupService.modify(1L, dto)
+        );
+        assertEquals("name already exists: demo", exception.getMessage());
     }
 
     @Test
     void remove() {
+        when(groupRepository.existsById(anyLong())).thenReturn(true);
         groupService.remove(1L);
 
-        verify(this.groupRepository, times(1)).deleteById(anyLong());
+        verify(groupRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(groupRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> groupService.remove(anyLong())
+        );
+        assertEquals("group not found: 0", exception.getMessage());
     }
 
     @Test
     void enable() {
-        given(this.groupRepository.updateEnabledById(anyLong())).willReturn(1);
+        when(groupRepository.existsById(anyLong())).thenReturn(true);
+        when(groupRepository.updateEnabledById(anyLong())).thenReturn(1);
 
         boolean enabled = groupService.enable(1L);
-
-        Assertions.assertTrue(enabled);
+        assertTrue(enabled);
     }
 
+
+    @Test
+    void enable_not_found() {
+        when(groupRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> groupService.enable(1L)
+        );
+        assertEquals("group not found: 1", exception.getMessage());
+    }
 }

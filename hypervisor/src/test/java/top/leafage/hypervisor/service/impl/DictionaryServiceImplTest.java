@@ -15,7 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +36,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * dictionary controller test
@@ -58,107 +58,133 @@ class DictionaryServiceImplTest {
     private DictionaryServiceImpl dictionaryService;
 
     private DictionaryDTO dto;
+    private Dictionary entity;
 
     @BeforeEach
     void setUp() {
         dto = new DictionaryDTO();
-        dto.setName("group");
+        dto.setName("test");
+        dto.setSuperiorId(1L);
+        dto.setDescription("description");
+
+        entity = DictionaryDTO.toEntity(dto);
     }
 
     @Test
     void retrieve() {
         Page<Dictionary> page = new PageImpl<>(List.of(mock(Dictionary.class)));
 
-        given(this.dictionaryRepository.findAll(ArgumentMatchers.<Specification<Dictionary>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(dictionaryRepository.findAll(ArgumentMatchers.<Specification<Dictionary>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<DictionaryVO> voPage = dictionaryService.retrieve(0, 2, "id", true, "test");
-
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(dictionaryRepository).findAll(ArgumentMatchers.<Specification<Dictionary>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.of(mock(Dictionary.class)));
+        when(dictionaryRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         DictionaryVO vo = dictionaryService.fetch(1L);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(dictionaryRepository).findById(anyLong());
+    }
 
-        Assertions.assertNotNull(vo);
+    @Test
+    void fetch_not_found() {
+        when(dictionaryRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> dictionaryService.fetch(anyLong())
+        );
+        assertEquals("dictionary not found: 0", exception.getMessage());
+        verify(dictionaryRepository).findById(anyLong());
     }
 
     @Test
     void subset() {
-        given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(List.of(mock(Dictionary.class)));
+        when(dictionaryRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(mock(Dictionary.class)));
 
         List<DictionaryVO> voList = dictionaryService.subset(1L);
-
-        Assertions.assertNotNull(voList);
+        assertNotNull(voList);
     }
 
     @Test
     void subset_empty() {
-        given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(Collections.emptyList());
+        when(dictionaryRepository.findAllBySuperiorId(anyLong())).thenReturn(Collections.emptyList());
 
         List<DictionaryVO> voList = dictionaryService.subset(1L);
-
-        Assertions.assertEquals(Collections.emptyList(), voList);
-    }
-
-    @Test
-    void exists() {
-        given(this.dictionaryRepository.existsBySuperiorIdAndNameAndIdNot(anyLong(), anyString(),
-                anyLong())).willReturn(true);
-
-        boolean exists = dictionaryService.exists(1L, "test", 2L);
-
-        Assertions.assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.dictionaryRepository.existsBySuperiorIdAndName(anyLong(), anyString())).willReturn(true);
-
-        boolean exists = dictionaryService.exists(1L, "test", null);
-
-        Assertions.assertTrue(exists);
+        assertEquals(Collections.emptyList(), voList);
     }
 
     @Test
     void create() {
-        given(this.dictionaryRepository.saveAndFlush(any(Dictionary.class))).willReturn(mock(Dictionary.class));
+        when(dictionaryRepository.existsByName("test")).thenReturn(false);
+        when(dictionaryRepository.saveAndFlush(any(Dictionary.class))).thenReturn(entity);
 
-        DictionaryVO vo = dictionaryService.create(mock(DictionaryDTO.class));
+        DictionaryVO vo = dictionaryService.create(dto);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(dictionaryRepository).saveAndFlush(any(Dictionary.class));
+    }
 
-        verify(this.dictionaryRepository, times(1)).saveAndFlush(any(Dictionary.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void create_name_conflict() {
+        when(dictionaryRepository.existsByName( "test")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> dictionaryService.create(dto)
+        );
+        assertEquals("name already exists: test", exception.getMessage());
+        verify(dictionaryRepository, never()).save(any());
     }
 
     @Test
     void modify() {
-        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.of(mock(Dictionary.class)));
+        when(dictionaryRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(dictionaryRepository.existsByName("demo")).thenReturn(false);
+        when(dictionaryRepository.save(any(Dictionary.class))).thenReturn(entity);
 
-        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(mock(Dictionary.class));
-
+        dto.setName("demo");
         DictionaryVO vo = dictionaryService.modify(1L, dto);
+        assertNotNull(vo);
+        assertEquals("demo", vo.name());
+        verify(dictionaryRepository).save(any(Dictionary.class));
+    }
 
-        verify(this.dictionaryRepository, times(1)).save(any(Dictionary.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void modify_username_conflict() {
+        when(dictionaryRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(dictionaryRepository.existsByName("demo")).thenReturn(true);
+
+        dto.setName("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> dictionaryService.modify(1L, dto)
+        );
+        assertEquals("name already exists: demo", exception.getMessage());
     }
 
     @Test
     void remove() {
-        dictionaryService.remove(1L);
+        when(dictionaryRepository.existsById(anyLong())).thenReturn(true);
 
-        verify(this.dictionaryRepository, times(1)).deleteById(anyLong());
+        dictionaryService.remove(1L);
+        verify(dictionaryRepository).deleteById(anyLong());
     }
 
     @Test
     void enable() {
-        given(this.dictionaryRepository.updateEnabledById(anyLong())).willReturn(1);
+        when(dictionaryRepository.existsById(anyLong())).thenReturn(true);
+        when(dictionaryRepository.updateEnabledById(anyLong())).thenReturn(1);
 
         boolean enabled = dictionaryService.enable(1L);
-
-        Assertions.assertTrue(enabled);
+        assertTrue(enabled);
     }
 
 }

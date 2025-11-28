@@ -31,7 +31,7 @@ public interface FileRecordService extends JpaCrudService<FileRecordDTO, FileRec
      * 上传
      *
      * @param file 文件
-     * @return 结果
+     * @return the result.
      */
     FileRecordVO upload(MultipartFile file);
 }

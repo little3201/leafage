@@ -31,7 +31,7 @@ import java.util.Set;
 @Table(name = "privileges")
 public class Privilege extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
     private Long superiorId;

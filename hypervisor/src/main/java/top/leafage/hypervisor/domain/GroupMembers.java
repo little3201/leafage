@@ -35,6 +35,13 @@ public class GroupMembers extends AbstractPersistable<@NonNull Long> {
     @Column(nullable = false, length = 50)
     private String username;
 
+    public GroupMembers() {
+    }
+
+    public GroupMembers(Long groupId, String username) {
+        this.groupId = groupId;
+        this.username = username;
+    }
 
     public Long getGroupId() {
         return groupId;

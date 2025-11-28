@@ -17,8 +17,6 @@ package top.leafage.hypervisor.domain.vo;
 
 import top.leafage.hypervisor.domain.AccessLog;
 
-import java.net.InetAddress;
-
 /**
  * vo class for access log.
  *
@@ -28,7 +26,7 @@ public record AccessLogVO(
         Long id,
         String url,
         String httpMethod,
-        InetAddress ip,
+        String ip,
         String params,
         String body,
         Integer statusCode,
@@ -40,7 +38,7 @@ public record AccessLogVO(
                 entity.getId(),
                 entity.getUrl(),
                 entity.getHttpMethod(),
-                entity.getIp(),
+                entity.getIp() == null ? null : entity.getIp().getHostAddress(),
                 entity.getParams(),
                 entity.getBody(),
                 entity.getStatusCode(),

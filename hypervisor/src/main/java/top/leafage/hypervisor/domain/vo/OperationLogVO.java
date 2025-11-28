@@ -40,7 +40,7 @@ public record OperationLogVO(
                 entity.getAction(),
                 entity.getParams(),
                 entity.getBody(),
-                entity.getIp().getHostAddress(),
+                entity.getIp() == null ? null : entity.getIp().getHostAddress(),
                 entity.getSessionId(),
                 entity.getUserAgent(),
                 entity.getStatusCode()

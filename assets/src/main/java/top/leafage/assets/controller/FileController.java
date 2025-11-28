@@ -80,10 +80,10 @@ public class FileController {
     }
 
     /**
-     * 根据 id 查询
+     * fetch.
      *
-     * @param id 业务id
-     * @return 查询的数据，异常时返回204状态码
+     * @param id th pk.
+     * @return th result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
@@ -99,10 +99,10 @@ public class FileController {
     }
 
     /**
-     * 添加信息
+     * create.
      *
-     * @param file 要添加的数据
-     * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
+     * @param file the request body.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
@@ -122,10 +122,10 @@ public class FileController {
     }
 
     /**
-     * 根据 id 查询
+     * fetch.
      *
-     * @param id 业务id
-     * @return 查询的数据，异常时返回204状态码
+     * @param id th pk.
+     * @return th result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")
@@ -160,9 +160,9 @@ public class FileController {
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")

@@ -15,8 +15,6 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +30,7 @@ import top.leafage.hypervisor.service.RoleMembersService;
 import top.leafage.hypervisor.service.RolePrivilegesService;
 import top.leafage.hypervisor.service.RoleService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -43,8 +42,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/roles")
 public class RoleController {
-
-    private final Logger logger = LoggerFactory.getLogger(RoleController.class);
 
     private final RoleMembersService roleMembersService;
     private final RoleService roleService;
@@ -78,134 +75,86 @@ public class RoleController {
     @GetMapping
     public ResponseEntity<Page<RoleVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                  String sortBy, boolean descending, String filters) {
-        Page<RoleVO> voPage;
-        try {
-            voPage = roleService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.info("Retrieve role error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<RoleVO> voPage = roleService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
     /**
-     * 查询信息
+     * fetch by id.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles')")
     @GetMapping("/{id}")
     public ResponseEntity<RoleVO> fetch(@PathVariable Long id) {
-        RoleVO vo;
-        try {
-            vo = roleService.fetch(id);
-        } catch (Exception e) {
-            logger.info("Fetch role error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        RoleVO vo = roleService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
     /**
-     * 添加信息
+     * create.
      *
-     * @param dto 要添加的数据
-     * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
+     * @param dto the request body.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:create')")
     @PostMapping
     public ResponseEntity<RoleVO> create(@Valid @RequestBody RoleDTO dto) {
-        RoleVO vo;
-        try {
-            boolean existed = roleService.exists(dto.getName(), null);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = roleService.create(dto);
-        } catch (Exception e) {
-            logger.error("Create role error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        RoleVO vo = roleService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
     /**
-     * 修改信息
+     * modify.
      *
-     * @param id  主键
-     * @param dto 要修改的数据
-     * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
+     * @param id  the pk.
+     * @param dto the request body.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<RoleVO> modify(@PathVariable Long id, @Valid @RequestBody RoleDTO dto) {
-        RoleVO vo;
-        try {
-            boolean existed = roleService.exists(dto.getName(), id);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = roleService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify role error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
+        RoleVO vo = roleService.modify(id, dto);
         return ResponseEntity.accepted().body(vo);
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_roles:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            roleService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove role error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        roleService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
-     * Enable a record when enabled is false or disable when enabled is ture.
+     * enable/disable..
      *
-     * @param id The record ID.
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @param id the pk..
+     * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_roles:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
-        boolean enabled;
-        try {
-            enabled = roleService.enable(id);
-        } catch (Exception e) {
-            logger.error("Toggle enabled error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(enabled);
+        boolean enabled = roleService.enable(id);
+        return ResponseEntity.ok(enabled);
     }
 
     /**
-     * Import the records.
+     * import..
      *
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_roles:import')")
     @PostMapping("/import")
-    public ResponseEntity<List<RoleVO>> importFromFile(MultipartFile file) {
-        List<RoleVO> voList;
-        try {
-            List<RoleDTO> dtoList = ExcelReader.read(file.getInputStream(), RoleDTO.class);
-            voList = roleService.createAll(dtoList);
-        } catch (Exception e) {
-            logger.error("Import role error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+    public ResponseEntity<List<RoleVO>> importFromFile(MultipartFile file) throws IOException {
+        List<RoleDTO> dtoList = ExcelReader.read(file.getInputStream(), RoleDTO.class);
+        List<RoleVO> voList = roleService.createAll(dtoList);
+
         return ResponseEntity.ok().body(voList);
     }
 
@@ -217,15 +166,9 @@ public class RoleController {
      * @return 操作结果
      */
     @PatchMapping("/{id}/members")
-    public ResponseEntity<List<RoleMembers>> relation(@PathVariable Long id, @RequestBody Set<String> usernames) {
-        List<RoleMembers> list;
-        try {
-            list = roleMembersService.relation(id, usernames);
-        } catch (Exception e) {
-            logger.error("Relation role members error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(list);
+    public ResponseEntity<List<RoleMembers>> relationMembers(@PathVariable Long id, @RequestBody Set<String> usernames) {
+        List<RoleMembers> roleMembers = roleMembersService.relation(id, usernames);
+        return ResponseEntity.accepted().body(roleMembers);
     }
 
     /**
@@ -236,14 +179,9 @@ public class RoleController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/members")
-    public ResponseEntity<Void> removeRelation(@PathVariable Long id, @RequestParam Set<String> usernames) {
-        try {
-            roleMembersService.removeRelation(id, usernames);
-        } catch (Exception e) {
-            logger.error("Remove relation role members error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removeMembers(@PathVariable Long id, @RequestParam Set<String> usernames) {
+        roleMembersService.removeRelation(id, usernames);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -254,32 +192,8 @@ public class RoleController {
      */
     @GetMapping("/{id}/members")
     public ResponseEntity<List<RoleMembers>> members(@PathVariable Long id) {
-        List<RoleMembers> voList;
-        try {
-            voList = roleMembersService.members(id);
-        } catch (Exception e) {
-            logger.error("Retrieve role members error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voList);
-    }
-
-    /**
-     * 查询role-privilege关联
-     *
-     * @param id role代码
-     * @return 操作结果
-     */
-    @GetMapping("/{id}/privileges")
-    public ResponseEntity<List<RolePrivileges>> privileges(@PathVariable Long id) {
-        List<RolePrivileges> voList;
-        try {
-            voList = rolePrivilegesService.privileges(id);
-        } catch (Exception e) {
-            logger.error("Retrieve role privileges error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voList);
+        List<RoleMembers> members = roleMembersService.members(id);
+        return ResponseEntity.ok(members);
     }
 
     /**
@@ -291,16 +205,22 @@ public class RoleController {
      * @return 操作结果
      */
     @PatchMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<RolePrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId,
-                                                        String action) {
-        RolePrivileges rp;
-        try {
-            rp = rolePrivilegesService.relation(id, privilegeId, action);
-        } catch (Exception e) {
-            logger.error("Relation role privileges error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(rp);
+    public ResponseEntity<RolePrivileges> relationPrivileges(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                             String action) {
+        RolePrivileges rolePrivilege = rolePrivilegesService.relation(id, privilegeId, action);
+        return ResponseEntity.accepted().body(rolePrivilege);
+    }
+
+    /**
+     * 查询role-privilege关联
+     *
+     * @param id role代码
+     * @return 操作结果
+     */
+    @GetMapping("/{id}/privileges")
+    public ResponseEntity<List<RolePrivileges>> privileges(@PathVariable Long id) {
+        List<RolePrivileges> privileges = rolePrivilegesService.privileges(id);
+        return ResponseEntity.ok(privileges);
     }
 
     /**
@@ -312,14 +232,9 @@ public class RoleController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId,
-                                                    String action) {
-        try {
-            rolePrivilegesService.removeRelation(id, privilegeId, action);
-        } catch (Exception e) {
-            logger.error("Remove relation role privileges error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removePrivileges(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                 String action) {
+        rolePrivilegesService.removeRelation(id, privilegeId, action);
+        return ResponseEntity.noContent().build();
     }
 }

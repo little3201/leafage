@@ -76,10 +76,10 @@ public class RegionController {
     }
 
     /**
-     * 根据 id 查询
+     * fetch.
      *
-     * @param id 业务id
-     * @return 查询的数据，异常时返回204状态码
+     * @param id th pk.
+     * @return th result.
      */
     @GetMapping("/{id}")
     public ResponseEntity<RegionVO> fetch(@PathVariable Long id) {
@@ -94,10 +94,10 @@ public class RegionController {
     }
 
     /**
-     * 添加信息
+     * create.
      *
-     * @param dto 要添加的数据
-     * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
+     * @param dto the request body.
+     * @return the result.
      */
     @PostMapping
     public ResponseEntity<RegionVO> create(@Valid @RequestBody RegionDTO dto) {
@@ -116,11 +116,11 @@ public class RegionController {
     }
 
     /**
-     * 修改信息
+     * modify.
      *
-     * @param id  主键
-     * @param dto 要修改的数据
-     * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
+     * @param id  the pk.
+     * @param dto the request body.
+     * @return the result.
      */
     @PutMapping("/{id}")
     public ResponseEntity<RegionVO> modify(@PathVariable Long id, @RequestBody RegionDTO dto) {
@@ -139,9 +139,9 @@ public class RegionController {
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
@@ -155,10 +155,10 @@ public class RegionController {
     }
 
     /**
-     * Enable a record when enabled is false or disable when enabled is ture.
+     * enable/disable..
      *
-     * @param id The record ID.
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @param id the pk..
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_regions:enable')")
     @PatchMapping("/{id}")
@@ -174,9 +174,9 @@ public class RegionController {
     }
 
     /**
-     * Import the records.
+     * import..
      *
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_regions:import')")
     @PostMapping("/import")

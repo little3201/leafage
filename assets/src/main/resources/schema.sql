@@ -31,7 +31,7 @@ CREATE TABLE tags
 COMMENT
 ON TABLE tags IS '标签表';
 COMMENT
-ON COLUMN tags.id IS '主键';
+ON COLUMN tags.id IS 'the pk.';
 COMMENT
 ON COLUMN tags.name IS '名称';
 COMMENT
@@ -66,7 +66,7 @@ CREATE TABLE posts
 COMMENT
 ON TABLE posts IS '帖子表';
 COMMENT
-ON COLUMN posts.id IS '主键';
+ON COLUMN posts.id IS 'the pk.';
 COMMENT
 ON COLUMN posts.title IS '标题';
 COMMENT
@@ -100,7 +100,7 @@ CREATE TABLE tag_posts
 COMMENT
 ON TABLE tag_posts IS '标签帖子关联表';
 COMMENT
-ON COLUMN tag_posts.id IS '主键';
+ON COLUMN tag_posts.id IS 'the pk.';
 COMMENT
 ON COLUMN tag_posts.tag_id IS 'tag主键';
 COMMENT
@@ -128,7 +128,7 @@ CREATE TABLE post_content
 COMMENT
 ON TABLE post_content IS '帖子内容表';
 COMMENT
-ON COLUMN post_content.id IS '主键';
+ON COLUMN post_content.id IS 'the pk.';
 COMMENT
 ON COLUMN post_content.post_id IS '帖子ID';
 COMMENT
@@ -166,7 +166,7 @@ CREATE TABLE comments
 COMMENT
 ON TABLE comments IS '评论表';
 COMMENT
-ON COLUMN comments.id IS '主键';
+ON COLUMN comments.id IS 'the pk.';
 COMMENT
 ON COLUMN comments.post_id IS '帖子ID';
 COMMENT
@@ -206,7 +206,7 @@ CREATE TABLE regions
 COMMENT
 ON TABLE regions IS '地区表';
 COMMENT
-ON COLUMN regions.id IS '主键';
+ON COLUMN regions.id IS 'the pk.';
 COMMENT
 ON COLUMN regions.name IS '名称';
 COMMENT
@@ -248,7 +248,7 @@ CREATE TABLE file_records
     last_modified_date timestamp(6)
 );
 COMMENT
-ON COLUMN file_records.id IS '主键';
+ON COLUMN file_records.id IS 'the pk.';
 COMMENT
 ON COLUMN file_records.name IS '名称';
 COMMENT

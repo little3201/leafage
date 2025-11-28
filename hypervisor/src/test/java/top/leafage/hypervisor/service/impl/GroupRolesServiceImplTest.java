@@ -15,7 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,11 +27,11 @@ import top.leafage.hypervisor.repository.GroupRolesRepository;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 
 /**
@@ -48,29 +48,45 @@ class GroupRolesServiceImplTest {
     @InjectMocks
     private GroupRolesServiceImpl groupRolesService;
 
+    private GroupRoles groupRoles;
+
+    @BeforeEach
+    void setUp() {
+        groupRoles = new GroupRoles(1L, 1L);
+    }
+
     @Test
     void roles() {
-        given(this.groupRolesRepository.findAllByGroupId(anyLong())).willReturn(List.of(mock(GroupRoles.class)));
+        when(groupRolesRepository.findAllByGroupId(anyLong())).thenReturn(List.of(mock(GroupRoles.class)));
 
         List<GroupRoles> members = groupRolesService.roles(1L);
-        Assertions.assertNotNull(members);
+        assertEquals(1, members.size());
+        verify(groupRolesRepository).findAllByGroupId(anyLong());
     }
 
     @Test
     void groups() {
-        given(this.groupRolesRepository.findAllByRoleId(anyLong())).willReturn(List.of(mock(GroupRoles.class)));
+        when(groupRolesRepository.findAllByRoleId(anyLong())).thenReturn(List.of(mock(GroupRoles.class)));
 
         List<GroupRoles> groups = groupRolesService.groups(1L);
-        Assertions.assertNotNull(groups);
+        assertEquals(1, groups.size());
+        verify(groupRolesRepository).findAllByRoleId(anyLong());
     }
 
     @Test
     void relation() {
-        given(this.groupRolesRepository.saveAllAndFlush(anyCollection())).willReturn(anyList());
+        when(groupRolesRepository.saveAllAndFlush(anyCollection())).thenReturn(List.of(mock(GroupRoles.class)));
 
         List<GroupRoles> relation = groupRolesService.relation(1L, Set.of(1L));
+        assertEquals(1, relation.size());
+        verify(groupRolesRepository).saveAllAndFlush(anyList());
+    }
 
-        verify(this.groupRolesRepository, times(1)).saveAllAndFlush(anyList());
-        Assertions.assertNotNull(relation);
+    @Test
+    void removeRelation() {
+        when(groupRolesRepository.findAllByGroupId(anyLong())).thenReturn(List.of(groupRoles));
+
+        groupRolesService.removeRelation(1L, Set.of(1L));
+        verify(groupRolesRepository).deleteAllByIdInBatch(anyCollection());
     }
 }

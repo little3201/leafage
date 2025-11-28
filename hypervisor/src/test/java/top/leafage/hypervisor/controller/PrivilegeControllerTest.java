@@ -41,7 +41,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
@@ -87,10 +87,10 @@ class PrivilegeControllerTest {
     void retrieve() {
         Page<@NonNull PrivilegeVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.privilegeService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(privilegeService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/privileges")
+        assertThat(mvc.get().uri("/privileges")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -103,10 +103,10 @@ class PrivilegeControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.privilegeService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(privilegeService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/privileges")
+        assertThat(mvc.get().uri("/privileges")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -118,26 +118,26 @@ class PrivilegeControllerTest {
 
     @Test
     void fetch() {
-        given(this.privilegeService.fetch(anyLong())).willReturn(vo);
+        when(privilegeService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/privileges/{id}", anyLong()))
+        assertThat(mvc.get().uri("/privileges/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.privilegeService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(privilegeService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/privileges/{id}", anyLong()))
+        assertThat(mvc.get().uri("/privileges/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void modify() {
-        given(this.privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).willReturn(vo);
+        when(privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.put().uri("/privileges/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/privileges/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -145,9 +145,9 @@ class PrivilegeControllerTest {
 
     @Test
     void modify_error() {
-        given(this.privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).willThrow(new RuntimeException());
+        when(privilegeService.modify(anyLong(), any(PrivilegeDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.put().uri("/privileges/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/privileges/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
@@ -155,26 +155,26 @@ class PrivilegeControllerTest {
     @Test
     void tree() {
         TreeNode<Long> treeNode = TreeNode.withId(1L).name("test").build();
-        given(this.privilegeService.tree(anyString())).willReturn(Collections.singletonList(treeNode));
+        when(privilegeService.tree(anyString())).thenReturn(Collections.singletonList(treeNode));
 
-        assertThat(this.mvc.get().uri("/privileges/tree"))
+        assertThat(mvc.get().uri("/privileges/tree"))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void tree_error() {
-        given(this.privilegeService.tree(anyString())).willThrow(new RuntimeException());
+        when(privilegeService.tree(anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/privileges/tree"))
+        assertThat(mvc.get().uri("/privileges/tree"))
                 .hasStatus4xxClientError();
     }
 
     @Test
     void enable() {
-        given(this.privilegeService.enable(anyLong())).willReturn(true);
+        when(privilegeService.enable(anyLong())).thenReturn(true);
 
-        assertThat(this.mvc.patch().uri("/privileges/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.patch().uri("/privileges/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
     }

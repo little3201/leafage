@@ -15,10 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +30,6 @@ import top.leafage.hypervisor.service.AuditLogService;
 @RestController
 @RequestMapping("/audit-logs")
 public class AuditLogController {
-
-    private final Logger logger = LoggerFactory.getLogger(AuditLogController.class);
 
     private final AuditLogService auditLogService;
 
@@ -62,50 +57,33 @@ public class AuditLogController {
     @GetMapping
     public ResponseEntity<Page<AuditLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                      String sortBy, boolean descending, String filters) {
-        Page<AuditLogVO> voPage;
-        try {
-            voPage = auditLogService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve record error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<AuditLogVO> voPage = auditLogService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
     /**
-     * 查询信息
+     * fetch by id.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs')")
     @GetMapping("/{id}")
     public ResponseEntity<AuditLogVO> fetch(@PathVariable Long id) {
-        AuditLogVO vo;
-        try {
-            vo = auditLogService.fetch(id);
-        } catch (Exception e) {
-            logger.info("Fetch audit log error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        AuditLogVO vo = auditLogService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_audit_logs:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            auditLogService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove audit log error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        auditLogService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

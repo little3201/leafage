@@ -17,8 +17,6 @@ package top.leafage.hypervisor.domain.vo;
 
 import top.leafage.hypervisor.domain.AuditLog;
 
-import java.net.InetAddress;
-
 /**
  * vo class for audit log.
  *
@@ -30,7 +28,7 @@ public record AuditLogVO(
         String resource,
         String oldValue,
         String newValue,
-        InetAddress ip,
+        String ip,
         Integer statusCode,
         Long operatedTimes
 ) {
@@ -41,7 +39,7 @@ public record AuditLogVO(
                 entity.getResource(),
                 entity.getOldValue(),
                 entity.getNewValue(),
-                entity.getIp(),
+                entity.getIp() == null ? null : entity.getIp().getHostAddress(),
                 entity.getStatusCode(),
                 entity.getOperatedTimes()
         );

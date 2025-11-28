@@ -15,9 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import io.leafage.hypervisor.domain.*;
-import io.leafage.hypervisor.repository.*;
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import top.leafage.common.TreeNode;
+import top.leafage.common.data.domain.TreeNode;
 import top.leafage.hypervisor.domain.*;
 import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
 import top.leafage.hypervisor.domain.vo.PrivilegeVO;
@@ -39,11 +37,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 
 /**
@@ -75,92 +73,114 @@ class PrivilegeServiceImplTest {
     @InjectMocks
     private PrivilegeServiceImpl privilegeService;
 
-    private PrivilegeDTO privilegeDTO;
+    private PrivilegeDTO dto;
+    private Privilege entity;
 
     @BeforeEach
     void init() {
-        privilegeDTO = new PrivilegeDTO();
-        privilegeDTO.setName("西安市");
-        privilegeDTO.setIcon("user");
-        privilegeDTO.setPath("/user");
-        privilegeDTO.setSuperiorId(1L);
+        dto = new PrivilegeDTO();
+        dto.setName("test");
+        dto.setIcon("test");
+        dto.setPath("/test");
+        dto.setSuperiorId(1L);
+
+        entity = PrivilegeDTO.toEntity(dto);
     }
 
     @Test
     void retrieve() {
         Page<Privilege> page = new PageImpl<>(List.of(new Privilege()));
 
-        given(this.privilegeRepository.findAll(ArgumentMatchers.<Specification<Privilege>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(privilegeRepository.findAll(ArgumentMatchers.<Specification<Privilege>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<PrivilegeVO> voPage = privilegeService.retrieve(0, 2, "id", true, null);
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(privilegeRepository).findAll(ArgumentMatchers.<Specification<Privilege>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(mock(Privilege.class)));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         PrivilegeVO vo = privilegeService.fetch(1L);
-
-        Assertions.assertNotNull(vo);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(privilegeRepository).findById(anyLong());
     }
 
     @Test
     void subset() {
-        given(this.privilegeRepository.findAllBySuperiorId(anyLong())).willReturn(List.of(mock(Privilege.class)));
+        when(privilegeRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(mock(Privilege.class)));
 
-        List<Privilege> list = privilegeService.subset(1L);
-
-        Assertions.assertNotNull(list);
+        List<PrivilegeVO> voList = privilegeService.subset(1L);
+        assertEquals(1, voList.size());
     }
 
     @Test
     void subset_empty() {
-        given(this.privilegeRepository.findAllBySuperiorId(anyLong())).willReturn(Collections.emptyList());
+        when(privilegeRepository.findAllBySuperiorId(anyLong())).thenReturn(Collections.emptyList());
 
-        List<Privilege> list = privilegeService.subset(1L);
-
-        Assertions.assertEquals(Collections.emptyList(), list);
+        List<PrivilegeVO> voList = privilegeService.subset(1L);
+        assertEquals(Collections.emptyList(), voList);
     }
 
     @Test
     void modify() {
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(mock(Privilege.class)));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(privilegeRepository.existsByName("demo")).thenReturn(false);
+        when(privilegeRepository.save(any(Privilege.class))).thenReturn(entity);
 
-        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(mock(Privilege.class));
+        dto.setName("demo");
+        PrivilegeVO vo = privilegeService.modify(1L, dto);
+        assertNotNull(vo);
+        assertEquals("demo", vo.name());
+        verify(privilegeRepository).save(any(Privilege.class));
+    }
 
-        PrivilegeVO vo = privilegeService.modify(anyLong(), privilegeDTO);
+    @Test
+    void modify_username_conflict() {
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(privilegeRepository.existsByName("demo")).thenReturn(true);
 
-        verify(this.privilegeRepository, times(1)).save(any(Privilege.class));
-        Assertions.assertNotNull(vo);
+        dto.setName("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> privilegeService.modify(1L, dto)
+        );
+        assertEquals("name already exists: demo", exception.getMessage());
     }
 
     @Test
     void tree() {
-        given(this.groupMembersRepository.findAllByUsername(anyString())).willReturn(Collections.singletonList(mock(GroupMembers.class)));
-
-        given(this.groupRolesRepository.findAllByGroupId(anyLong())).willReturn(Collections.singletonList(mock(GroupRoles.class)));
-
-        given(this.groupPrivilegesRepository.findAllByGroupId(anyLong())).willReturn(Collections.singletonList(mock(GroupPrivileges.class)));
-
-        given(this.roleMembersRepository.findAllByUsername(anyString())).willReturn(Collections.singletonList(mock(RoleMembers.class)));
-
-        given(this.rolePrivilegesRepository.findAllByRoleId(anyLong())).willReturn(Collections.singletonList(mock(RolePrivileges.class)));
-
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(mock(Privilege.class)));
+        when(groupMembersRepository.findAllByUsername(anyString())).thenReturn(Collections.singletonList(mock(GroupMembers.class)));
+        when(groupRolesRepository.findAllByGroupId(anyLong())).thenReturn(Collections.singletonList(mock(GroupRoles.class)));
+        when(groupPrivilegesRepository.findAllByGroupId(anyLong())).thenReturn(Collections.singletonList(mock(GroupPrivileges.class)));
+        when(roleMembersRepository.findAllByUsername(anyString())).thenReturn(Collections.singletonList(mock(RoleMembers.class)));
+        when(rolePrivilegesRepository.findAllByRoleId(anyLong())).thenReturn(Collections.singletonList(mock(RolePrivileges.class)));
 
         List<TreeNode<Long>> nodes = privilegeService.tree("test");
-        Assertions.assertNotNull(nodes);
+        assertNotNull(nodes);
     }
 
     @Test
     void enable() {
-        given(this.privilegeRepository.updateEnabledById(anyLong())).willReturn(1);
+        when(privilegeRepository.existsById(anyLong())).thenReturn(true);
+        when(privilegeRepository.updateEnabledById(anyLong())).thenReturn(1);
 
         boolean enabled = privilegeService.enable(1L);
-
-        Assertions.assertTrue(enabled);
+        assertTrue(enabled);
     }
 
+    @Test
+    void enable_not_found() {
+        when(privilegeRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> privilegeService.enable(1L)
+        );
+        assertEquals("privilege not found: 1", exception.getMessage());
+    }
 }

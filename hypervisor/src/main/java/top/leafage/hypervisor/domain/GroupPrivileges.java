@@ -49,6 +49,12 @@ public class GroupPrivileges extends AbstractPersistable<@NonNull Long> {
         this.actions = actions;
     }
 
+    public GroupPrivileges(Long id, Long groupId, Long privilegeId, Set<String> actions) {
+        this.setId(id);
+        this.groupId = groupId;
+        this.privilegeId = privilegeId;
+        this.actions = actions;
+    }
 
     public Long getGroupId() {
         return groupId;

@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -52,18 +54,17 @@ class UserControllerTest {
     @Autowired
     private MockMvcTester mvc;
 
-    @Autowired
-    private ObjectMapper mapper;
-
     @MockitoBean
     private UserService userService;
 
+    private ObjectMapper mapper;
     private UserVO vo;
-
     private UserDTO dto;
 
     @BeforeEach
     void setUp() {
+        mapper = new ObjectMapper();
+
         vo = new UserVO(1L, "test", true, true, true, true);
 
         dto = new UserDTO();
@@ -76,10 +77,10 @@ class UserControllerTest {
     void retrieve() {
         Page<@NonNull UserVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.userService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(userService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/users")
+        assertThat(mvc.get().uri("/users")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -88,45 +89,47 @@ class UserControllerTest {
         )
                 .hasStatusOk()
                 .body().isNotNull().hasSize(1);
+
+        verify(userService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
     void retrieve_error() {
-        given(this.userService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(userService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/users")
+        assertThat(mvc.get().uri("/users")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
                 .queryParam("filters", "scheduler:like:a")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatusOk();
     }
 
     @Test
     void fetch() {
-        given(this.userService.fetch(anyLong())).willReturn(vo);
+        when(userService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/users/{id}", anyLong()))
+        assertThat(mvc.get().uri("/users/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.userService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(userService.fetch(anyLong())).thenThrow(new EntityNotFoundException());
 
-        assertThat(this.mvc.get().uri("/users/{id}", anyLong()))
+        assertThat(mvc.get().uri("/users/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void create() {
-        given(this.userService.create(any(UserDTO.class))).willReturn(vo);
+        when(userService.create(any(UserDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.post().uri("/users").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/users").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatusOk()
@@ -135,9 +138,9 @@ class UserControllerTest {
 
     @Test
     void modify() {
-        given(this.userService.modify(anyLong(), any(UserDTO.class))).willReturn(vo);
+        when(userService.modify(anyLong(), any(UserDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.put().uri("/users/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/users/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -145,19 +148,27 @@ class UserControllerTest {
 
     @Test
     void modify_error() {
-        given(this.userService.modify(anyLong(), any(UserDTO.class))).willThrow(new RuntimeException());
+        when(userService.modify(anyLong(), any(UserDTO.class))).thenThrow(new EntityNotFoundException());
 
-        assertThat(this.mvc.put().uri("/users/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/users/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
     @Test
     void enable() {
-        given(this.userService.enable(anyLong())).willReturn(true);
+        when(userService.enable(anyLong())).thenReturn(true);
 
-        assertThat(this.mvc.patch().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.patch().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
+    }
+
+    @Test
+    void enable_error() {
+        when(userService.enable(anyLong())).thenThrow(new EntityNotFoundException());
+
+        assertThat(mvc.patch().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatus(HttpStatus.NOT_FOUND);
     }
 
 }

@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.domain.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import top.leafage.hypervisor.domain.User;
 
@@ -30,6 +31,7 @@ public class UserDTO {
     @NotBlank
     private String name;
 
+    @Email
     private String email;
 
 

@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static top.leafage.common.data.converter.ModelToTreeNodeConverter.convertToTree;
+import static top.leafage.common.data.converter.ModelToTreeNodeConverter.toTree;
 
 /**
  * privilege service impl.
@@ -127,7 +128,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
 
         List<Privilege> allPrivileges = new ArrayList<>(privilegeMap.values());
         Set<String> meta = Set.of("path", "redirect", "component", "icon", "actions");
-        return convertToTree(allPrivileges, meta);
+        return toTree(allPrivileges, meta);
     }
 
     /**
@@ -158,7 +159,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
 
         return privilegeRepository.findById(id)
                 .map(PrivilegeVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("privilege log not found: " + id));
     }
 
     /**
@@ -167,7 +168,9 @@ public class PrivilegeServiceImpl implements PrivilegeService {
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!privilegeRepository.existsById(id)) {
+            throw new EntityNotFoundException("privilege not found: " + id);
+        }
         return privilegeRepository.updateEnabledById(id) > 0;
     }
 
@@ -178,11 +181,14 @@ public class PrivilegeServiceImpl implements PrivilegeService {
     public PrivilegeVO modify(Long id, PrivilegeDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        Privilege entity = privilegeRepository.findById(id).map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return privilegeRepository.save(existing);
-                })
-                .orElseThrow();
+        Privilege existing = privilegeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("privilege not found: " + id));
+        if (!existing.getName().equals(dto.getName()) &&
+                privilegeRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
+        copier.copy(dto, existing, null);
+        Privilege entity = privilegeRepository.save(existing);
         return PrivilegeVO.from(entity);
     }
 

@@ -28,7 +28,7 @@ public interface UserService extends JpaCrudService<UserDTO, UserVO> {
     /**
      * Update accountNonLocked.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return result.
      */
     boolean unlock(Long id);

@@ -15,7 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,11 +27,11 @@ import top.leafage.hypervisor.repository.GroupMembersRepository;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 
 /**
@@ -48,30 +48,45 @@ class GroupMembersServiceImplTest {
     @InjectMocks
     private GroupMembersServiceImpl groupMembersService;
 
+    private GroupMembers groupMembers;
+
+    @BeforeEach
+    void setUp() {
+        groupMembers = new GroupMembers(1L, "test");
+    }
+
     @Test
     void members() {
-        given(this.groupMembersRepository.findAllByGroupId(anyLong())).willReturn(List.of(mock(GroupMembers.class)));
+        when(groupMembersRepository.findAllByGroupId(anyLong())).thenReturn(List.of(mock(GroupMembers.class)));
 
         List<GroupMembers> members = groupMembersService.members(1L);
-        Assertions.assertNotNull(members);
+        assertEquals(1, members.size());
+        verify(groupMembersRepository).findAllByGroupId(anyLong());
     }
 
     @Test
     void groups() {
-        given(this.groupMembersRepository.findAllByUsername(anyString())).willReturn(List.of(mock(GroupMembers.class)));
+        when(groupMembersRepository.findAllByUsername(anyString())).thenReturn(List.of(mock(GroupMembers.class)));
 
         List<GroupMembers> groups = groupMembersService.groups("test");
-        Assertions.assertNotNull(groups);
+        assertEquals(1, groups.size());
+        verify(groupMembersRepository).findAllByUsername(anyString());
     }
 
     @Test
     void relation() {
-
-        given(this.groupMembersRepository.saveAllAndFlush(anyCollection())).willReturn(anyList());
+        when(groupMembersRepository.saveAllAndFlush(anyCollection())).thenReturn(List.of(mock(GroupMembers.class)));
 
         List<GroupMembers> relation = groupMembersService.relation(1L, Set.of("test"));
+        assertEquals(1, relation.size());
+        verify(groupMembersRepository).saveAllAndFlush(anyCollection());
+    }
 
-        verify(this.groupMembersRepository, times(1)).saveAllAndFlush(anyList());
-        Assertions.assertNotNull(relation);
+    @Test
+    void removeRelation() {
+        when(groupMembersRepository.findAllByGroupId(anyLong())).thenReturn(List.of(groupMembers));
+
+        groupMembersService.removeRelation(1L, Set.of("test"));
+        verify(groupMembersRepository).deleteAllByIdInBatch(anyCollection());
     }
 }

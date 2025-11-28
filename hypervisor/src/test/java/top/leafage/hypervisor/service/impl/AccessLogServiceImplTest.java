@@ -15,7 +15,8 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -33,12 +34,12 @@ import top.leafage.hypervisor.repository.AccessLogRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * access log service test
@@ -54,39 +55,75 @@ class AccessLogServiceImplTest {
     @InjectMocks
     private AccessLogServiceImpl accessLogService;
 
+    private AccessLog entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new AccessLog();
+        entity.setUrl("test");
+        entity.setHttpMethod("test");
+        entity.setParams("test");
+    }
+
     @Test
     void retrieve() {
         Page<AccessLog> page = new PageImpl<>(List.of(mock(AccessLog.class)));
 
-        given(this.accessLogRepository.findAll(ArgumentMatchers.<Specification<AccessLog>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(accessLogRepository.findAll(ArgumentMatchers.<Specification<AccessLog>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<AccessLogVO> voPage = accessLogService.retrieve(0, 2, "id", true, "test");
-
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(accessLogRepository).findAll(ArgumentMatchers.<Specification<AccessLog>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.accessLogRepository.findById(anyLong())).willReturn(Optional.of(mock(AccessLog.class)));
+        when(accessLogRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         AccessLogVO vo = accessLogService.fetch(anyLong());
+        assertNotNull(vo);
+        assertEquals("test", vo.url());
+        verify(accessLogRepository).findById(anyLong());
+    }
 
-        Assertions.assertNotNull(vo);
+    @Test
+    void fetch_not_found() {
+        when(accessLogRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> accessLogService.fetch(anyLong())
+        );
+        assertEquals("access log not found: 0", exception.getMessage());
+        verify(accessLogRepository).findById(anyLong());
     }
 
     @Test
     void remove() {
+        when(accessLogRepository.existsById(anyLong())).thenReturn(true);
         accessLogService.remove(1L);
 
-        verify(this.accessLogRepository, times(1)).deleteById(anyLong());
+        verify(accessLogRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(accessLogRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> accessLogService.remove(anyLong())
+        );
+        assertEquals("access log not found: 0", exception.getMessage());
     }
 
     @Test
     void clear() {
         accessLogService.clear();
 
-        verify(this.accessLogRepository, times(1)).deleteAll();
+        verify(accessLogRepository).deleteAll();
     }
 
 }

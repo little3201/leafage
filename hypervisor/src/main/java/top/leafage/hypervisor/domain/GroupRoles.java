@@ -38,6 +38,13 @@ public class GroupRoles extends AbstractPersistable<@NonNull Long> {
     @Column(nullable = false)
     private Long roleId;
 
+    public GroupRoles() {
+    }
+
+    public GroupRoles(Long groupId, Long roleId) {
+        this.groupId = groupId;
+        this.roleId = roleId;
+    }
 
     public Long getGroupId() {
         return groupId;

@@ -36,7 +36,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -67,10 +67,10 @@ class SchedulerLogControllerTest {
     void retrieve() {
         Page<@NonNull SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.schedulerLogService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(schedulerLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/scheduler-logs")
+        assertThat(mvc.get().uri("/scheduler-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -83,10 +83,10 @@ class SchedulerLogControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(schedulerLogService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/scheduler-logs")
+        assertThat(mvc.get().uri("/scheduler-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -98,18 +98,18 @@ class SchedulerLogControllerTest {
 
     @Test
     void fetch() {
-        given(this.schedulerLogService.fetch(anyLong())).willReturn(vo);
+        when(schedulerLogService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/scheduler-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/scheduler-logs/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.schedulerLogService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(schedulerLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/scheduler-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/scheduler-logs/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
@@ -117,15 +117,15 @@ class SchedulerLogControllerTest {
     void remove() {
         this.schedulerLogService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.schedulerLogService).remove(anyLong());
+        doThrow(new RuntimeException()).when(schedulerLogService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
@@ -133,15 +133,15 @@ class SchedulerLogControllerTest {
     void clear() {
         this.schedulerLogService.clear();
 
-        assertThat(this.mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void clear_error() {
-        doThrow(new RuntimeException()).when(this.schedulerLogService).clear();
+        doThrow(new RuntimeException()).when(schedulerLogService).clear();
 
-        assertThat(this.mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 

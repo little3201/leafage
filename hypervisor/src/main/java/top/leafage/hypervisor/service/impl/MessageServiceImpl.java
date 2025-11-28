@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -71,7 +72,7 @@ public class MessageServiceImpl implements MessageService {
 
         return messageRepository.findById(id)
                 .map(MessageVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("message not found: " + id));
     }
 
     /**
@@ -79,6 +80,9 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public MessageVO create(MessageDTO dto) {
+        if (messageRepository.existsByTitle(dto.getTitle())) {
+            throw new IllegalArgumentException("title already exists: " + dto.getTitle());
+        }
         Message entity = messageRepository.saveAndFlush(MessageDTO.toEntity(dto));
         return MessageVO.from(entity);
     }
@@ -88,11 +92,14 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public MessageVO modify(Long id, MessageDTO dto) {
-        Message entity = messageRepository.findById(id).map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return messageRepository.save(existing);
-                })
-                .orElseThrow();
+        Message existing = messageRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("message not found: " + id));
+        if (!existing.getTitle().equals(dto.getTitle()) &&
+                messageRepository.existsByTitle(dto.getTitle())) {
+            throw new IllegalArgumentException("title already exists: " + dto.getTitle());
+        }
+        copier.copy(dto, existing, null);
+        Message entity = messageRepository.save(existing);
         return MessageVO.from(entity);
     }
 
@@ -102,7 +109,9 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!messageRepository.existsById(id)) {
+            throw new EntityNotFoundException("message not found: " + id);
+        }
         messageRepository.deleteById(id);
     }
 }

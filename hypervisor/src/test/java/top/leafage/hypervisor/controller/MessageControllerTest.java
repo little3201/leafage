@@ -37,7 +37,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
@@ -77,10 +77,10 @@ class MessageControllerTest {
     void retrieve() {
         Page<@NonNull MessageVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.messageService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(messageService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/messages")
+        assertThat(mvc.get().uri("/messages")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -93,10 +93,10 @@ class MessageControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.messageService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(messageService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/messages")
+        assertThat(mvc.get().uri("/messages")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -108,26 +108,26 @@ class MessageControllerTest {
 
     @Test
     void fetch() {
-        given(this.messageService.fetch(anyLong())).willReturn(vo);
+        when(messageService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/messages/{id}", anyLong()))
+        assertThat(mvc.get().uri("/messages/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.messageService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(messageService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/messages/{id}", anyLong()))
+        assertThat(mvc.get().uri("/messages/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void create() {
-        given(this.messageService.create(any(MessageDTO.class))).willReturn(vo);
+        when(messageService.create(any(MessageDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatusOk()
@@ -136,9 +136,9 @@ class MessageControllerTest {
 
     @Test
     void create_error() {
-        given(this.messageService.create(any(MessageDTO.class))).willThrow(new RuntimeException());
+        when(messageService.create(any(MessageDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatus4xxClientError();

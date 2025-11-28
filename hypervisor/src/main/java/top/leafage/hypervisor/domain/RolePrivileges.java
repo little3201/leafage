@@ -48,6 +48,12 @@ public class RolePrivileges extends AbstractPersistable<@NonNull Long> {
         this.actions = actions;
     }
 
+    public RolePrivileges(Long id, Long roleId, Long privilegeId, Set<String> actions) {
+        this.setId(id);
+        this.roleId = roleId;
+        this.privilegeId = privilegeId;
+        this.actions = actions;
+    }
 
     public Long getRoleId() {
         return roleId;

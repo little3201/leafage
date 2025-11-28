@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -74,13 +75,15 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         return dictionaryRepository.findById(id)
                 .map(DictionaryVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("dictionary not found: " + id));
     }
 
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!dictionaryRepository.existsById(id)) {
+            throw new EntityNotFoundException("dictionary not found: " + id);
+        }
         return dictionaryRepository.updateEnabledById(id) > 0;
     }
 
@@ -100,20 +103,10 @@ public class DictionaryServiceImpl implements DictionaryService {
      * {@inheritDoc}
      */
     @Override
-    public boolean exists(Long superiorId, String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-
-        if (id == null) {
-            return dictionaryRepository.existsBySuperiorIdAndName(superiorId, name);
-        }
-        return dictionaryRepository.existsBySuperiorIdAndNameAndIdNot(superiorId, name, id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public DictionaryVO create(DictionaryDTO dto) {
+        if (dictionaryRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
         Dictionary entity = dictionaryRepository.saveAndFlush(DictionaryDTO.toEntity(dto));
         return DictionaryVO.from(entity);
     }
@@ -125,11 +118,15 @@ public class DictionaryServiceImpl implements DictionaryService {
     public DictionaryVO modify(Long id, DictionaryDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        Dictionary entity = dictionaryRepository.findById(id).map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return dictionaryRepository.save(existing);
-                })
-                .orElseThrow();
+        Dictionary existing = dictionaryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("dictionary not found: " + id));
+        if (!existing.getName().equals(dto.getName()) &&
+                dictionaryRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
+
+        copier.copy(dto, existing, null);
+        Dictionary entity = dictionaryRepository.save(existing);
         return DictionaryVO.from(entity);
     }
 
@@ -139,7 +136,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!dictionaryRepository.existsById(id)) {
+            throw new EntityNotFoundException("dictionary not found: " + id);
+        }
         dictionaryRepository.deleteById(id);
     }
 

@@ -15,7 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,11 +35,11 @@ import top.leafage.hypervisor.repository.RoleRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * role service test
@@ -56,89 +56,137 @@ class RoleServiceImplTest {
     private RoleServiceImpl roleService;
 
     private RoleDTO dto;
+    private Role entity;
 
     @BeforeEach
     void setUp() {
         dto = new RoleDTO();
-        dto.setName("role");
-        dto.setDescription("role");
+        dto.setName("test");
+        dto.setDescription("description");
+
+        entity = RoleDTO.toEntity(dto);
     }
 
     @Test
     void retrieve() {
         Page<Role> page = new PageImpl<>(List.of(mock(Role.class)));
 
-        given(this.roleRepository.findAll(ArgumentMatchers.<Specification<Role>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(roleRepository.findAll(ArgumentMatchers.<Specification<Role>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<RoleVO> voPage = roleService.retrieve(0, 2, "id", true, "test");
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(roleRepository).findAll(ArgumentMatchers.<Specification<Role>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.roleRepository.findById(anyLong())).willReturn(Optional.of(mock(Role.class)));
+        when(roleRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         RoleVO vo = roleService.fetch(anyLong());
-
-        Assertions.assertNotNull(vo);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(roleRepository).findById(anyLong());
     }
 
     @Test
-    void exists() {
-        given(this.roleRepository.existsByNameAndIdNot(anyString(),
-                anyLong())).willReturn(true);
+    void fetch_not_found() {
+        when(roleRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        boolean exists = roleService.exists("test", 2L);
-
-        Assertions.assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.roleRepository.existsByName(anyString())).willReturn(true);
-
-        boolean exists = roleService.exists("test", null);
-
-        Assertions.assertTrue(exists);
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> roleService.fetch(anyLong())
+        );
+        assertEquals("role not found: 0", exception.getMessage());
+        verify(roleRepository).findById(anyLong());
     }
 
     @Test
     void create() {
-        given(this.roleRepository.saveAndFlush(any(Role.class))).willReturn(mock(Role.class));
+        when(roleRepository.existsByName("test")).thenReturn(false);
+        when(roleRepository.saveAndFlush(any(Role.class))).thenReturn(entity);
 
-        RoleVO vo = roleService.create(mock(RoleDTO.class));
+        RoleVO vo = roleService.create(dto);
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(roleRepository).saveAndFlush(any(Role.class));
+    }
 
-        verify(this.roleRepository, times(1)).saveAndFlush(any(Role.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void create_username_conflict() {
+        when(roleRepository.existsByName("test")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> roleService.create(dto)
+        );
+        assertEquals("name already exists: test", exception.getMessage());
+        verify(roleRepository, never()).save(any());
     }
 
     @Test
     void modify() {
-        given(this.roleRepository.findById(anyLong())).willReturn(Optional.of(mock(Role.class)));
+        when(roleRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(roleRepository.existsByName("demo")).thenReturn(false);
+        when(roleRepository.save(any(Role.class))).thenReturn(entity);
 
-        given(this.roleRepository.save(any(Role.class))).willReturn(mock(Role.class));
-
+        dto.setName("demo");
         RoleVO vo = roleService.modify(1L, dto);
+        assertNotNull(vo);
+        assertEquals("demo", vo.name());
+        verify(roleRepository).save(any(Role.class));
+    }
 
-        verify(this.roleRepository, times(1)).save(any(Role.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void modify_username_conflict() {
+        when(roleRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(roleRepository.existsByName("demo")).thenReturn(true);
+
+        dto.setName("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> roleService.modify(1L, dto)
+        );
+        assertEquals("name already exists: demo", exception.getMessage());
     }
 
     @Test
     void remove() {
-        roleService.remove(anyLong());
+        when(roleRepository.existsById(anyLong())).thenReturn(true);
 
-        verify(this.roleRepository, times(1)).deleteById(anyLong());
+        roleService.remove(anyLong());
+        verify(roleRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(roleRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> roleService.remove(anyLong())
+        );
+        assertEquals("role not found: 0", exception.getMessage());
     }
 
     @Test
     void enable() {
-        given(this.roleRepository.updateEnabledById(anyLong())).willReturn(1);
+        when(roleRepository.existsById(anyLong())).thenReturn(true);
+        when(roleRepository.updateEnabledById(anyLong())).thenReturn(1);
 
         boolean enabled = roleService.enable(1L);
-
-        Assertions.assertTrue(enabled);
+        assertTrue(enabled);
     }
 
+    @Test
+    void enable_not_found() {
+        when(roleRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> roleService.enable(1L)
+        );
+        assertEquals("role not found: 1", exception.getMessage());
+    }
 }

@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import top.leafage.common.data.domain.TreeNode;
 import top.leafage.hypervisor.domain.Group;
 import top.leafage.hypervisor.domain.dto.GroupDTO;
@@ -28,9 +30,10 @@ import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.repository.GroupRepository;
 import top.leafage.hypervisor.service.GroupService;
 
+import java.util.Collections;
 import java.util.List;
 
-import static top.leafage.common.data.converter.ModelToTreeNodeConverter.convertToTree;
+import static top.leafage.common.data.converter.ModelToTreeNodeConverter.toTree;
 
 
 /**
@@ -73,7 +76,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<TreeNode<@NonNull Long>> tree() {
         List<Group> groups = groupRepository.findAll();
-        return convertToTree(groups);
+        if (CollectionUtils.isEmpty(groups)) {
+            return Collections.emptyList();
+        }
+        return toTree(groups);
     }
 
     /**
@@ -85,22 +91,16 @@ public class GroupServiceImpl implements GroupService {
 
         return groupRepository.findById(id)
                 .map(GroupVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("group not found: " + id));
     }
 
     @Override
     public boolean enable(Long id) {
-        return groupRepository.updateEnabledById(id) > 0;
-    }
-
-    @Override
-    public boolean exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-
-        if (id == null) {
-            return groupRepository.existsByName(name);
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+        if (!groupRepository.existsById(id)) {
+            throw new EntityNotFoundException("group not found: " + id);
         }
-        return groupRepository.existsByNameAndIdNot(name, id);
+        return groupRepository.updateEnabledById(id) > 0;
     }
 
     /**
@@ -108,6 +108,9 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public GroupVO create(GroupDTO dto) {
+        if (groupRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
         Group entity = groupRepository.saveAndFlush(GroupDTO.toEntity(dto));
         return GroupVO.from(entity);
     }
@@ -119,11 +122,15 @@ public class GroupServiceImpl implements GroupService {
     public GroupVO modify(Long id, GroupDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        Group entity = groupRepository.findById(id).map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return groupRepository.save(existing);
-                })
-                .orElseThrow();
+        Group existing = groupRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("group not found: " + id));
+        if (!existing.getName().equals(dto.getName()) &&
+                groupRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
+
+        copier.copy(dto, existing, null);
+        Group entity = groupRepository.save(existing);
         return GroupVO.from(entity);
     }
 
@@ -133,7 +140,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!groupRepository.existsById(id)) {
+            throw new EntityNotFoundException("group not found: " + id);
+        }
         groupRepository.deleteById(id);
     }
 

@@ -15,7 +15,8 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -30,15 +31,16 @@ import top.leafage.hypervisor.domain.SchedulerLog;
 import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
 import top.leafage.hypervisor.repository.SchedulerLogRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * scheduler log service test
@@ -54,39 +56,75 @@ class SchedulerLogServiceImplTest {
     @InjectMocks
     private SchedulerLogServiceImpl schedulerLogService;
 
+    private SchedulerLog entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new SchedulerLog();
+        entity.setName("test");
+        entity.setStartTime(Instant.now());
+        entity.setDescription("description");
+    }
+
     @Test
     void retrieve() {
         Page<SchedulerLog> page = new PageImpl<>(List.of(mock(SchedulerLog.class)));
 
-        given(this.schedulerLogRepository.findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(schedulerLogRepository.findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<SchedulerLogVO> voPage = schedulerLogService.retrieve(0, 2, "id", true, "test");
-
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(schedulerLogRepository).findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Optional.of(mock(SchedulerLog.class)));
+        when(schedulerLogRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         SchedulerLogVO vo = schedulerLogService.fetch(anyLong());
+        assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(schedulerLogRepository).findById(anyLong());
+    }
 
-        Assertions.assertNotNull(vo);
+    @Test
+    void fetch_not_found() {
+        when(schedulerLogRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> schedulerLogService.fetch(anyLong())
+        );
+        assertEquals("scheduler log not found: 0", exception.getMessage());
+        verify(schedulerLogRepository).findById(anyLong());
     }
 
     @Test
     void remove() {
+        when(schedulerLogRepository.existsById(anyLong())).thenReturn(true);
         schedulerLogService.remove(1L);
 
-        verify(this.schedulerLogRepository, times(1)).deleteById(anyLong());
+        verify(schedulerLogRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(schedulerLogRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> schedulerLogService.remove(anyLong())
+        );
+        assertEquals("scheduler log not found: 0", exception.getMessage());
     }
 
     @Test
     void clear() {
         schedulerLogService.clear();
 
-        verify(this.schedulerLogRepository, times(1)).deleteAll();
+        verify(schedulerLogRepository).deleteAll();
     }
 
 }

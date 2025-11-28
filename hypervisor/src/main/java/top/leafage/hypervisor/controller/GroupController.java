@@ -15,8 +15,6 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +33,7 @@ import top.leafage.hypervisor.service.GroupPrivilegesService;
 import top.leafage.hypervisor.service.GroupRolesService;
 import top.leafage.hypervisor.service.GroupService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -46,8 +45,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
-
-    private final Logger logger = LoggerFactory.getLogger(GroupController.class);
 
     private final GroupService groupService;
     private final GroupMembersService groupMembersService;
@@ -83,152 +80,98 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                   String sortBy, boolean descending, String filters) {
-        Page<GroupVO> voPage;
-        try {
-            voPage = groupService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.info("Retrieve group error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<GroupVO> voPage = groupService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
     /**
      * 查询树形数据
      *
-     * @return 查询到的数据，否则返回空
+     * @return th result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/tree")
     public ResponseEntity<List<TreeNode<Long>>> tree() {
-        List<TreeNode<Long>> treeNodes;
-        try {
-            treeNodes = groupService.tree();
-        } catch (Exception e) {
-            logger.info("Retrieve privilege tree error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        List<TreeNode<Long>> treeNodes = groupService.tree();
         return ResponseEntity.ok(treeNodes);
     }
 
     /**
-     * 查询信息
+     * fetch by id.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/{id}")
     public ResponseEntity<GroupVO> fetch(@PathVariable Long id) {
-        GroupVO groupVO;
-        try {
-            groupVO = groupService.fetch(id);
-        } catch (Exception e) {
-            logger.info("Fetch group error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(groupVO);
+        GroupVO vo = groupService.fetch(id);
+        return ResponseEntity.ok(vo);
     }
 
     /**
-     * 添加信息
+     * create.
      *
-     * @param dto 要添加的数据
-     * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
+     * @param dto the request body.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:create')")
     @PostMapping
     public ResponseEntity<GroupVO> create(@Valid @RequestBody GroupDTO dto) {
-        GroupVO vo;
-        try {
-            boolean existed = groupService.exists(dto.getName(), null);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = groupService.create(dto);
-        } catch (Exception e) {
-            logger.error("Create group error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        GroupVO vo = groupService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
     /**
-     * 修改信息
+     * modify.
      *
-     * @param id  主键
-     * @param dto 要修改的数据
-     * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
+     * @param id  the pk.
+     * @param dto the request body.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<GroupVO> modify(@PathVariable Long id, @RequestBody GroupDTO dto) {
-        GroupVO vo;
-        try {
-            boolean existed = groupService.exists(dto.getName(), id);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = groupService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify group error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
+        GroupVO vo = groupService.modify(id, dto);
         return ResponseEntity.accepted().body(vo);
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            groupService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove group error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        groupService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
-     * Enable a record when enabled is false or disable when enabled is ture.
+     * enable/disable..
      *
-     * @param id The record ID.
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @param id the pk..
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
-        boolean enabled;
-        try {
-            enabled = groupService.enable(id);
-        } catch (Exception e) {
-            logger.error("Toggle enabled error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(enabled);
+        boolean enabled = groupService.enable(id);
+        return ResponseEntity.ok(enabled);
     }
 
     /**
-     * Import the records.
+     * import..
      *
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:import')")
     @PostMapping("/import")
-    public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) {
-        List<GroupVO> voList;
-        try {
-            List<GroupDTO> dtoList = ExcelReader.read(file.getInputStream(), GroupDTO.class);
-            voList = groupService.createAll(dtoList);
-        } catch (Exception e) {
-            logger.error("Import groups error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+    public ResponseEntity<List<GroupVO>> importFromFile(MultipartFile file) throws IOException {
+        List<GroupDTO> dtoList = ExcelReader.read(file.getInputStream(), GroupDTO.class);
+        List<GroupVO> voList = groupService.createAll(dtoList);
+
         return ResponseEntity.ok().body(voList);
     }
 
@@ -240,15 +183,9 @@ public class GroupController {
      * @return 操作结果
      */
     @PatchMapping("/{id}/members")
-    public ResponseEntity<List<GroupMembers>> relation(@PathVariable Long id, @RequestBody Set<String> usernames) {
-        List<GroupMembers> list;
-        try {
-            list = groupMembersService.relation(id, usernames);
-        } catch (Exception e) {
-            logger.error("Relation group members error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(list);
+    public ResponseEntity<List<GroupMembers>> relationMembers(@PathVariable Long id, @RequestBody Set<String> usernames) {
+        List<GroupMembers> groupMembers = groupMembersService.relation(id, usernames);
+        return ResponseEntity.accepted().body(groupMembers);
     }
 
     /**
@@ -259,14 +196,9 @@ public class GroupController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/members")
-    public ResponseEntity<Void> removeRelation(@PathVariable Long id, @RequestParam Set<String> usernames) {
-        try {
-            groupMembersService.removeRelation(id, usernames);
-        } catch (Exception e) {
-            logger.error("Remove relation group members error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removeMembers(@PathVariable Long id, @RequestParam Set<String> usernames) {
+        groupMembersService.removeRelation(id, usernames);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -277,14 +209,8 @@ public class GroupController {
      */
     @GetMapping("/{id}/members")
     public ResponseEntity<List<GroupMembers>> members(@PathVariable Long id) {
-        List<GroupMembers> voList;
-        try {
-            voList = groupMembersService.members(id);
-        } catch (Exception e) {
-            logger.error("Retrieve group users error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voList);
+        List<GroupMembers> members = groupMembersService.members(id);
+        return ResponseEntity.ok(members);
     }
 
     /**
@@ -296,14 +222,8 @@ public class GroupController {
      */
     @PatchMapping("/{id}/roles")
     public ResponseEntity<List<GroupRoles>> relationRoles(@PathVariable Long id, @RequestBody Set<Long> roleIds) {
-        List<GroupRoles> list;
-        try {
-            list = groupRolesService.relation(id, roleIds);
-        } catch (Exception e) {
-            logger.error("Relation group roles error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(list);
+        List<GroupRoles> groupRoles = groupRolesService.relation(id, roleIds);
+        return ResponseEntity.accepted().body(groupRoles);
     }
 
     /**
@@ -314,14 +234,9 @@ public class GroupController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/roles")
-    public ResponseEntity<Void> removeRelationRoles(@PathVariable Long id, @RequestParam Set<Long> roleIds) {
-        try {
-            groupRolesService.removeRelation(id, roleIds);
-        } catch (Exception e) {
-            logger.error("Remove relation group roles error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removeRoles(@PathVariable Long id, @RequestParam Set<Long> roleIds) {
+        groupRolesService.removeRelation(id, roleIds);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -331,15 +246,9 @@ public class GroupController {
      * @return 查询到的数据集，异常时返回204状态码
      */
     @GetMapping("/{id}/roles")
-    public ResponseEntity<List<GroupMembers>> roles(@PathVariable Long id) {
-        List<GroupMembers> voList;
-        try {
-            voList = groupMembersService.members(id);
-        } catch (Exception e) {
-            logger.error("Retrieve group users error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voList);
+    public ResponseEntity<List<GroupRoles>> roles(@PathVariable Long id) {
+        List<GroupRoles> roles = groupRolesService.roles(id);
+        return ResponseEntity.ok(roles);
     }
 
     /**
@@ -350,14 +259,8 @@ public class GroupController {
      */
     @GetMapping("/{id}/privileges")
     public ResponseEntity<List<GroupPrivileges>> privileges(@PathVariable Long id) {
-        List<GroupPrivileges> voList;
-        try {
-            voList = groupPrivilegesService.privileges(id);
-        } catch (Exception e) {
-            logger.error("Retrieve role privileges error: ", e);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(voList);
+        List<GroupPrivileges> privileges = groupPrivilegesService.privileges(id);
+        return ResponseEntity.ok(privileges);
     }
 
     /**
@@ -369,16 +272,10 @@ public class GroupController {
      * @return 操作结果
      */
     @PatchMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<GroupPrivileges> authorization(@PathVariable Long id, @PathVariable Long privilegeId,
-                                                         String action) {
-        GroupPrivileges gp;
-        try {
-            gp = groupPrivilegesService.relation(id, privilegeId, action);
-        } catch (Exception e) {
-            logger.error("Relation group privileges error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.accepted().body(gp);
+    public ResponseEntity<GroupPrivileges> relationPrivileges(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                              String action) {
+        GroupPrivileges groupPrivileges = groupPrivilegesService.relation(id, privilegeId, action);
+        return ResponseEntity.accepted().body(groupPrivileges);
     }
 
     /**
@@ -390,14 +287,10 @@ public class GroupController {
      * @return 操作结果
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
-    public ResponseEntity<Void> removeAuthorization(@PathVariable Long id, @PathVariable Long privilegeId,
-                                                    String action) {
-        try {
-            groupPrivilegesService.removeRelation(id, privilegeId, action);
-        } catch (Exception e) {
-            logger.error("Remove relation group privileges error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> removePrivileges(@PathVariable Long id, @PathVariable Long privilegeId,
+                                                 String action) {
+        groupPrivilegesService.removeRelation(id, privilegeId, action);
+
+        return ResponseEntity.noContent().build();
     }
 }

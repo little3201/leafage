@@ -37,7 +37,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
@@ -46,7 +46,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
  *
  * @author wq li
  **/
-@WithMockUser(roles = "ADMIN")
+@WithMockUser
 @WebMvcTest(CommentController.class)
 class CommentControllerTest {
 
@@ -77,9 +77,9 @@ class CommentControllerTest {
     void retrieve() {
         Page<@NonNull CommentVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(commentService.retrieve(anyInt(), anyInt(), eq("id"), anyBoolean(), anyString())).willReturn(page);
+        when(commentService.retrieve(anyInt(), anyInt(), eq("id"), anyBoolean(), anyString())).thenReturn(page);
 
-        assertThat(this.mvc.get().uri("/comments")
+        assertThat(mvc.get().uri("/comments")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
         )
@@ -90,9 +90,9 @@ class CommentControllerTest {
 
     @Test
     void retrieve_error() {
-        given(commentService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(commentService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/comments")
+        assertThat(mvc.get().uri("/comments")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -104,43 +104,43 @@ class CommentControllerTest {
 
     @Test
     void relation() {
-        given(commentService.relation(anyLong())).willReturn(List.of(vo));
+        when(commentService.relation(anyLong())).thenReturn(List.of(vo));
 
-        assertThat(this.mvc.get().uri("/comments/{id}", anyLong()))
+        assertThat(mvc.get().uri("/comments/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void relation_error() {
-        given(commentService.relation(anyLong())).willThrow(new RuntimeException());
+        when(commentService.relation(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/comments/{id}", anyLong()))
+        assertThat(mvc.get().uri("/comments/{id}", anyLong()))
                 .hasStatus5xxServerError();
     }
 
     @Test
     void replies() {
-        given(commentService.replies(anyLong())).willReturn(List.of(vo));
+        when(commentService.replies(anyLong())).thenReturn(List.of(vo));
 
-        assertThat(this.mvc.get().uri("/comments/{id}/replies", 1L))
+        assertThat(mvc.get().uri("/comments/{id}/replies", 1L))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void replies_error() {
-        given(commentService.replies(anyLong())).willThrow(new RuntimeException());
+        when(commentService.replies(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/comments/{id}/replies", 1L))
+        assertThat(mvc.get().uri("/comments/{id}/replies", 1L))
                 .hasStatus5xxServerError();
     }
 
     @Test
     void create() {
-        given(commentService.create(any(CommentDTO.class))).willReturn(vo);
+        when(commentService.create(any(CommentDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -148,9 +148,9 @@ class CommentControllerTest {
 
     @Test
     void create_error() {
-        given(commentService.create(any(CommentDTO.class))).willThrow(new RuntimeException());
+        when(commentService.create(any(CommentDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }

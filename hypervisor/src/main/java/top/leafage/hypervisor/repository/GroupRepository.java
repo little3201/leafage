@@ -39,15 +39,6 @@ public interface GroupRepository extends JpaRepository<Group, Long>, JpaSpecific
     boolean existsByName(String name);
 
     /**
-     * 是否存在
-     *
-     * @param name 名称
-     * @param id   the record's id.
-     * @return true-存在，false-否
-     */
-    boolean existsByNameAndIdNot(String name, Long id);
-
-    /**
      * Toggles the enabled status of a record by its ID.
      *
      * @param id The ID of the record.

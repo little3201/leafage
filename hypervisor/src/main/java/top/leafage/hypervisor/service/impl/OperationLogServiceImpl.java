@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,7 +66,7 @@ public class OperationLogServiceImpl implements OperationLogService {
 
         return operationLogRepository.findById(id)
                 .map(OperationLogVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("operation log not found: " + id));
     }
 
     /**
@@ -74,7 +75,9 @@ public class OperationLogServiceImpl implements OperationLogService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!operationLogRepository.existsById(id)) {
+            throw new EntityNotFoundException("operation log not found: " + id);
+        }
         operationLogRepository.deleteById(id);
     }
 

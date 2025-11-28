@@ -20,7 +20,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import top.leafage.hypervisor.domain.GroupAuthorities;
 import top.leafage.hypervisor.domain.GroupPrivileges;
-import top.leafage.hypervisor.domain.Privilege;
 import top.leafage.hypervisor.repository.GroupAuthoritiesRepository;
 import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
 import top.leafage.hypervisor.repository.PrivilegeRepository;
@@ -74,13 +73,13 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
     @Override
     public void removeRelation(Long groupId, Long privilegeId, String action) {
         groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId)
-                .ifPresent(rolePrivilege -> {
+                .ifPresent(groupPrivilege -> {
                     // actions为空，删除菜单
                     if (!StringUtils.hasText(action)) {
-                        groupPrivilegesRepository.deleteById(rolePrivilege.getId());
+                        groupPrivilegesRepository.deleteById(groupPrivilege.getId());
                     }
                     privilegeRepository.findById(privilegeId).ifPresent(privilege ->
-                            removeGroupAuthority(groupId, privilege, action));
+                            removeGroupAuthority(groupId, privilege.getName(), action));
                 });
     }
 
@@ -95,12 +94,12 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
         groupAuthoritiesRepository.saveAll(groupAuthorities);
     }
 
-    private void removeGroupAuthority(Long groupId, Privilege privilege, String action) {
+    private void removeGroupAuthority(Long groupId, String name, String action) {
         // 移除授权actions
         if (StringUtils.hasText(action)) {
-            groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupId, privilege.getName() + ":" + action);
+            groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupId, name + ":" + action);
         } else {
-            groupAuthoritiesRepository.deleteByGroupIdAndAuthorityStartingWith(groupId, privilege.getName());
+            groupAuthoritiesRepository.deleteByGroupIdAndAuthorityStartingWith(groupId, name);
         }
     }
 

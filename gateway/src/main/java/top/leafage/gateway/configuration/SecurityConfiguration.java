@@ -61,7 +61,7 @@ public class SecurityConfiguration {
                                 .authenticationEntryPoint(authenticationEntryPoint())
                 )
                 .oauth2Login(oauth2Login ->
-                        oauth2Login.successHandler(new SimpleUrlAuthenticationSuccessHandler(this.appBaseUri)))
+                        oauth2Login.successHandler(new SimpleUrlAuthenticationSuccessHandler(appBaseUri)))
                 .logout(logout ->
                         logout.addLogoutHandler(logoutHandler(cookieCsrfTokenRepository))
                                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))

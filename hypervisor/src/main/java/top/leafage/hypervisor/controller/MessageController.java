@@ -16,8 +16,6 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +35,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
-
-    private final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     private final MessageService messageService;
 
@@ -65,95 +61,58 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<Page<MessageVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                     String sortBy, boolean descending, Principal principal) {
-        Page<MessageVO> voPage;
-        try {
-            voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()));
-        } catch (Exception e) {
-            logger.info("Retrieve message error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<MessageVO> voPage = messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()));
         return ResponseEntity.ok(voPage);
     }
 
     /**
-     * 根据 id 查询
+     * fetch.
      *
-     * @param id 主键
-     * @return 查询的数据，异常时返回204状态码
+     * @param id the pk.
+     * @return th result.
      */
     @GetMapping("/{id}")
     public ResponseEntity<MessageVO> fetch(@PathVariable Long id) {
-        MessageVO vo;
-        try {
-            vo = messageService.fetch(id);
-        } catch (Exception e) {
-            logger.info("Fetch message error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        MessageVO vo = messageService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
     /**
      * 新增信息
      *
-     * @param dto 要添加的数据
-     * @return 如果添加数据成功，返回添加后的信息，否则返回417状态码
+     * @param dto the request body.
+     * @return the result.
      */
     @PostMapping
     public ResponseEntity<MessageVO> create(@Valid @RequestBody MessageDTO dto) {
-        MessageVO vo;
-        try {
-            boolean existed = messageService.exists(dto.getTitle(), null);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = messageService.create(dto);
-        } catch (Exception e) {
-            logger.info("Create message error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        MessageVO vo = messageService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
     /**
-     * 修改信息
+     * modify.
      *
-     * @param id  主键
-     * @param dto 要修改的数据
-     * @return 如果修改数据成功，返回修改后的信息，否则返回304状态码
+     * @param id  the pk.
+     * @param dto the request body.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<MessageVO> modify(@PathVariable Long id, @RequestBody MessageDTO dto) {
-        MessageVO vo;
-        try {
-            boolean existed = messageService.exists(dto.getTitle(), id);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = messageService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify message error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
+        MessageVO vo = messageService.modify(id, dto);
         return ResponseEntity.accepted().body(vo);
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            messageService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove message error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        messageService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

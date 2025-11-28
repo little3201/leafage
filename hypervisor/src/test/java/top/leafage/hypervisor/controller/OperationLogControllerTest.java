@@ -29,12 +29,11 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import top.leafage.hypervisor.domain.vo.OperationLogVO;
 import top.leafage.hypervisor.service.OperationLogService;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -57,7 +56,7 @@ class OperationLogControllerTest {
     private OperationLogVO vo;
 
     @BeforeEach
-    void setUp() throws UnknownHostException {
+    void setUp() {
         vo = new OperationLogVO(1L, "test", "create", "filters=test", "test", "127.0.0.1", "test", "test", 200);
     }
 
@@ -65,10 +64,10 @@ class OperationLogControllerTest {
     void retrieve() {
         Page<OperationLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.operationLogService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(operationLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/operation-logs")
+        assertThat(mvc.get().uri("/operation-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -81,10 +80,10 @@ class OperationLogControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.operationLogService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(operationLogService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/operation-logs")
+        assertThat(mvc.get().uri("/operation-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -96,18 +95,18 @@ class OperationLogControllerTest {
 
     @Test
     void fetch() {
-        given(this.operationLogService.fetch(anyLong())).willReturn(vo);
+        when(operationLogService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/operation-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/operation-logs/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.operationLogService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(operationLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/operation-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/operation-logs/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
@@ -115,15 +114,15 @@ class OperationLogControllerTest {
     void remove() {
         this.operationLogService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.operationLogService).remove(anyLong());
+        doThrow(new RuntimeException()).when(operationLogService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
@@ -131,15 +130,15 @@ class OperationLogControllerTest {
     void clear() {
         this.operationLogService.clear();
 
-        assertThat(this.mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void clear_error() {
-        doThrow(new RuntimeException()).when(this.operationLogService).clear();
+        doThrow(new RuntimeException()).when(operationLogService).clear();
 
-        assertThat(this.mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 

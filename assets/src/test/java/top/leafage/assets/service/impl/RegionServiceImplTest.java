@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -70,66 +70,66 @@ class RegionServiceImplTest {
     void retrieve() {
         Page<Region> page = new PageImpl<>(List.of(mock(Region.class)));
 
-        given(this.regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
-        Assertions.assertNotNull(voPage.getContent());
+assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(this.regionRepository.findById(anyLong())).willReturn(Optional.of(mock(Region.class)));
+        when(regionRepository.findById(anyLong())).thenReturn(Optional.of(mock(Region.class)));
 
         RegionVO vo = regionService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
+assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(this.regionRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(true);
+        when(regionRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(true);
 
         boolean exists = regionService.exists("test", 1L);
 
-        Assertions.assertTrue(exists);
+assertTrue(exists);
     }
 
     @Test
     void exists_id_null() {
-        given(this.regionRepository.existsByName(anyString())).willReturn(true);
+        when(regionRepository.existsByName(anyString())).thenReturn(true);
 
         boolean exists = regionService.exists("test", null);
 
-        Assertions.assertTrue(exists);
+assertTrue(exists);
     }
 
     @Test
     void create() {
-        given(this.regionRepository.saveAndFlush(any(Region.class))).willReturn(mock(Region.class));
+        when(regionRepository.saveAndFlush(any(Region.class))).thenReturn(mock(Region.class));
 
         RegionVO vo = regionService.create(mock(RegionDTO.class));
 
-        verify(this.regionRepository, times(1)).saveAndFlush(any(Region.class));
-        Assertions.assertNotNull(vo);
+        verify(regionRepository).saveAndFlush(any(Region.class));
+assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(this.regionRepository.findById(anyLong())).willReturn(Optional.of(mock(Region.class)));
+        when(regionRepository.findById(anyLong())).thenReturn(Optional.of(mock(Region.class)));
 
-        given(this.regionRepository.save(any(Region.class))).willReturn(mock(Region.class));
+        when(regionRepository.save(any(Region.class))).thenReturn(mock(Region.class));
 
         RegionVO vo = regionService.modify(anyLong(), dto);
 
-        verify(this.regionRepository, times(1)).save(any(Region.class));
-        Assertions.assertNotNull(vo);
+        verify(regionRepository).save(any(Region.class));
+assertNotNull(vo);
     }
 
     @Test
     void remove() {
         regionService.remove(11L);
 
-        verify(this.regionRepository, times(1)).deleteById(anyLong());
+        verify(regionRepository).deleteById(anyLong());
     }
 }

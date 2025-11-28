@@ -109,9 +109,9 @@ public class CommentController {
     }
 
     /**
-     * 添加信息
+     * create.
      *
-     * @param dto 要添加的数据
+     * @param dto the request body.
      * @return 添加后的信息，异常时返回417状态码
      */
     @PostMapping

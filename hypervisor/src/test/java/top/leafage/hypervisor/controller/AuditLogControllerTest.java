@@ -36,7 +36,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -59,18 +59,18 @@ class AuditLogControllerTest {
     private AuditLogVO vo;
 
     @BeforeEach
-    void setUp() throws UnknownHostException {
-        vo = new AuditLogVO(1L, "", "", "", "", InetAddress.getByName("12.1.3.2"), 200, 2132L);
+    void setUp() {
+        vo = new AuditLogVO(1L, "", "", "", "", "127.0.0.1", 200, 2132L);
     }
 
     @Test
     void retrieve() {
         Page<@NonNull AuditLogVO> voPage = new PageImpl<>(List.of(Mockito.mock(AuditLogVO.class)), mock(PageRequest.class), 2L);
 
-        given(this.auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/audit-logs")
+        assertThat(mvc.get().uri("/audit-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -83,10 +83,10 @@ class AuditLogControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/audit-logs")
+        assertThat(mvc.get().uri("/audit-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -99,18 +99,18 @@ class AuditLogControllerTest {
 
     @Test
     void fetch() {
-        given(this.auditLogService.fetch(anyLong())).willReturn(Mockito.mock(AuditLogVO.class));
+        when(auditLogService.fetch(anyLong())).thenReturn(Mockito.mock(AuditLogVO.class));
 
-        assertThat(this.mvc.get().uri("/audit-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/audit-logs/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.auditLogService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(auditLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/audit-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/audit-logs/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
@@ -119,16 +119,16 @@ class AuditLogControllerTest {
     void remove() {
         this.auditLogService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.auditLogService).remove(anyLong());
+        doThrow(new RuntimeException()).when(auditLogService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
     }

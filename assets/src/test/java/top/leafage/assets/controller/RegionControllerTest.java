@@ -36,7 +36,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -79,11 +79,11 @@ class RegionControllerTest {
         Page<@NonNull RegionVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         // 使用 eq() 准确匹配参数
-        given(this.regionService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(regionService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
         // 调用接口并验证结果
-        assertThat(this.mvc.get().uri("/regions")
+        assertThat(mvc.get().uri("/regions")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -96,9 +96,9 @@ class RegionControllerTest {
 
     @Test
     void retrieve_error() {
-        given(regionService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(regionService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/regions")
+        assertThat(mvc.get().uri("/regions")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -110,26 +110,26 @@ class RegionControllerTest {
 
     @Test
     void fetch() {
-        given(this.regionService.fetch(anyLong())).willReturn(vo);
+        when(regionService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/regions/{id}", anyLong()))
+        assertThat(mvc.get().uri("/regions/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.regionService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(regionService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/regions/{id}", anyLong()))
+        assertThat(mvc.get().uri("/regions/{id}", anyLong()))
                 .hasStatus2xxSuccessful();
     }
 
     @Test
     void create() {
-        given(this.regionService.create(any(RegionDTO.class))).willReturn(vo);
+        when(regionService.create(any(RegionDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -137,18 +137,18 @@ class RegionControllerTest {
 
     @Test
     void create_error() {
-        given(this.regionService.create(any(RegionDTO.class))).willThrow(new RuntimeException());
+        when(regionService.create(any(RegionDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
     @Test
     void modify() {
-        given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willReturn(vo);
+        when(regionService.modify(anyLong(), any(RegionDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.put().uri("/regions/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/regions/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -156,9 +156,9 @@ class RegionControllerTest {
 
     @Test
     void modify_error() {
-        given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willThrow(new RuntimeException());
+        when(regionService.modify(anyLong(), any(RegionDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.put().uri("/regions/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/regions/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
@@ -167,15 +167,15 @@ class RegionControllerTest {
     void remove() {
         this.regionService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.regionService).remove(anyLong());
+        doThrow(new RuntimeException()).when(regionService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 }

@@ -31,18 +31,9 @@ public interface DictionaryService extends JpaCrudService<DictionaryDTO, Diction
     /**
      * 获取子节点
      *
-     * @param id a {@link Long} object
+     * @param id th pk.
      * @return 数据集
      */
     List<DictionaryVO> subset(Long id);
 
-    /**
-     * Checks if a record exists by it's superiorId and name.
-     *
-     * @param superiorId the record's superiorId.
-     * @param name       the record's name.
-     * @param id         the record's id.
-     * @return a Mono emitting true if the record exists, false otherwise.
-     */
-    boolean exists(Long superiorId, String name, Long id);
 }

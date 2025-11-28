@@ -37,7 +37,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -79,10 +79,10 @@ class PostControllerTest {
     void retrieve() {
         Page<@NonNull PostVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(postService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willReturn(page);
+        when(postService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenReturn(page);
 
-        assertThat(this.mvc.get().uri("/posts")
+        assertThat(mvc.get().uri("/posts")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -95,10 +95,10 @@ class PostControllerTest {
 
     @Test
     void retrieve_error() {
-        given(postService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(postService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/posts")
+        assertThat(mvc.get().uri("/posts")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -110,25 +110,25 @@ class PostControllerTest {
 
     @Test
     void fetch() {
-        given(postService.fetch(anyLong())).willReturn(vo);
+        when(postService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/posts/{id}", anyLong()))
+        assertThat(mvc.get().uri("/posts/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(postService.fetch(anyLong())).willThrow(new RuntimeException());
-        assertThat(this.mvc.get().uri("/posts/{id}", anyLong()))
+        when(postService.fetch(anyLong())).thenThrow(new RuntimeException());
+        assertThat(mvc.get().uri("/posts/{id}", anyLong()))
                 .hasStatus5xxServerError();
     }
 
     @Test
     void create() {
-        given(postService.create(any(PostDTO.class))).willReturn(vo);
+        when(postService.create(any(PostDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -136,18 +136,18 @@ class PostControllerTest {
 
     @Test
     void create_error() {
-        given(postService.create(any(PostDTO.class))).willThrow(new RuntimeException());
+        when(postService.create(any(PostDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 
     @Test
     void modify() {
-        given(postService.modify(anyLong(), any(PostDTO.class))).willReturn(vo);
+        when(postService.modify(anyLong(), any(PostDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -155,9 +155,9 @@ class PostControllerTest {
 
     @Test
     void modify_error() {
-        given(postService.modify(anyLong(), any(PostDTO.class))).willThrow(new RuntimeException());
+        when(postService.modify(anyLong(), any(PostDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
@@ -165,14 +165,14 @@ class PostControllerTest {
     @Test
     void remove() {
         postService.remove(anyLong());
-        assertThat(this.mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
         doThrow(new RuntimeException()).when(postService).remove(anyLong());
-        assertThat(this.mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 

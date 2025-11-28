@@ -41,7 +41,7 @@ public interface PrivilegeService extends JpaCrudService<PrivilegeDTO, Privilege
      * get subset
      *
      * @param superiorId superior主键
-     * @return 结果
+     * @return the result.
      */
     List<PrivilegeVO> subset(Long superiorId);
 

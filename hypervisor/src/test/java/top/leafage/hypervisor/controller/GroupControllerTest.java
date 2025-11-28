@@ -44,7 +44,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -94,10 +94,10 @@ class GroupControllerTest {
     void retrieve() {
         Page<@NonNull GroupVO> voPage = new PageImpl<>(List.of(Mockito.mock(GroupVO.class)), mock(PageRequest.class), 2L);
 
-        given(this.groupService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(groupService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/groups")
+        assertThat(mvc.get().uri("/groups")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -110,10 +110,10 @@ class GroupControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.groupService.retrieve(anyInt(), anyInt(), eq("id"), anyBoolean(),
-                anyString())).willThrow(new RuntimeException());
+        when(groupService.retrieve(anyInt(), anyInt(), eq("id"), anyBoolean(),
+                anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/groups")
+        assertThat(mvc.get().uri("/groups")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -126,35 +126,35 @@ class GroupControllerTest {
     @Test
     void tree() {
         TreeNode<Long> treeNode = TreeNode.withId(1L).name("test").build();
-        given(this.groupService.tree()).willReturn(Collections.singletonList(treeNode));
+        when(groupService.tree()).thenReturn(Collections.singletonList(treeNode));
 
-        assertThat(this.mvc.get().uri("/groups/tree"))
+        assertThat(mvc.get().uri("/groups/tree"))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch() {
-        given(this.groupService.fetch(anyLong())).willReturn(Mockito.mock(GroupVO.class));
+        when(groupService.fetch(anyLong())).thenReturn(Mockito.mock(GroupVO.class));
 
-        assertThat(this.mvc.get().uri("/groups/{id}", anyLong()))
+        assertThat(mvc.get().uri("/groups/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.groupService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(groupService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/groups/{id}", anyLong()))
+        assertThat(mvc.get().uri("/groups/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void create() {
-        given(this.groupService.create(any(GroupDTO.class))).willReturn(Mockito.mock(GroupVO.class));
+        when(groupService.create(any(GroupDTO.class))).thenReturn(Mockito.mock(GroupVO.class));
 
-        assertThat(this.mvc.post().uri("/groups")
+        assertThat(mvc.post().uri("/groups")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
@@ -164,9 +164,9 @@ class GroupControllerTest {
 
     @Test
     void create_error() {
-        given(this.groupService.create(any(GroupDTO.class))).willThrow(new RuntimeException());
+        when(groupService.create(any(GroupDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.post().uri("/groups").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/groups").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatus4xxClientError();
@@ -174,9 +174,9 @@ class GroupControllerTest {
 
     @Test
     void modify() {
-        given(this.groupService.modify(anyLong(), any(GroupDTO.class))).willReturn(Mockito.mock(GroupVO.class));
+        when(groupService.modify(anyLong(), any(GroupDTO.class))).thenReturn(Mockito.mock(GroupVO.class));
 
-        assertThat(this.mvc.put().uri("/groups/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/groups/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatusOk()
@@ -185,9 +185,9 @@ class GroupControllerTest {
 
     @Test
     void modify_error() {
-        given(this.groupService.modify(anyLong(), any(GroupDTO.class))).willThrow(new RuntimeException());
+        when(groupService.modify(anyLong(), any(GroupDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.put().uri("/groups/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/groups/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatus4xxClientError();
@@ -197,50 +197,50 @@ class GroupControllerTest {
     void remove() {
         this.groupService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.groupService).remove(anyLong());
+        doThrow(new RuntimeException()).when(groupService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
     @Test
     void enable() {
-        given(this.groupService.enable(anyLong())).willReturn(true);
+        when(groupService.enable(anyLong())).thenReturn(true);
 
-        assertThat(this.mvc.patch().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.patch().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void members() {
-        given(this.groupMembersService.members(anyLong())).willReturn(anyList());
+        when(groupMembersService.members(anyLong())).thenReturn(anyList());
 
-        assertThat(this.mvc.get().uri("/groups/{id}/members", 1L))
+        assertThat(mvc.get().uri("/groups/{id}/members", 1L))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void members_error() {
-        doThrow(new RuntimeException()).when(this.groupMembersService).members(anyLong());
+        doThrow(new RuntimeException()).when(groupMembersService).members(anyLong());
 
-        assertThat(this.mvc.get().uri("/groups/{id}/members", anyLong()))
+        assertThat(mvc.get().uri("/groups/{id}/members", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
 
     @Test
-    void relation() {
-        given(this.groupPrivilegesService.relation(anyLong(), anyLong(), anyString()))
-                .willReturn(mock(GroupPrivileges.class));
+    void relationMembers() {
+        when(groupPrivilegesService.relation(anyLong(), anyLong(), anyString()))
+                .thenReturn(mock(GroupPrivileges.class));
 
-        assertThat(this.mvc.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
+        assertThat(mvc.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
                 .queryParam("action", "create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
@@ -250,10 +250,10 @@ class GroupControllerTest {
     }
 
     @Test
-    void relation_error() {
-        doThrow(new RuntimeException()).when(this.groupPrivilegesService).relation(anyLong(), anyLong(), anyString());
+    void relation_Members_error() {
+        doThrow(new RuntimeException()).when(groupPrivilegesService).relation(anyLong(), anyLong(), anyString());
 
-        assertThat(this.mvc.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
+        assertThat(mvc.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
                 .queryParam("action", "create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())

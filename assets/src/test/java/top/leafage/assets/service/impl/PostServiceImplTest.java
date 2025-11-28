@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -71,76 +71,76 @@ class PostServiceImplTest {
     void retrieve() {
         Page<Post> page = new PageImpl<>(List.of(mock(Post.class)));
 
-        given(postRepository.findAll(ArgumentMatchers.<Specification<Post>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(postRepository.findAll(ArgumentMatchers.<Specification<Post>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
-        Assertions.assertNotNull(voPage.getContent());
+assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(postRepository.findById(anyLong())).willReturn(Optional.of(mock(Post.class)));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(mock(Post.class)));
 
         PostVO vo = postsService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
+assertNotNull(vo);
     }
 
     @Test
     void fetch_posts_null() {
-        given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+        when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         PostVO vo = postsService.fetch(anyLong());
 
-        Assertions.assertNull(vo);
+assertNull(vo);
     }
 
     @Test
     void exists() {
-        given(postRepository.existsByTitleAndIdNot(anyString(), anyLong())).willReturn(true);
+        when(postRepository.existsByTitleAndIdNot(anyString(), anyLong())).thenReturn(true);
 
         boolean exists = postsService.exists("test", 1L);
 
-        Assertions.assertTrue(exists);
+assertTrue(exists);
     }
 
     @Test
     void exists_id_null() {
-        given(postRepository.existsByTitle(anyString())).willReturn(true);
+        when(postRepository.existsByTitle(anyString())).thenReturn(true);
 
         boolean exists = postsService.exists("test", null);
 
-        Assertions.assertTrue(exists);
+assertTrue(exists);
     }
 
     @Test
     void create() {
-        given(postRepository.saveAndFlush(any(Post.class))).willReturn(mock(Post.class));
+        when(postRepository.saveAndFlush(any(Post.class))).thenReturn(mock(Post.class));
 
         PostVO vo = postsService.create(dto);
 
-        verify(postRepository, times(1)).saveAndFlush(any(Post.class));
-        Assertions.assertNotNull(vo);
+        verify(postRepository).saveAndFlush(any(Post.class));
+assertNotNull(vo);
     }
 
     @Test
     void modify() {
-        given(postRepository.findById(anyLong())).willReturn(Optional.of(mock(Post.class)));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(mock(Post.class)));
 
-        given(postRepository.save(any(Post.class))).willReturn(mock(Post.class));
+        when(postRepository.save(any(Post.class))).thenReturn(mock(Post.class));
 
         PostVO vo = postsService.modify(1L, dto);
 
-        verify(postRepository, times(1)).save(any(Post.class));
-        Assertions.assertNotNull(vo);
+        verify(postRepository).save(any(Post.class));
+assertNotNull(vo);
     }
 
     @Test
     void remove() {
         postsService.remove(anyLong());
 
-        verify(postRepository, times(1)).deleteById(anyLong());
+        verify(postRepository).deleteById(anyLong());
     }
 
 }

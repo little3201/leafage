@@ -35,6 +35,13 @@ public class RoleMembers extends AbstractPersistable<@NonNull Long> {
     @Column(nullable = false)
     private String username;
 
+    public RoleMembers() {
+    }
+
+    public RoleMembers(Long roleId, String username) {
+        this.roleId = roleId;
+        this.username = username;
+    }
 
     public Long getRoleId() {
         return roleId;

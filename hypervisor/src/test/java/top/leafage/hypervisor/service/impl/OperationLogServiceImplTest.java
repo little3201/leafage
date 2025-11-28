@@ -15,7 +15,9 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -26,16 +28,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import top.leafage.hypervisor.domain.AccessLog;
 import top.leafage.hypervisor.domain.OperationLog;
+import top.leafage.hypervisor.domain.Role;
 import top.leafage.hypervisor.domain.vo.OperationLogVO;
 import top.leafage.hypervisor.repository.OperationLogRepository;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -55,39 +60,77 @@ class OperationLogServiceImplTest {
     @InjectMocks
     private OperationLogServiceImpl operationLogService;
 
+    private OperationLog entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new OperationLog();
+        entity.setModule("test");
+        entity.setBody("body");
+        entity.setParams("params");
+        entity.setAction("test");
+        entity.setStatusCode(200);
+    }
+
     @Test
     void retrieve() {
         Page<OperationLog> page = new PageImpl<>(List.of(mock(OperationLog.class)));
 
-        given(this.operationLogRepository.findAll(ArgumentMatchers.<Specification<OperationLog>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(operationLogRepository.findAll(ArgumentMatchers.<Specification<OperationLog>>any(),
+                any(Pageable.class))).thenReturn(page);
 
-        Page<OperationLogVO> voPage = operationLogService.retrieve(0, 2, "id", true, "test");
-
-        Assertions.assertNotNull(voPage.getContent());
+        Page<OperationLogVO> voPage = operationLogService.retrieve(0, 2, "id", true, "module:like:test");
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(operationLogRepository).findAll(ArgumentMatchers.<Specification<OperationLog>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.operationLogRepository.findById(anyLong())).willReturn(Optional.of(mock(OperationLog.class)));
+        when(operationLogRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         OperationLogVO vo = operationLogService.fetch(anyLong());
+        assertNotNull(vo);
+        assertEquals("test", vo.module());
+        verify(operationLogRepository).findById(anyLong());
+    }
 
-        Assertions.assertNotNull(vo);
+    @Test
+    void fetch_not_found() {
+        when(operationLogRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> operationLogService.fetch(anyLong())
+        );
+        assertEquals("operation log not found: 0", exception.getMessage());
+        verify(operationLogRepository).findById(anyLong());
     }
 
     @Test
     void remove() {
+        when(operationLogRepository.existsById(anyLong())).thenReturn(true);
         operationLogService.remove(1L);
 
-        verify(this.operationLogRepository, times(1)).deleteById(anyLong());
+        verify(operationLogRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(operationLogRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> operationLogService.remove(anyLong())
+        );
+        assertEquals("operation log not found: 0", exception.getMessage());
     }
 
     @Test
     void clear() {
         operationLogService.clear();
 
-        verify(this.operationLogRepository, times(1)).deleteAll();
+        verify(operationLogRepository).deleteAll();
     }
 
 }

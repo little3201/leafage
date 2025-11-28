@@ -15,7 +15,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,12 +32,13 @@ import top.leafage.hypervisor.repository.RolePrivilegesRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * role privileges service test
@@ -65,6 +65,7 @@ class RolePrivilegeServiceImplTest {
 
     private GroupRoles groupRoles;
     private Privilege privilege;
+    private RolePrivileges rolePrivilege;
 
     @BeforeEach
     void setUp() {
@@ -73,46 +74,62 @@ class RolePrivilegeServiceImplTest {
         groupRoles.setRoleId(2L);
 
         privilege = new Privilege();
-        privilege.setId(1L);
         privilege.setName("name");
+        privilege.setActions(Set.of("create"));
+
+        rolePrivilege = new RolePrivileges(1L, 1L, 1L, Set.of("test"));
     }
 
     @Test
     void privileges() {
-        given(this.rolePrivilegesRepository.findAllByRoleId(anyLong())).willReturn(List.of(mock(RolePrivileges.class)));
+        when(rolePrivilegesRepository.findAllByRoleId(anyLong())).thenReturn(List.of(mock(RolePrivileges.class)));
 
         List<RolePrivileges> privileges = rolePrivilegesService.privileges(anyLong());
-        Assertions.assertNotNull(privileges);
+        assertEquals(1, privileges.size());
+        verify(rolePrivilegesRepository).findAllByRoleId(anyLong());
     }
 
     @Test
     void roles() {
-        given(this.rolePrivilegesRepository.findAllByPrivilegeId(anyLong())).willReturn(List.of(mock(RolePrivileges.class)));
+        when(rolePrivilegesRepository.findAllByPrivilegeId(anyLong())).thenReturn(List.of(mock(RolePrivileges.class)));
 
         List<RolePrivileges> roles = rolePrivilegesService.roles(anyLong());
-        Assertions.assertNotNull(roles);
+        assertEquals(1, roles.size());
+        verify(rolePrivilegesRepository).findAllByPrivilegeId(anyLong());
     }
 
     @Test
     void relation() {
-        RolePrivileges rolePrivilege = new RolePrivileges();
-        rolePrivilege.setId(1L);
-        rolePrivilege.setPrivilegeId(1L);
-        rolePrivilege.setRoleId(1L);
-        given(this.rolePrivilegesRepository.findByRoleIdAndPrivilegeId(anyLong(), anyLong())).willReturn(Optional.of(rolePrivilege));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
+        when(groupRolesRepository.findAllByRoleId(anyLong())).thenReturn(List.of(groupRoles));
+        when(groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).thenReturn(Optional.of(mock(GroupAuthorities.class)));
+        when(rolePrivilegesRepository.saveAndFlush(any(RolePrivileges.class))).thenReturn(rolePrivilege);
 
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(privilege));
-
-        given(this.groupRolesRepository.findAllByRoleId(anyLong())).willReturn(List.of(groupRoles));
-
-        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).willReturn(Optional.of(mock(GroupAuthorities.class)));
-
-        given(this.rolePrivilegesRepository.saveAndFlush(any(RolePrivileges.class))).willReturn(rolePrivilege);
         RolePrivileges relation = rolePrivilegesService.relation(1L, 1L, "");
+        assertEquals(1, relation.getRoleId());
+        verify(rolePrivilegesRepository).saveAndFlush(any(RolePrivileges.class));
+        verify(groupAuthoritiesRepository).saveAll(anyList());
+    }
 
-        verify(this.rolePrivilegesRepository, times(1)).saveAndFlush(any(RolePrivileges.class));
-        verify(this.groupAuthoritiesRepository, times(1)).saveAll(anyList());
 
-        Assertions.assertNotNull(relation);
+    @Test
+    void removeRelation() {
+        when(rolePrivilegesRepository.findByRoleIdAndPrivilegeId(anyLong(), anyLong())).thenReturn(Optional.of(rolePrivilege));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
+        when(groupRolesRepository.findAllByRoleId(anyLong())).thenReturn(List.of(groupRoles));
+
+        rolePrivilegesService.removeRelation(1L, 2L, "test");
+        verify(groupAuthoritiesRepository).deleteByGroupIdAndAuthority(anyLong(), anyString());
+    }
+
+    @Test
+    void removeRelation_empty_action() {
+        when(rolePrivilegesRepository.findByRoleIdAndPrivilegeId(anyLong(), anyLong())).thenReturn(Optional.of(rolePrivilege));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
+        when(groupRolesRepository.findAllByRoleId(anyLong())).thenReturn(List.of(groupRoles));
+
+        rolePrivilegesService.removeRelation(1L, 2L, "");
+        verify(rolePrivilegesRepository).deleteById(anyLong());
+        verify(groupAuthoritiesRepository).deleteByGroupIdAndAuthorityStartingWith(anyLong(), anyString());
     }
 }

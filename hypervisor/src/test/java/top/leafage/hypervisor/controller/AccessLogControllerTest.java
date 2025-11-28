@@ -36,7 +36,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -59,18 +59,18 @@ class AccessLogControllerTest {
     private AccessLogVO vo;
 
     @BeforeEach
-    void setUp() throws UnknownHostException {
-        vo = new AccessLogVO(1L, "/users", "POST", InetAddress.getByName("12.1.3.2"), "", "", 200, 230L, "");
+    void setUp()  {
+        vo = new AccessLogVO(1L, "/users", "POST", "127.0.0.1", "", "", 200, 230L, "");
     }
 
     @Test
     void retrieve() {
         Page<@NonNull AccessLogVO> voPage = new PageImpl<>(List.of(Mockito.mock(AccessLogVO.class)), mock(PageRequest.class), 2L);
 
-        given(this.accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/access-logs")
+        assertThat(mvc.get().uri("/access-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -83,10 +83,10 @@ class AccessLogControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/access-logs")
+        assertThat(mvc.get().uri("/access-logs")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -98,18 +98,18 @@ class AccessLogControllerTest {
 
     @Test
     void fetch() {
-        given(this.accessLogService.fetch(anyLong())).willReturn(Mockito.mock(AccessLogVO.class));
+        when(accessLogService.fetch(anyLong())).thenReturn(Mockito.mock(AccessLogVO.class));
 
-        assertThat(this.mvc.get().uri("/access-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/access-logs/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.accessLogService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(accessLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/access-logs/{id}", anyLong()))
+        assertThat(mvc.get().uri("/access-logs/{id}", anyLong()))
                 .hasStatus5xxServerError();
     }
 
@@ -117,15 +117,15 @@ class AccessLogControllerTest {
     void remove() {
         this.accessLogService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/access-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/access-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.accessLogService).remove(anyLong());
+        doThrow(new RuntimeException()).when(accessLogService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/access-logs/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/access-logs/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 
@@ -133,15 +133,15 @@ class AccessLogControllerTest {
     void clear() {
         this.accessLogService.clear();
 
-        assertThat(this.mvc.delete().uri("/access-logs").with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/access-logs").with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void clear_error() {
-        doThrow(new RuntimeException()).when(this.accessLogService).clear();
+        doThrow(new RuntimeException()).when(accessLogService).clear();
 
-        assertThat(this.mvc.delete().uri("/access-logs").with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/access-logs").with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 

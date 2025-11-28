@@ -1,5 +1,6 @@
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,13 +43,15 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
 
         return schedulerLogRepository.findById(id)
                 .map(SchedulerLogVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("scheduler log not found: " + id));
     }
 
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!schedulerLogRepository.existsById(id)) {
+            throw new EntityNotFoundException("scheduler log not found: " + id);
+        }
         schedulerLogRepository.deleteById(id);
     }
 

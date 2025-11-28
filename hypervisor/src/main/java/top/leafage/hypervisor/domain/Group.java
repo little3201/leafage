@@ -51,6 +51,13 @@ public class Group extends JpaAbstractAuditable<@NonNull String, @NonNull Long> 
         this.description = description;
     }
 
+    public Group(Long id, String name, Long superiorId, String description) {
+        this.setId(id);
+        this.name = name;
+        this.superiorId = superiorId;
+        this.description = description;
+    }
+
     public String getName() {
         return name;
     }

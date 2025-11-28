@@ -40,7 +40,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -86,10 +86,10 @@ class RoleControllerTest {
     void retrieve() {
         Page<@NonNull RoleVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(this.roleService.retrieve(anyInt(), anyInt(), eq("id"),
-                anyBoolean(), anyString())).willReturn(voPage);
+        when(roleService.retrieve(anyInt(), anyInt(), eq("id"),
+                anyBoolean(), anyString())).thenReturn(voPage);
 
-        assertThat(this.mvc.get().uri("/roles")
+        assertThat(mvc.get().uri("/roles")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -102,10 +102,10 @@ class RoleControllerTest {
 
     @Test
     void retrieve_error() {
-        given(this.roleService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(roleService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/roles")
+        assertThat(mvc.get().uri("/roles")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -117,26 +117,26 @@ class RoleControllerTest {
 
     @Test
     void fetch() {
-        given(this.roleService.fetch(anyLong())).willReturn(vo);
+        when(roleService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/roles/{id}", anyLong()))
+        assertThat(mvc.get().uri("/roles/{id}", anyLong()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(this.roleService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(roleService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/roles/{id}", anyLong()))
+        assertThat(mvc.get().uri("/roles/{id}", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void create() {
-        given(this.roleService.create(any(RoleDTO.class))).willReturn(vo);
+        when(roleService.create(any(RoleDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.post().uri("/roles").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/roles").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
                 .hasStatusOk()
@@ -145,18 +145,18 @@ class RoleControllerTest {
 
     @Test
     void create_error() {
-        given(this.roleService.create(any(RoleDTO.class))).willThrow(new RuntimeException());
+        when(roleService.create(any(RoleDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.post().uri("/roles").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/roles").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
     @Test
     void modify() {
-        given(this.roleService.modify(anyLong(), any(RoleDTO.class))).willReturn(vo);
+        when(roleService.modify(anyLong(), any(RoleDTO.class))).thenReturn(vo);
 
-        assertThat(this.mvc.put().uri("/roles/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/roles/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
@@ -164,9 +164,9 @@ class RoleControllerTest {
 
     @Test
     void modify_error() {
-        given(this.roleService.modify(anyLong(), any(RoleDTO.class))).willThrow(new RuntimeException());
+        when(roleService.modify(anyLong(), any(RoleDTO.class))).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.put().uri("/roles/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.put().uri("/roles/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
@@ -175,66 +175,66 @@ class RoleControllerTest {
     void remove() {
         this.roleService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/roles/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/roles/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void remove_error() {
-        doThrow(new RuntimeException()).when(this.roleService).remove(anyLong());
+        doThrow(new RuntimeException()).when(roleService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/roles/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/roles/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus4xxClientError();
     }
 
     @Test
     void enable() {
-        given(this.roleService.enable(anyLong())).willReturn(true);
+        when(roleService.enable(anyLong())).thenReturn(true);
 
-        assertThat(this.mvc.patch().uri("/roles/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.patch().uri("/roles/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
     }
 
     @Test
     void members() {
-        given(this.roleMembersService.members(anyLong())).willReturn(anyList());
+        when(roleMembersService.members(anyLong())).thenReturn(anyList());
 
-        assertThat(this.mvc.get().uri("/roles/{id}/members", 1L))
+        assertThat(mvc.get().uri("/roles/{id}/members", 1L))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void members_error() {
-        doThrow(new RuntimeException()).when(this.roleMembersService).members(anyLong());
+        doThrow(new RuntimeException()).when(roleMembersService).members(anyLong());
 
-        assertThat(this.mvc.get().uri("/roles/{id}/members", anyLong()))
+        assertThat(mvc.get().uri("/roles/{id}/members", anyLong()))
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void privileges() {
-        given(this.rolePrivilegesService.privileges(anyLong())).willReturn(anyList());
+        when(rolePrivilegesService.privileges(anyLong())).thenReturn(anyList());
 
-        assertThat(this.mvc.get().uri("/roles/{id}/privileges", 1L))
+        assertThat(mvc.get().uri("/roles/{id}/privileges", 1L))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void authorities_error() {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).privileges(anyLong());
+        doThrow(new RuntimeException()).when(rolePrivilegesService).privileges(anyLong());
 
-        assertThat(this.mvc.get().uri("/roles/{id}/privileges", anyLong()))
+        assertThat(mvc.get().uri("/roles/{id}/privileges", anyLong()))
                 .hasStatus4xxClientError();
     }
 
     @Test
-    void relation() {
-        given(this.rolePrivilegesService.relation(anyLong(), anyLong(), anyString()))
-                .willReturn(mock(RolePrivileges.class));
+    void relationMembers() {
+        when(rolePrivilegesService.relation(anyLong(), anyLong(), anyString()))
+                .thenReturn(mock(RolePrivileges.class));
 
-        assertThat(this.mvc.patch().uri("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
+        assertThat(mvc.patch().uri("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
                 .queryParam("action", "create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
@@ -243,10 +243,10 @@ class RoleControllerTest {
     }
 
     @Test
-    void relation_error() {
-        doThrow(new RuntimeException()).when(this.rolePrivilegesService).relation(anyLong(), anyLong(), anyString());
+    void relation_Members_error() {
+        doThrow(new RuntimeException()).when(rolePrivilegesService).relation(anyLong(), anyLong(), anyString());
 
-        assertThat(this.mvc.patch().uri("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
+        assertThat(mvc.patch().uri("/roles/{id}/privileges/{privilegeId}", 1L, 1L)
                 .queryParam("action", "create")
                 .contentType(MediaType.APPLICATION_JSON).with(csrf().asHeader())
         )

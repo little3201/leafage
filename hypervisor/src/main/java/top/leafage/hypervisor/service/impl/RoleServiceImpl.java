@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -70,24 +71,16 @@ public class RoleServiceImpl implements RoleService {
 
         return roleRepository.findById(id)
                 .map(RoleVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("role not found: " + id));
     }
 
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
-        return roleRepository.updateEnabledById(id) > 0;
-    }
-
-    @Override
-    public boolean exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-
-        if (id == null) {
-            return roleRepository.existsByName(name);
+        if (!roleRepository.existsById(id)) {
+            throw new EntityNotFoundException("role not found: " + id);
         }
-        return roleRepository.existsByNameAndIdNot(name, id);
+        return roleRepository.updateEnabledById(id) > 0;
     }
 
     /**
@@ -95,6 +88,9 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public RoleVO create(RoleDTO dto) {
+        if (roleRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
         Role entity = roleRepository.saveAndFlush(RoleDTO.toEntity(dto));
         return RoleVO.from(entity);
     }
@@ -106,11 +102,14 @@ public class RoleServiceImpl implements RoleService {
     public RoleVO modify(Long id, RoleDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        Role entity = roleRepository.findById(id).map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return roleRepository.save(existing);
-                })
-                .orElseThrow();
+        Role existing = roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("role not found: " + id));
+        if (!existing.getName().equals(dto.getName()) &&
+                roleRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
+        copier.copy(dto, existing, null);
+        Role entity = roleRepository.save(existing);
         return RoleVO.from(entity);
     }
 
@@ -120,7 +119,9 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!roleRepository.existsById(id)) {
+            throw new EntityNotFoundException("role not found: " + id);
+        }
         roleRepository.deleteById(id);
     }
 

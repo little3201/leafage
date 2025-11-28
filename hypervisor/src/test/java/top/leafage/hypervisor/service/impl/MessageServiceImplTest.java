@@ -15,7 +15,8 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -34,12 +35,11 @@ import top.leafage.hypervisor.repository.MessageRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.*;
 
 
 /**
@@ -56,35 +56,119 @@ class MessageServiceImplTest {
     @InjectMocks
     private MessageServiceImpl messageService;
 
+    private MessageDTO dto;
+    private Message entity;
+
+    @BeforeEach
+    void setUp() {
+        dto = new MessageDTO();
+        dto.setTitle("test");
+        dto.setBody("body");
+        dto.setReceiver("demo");
+
+        entity = MessageDTO.toEntity(dto);
+    }
 
     @Test
     void retrieve() {
         Page<Message> page = new PageImpl<>(List.of(mock(Message.class)));
 
-        given(this.messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<MessageVO> voPage = messageService.retrieve(0, 2, "id", true, "test");
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(messageRepository).findAll(ArgumentMatchers.<Specification<Message>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.messageRepository.findById(anyLong())).willReturn(Optional.of(mock(Message.class)));
+        when(messageRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         MessageVO vo = messageService.fetch(anyLong());
-
-        Assertions.assertNotNull(vo);
+        assertNotNull(vo);
+        assertEquals("test", vo.title());
+        verify(messageRepository).findById(anyLong());
     }
 
+    @Test
+    void fetch_not_found() {
+        when(messageRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> messageService.fetch(anyLong())
+        );
+        assertEquals("message not found: 0", exception.getMessage());
+        verify(messageRepository).findById(anyLong());
+    }
 
     @Test
     void create() {
-        given(this.messageRepository.saveAndFlush(any(Message.class))).willReturn(mock(Message.class));
+        when(messageRepository.existsByTitle("test")).thenReturn(false);
+        when(messageRepository.saveAndFlush(any(Message.class))).thenReturn(entity);
 
-        MessageVO vo = messageService.create(mock(MessageDTO.class));
+        MessageVO vo = messageService.create(dto);
+        assertNotNull(vo);
+        assertEquals("test", vo.title());
+        verify(messageRepository).saveAndFlush(any(Message.class));
+    }
 
-        verify(this.messageRepository, times(1)).saveAndFlush(any(Message.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void create_name_conflict() {
+        when(messageRepository.existsByTitle("test")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> messageService.create(dto)
+        );
+        assertEquals("title already exists: test", exception.getMessage());
+        verify(messageRepository, never()).save(any());
+    }
+
+    @Test
+    void modify() {
+        when(messageRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(messageRepository.existsByTitle("demo")).thenReturn(false);
+        when(messageRepository.save(any(Message.class))).thenReturn(entity);
+
+        dto.setTitle("demo");
+        MessageVO vo = messageService.modify(1L, dto);
+        assertNotNull(vo);
+        assertEquals("demo", vo.title());
+        verify(messageRepository).save(any(Message.class));
+    }
+
+    @Test
+    void modify_username_conflict() {
+        when(messageRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(messageRepository.existsByTitle("demo")).thenReturn(true);
+
+        dto.setTitle("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> messageService.modify(1L, dto)
+        );
+        assertEquals("title already exists: demo", exception.getMessage());
+    }
+
+    @Test
+    void remove() {
+        when(messageRepository.existsById(anyLong())).thenReturn(true);
+        messageService.remove(1L);
+
+        verify(messageRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(messageRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> messageService.remove(anyLong())
+        );
+        assertEquals("message not found: 0", exception.getMessage());
     }
 }

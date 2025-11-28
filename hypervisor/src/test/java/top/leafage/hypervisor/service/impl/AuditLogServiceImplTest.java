@@ -15,7 +15,9 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -27,15 +29,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import top.leafage.hypervisor.domain.AuditLog;
+import top.leafage.hypervisor.domain.OperationLog;
+import top.leafage.hypervisor.domain.Role;
 import top.leafage.hypervisor.domain.vo.AuditLogVO;
 import top.leafage.hypervisor.repository.AuditLogRepository;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -54,32 +59,70 @@ class AuditLogServiceImplTest {
     @InjectMocks
     private AuditLogServiceImpl auditLogService;
 
+    private AuditLog entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new AuditLog();
+        entity.setOperation("test");
+        entity.setResource("test");
+        entity.setOldValue("old");
+        entity.setNewValue("new");
+        entity.setStatusCode(200);
+    }
+
     @Test
     void retrieve() {
         Page<AuditLog> page = new PageImpl<>(List.of(mock(AuditLog.class)));
 
-        given(this.auditLogRepository.findAll(ArgumentMatchers.<Specification<AuditLog>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(auditLogRepository.findAll(ArgumentMatchers.<Specification<AuditLog>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<AuditLogVO> voPage = auditLogService.retrieve(0, 2, "id", true, "test");
-
-        Assertions.assertNotNull(voPage.getContent());
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(auditLogRepository).findAll(ArgumentMatchers.<Specification<AuditLog>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.auditLogRepository.findById(anyLong())).willReturn(Optional.of(mock(AuditLog.class)));
+        when(auditLogRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         AuditLogVO vo = auditLogService.fetch(anyLong());
+        assertNotNull(vo);
+        assertEquals("test", vo.operation());
+        verify(auditLogRepository).findById(anyLong());
+    }
 
-        Assertions.assertNotNull(vo);
+    @Test
+    void fetch_not_found() {
+        when(auditLogRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> auditLogService.fetch(anyLong())
+        );
+        assertEquals("audit log not found: 0", exception.getMessage());
+        verify(auditLogRepository).findById(anyLong());
     }
 
     @Test
     void remove() {
+        when(auditLogRepository.existsById(anyLong())).thenReturn(true);
         auditLogService.remove(1L);
 
-        verify(this.auditLogRepository, times(1)).deleteById(anyLong());
+        verify(auditLogRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(auditLogRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> auditLogService.remove(anyLong())
+        );
+        assertEquals("audit log not found: 0", exception.getMessage());
     }
 
 }

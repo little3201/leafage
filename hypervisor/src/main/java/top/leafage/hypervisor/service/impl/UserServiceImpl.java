@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -70,20 +71,24 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findById(id)
                 .map(UserVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("user not found: " + id));
     }
 
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("user not found: " + id);
+        }
         return userRepository.updateEnabledById(id) > 0;
     }
 
     @Override
     public boolean unlock(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("user not found: " + id);
+        }
         return userRepository.updateAccountNonLockedById(id) > 0;
     }
 
@@ -91,20 +96,13 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public boolean exists(String username, Long id) {
-        Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
-
-        if (id == null) {
-            return userRepository.existsByUsername(username);
-        }
-        return userRepository.existsByUsernameAndIdNot(username, id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public UserVO create(UserDTO dto) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("username already exists: " + dto.getUsername());
+        }
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("username already exists: " + dto.getUsername());
+        }
         User entity = userRepository.saveAndFlush(UserDTO.toEntity(dto, "{noop}123456"));
         return UserVO.from(entity);
     }
@@ -116,11 +114,20 @@ public class UserServiceImpl implements UserService {
     public UserVO modify(Long id, UserDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        User entity = userRepository.findById(id).map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return userRepository.save(existing);
-                })
-                .orElseThrow();
+        User existing = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user not found: " + id));
+
+        if (!existing.getUsername().equals(dto.getUsername()) &&
+                userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("username already exists: " + dto.getUsername());
+        }
+        if (!existing.getEmail().equals(dto.getEmail()) &&
+                userRepository.existsByEmail(dto.getEmail())) {
+            throw new IllegalArgumentException("email already exists: " + dto.getEmail());
+        }
+
+        copier.copy(dto, existing, null);
+        User entity = userRepository.save(existing);
         return UserVO.from(entity);
     }
 
@@ -130,7 +137,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("user not found: " + id);
+        }
         userRepository.deleteById(id);
     }
 

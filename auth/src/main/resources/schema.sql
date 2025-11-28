@@ -40,7 +40,7 @@ CREATE TABLE "public"."oauth2_authorization"
 )
 ;
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."id" IS '主键';
+ON COLUMN "public"."oauth2_authorization"."id" IS 'the pk.';
 COMMENT
 ON COLUMN "public"."oauth2_authorization"."registered_client_id" IS 'client id';
 COMMENT
@@ -132,7 +132,7 @@ CREATE TABLE "public"."oauth2_registered_client"
 )
 ;
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."id" IS '主键';
+ON COLUMN "public"."oauth2_registered_client"."id" IS 'the pk.';
 COMMENT
 ON COLUMN "public"."oauth2_registered_client"."client_id" IS 'ID';
 COMMENT

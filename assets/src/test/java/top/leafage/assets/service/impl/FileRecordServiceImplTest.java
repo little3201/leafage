@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -59,55 +59,55 @@ class FileRecordServiceImplTest {
     void retrieve() {
         Page<FileRecord> page = new PageImpl<>(List.of(mock(FileRecord.class)));
 
-        given(this.fileRecordRepository.findAll(ArgumentMatchers.<Specification<FileRecord>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(fileRecordRepository.findAll(ArgumentMatchers.<Specification<FileRecord>>any(),
+                any(Pageable.class))).thenReturn(page);
 
         Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
-        Assertions.assertNotNull(voPage.getContent());
+assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(fileRecordRepository.findById(anyLong())).willReturn(Optional.of(mock(FileRecord.class)));
+        when(fileRecordRepository.findById(anyLong())).thenReturn(Optional.of(mock(FileRecord.class)));
 
         FileRecordVO vo = fileRecordService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
+assertNotNull(vo);
     }
 
     @Test
     void exists() {
-        given(fileRecordRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(true);
+        when(fileRecordRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(true);
 
         boolean exists = fileRecordService.exists("test", 1L);
 
-        Assertions.assertTrue(exists);
+assertTrue(exists);
     }
 
     @Test
     void exists_id_null() {
-        given(fileRecordRepository.existsByName(anyString())).willReturn(true);
+        when(fileRecordRepository.existsByName(anyString())).thenReturn(true);
 
         boolean exists = fileRecordService.exists("test", null);
 
-        Assertions.assertTrue(exists);
+assertTrue(exists);
     }
 
     @Test
     void upload() {
-        given(fileRecordRepository.saveAndFlush(any(FileRecord.class))).willReturn(mock(FileRecord.class));
+        when(fileRecordRepository.saveAndFlush(any(FileRecord.class))).thenReturn(mock(FileRecord.class));
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
         FileRecordVO vo = fileRecordService.upload(file);
 
-        verify(fileRecordRepository, times(1)).saveAndFlush(any(FileRecord.class));
-        Assertions.assertNotNull(vo);
+        verify(fileRecordRepository).saveAndFlush(any(FileRecord.class));
+assertNotNull(vo);
     }
 
     @Test
     void remove() {
         fileRecordService.remove(11L);
 
-        verify(this.fileRecordRepository, times(1)).deleteById(anyLong());
+        verify(fileRecordRepository).deleteById(anyLong());
     }
 }

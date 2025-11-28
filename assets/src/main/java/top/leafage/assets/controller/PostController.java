@@ -78,7 +78,7 @@ public class PostController {
     /**
      * fetch with id .
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 帖子信息，不包括内容
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
@@ -120,7 +120,7 @@ public class PostController {
     /**
      * 修改帖子信息
      *
-     * @param id  主键
+     * @param id  the pk.
      * @param dto 帖子信息
      * @return 修改后的帖子信息
      */
@@ -144,7 +144,7 @@ public class PostController {
     /**
      * 删除帖子信息
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 删除结果
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:remove')")
@@ -160,10 +160,10 @@ public class PostController {
     }
 
     /**
-     * Enable a record when enabled is false or disable when enabled is ture.
+     * enable/disable..
      *
-     * @param id The record ID.
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @param id the pk..
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:enable')")
     @PatchMapping("/{id}")
@@ -179,9 +179,9 @@ public class PostController {
     }
 
     /**
-     * Import the records.
+     * import..
      *
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_posts:import')")
     @PostMapping("/import")

@@ -41,11 +41,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     /**
      * 是否存在
      *
-     * @param username 用户名
-     * @param id       the record's id.
+     * @param email 用户名
      * @return true-存在，false-否
      */
-    boolean existsByUsernameAndIdNot(String username, Long id);
+    boolean existsByEmail(String email);
 
     /**
      * Toggles the enabled status of a record by its ID.

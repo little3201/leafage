@@ -15,23 +15,25 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import top.leafage.hypervisor.domain.GroupMembers;
 import top.leafage.hypervisor.domain.RoleMembers;
 import top.leafage.hypervisor.repository.RoleMembersRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * role members service test
@@ -47,29 +49,45 @@ class RoleMembersServiceImplTest {
     @InjectMocks
     private RoleMembersServiceImpl roleMembersService;
 
+    private RoleMembers roleMembers;
+
+    @BeforeEach
+    void setUp() {
+        roleMembers = new RoleMembers(1L, "test");
+    }
+
     @Test
     void members() {
-        given(this.roleMembersRepository.findAllByRoleId(anyLong())).willReturn(List.of(mock(RoleMembers.class)));
+        when(roleMembersRepository.findAllByRoleId(anyLong())).thenReturn(List.of(mock(RoleMembers.class)));
 
         List<RoleMembers> members = roleMembersService.members(anyLong());
-        Assertions.assertNotNull(members);
+        assertEquals(1, members.size());
+        verify(roleMembersRepository).findAllByRoleId(anyLong());
     }
 
     @Test
     void roles() {
-        given(this.roleMembersRepository.findAllByUsername(anyString())).willReturn(List.of(mock(RoleMembers.class)));
+        when(roleMembersRepository.findAllByUsername(anyString())).thenReturn(List.of(mock(RoleMembers.class)));
 
         List<RoleMembers> roles = roleMembersService.roles("test");
-        Assertions.assertNotNull(roles);
+        assertEquals(1, roles.size());
+        verify(roleMembersRepository).findAllByUsername(anyString());
     }
 
     @Test
     void relation() {
-        given(this.roleMembersRepository.saveAllAndFlush(anyIterable())).willReturn(anyList());
+        when(roleMembersRepository.saveAllAndFlush(anyIterable())).thenReturn(List.of(mock(RoleMembers.class)));
 
         List<RoleMembers> relation = roleMembersService.relation(1L, Set.of("test"));
+        assertEquals(1, relation.size());
+        verify(roleMembersRepository).saveAllAndFlush(anyList());
+    }
 
-        verify(this.roleMembersRepository, times(1)).saveAllAndFlush(anyList());
-        Assertions.assertNotNull(relation);
+    @Test
+    void removeRelation() {
+        when(roleMembersRepository.findAllByRoleId(anyLong())).thenReturn(List.of(roleMembers));
+
+        roleMembersService.removeRelation(1L, Set.of("test"));
+        verify(roleMembersRepository).deleteAllByIdInBatch(anyCollection());
     }
 }

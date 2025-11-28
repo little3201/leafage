@@ -15,10 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +30,6 @@ import top.leafage.hypervisor.service.AccessLogService;
 @RestController
 @RequestMapping("/access-logs")
 public class AccessLogController {
-
-    private final Logger logger = LoggerFactory.getLogger(AccessLogController.class);
 
     private final AccessLogService accessLogService;
 
@@ -62,50 +57,33 @@ public class AccessLogController {
     @GetMapping
     public ResponseEntity<Page<AccessLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                       String sortBy, boolean descending, String filters) {
-        Page<AccessLogVO> voPage;
-        try {
-            voPage = accessLogService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve record error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<AccessLogVO> voPage = accessLogService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
     /**
-     * 查询信息
+     * fetch by id.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 如果查询到数据，返回查询到的信息，否则返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_access_logs')")
     @GetMapping("/{id}")
     public ResponseEntity<AccessLogVO> fetch(@PathVariable Long id) {
-        AccessLogVO vo;
-        try {
-            vo = accessLogService.fetch(id);
-        } catch (Exception e) {
-            logger.info("Fetch access log error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        AccessLogVO vo = accessLogService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
     /**
-     * 删除信息
+     * remove.
      *
-     * @param id 主键
+     * @param id the pk.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_access_logs:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            accessLogService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove access log error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        accessLogService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -115,12 +93,7 @@ public class AccessLogController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_access_logs:clear')")
     @DeleteMapping
     public ResponseEntity<Void> clear() {
-        try {
-            accessLogService.clear();
-        } catch (Exception e) {
-            logger.error("Clear access log error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        accessLogService.clear();
+        return ResponseEntity.noContent().build();
     }
 }

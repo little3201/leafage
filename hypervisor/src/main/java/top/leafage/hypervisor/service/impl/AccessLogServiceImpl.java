@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,13 +65,15 @@ public class AccessLogServiceImpl implements AccessLogService {
 
         return accessLogRepository.findById(id)
                 .map(AccessLogVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("access log not found: " + id));
     }
 
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!accessLogRepository.existsById(id)) {
+            throw new EntityNotFoundException("access log not found: " + id);
+        }
         accessLogRepository.deleteById(id);
     }
 

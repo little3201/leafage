@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import top.leafage.hypervisor.domain.User;
 import top.leafage.hypervisor.domain.dto.UserDTO;
 import top.leafage.hypervisor.domain.vo.UserVO;
 import top.leafage.hypervisor.repository.UserRepository;
@@ -33,11 +35,11 @@ import top.leafage.hypervisor.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * user service test
@@ -54,93 +56,161 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     private UserDTO dto;
+    private User entity;
 
     @BeforeEach
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setName("zhangsan");
-        dto.setAvatar("a.jpg");
-        dto.setEmail("zhang@test.com");
+        dto.setName("test");
+        dto.setEmail("test@example.com");
+
+        entity = UserDTO.toEntity(dto, "123");
     }
 
     @Test
     void retrieve() {
         Page<User> page = new PageImpl<>(List.of(mock(User.class)));
 
-        given(this.userRepository.findAll(ArgumentMatchers.<Specification<User>>any(),
-                any(Pageable.class))).willReturn(page);
+        when(userRepository.findAll(ArgumentMatchers.<Specification<User>>any(),
+                any(Pageable.class))).thenReturn(page);
 
-        Page<UserVO> voPage = userService.retrieve(0, 2, "id", true, "test");
-        Assertions.assertNotNull(voPage.getContent());
+        Page<UserVO> voPage = userService.retrieve(0, 2, "id", true, "username:like:test");
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(userRepository).findAll(ArgumentMatchers.<Specification<User>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        given(this.userRepository.findById(anyLong())).willReturn(Optional.of(mock(User.class)));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         UserVO vo = userService.fetch(anyLong());
-
-        Assertions.assertNotNull(vo);
+        assertNotNull(vo);
+        assertEquals("test", vo.username());
+        verify(userRepository).findById(anyLong());
     }
 
     @Test
-    void exists() {
-        given(this.userRepository.existsByUsernameAndIdNot(anyString(),
-                anyLong())).willReturn(true);
+    void fetch_not_found() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        boolean exists = userService.exists("test", 2L);
-
-        Assertions.assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.userRepository.existsByUsername(anyString())).willReturn(true);
-
-        boolean exists = userService.exists("test", null);
-
-        Assertions.assertTrue(exists);
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.fetch(anyLong())
+        );
+        assertEquals("user not found: 0", exception.getMessage());
+        verify(userRepository).findById(anyLong());
     }
 
     @Test
     void create() {
-        given(this.userRepository.saveAndFlush(any(User.class))).willReturn(mock(User.class));
+        when(userRepository.existsByUsername("test")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(userRepository.saveAndFlush(any(User.class))).thenReturn(entity);
 
         UserVO vo = userService.create(dto);
+        assertNotNull(vo);
+        assertEquals("test", vo.username());
+        verify(userRepository).saveAndFlush(any(User.class));
+    }
 
-        verify(userRepository, times(1)).saveAndFlush(any(User.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void create_username_conflict() {
+        when(userRepository.existsByUsername("test")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.create(dto)
+        );
+        assertEquals("username already exists: test", exception.getMessage());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
     void modify() {
-        // 根据id查询信息
-        given(this.userRepository.findById(anyLong())).willReturn(Optional.of(mock(User.class)));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(userRepository.existsByUsername("demo")).thenReturn(false);
+        when(userRepository.existsByEmail("demo@example.com")).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(entity);
 
-        // 保存更新信息
-        given(this.userRepository.save(any(User.class))).willReturn(mock(User.class));
-
+        dto.setUsername("demo");
+        dto.setEmail("demo@example.com");
         UserVO vo = userService.modify(1L, dto);
+        assertNotNull(vo);
+        assertEquals("demo", vo.username());
+        verify(userRepository).save(any(User.class));
+    }
 
-        verify(userRepository, times(1)).save(any(User.class));
-        Assertions.assertNotNull(vo);
+    @Test
+    void modify_username_conflict() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(userRepository.existsByUsername("demo")).thenReturn(true);
+
+        dto.setUsername("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.modify(1L, dto)
+        );
+        assertEquals("username already exists: demo", exception.getMessage());
     }
 
     @Test
     void remove() {
+        when(userRepository.existsById(anyLong())).thenReturn(true);
         userService.remove(anyLong());
 
-        verify(userRepository, times(1)).deleteById(anyLong());
+        verify(userRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.remove(anyLong())
+        );
+        assertEquals("user not found: 0", exception.getMessage());
     }
 
     @Test
     void enable() {
-        given(this.userRepository.updateEnabledById(anyLong())).willReturn(1);
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(userRepository.updateEnabledById(anyLong())).thenReturn(1);
 
         boolean enabled = userService.enable(1L);
-
-        Assertions.assertTrue(enabled);
+assertTrue(enabled);
     }
 
+    @Test
+    void enable_not_found() {
+        when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.enable(1L)
+        );
+        assertEquals("user not found: 1", exception.getMessage());
+    }
+
+    @Test
+    void unlock() {
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(userRepository.updateAccountNonLockedById(anyLong())).thenReturn(1);
+
+        boolean unlock = userService.unlock(1L);
+assertTrue(unlock);
+    }
+
+    @Test
+    void unlock_not_found() {
+        when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.unlock(1L)
+        );
+        assertEquals("user not found: 1", exception.getMessage());
+    }
 }

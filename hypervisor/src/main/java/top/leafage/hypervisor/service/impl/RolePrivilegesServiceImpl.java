@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import top.leafage.hypervisor.domain.GroupAuthorities;
-import top.leafage.hypervisor.domain.Privilege;
 import top.leafage.hypervisor.domain.RolePrivileges;
 import top.leafage.hypervisor.repository.GroupAuthoritiesRepository;
 import top.leafage.hypervisor.repository.GroupRolesRepository;
@@ -110,7 +109,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
                         rolePrivilegesRepository.deleteById(rolePrivilege.getId());
                     }
                     privilegeRepository.findById(privilegeId).ifPresent(privilege ->
-                            removeGroupAuthority(roleId, privilege, action));
+                            removeGroupAuthority(roleId, privilege.getName(), action));
                 });
     }
 
@@ -126,13 +125,13 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         groupAuthoritiesRepository.saveAll(groupAuthorities);
     }
 
-    private void removeGroupAuthority(Long roleId, Privilege privilege, String action) {
+    private void removeGroupAuthority(Long roleId, String name, String action) {
         groupRolesRepository.findAllByRoleId(roleId).forEach(groupRole -> {
                     // 移除授权actions
                     if (StringUtils.hasText(action)) {
-                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), privilege.getName() + ":" + action);
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthority(groupRole.getGroupId(), name + ":" + action);
                     } else {
-                        groupAuthoritiesRepository.deleteByGroupIdAndAuthorityStartingWith(groupRole.getGroupId(), privilege.getName());
+                        groupAuthoritiesRepository.deleteByGroupIdAndAuthorityStartingWith(groupRole.getGroupId(), name);
                     }
                 }
         );

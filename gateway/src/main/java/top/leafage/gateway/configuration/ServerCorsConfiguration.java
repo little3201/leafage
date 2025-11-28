@@ -27,7 +27,7 @@ public class ServerCorsConfiguration {
         config.addAllowedHeader("X-XSRF-TOKEN");
         config.addAllowedHeader(HttpHeaders.CONTENT_TYPE);
         config.setAllowedMethods(Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedOrigins(Collections.singletonList(this.appBaseUri));
+        config.setAllowedOrigins(Collections.singletonList(appBaseUri));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

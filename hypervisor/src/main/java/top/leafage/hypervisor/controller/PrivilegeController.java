@@ -15,10 +15,7 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +26,7 @@ import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
 import top.leafage.hypervisor.domain.vo.PrivilegeVO;
 import top.leafage.hypervisor.service.PrivilegeService;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -41,8 +39,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/privileges")
 public class PrivilegeController {
-
-    private final Logger logger = LoggerFactory.getLogger(PrivilegeController.class);
 
     private final PrivilegeService privilegeService;
 
@@ -70,130 +66,85 @@ public class PrivilegeController {
     @GetMapping
     public ResponseEntity<Page<PrivilegeVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                       String sortBy, boolean descending, String filters) {
-        Page<PrivilegeVO> voPage;
-        try {
-            voPage = privilegeService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.info("Retrieve privilege error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<PrivilegeVO> voPage = privilegeService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
     /**
      * 查询树形数据
      *
-     * @return 查询到的数据，否则返回空
+     * @return th result.
      */
     @GetMapping("/tree")
     public ResponseEntity<List<TreeNode<Long>>> tree(Principal principal) {
-        List<TreeNode<Long>> treeNodes;
-        try {
-            treeNodes = privilegeService.tree(principal.getName());
-        } catch (Exception e) {
-            logger.info("Retrieve privilege tree error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        List<TreeNode<Long>> treeNodes = privilegeService.tree(principal.getName());
         return ResponseEntity.ok(treeNodes);
     }
 
     /**
-     * 查询信息
+     * fetch by id.
      *
-     * @param superiorId 主键
+     * @param superiorId the pk.
      * @return 查询到的信息，否则返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping("/{superiorId}/subset")
     public ResponseEntity<List<PrivilegeVO>> subset(@PathVariable Long superiorId) {
-        List<PrivilegeVO> voList;
-        try {
-            voList = privilegeService.subset(superiorId);
-        } catch (Exception e) {
-            logger.info("Retrieve privilege subset error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        List<PrivilegeVO> voList = privilegeService.subset(superiorId);
         return ResponseEntity.ok(voList);
     }
 
     /**
-     * 查询信息
+     * fetch by id.
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 查询到的信息，否则返回204状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges')")
     @GetMapping("/{id}")
     public ResponseEntity<PrivilegeVO> fetch(@PathVariable Long id) {
-        PrivilegeVO vo;
-        try {
-            vo = privilegeService.fetch(id);
-        } catch (Exception e) {
-            logger.info("Fetch privilege error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        PrivilegeVO vo = privilegeService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
     /**
-     * 修改信息
+     * modify.
      *
-     * @param id  主键
-     * @param dto 要添加的数据
+     * @param id  the pk.
+     * @param dto the request body.
      * @return 编辑后的信息，否则返回417状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<PrivilegeVO> modify(@PathVariable Long id, @Valid @RequestBody PrivilegeDTO dto) {
-        PrivilegeVO vo;
-        try {
-            boolean existed = privilegeService.exists(dto.getName(), id);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            vo = privilegeService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify privilege error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
+        PrivilegeVO vo = privilegeService.modify(id, dto);
         return ResponseEntity.accepted().body(vo);
     }
 
     /**
      * 启用、停用
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 编辑后的信息，否则返回417状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_privileges:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
-        boolean enabled;
-        try {
-            enabled = privilegeService.enable(id);
-        } catch (Exception e) {
-            logger.error("Modify privilege error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(enabled);
+        boolean enabled = privilegeService.enable(id);
+        return ResponseEntity.ok(enabled);
     }
 
     /**
-     * Import the records.
+     * import..
      *
-     * @return 200 status code if successful, or 417 status code if an error occurs.
+     * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_privileges:import')")
     @PostMapping("/import")
-    public ResponseEntity<List<PrivilegeVO>> importFromFile(MultipartFile file) {
-        List<PrivilegeVO> voList;
-        try {
-            List<PrivilegeDTO> dtoList = ExcelReader.read(file.getInputStream(), PrivilegeDTO.class);
-            voList = privilegeService.createAll(dtoList);
-        } catch (Exception e) {
-            logger.error("Import privilege error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+    public ResponseEntity<List<PrivilegeVO>> importFromFile(MultipartFile file) throws IOException {
+        List<PrivilegeDTO> dtoList = ExcelReader.read(file.getInputStream(), PrivilegeDTO.class);
+        List<PrivilegeVO> voList = privilegeService.createAll(dtoList);
+
         return ResponseEntity.ok().body(voList);
     }
 

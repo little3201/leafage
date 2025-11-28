@@ -36,7 +36,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -70,10 +70,10 @@ class FileControllerTest {
     void retrieve() {
         Page<@NonNull FileRecordVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
-        given(fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willReturn(page);
+        when(fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenReturn(page);
 
-        assertThat(this.mvc.get().uri("/files")
+        assertThat(mvc.get().uri("/files")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -86,10 +86,10 @@ class FileControllerTest {
 
     @Test
     void retrieve_error() {
-        given(fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
-                anyBoolean(), anyString())).willThrow(new RuntimeException());
+        when(fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
+                anyBoolean(), anyString())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/files")
+        assertThat(mvc.get().uri("/files")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
@@ -101,40 +101,40 @@ class FileControllerTest {
 
     @Test
     void fetch() {
-        given(fileRecordService.fetch(anyLong())).willReturn(vo);
+        when(fileRecordService.fetch(anyLong())).thenReturn(vo);
 
-        assertThat(this.mvc.get().uri("/files/{id}", 1L))
+        assertThat(mvc.get().uri("/files/{id}", 1L))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void fetch_error() {
-        given(fileRecordService.fetch(anyLong())).willThrow(new RuntimeException());
+        when(fileRecordService.fetch(anyLong())).thenThrow(new RuntimeException());
 
-        assertThat(this.mvc.get().uri("/files/{id}", 1L))
+        assertThat(mvc.get().uri("/files/{id}", 1L))
                 .hasStatus5xxServerError();
     }
 
     @Test
     void upload() {
-        given(fileRecordService.exists(anyString(), any())).willReturn(false);
-        given(fileRecordService.upload(any(MultipartFile.class))).willReturn(vo);
+        when(fileRecordService.exists(anyString(), any())).thenReturn(false);
+        when(fileRecordService.upload(any(MultipartFile.class))).thenReturn(vo);
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
-        assertThat(this.mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
+        assertThat(mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
 
     @Test
     void upload_error() {
-        given(fileRecordService.exists(anyString(), any())).willReturn(false);
+        when(fileRecordService.exists(anyString(), any())).thenReturn(false);
 
-        given(fileRecordService.upload(any(MultipartFile.class))).willThrow(new RuntimeException());
+        when(fileRecordService.upload(any(MultipartFile.class))).thenThrow(new RuntimeException());
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
-        assertThat(this.mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
+        assertThat(mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 
@@ -142,7 +142,7 @@ class FileControllerTest {
     void remove() {
         fileRecordService.remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk()
                 .body().isNotNull();
     }
@@ -151,7 +151,7 @@ class FileControllerTest {
     void remove_error() {
         doThrow(new RuntimeException()).when(fileRecordService).remove(anyLong());
 
-        assertThat(this.mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
+        assertThat(mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 }

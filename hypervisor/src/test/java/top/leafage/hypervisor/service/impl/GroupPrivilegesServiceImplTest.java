@@ -15,7 +15,7 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,12 +31,13 @@ import top.leafage.hypervisor.repository.PrivilegeRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 
 /**
@@ -59,44 +60,67 @@ class GroupPrivilegesServiceImplTest {
     @InjectMocks
     private GroupPrivilegesServiceImpl groupPrivilegesService;
 
+    private Privilege privilege;
+    private GroupAuthorities groupAuthority;
+    private GroupPrivileges groupPrivileges;
+
+    @BeforeEach
+    void setUp() {
+        privilege = new Privilege();
+        privilege.setName("test");
+        privilege.setActions(Set.of("create"));
+
+        groupAuthority = new GroupAuthorities(1L, "test");
+
+        groupPrivileges = new GroupPrivileges(1L, 1L, 1L, Set.of("test"));
+    }
+
     @Test
     void privileges() {
-        given(this.groupPrivilegesRepository.findAllByGroupId(anyLong())).willReturn(List.of(mock(GroupPrivileges.class)));
+        when(groupPrivilegesRepository.findAllByGroupId(anyLong())).thenReturn(List.of(mock(GroupPrivileges.class)));
 
         List<GroupPrivileges> members = groupPrivilegesService.privileges(1L);
-        Assertions.assertNotNull(members);
+        assertEquals(1, members.size());
+        verify(groupPrivilegesRepository).findAllByGroupId(anyLong());
     }
 
     @Test
     void groups() {
-        given(this.groupPrivilegesRepository.findAllByPrivilegeId(anyLong())).willReturn(List.of(mock(GroupPrivileges.class)));
+        when(groupPrivilegesRepository.findAllByPrivilegeId(anyLong())).thenReturn(List.of(mock(GroupPrivileges.class)));
 
         List<GroupPrivileges> groups = groupPrivilegesService.groups(1L);
-        Assertions.assertNotNull(groups);
+        assertEquals(1, groups.size());
+        verify(groupPrivilegesRepository).findAllByPrivilegeId(anyLong());
     }
 
     @Test
     void relation() {
-        given(this.groupPrivilegesRepository.findByGroupIdAndPrivilegeId(anyLong(), anyLong())).willReturn(Optional.of(mock(GroupPrivileges.class)));
-
-        Privilege privilege = new Privilege();
-        privilege.setId(2L);
-        privilege.setName("test");
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(privilege));
-
-        GroupAuthorities groupAuthority = new GroupAuthorities();
-        groupAuthority.setId(1L);
-        groupAuthority.setGroupId(1L);
-        groupAuthority.setAuthority("test");
-        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).willReturn(Optional.of(groupAuthority));
-
-        given(this.groupAuthoritiesRepository.saveAll(anyCollection())).willReturn(Collections.singletonList(groupAuthority));
-
-        given(this.groupPrivilegesRepository.saveAndFlush(any(GroupPrivileges.class))).willReturn(mock(GroupPrivileges.class));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
+        when(groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).thenReturn(Optional.of(groupAuthority));
+        when(groupAuthoritiesRepository.saveAll(anyCollection())).thenReturn(Collections.singletonList(groupAuthority));
+        when(groupPrivilegesRepository.saveAndFlush(any(GroupPrivileges.class))).thenReturn(groupPrivileges);
 
         GroupPrivileges relation = groupPrivilegesService.relation(1L, 2L, "test");
+        assertEquals(1, relation.getGroupId());
+        verify(groupPrivilegesRepository).saveAndFlush(any());
+    }
 
-        verify(this.groupPrivilegesRepository, times(1)).saveAndFlush(any());
-        Assertions.assertNotNull(relation);
+    @Test
+    void removeRelation() {
+        when(groupPrivilegesRepository.findByGroupIdAndPrivilegeId(anyLong(), anyLong())).thenReturn(Optional.of(groupPrivileges));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
+
+        groupPrivilegesService.removeRelation(1L, 2L, "test");
+        verify(groupAuthoritiesRepository).deleteByGroupIdAndAuthority(anyLong(), anyString());
+    }
+
+    @Test
+    void removeRelation_empty_action() {
+        when(groupPrivilegesRepository.findByGroupIdAndPrivilegeId(anyLong(), anyLong())).thenReturn(Optional.of(groupPrivileges));
+        when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
+
+        groupPrivilegesService.removeRelation(1L, 2L, "");
+        verify(groupPrivilegesRepository).deleteById(anyLong());
+        verify(groupAuthoritiesRepository).deleteByGroupIdAndAuthorityStartingWith(anyLong(), anyString());
     }
 }

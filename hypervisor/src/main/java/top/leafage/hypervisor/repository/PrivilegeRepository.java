@@ -33,6 +33,14 @@ import java.util.List;
 public interface PrivilegeRepository extends JpaRepository<Privilege, Long>, JpaSpecificationExecutor<Privilege> {
 
     /**
+     * 是否存在
+     *
+     * @param name 名称
+     * @return true-存在，false-否
+     */
+    boolean existsByName(String name);
+
+    /**
      * Finds all records by superior ID.
      *
      * @param superiorId The superior ID.
