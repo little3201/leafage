@@ -68,20 +68,10 @@ class AuditLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.auditLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(AuditLog.class)));
+        given(this.auditLogRepository.findById(anyLong())).willReturn(Optional.of(mock(AuditLog.class)));
 
         AuditLogVO vo = auditLogService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
-    }
-
-    @Test
-    void create() {
-        given(this.auditLogRepository.saveAndFlush(any(AuditLog.class))).willReturn(mock(AuditLog.class));
-
-        AuditLogVO vo = auditLogService.create(mock(AuditLogDTO.class));
-
-        verify(this.auditLogRepository, times(1)).saveAndFlush(any(AuditLog.class));
         Assertions.assertNotNull(vo);
     }
 

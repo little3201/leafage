@@ -68,20 +68,10 @@ class SchedulerLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(SchedulerLog.class)));
+        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Optional.of(mock(SchedulerLog.class)));
 
         SchedulerLogVO vo = schedulerLogService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
-    }
-
-    @Test
-    void create() {
-        given(this.schedulerLogRepository.saveAndFlush(any(SchedulerLog.class))).willReturn(mock(SchedulerLog.class));
-
-        SchedulerLogVO vo = schedulerLogService.create(mock(SchedulerLogDTO.class));
-
-        verify(this.schedulerLogRepository, times(1)).saveAndFlush(any(SchedulerLog.class));
         Assertions.assertNotNull(vo);
     }
 

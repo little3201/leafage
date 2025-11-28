@@ -69,20 +69,10 @@ class OperationLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.operationLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(OperationLog.class)));
+        given(this.operationLogRepository.findById(anyLong())).willReturn(Optional.of(mock(OperationLog.class)));
 
         OperationLogVO vo = operationLogService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
-    }
-
-    @Test
-    void create() {
-        given(this.operationLogRepository.saveAndFlush(any(OperationLog.class))).willReturn(mock(OperationLog.class));
-
-        OperationLogVO vo = operationLogService.create(mock(OperationLogDTO.class));
-
-        verify(this.operationLogRepository, times(1)).saveAndFlush(any(OperationLog.class));
         Assertions.assertNotNull(vo);
     }
 

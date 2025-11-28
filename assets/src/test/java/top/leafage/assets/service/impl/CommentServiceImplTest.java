@@ -15,7 +15,6 @@
 
 package top.leafage.assets.service.impl;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,12 +54,12 @@ class CommentServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull Comment> page = new PageImpl<>(List.of(mock(Comment.class)));
+        Page<Comment> page = new PageImpl<>(List.of(mock(Comment.class)));
 
-        given(commentRepository.findAll(ArgumentMatchers.<Specification<@NonNull Comment>>any(),
+        given(commentRepository.findAll(ArgumentMatchers.<Specification<Comment>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<@NonNull CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
+        Page<CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
         Assertions.assertNotNull(voPage.getContent());
     }
 

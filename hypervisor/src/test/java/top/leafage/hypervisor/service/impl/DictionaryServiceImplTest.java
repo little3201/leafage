@@ -79,7 +79,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Dictionary.class)));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.of(mock(Dictionary.class)));
 
         DictionaryVO vo = dictionaryService.fetch(1L);
 
@@ -90,18 +90,18 @@ class DictionaryServiceImplTest {
     void subset() {
         given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(List.of(mock(Dictionary.class)));
 
-        List<Dictionary> list = dictionaryService.subset(1L);
+        List<DictionaryVO> voList = dictionaryService.subset(1L);
 
-        Assertions.assertNotNull(list);
+        Assertions.assertNotNull(voList);
     }
 
     @Test
     void subset_empty() {
         given(this.dictionaryRepository.findAllBySuperiorId(anyLong())).willReturn(Collections.emptyList());
 
-        List<Dictionary> list = dictionaryService.subset(1L);
+        List<DictionaryVO> voList = dictionaryService.subset(1L);
 
-        Assertions.assertEquals(Collections.emptyList(), list);
+        Assertions.assertEquals(Collections.emptyList(), voList);
     }
 
     @Test
@@ -135,7 +135,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void modify() {
-        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Dictionary.class)));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Optional.of(mock(Dictionary.class)));
 
         given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(mock(Dictionary.class));
 

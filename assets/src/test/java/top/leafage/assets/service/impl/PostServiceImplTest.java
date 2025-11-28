@@ -15,7 +15,6 @@
 package top.leafage.assets.service.impl;
 
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,18 +69,18 @@ class PostServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull Post> page = new PageImpl<>(List.of(mock(Post.class)));
+        Page<Post> page = new PageImpl<>(List.of(mock(Post.class)));
 
-        given(postRepository.findAll(ArgumentMatchers.<Specification<@NonNull Post>>any(),
+        given(postRepository.findAll(ArgumentMatchers.<Specification<Post>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<@NonNull PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
+        Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
         Assertions.assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(postRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Post.class)));
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(mock(Post.class)));
 
         PostVO vo = postsService.fetch(anyLong());
 
@@ -127,7 +126,7 @@ class PostServiceImplTest {
 
     @Test
     void modify() {
-        given(postRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Post.class)));
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(mock(Post.class)));
 
         given(postRepository.save(any(Post.class))).willReturn(mock(Post.class));
 

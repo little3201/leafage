@@ -121,7 +121,7 @@ public class AuthorizationServerConfiguration {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
                 context.getClaims().claims(claims -> {
                     // 获取原有的 scope，若不存在则初始化
-                    Set<String> scope = Optional.ofNullable((Collection<?>) claims.get("scope"))
+                    Set<String> scope = Optional.of((Collection<?>) claims.get("scope"))
                             .stream()
                             .flatMap(Collection::stream)
                             .filter(String.class::isInstance)

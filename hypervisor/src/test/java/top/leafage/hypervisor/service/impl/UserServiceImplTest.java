@@ -77,7 +77,7 @@ class UserServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(User.class)));
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.of(mock(User.class)));
 
         UserVO vo = userService.fetch(anyLong());
 
@@ -116,7 +116,7 @@ class UserServiceImplTest {
     @Test
     void modify() {
         // 根据id查询信息
-        given(this.userRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(User.class)));
+        given(this.userRepository.findById(anyLong())).willReturn(Optional.of(mock(User.class)));
 
         // 保存更新信息
         given(this.userRepository.save(any(User.class))).willReturn(mock(User.class));

@@ -27,7 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import top.leafage.common.TreeNode;
+import top.leafage.common.data.domain.TreeNode;
 import top.leafage.hypervisor.domain.Group;
 import top.leafage.hypervisor.domain.dto.GroupDTO;
 import top.leafage.hypervisor.domain.vo.GroupVO;
@@ -87,7 +87,7 @@ class GroupServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.groupRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Group.class)));
+        given(this.groupRepository.findById(anyLong())).willReturn(Optional.of(mock(Group.class)));
 
         GroupVO vo = groupService.fetch(anyLong());
 
@@ -132,7 +132,7 @@ class GroupServiceImplTest {
 
     @Test
     void modify() {
-        given(this.groupRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Group.class)));
+        given(this.groupRepository.findById(anyLong())).willReturn(Optional.of(mock(Group.class)));
 
         given(this.groupRepository.save(any(Group.class))).willReturn(mock(Group.class));
 

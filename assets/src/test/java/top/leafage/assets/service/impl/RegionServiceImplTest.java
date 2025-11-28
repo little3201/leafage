@@ -15,7 +15,6 @@
 
 package top.leafage.assets.service.impl;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,18 +68,18 @@ class RegionServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull Region> page = new PageImpl<>(List.of(mock(Region.class)));
+        Page<Region> page = new PageImpl<>(List.of(mock(Region.class)));
 
-        given(this.regionRepository.findAll(ArgumentMatchers.<Specification<@NonNull Region>>any(),
+        given(this.regionRepository.findAll(ArgumentMatchers.<Specification<Region>>any(),
                 any(Pageable.class))).willReturn(page);
 
-        Page<@NonNull RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
+        Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
         Assertions.assertNotNull(voPage.getContent());
     }
 
     @Test
     void fetch() {
-        given(this.regionRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Region.class)));
+        given(this.regionRepository.findById(anyLong())).willReturn(Optional.of(mock(Region.class)));
 
         RegionVO vo = regionService.fetch(anyLong());
 
@@ -117,7 +116,7 @@ class RegionServiceImplTest {
 
     @Test
     void modify() {
-        given(this.regionRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Region.class)));
+        given(this.regionRepository.findById(anyLong())).willReturn(Optional.of(mock(Region.class)));
 
         given(this.regionRepository.save(any(Region.class))).willReturn(mock(Region.class));
 

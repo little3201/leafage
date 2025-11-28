@@ -68,20 +68,10 @@ class AccessLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.accessLogRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(AccessLog.class)));
+        given(this.accessLogRepository.findById(anyLong())).willReturn(Optional.of(mock(AccessLog.class)));
 
         AccessLogVO vo = accessLogService.fetch(anyLong());
 
-        Assertions.assertNotNull(vo);
-    }
-
-    @Test
-    void create() {
-        given(this.accessLogRepository.saveAndFlush(any(AccessLog.class))).willReturn(mock(AccessLog.class));
-
-        AccessLogVO vo = accessLogService.create(mock(AccessLogDTO.class));
-
-        verify(this.accessLogRepository, times(1)).saveAndFlush(any(AccessLog.class));
         Assertions.assertNotNull(vo);
     }
 

@@ -105,7 +105,7 @@ class RolePrivilegeServiceImplTest {
 
         given(this.groupRolesRepository.findAllByRoleId(anyLong())).willReturn(List.of(groupRoles));
 
-        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).willReturn(Optional.ofNullable(mock(GroupAuthorities.class)));
+        given(this.groupAuthoritiesRepository.findByGroupIdAndAuthority(anyLong(), anyString())).willReturn(Optional.of(mock(GroupAuthorities.class)));
 
         given(this.rolePrivilegesRepository.saveAndFlush(any(RolePrivileges.class))).willReturn(rolePrivilege);
         RolePrivileges relation = rolePrivilegesService.relation(1L, 1L, "");

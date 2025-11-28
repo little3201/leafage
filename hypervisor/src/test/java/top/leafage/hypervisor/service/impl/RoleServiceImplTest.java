@@ -77,7 +77,7 @@ class RoleServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Role.class)));
+        given(this.roleRepository.findById(anyLong())).willReturn(Optional.of(mock(Role.class)));
 
         RoleVO vo = roleService.fetch(anyLong());
 
@@ -115,7 +115,7 @@ class RoleServiceImplTest {
 
     @Test
     void modify() {
-        given(this.roleRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Role.class)));
+        given(this.roleRepository.findById(anyLong())).willReturn(Optional.of(mock(Role.class)));
 
         given(this.roleRepository.save(any(Role.class))).willReturn(mock(Role.class));
 

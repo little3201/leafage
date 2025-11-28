@@ -99,7 +99,7 @@ class PrivilegeServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(mock(Privilege.class)));
 
         PrivilegeVO vo = privilegeService.fetch(1L);
 
@@ -126,7 +126,7 @@ class PrivilegeServiceImplTest {
 
     @Test
     void modify() {
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Privilege.class)));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Optional.of(mock(Privilege.class)));
 
         given(this.privilegeRepository.save(any(Privilege.class))).willReturn(mock(Privilege.class));
 

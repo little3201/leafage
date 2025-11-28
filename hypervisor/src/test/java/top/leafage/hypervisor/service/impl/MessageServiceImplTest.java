@@ -70,7 +70,7 @@ class MessageServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.messageRepository.findById(anyLong())).willReturn(Optional.ofNullable(mock(Message.class)));
+        given(this.messageRepository.findById(anyLong())).willReturn(Optional.of(mock(Message.class)));
 
         MessageVO vo = messageService.fetch(anyLong());
 
