@@ -15,10 +15,10 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -45,8 +45,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -92,7 +91,7 @@ class GroupControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull GroupVO> voPage = new PageImpl<>(List.of(Mockito.mock(GroupVO.class)), mock(PageRequest.class), 2L);
+        Page<@NonNull GroupVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(groupService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -105,7 +104,12 @@ class GroupControllerTest {
                 .queryParam("filters", "")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(GroupVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
+
+        verify(groupService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -120,7 +124,7 @@ class GroupControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -130,16 +134,18 @@ class GroupControllerTest {
 
         assertThat(mvc.get().uri("/groups/tree"))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson().extractingPath("$[0].name").isEqualTo("test");
     }
 
     @Test
     void fetch() {
-        when(groupService.fetch(anyLong())).thenReturn(Mockito.mock(GroupVO.class));
+        when(groupService.fetch(anyLong())).thenReturn(vo);
 
         assertThat(mvc.get().uri("/groups/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(GroupVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -147,19 +153,21 @@ class GroupControllerTest {
         when(groupService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/groups/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
     void create() {
-        when(groupService.create(any(GroupDTO.class))).thenReturn(Mockito.mock(GroupVO.class));
+        when(groupService.create(any(GroupDTO.class))).thenReturn(vo);
 
         assertThat(mvc.post().uri("/groups")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .convertTo(GroupVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -169,18 +177,20 @@ class GroupControllerTest {
         assertThat(mvc.post().uri("/groups").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
     void modify() {
-        when(groupService.modify(anyLong(), any(GroupDTO.class))).thenReturn(Mockito.mock(GroupVO.class));
+        when(groupService.modify(anyLong(), any(GroupDTO.class))).thenReturn(vo);
 
         assertThat(mvc.put().uri("/groups/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.ACCEPTED)
+                .bodyJson()
+                .convertTo(GroupVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -190,7 +200,7 @@ class GroupControllerTest {
         assertThat(mvc.put().uri("/groups/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -198,7 +208,7 @@ class GroupControllerTest {
         this.groupService.remove(anyLong());
 
         assertThat(mvc.delete().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -206,7 +216,7 @@ class GroupControllerTest {
         doThrow(new RuntimeException()).when(groupService).remove(anyLong());
 
         assertThat(mvc.delete().uri("/groups/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -231,7 +241,7 @@ class GroupControllerTest {
         doThrow(new RuntimeException()).when(groupMembersService).members(anyLong());
 
         assertThat(mvc.get().uri("/groups/{id}/members", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
 
@@ -250,7 +260,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void relation_Members_error() {
+    void relationMembers_error() {
         doThrow(new RuntimeException()).when(groupPrivilegesService).relation(anyLong(), anyLong(), anyString());
 
         assertThat(mvc.patch().uri("/groups/{id}/privileges/{privilegeId}", 1L, 1L)
@@ -258,7 +268,7 @@ class GroupControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
         )
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
 }

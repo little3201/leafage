@@ -16,7 +16,6 @@
 package top.leafage.hypervisor.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +28,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import top.leafage.hypervisor.domain.AuditLog;
-import top.leafage.hypervisor.domain.OperationLog;
-import top.leafage.hypervisor.domain.Role;
 import top.leafage.hypervisor.domain.vo.AuditLogVO;
 import top.leafage.hypervisor.repository.AuditLogRepository;
 
@@ -43,7 +40,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * audit log service test

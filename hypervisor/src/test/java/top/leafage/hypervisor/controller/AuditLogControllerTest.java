@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,21 +25,21 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import top.leafage.hypervisor.domain.vo.AuditLogVO;
+import top.leafage.hypervisor.domain.vo.GroupVO;
+import top.leafage.hypervisor.domain.vo.UserVO;
 import top.leafage.hypervisor.service.AuditLogService;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -60,12 +61,12 @@ class AuditLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new AuditLogVO(1L, "", "", "", "", "127.0.0.1", 200, 2132L);
+        vo = new AuditLogVO(1L, "test", "test", "test", "test", "127.0.0.1", 200, 2132L);
     }
 
     @Test
     void retrieve() {
-        Page<@NonNull AuditLogVO> voPage = new PageImpl<>(List.of(Mockito.mock(AuditLogVO.class)), mock(PageRequest.class), 2L);
+        Page<@NonNull AuditLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -78,7 +79,12 @@ class AuditLogControllerTest {
                 .queryParam("filters", "url:like:test")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(AuditLogVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.operation()).isEqualTo("test"));
+
+        verify(auditLogService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -93,17 +99,18 @@ class AuditLogControllerTest {
                 .queryParam("descending", "false")
                 .queryParam("filters", "url:like:test")
         )
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus5xxServerError();
     }
 
     @Test
     void fetch() {
-        when(auditLogService.fetch(anyLong())).thenReturn(Mockito.mock(AuditLogVO.class));
+        when(auditLogService.fetch(anyLong())).thenReturn(vo);
 
         assertThat(mvc.get().uri("/audit-logs/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(AuditLogVO.class)
+                .satisfies(vo -> assertThat(vo.operation()).isEqualTo("test"));
     }
 
     @Test
@@ -111,8 +118,7 @@ class AuditLogControllerTest {
         when(auditLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/audit-logs/{id}", anyLong()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -120,8 +126,7 @@ class AuditLogControllerTest {
         this.auditLogService.remove(anyLong());
 
         assertThat(mvc.delete().uri("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -129,8 +134,7 @@ class AuditLogControllerTest {
         doThrow(new RuntimeException()).when(auditLogService).remove(anyLong());
 
         assertThat(mvc.delete().uri("/audit-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus5xxServerError();
     }
 
 }

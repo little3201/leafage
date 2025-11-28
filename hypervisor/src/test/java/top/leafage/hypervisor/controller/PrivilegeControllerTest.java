@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -98,7 +100,12 @@ class PrivilegeControllerTest {
                 .queryParam("filters", "name:like:a")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(PrivilegeVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
+
+        verify(privilegeService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -113,7 +120,7 @@ class PrivilegeControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "name:like:a")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -122,7 +129,9 @@ class PrivilegeControllerTest {
 
         assertThat(mvc.get().uri("/privileges/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(PrivilegeVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -130,7 +139,7 @@ class PrivilegeControllerTest {
         when(privilegeService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/privileges/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -139,8 +148,10 @@ class PrivilegeControllerTest {
 
         assertThat(mvc.put().uri("/privileges/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.ACCEPTED)
+                .bodyJson()
+                .convertTo(PrivilegeVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -149,7 +160,7 @@ class PrivilegeControllerTest {
 
         assertThat(mvc.put().uri("/privileges/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -159,7 +170,7 @@ class PrivilegeControllerTest {
 
         assertThat(mvc.get().uri("/privileges/tree"))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson().extractingPath("$[0].name").isEqualTo("test");
     }
 
     @Test
@@ -167,7 +178,7 @@ class PrivilegeControllerTest {
         when(privilegeService.tree(anyString())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/privileges/tree"))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -175,8 +186,7 @@ class PrivilegeControllerTest {
         when(privilegeService.enable(anyLong())).thenReturn(true);
 
         assertThat(mvc.patch().uri("/privileges/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatusOk();
     }
 
 }

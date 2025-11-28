@@ -21,12 +21,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import top.leafage.hypervisor.domain.GroupMembers;
 import top.leafage.hypervisor.domain.RoleMembers;
 import top.leafage.hypervisor.repository.RoleMembersRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

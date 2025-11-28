@@ -15,7 +15,6 @@
 
 package top.leafage.assets.service.impl;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -34,11 +33,11 @@ import top.leafage.assets.repository.FileRecordRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * file record service test
@@ -63,7 +62,7 @@ class FileRecordServiceImplTest {
                 any(Pageable.class))).thenReturn(page);
 
         Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
-assertNotNull(voPage.getContent());
+        assertNotNull(voPage.getContent());
     }
 
     @Test
@@ -72,25 +71,7 @@ assertNotNull(voPage.getContent());
 
         FileRecordVO vo = fileRecordService.fetch(anyLong());
 
-assertNotNull(vo);
-    }
-
-    @Test
-    void exists() {
-        when(fileRecordRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(true);
-
-        boolean exists = fileRecordService.exists("test", 1L);
-
-assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        when(fileRecordRepository.existsByName(anyString())).thenReturn(true);
-
-        boolean exists = fileRecordService.exists("test", null);
-
-assertTrue(exists);
+        assertNotNull(vo);
     }
 
     @Test
@@ -101,7 +82,7 @@ assertTrue(exists);
         FileRecordVO vo = fileRecordService.upload(file);
 
         verify(fileRecordRepository).saveAndFlush(any(FileRecord.class));
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
     @Test

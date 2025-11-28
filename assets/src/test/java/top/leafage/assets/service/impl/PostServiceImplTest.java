@@ -15,7 +15,6 @@
 package top.leafage.assets.service.impl;
 
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +35,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * 帖子接口测试
@@ -75,7 +76,7 @@ class PostServiceImplTest {
                 any(Pageable.class))).thenReturn(page);
 
         Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
-assertNotNull(voPage.getContent());
+        assertNotNull(voPage.getContent());
     }
 
     @Test
@@ -84,7 +85,7 @@ assertNotNull(voPage.getContent());
 
         PostVO vo = postsService.fetch(anyLong());
 
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
     @Test
@@ -93,25 +94,7 @@ assertNotNull(vo);
 
         PostVO vo = postsService.fetch(anyLong());
 
-assertNull(vo);
-    }
-
-    @Test
-    void exists() {
-        when(postRepository.existsByTitleAndIdNot(anyString(), anyLong())).thenReturn(true);
-
-        boolean exists = postsService.exists("test", 1L);
-
-assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        when(postRepository.existsByTitle(anyString())).thenReturn(true);
-
-        boolean exists = postsService.exists("test", null);
-
-assertTrue(exists);
+        assertNull(vo);
     }
 
     @Test
@@ -121,7 +104,7 @@ assertTrue(exists);
         PostVO vo = postsService.create(dto);
 
         verify(postRepository).saveAndFlush(any(Post.class));
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
     @Test
@@ -133,7 +116,7 @@ assertNotNull(vo);
         PostVO vo = postsService.modify(1L, dto);
 
         verify(postRepository).save(any(Post.class));
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
     @Test

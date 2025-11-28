@@ -168,7 +168,7 @@ public class RoleController {
     @PatchMapping("/{id}/members")
     public ResponseEntity<List<RoleMembers>> relationMembers(@PathVariable Long id, @RequestBody Set<String> usernames) {
         List<RoleMembers> roleMembers = roleMembersService.relation(id, usernames);
-        return ResponseEntity.accepted().body(roleMembers);
+        return ResponseEntity.ok(roleMembers);
     }
 
     /**
@@ -208,7 +208,7 @@ public class RoleController {
     public ResponseEntity<RolePrivileges> relationPrivileges(@PathVariable Long id, @PathVariable Long privilegeId,
                                                              String action) {
         RolePrivileges rolePrivilege = rolePrivilegesService.relation(id, privilegeId, action);
-        return ResponseEntity.accepted().body(rolePrivilege);
+        return ResponseEntity.ok(rolePrivilege);
     }
 
     /**

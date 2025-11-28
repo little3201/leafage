@@ -68,15 +68,6 @@ public class FileRecordServiceImpl implements FileRecordService {
     }
 
     @Override
-    public boolean exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-        if (id == null) {
-            return fileRecordRepository.existsByName(name);
-        }
-        return fileRecordRepository.existsByNameAndIdNot(name, id);
-    }
-
-    @Override
     public FileRecordVO upload(MultipartFile file) {
         FileRecord fileRecord = new FileRecord();
         fileRecord.setName(file.getName());

@@ -134,7 +134,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void create_name_conflict() {
-        when(dictionaryRepository.existsByName( "test")).thenReturn(true);
+        when(dictionaryRepository.existsByName("test")).thenReturn(true);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,

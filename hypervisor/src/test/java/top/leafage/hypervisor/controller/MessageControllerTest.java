@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -88,7 +90,12 @@ class MessageControllerTest {
                 .queryParam("filters", "title:like:a")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(MessageVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
+
+        verify(messageService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -103,7 +110,7 @@ class MessageControllerTest {
                 .queryParam("descending", "false")
                 .queryParam("filters", "title:like:a")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -112,7 +119,9 @@ class MessageControllerTest {
 
         assertThat(mvc.get().uri("/messages/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(MessageVO.class)
+                .satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
     }
 
     @Test
@@ -120,7 +129,7 @@ class MessageControllerTest {
         when(messageService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/messages/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -130,8 +139,10 @@ class MessageControllerTest {
         assertThat(mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .convertTo(MessageVO.class)
+                .satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
     }
 
     @Test
@@ -141,6 +152,29 @@ class MessageControllerTest {
         assertThat(mvc.post().uri("/messages").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
+    }
+
+    @Test
+    void modify() {
+        when(messageService.modify(anyLong(), any(MessageDTO.class))).thenReturn(vo);
+
+        assertThat(mvc.put().uri("/messages/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
+        )
+                .hasStatus(HttpStatus.ACCEPTED)
+                .bodyJson()
+                .convertTo(MessageVO.class)
+                .satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
+    }
+
+    @Test
+    void modify_error() {
+        when(messageService.modify(anyLong(), any(MessageDTO.class))).thenThrow(new RuntimeException());
+
+        assertThat(mvc.put().uri("/messages/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
+        )
+                .hasStatus5xxServerError();
     }
 }

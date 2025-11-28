@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
+import top.leafage.hypervisor.domain.vo.UserVO;
 import top.leafage.hypervisor.service.SchedulerLogService;
 
 import java.time.Instant;
@@ -37,8 +40,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -78,7 +80,12 @@ class SchedulerLogControllerTest {
                 .queryParam("filters", "scheduler:like:a")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(SchedulerLogVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
+
+        verify(schedulerLogService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -93,7 +100,7 @@ class SchedulerLogControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "scheduler:like:a")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -102,7 +109,9 @@ class SchedulerLogControllerTest {
 
         assertThat(mvc.get().uri("/scheduler-logs/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(SchedulerLogVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -110,7 +119,7 @@ class SchedulerLogControllerTest {
         when(schedulerLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/scheduler-logs/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -118,7 +127,7 @@ class SchedulerLogControllerTest {
         this.schedulerLogService.remove(anyLong());
 
         assertThat(mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -126,7 +135,7 @@ class SchedulerLogControllerTest {
         doThrow(new RuntimeException()).when(schedulerLogService).remove(anyLong());
 
         assertThat(mvc.delete().uri("/scheduler-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -134,7 +143,7 @@ class SchedulerLogControllerTest {
         this.schedulerLogService.clear();
 
         assertThat(mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -142,7 +151,7 @@ class SchedulerLogControllerTest {
         doThrow(new RuntimeException()).when(schedulerLogService).clear();
 
         assertThat(mvc.delete().uri("/scheduler-logs").with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
 }

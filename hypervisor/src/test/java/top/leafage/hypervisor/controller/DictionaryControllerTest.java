@@ -15,10 +15,11 @@
 
 package top.leafage.hypervisor.controller;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -40,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -50,7 +52,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @WithMockUser
 @WebMvcTest(DictionaryController.class)
 class DictionaryControllerTest {
-
 
     @Autowired
     private MockMvcTester mvc;
@@ -67,7 +68,7 @@ class DictionaryControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new DictionaryVO(1L, "test", null, "desctiption", true);
+        vo = new DictionaryVO(1L, "test", null, "description", true);
 
         dto = new DictionaryDTO();
         dto.setName("gender");
@@ -77,7 +78,7 @@ class DictionaryControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull DictionaryVO> voPage = new PageImpl<>(List.of(Mockito.mock(DictionaryVO.class)), mock(PageRequest.class), 2L);
+        Page<@NonNull DictionaryVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -90,7 +91,12 @@ class DictionaryControllerTest {
                 .queryParam("filters", "name:like:a")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(DictionaryVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
+
+        verify(dictionaryService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -105,33 +111,38 @@ class DictionaryControllerTest {
                 .queryParam("descending", "false")
                 .queryParam("filters", "name:like:a")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
     void subset() {
-        when(dictionaryService.subset(anyLong())).thenReturn(List.of(Mockito.mock(DictionaryVO.class)));
+        when(dictionaryService.subset(anyLong())).thenReturn(List.of(vo));
 
         assertThat(mvc.get().uri("/dictionaries/{id}/subset", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(DictionaryVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
     void fetch() {
-        when(dictionaryService.fetch(anyLong())).thenReturn(Mockito.mock(DictionaryVO.class));
+        when(dictionaryService.fetch(anyLong())).thenReturn(vo);
 
         assertThat(mvc.get().uri("/dictionaries/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(DictionaryVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
     void fetch_error() {
-        when(dictionaryService.fetch(anyLong())).thenThrow(new RuntimeException());
+        when(dictionaryService.fetch(anyLong())).thenThrow(new EntityNotFoundException());
 
         assertThat(mvc.get().uri("/dictionaries/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -139,17 +150,19 @@ class DictionaryControllerTest {
         when(dictionaryService.subset(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/dictionaries/{id}/subset", "1"))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
     void create() {
-        when(dictionaryService.create(any(DictionaryDTO.class))).thenReturn(Mockito.mock(DictionaryVO.class));
+        when(dictionaryService.create(any(DictionaryDTO.class))).thenReturn(vo);
 
         assertThat(mvc.post().uri("/dictionaries").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus(HttpStatus.CREATED)
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(DictionaryVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -158,17 +171,19 @@ class DictionaryControllerTest {
 
         assertThat(mvc.post().uri("/dictionaries").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
     void modify() {
-        when(dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).thenReturn(Mockito.mock(DictionaryVO.class));
+        when(dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).thenReturn(vo);
 
         assertThat(mvc.put().uri("/dictionaries/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
                 .hasStatus(HttpStatus.ACCEPTED)
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(DictionaryVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -177,7 +192,7 @@ class DictionaryControllerTest {
 
         assertThat(mvc.put().uri("/dictionaries/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test

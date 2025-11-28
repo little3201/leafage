@@ -105,10 +105,6 @@ public class PostController {
     public ResponseEntity<PostVO> create(@Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
-            boolean existed = postService.exists(dto.getTitle(), null);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
             vo = postService.create(dto);
         } catch (Exception e) {
             logger.error("Save posts error: ", e);
@@ -129,10 +125,6 @@ public class PostController {
     public ResponseEntity<PostVO> modify(@PathVariable Long id, @Valid @RequestBody PostDTO dto) {
         PostVO vo;
         try {
-            boolean existed = postService.exists(dto.getTitle(), id);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
             vo = postService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify posts error: ", e);

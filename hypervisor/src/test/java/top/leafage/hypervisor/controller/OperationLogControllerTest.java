@@ -15,6 +15,8 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.domain.vo.OperationLogVO;
+import top.leafage.hypervisor.domain.vo.UserVO;
 import top.leafage.hypervisor.service.OperationLogService;
 
 import java.util.List;
@@ -34,8 +38,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -62,7 +65,7 @@ class OperationLogControllerTest {
 
     @Test
     void retrieve() {
-        Page<OperationLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<@NonNull OperationLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(operationLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -75,7 +78,12 @@ class OperationLogControllerTest {
                 .queryParam("filters", "operation:like:a")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(OperationLogVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.module()).isEqualTo("test"));
+
+        verify(operationLogService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -90,7 +98,7 @@ class OperationLogControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "operation:like:a")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -99,7 +107,9 @@ class OperationLogControllerTest {
 
         assertThat(mvc.get().uri("/operation-logs/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(OperationLogVO.class)
+                .satisfies(vo -> assertThat(vo.module()).isEqualTo("test"));
     }
 
     @Test
@@ -107,7 +117,7 @@ class OperationLogControllerTest {
         when(operationLogService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/operation-logs/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -115,7 +125,7 @@ class OperationLogControllerTest {
         this.operationLogService.remove(anyLong());
 
         assertThat(mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -123,7 +133,7 @@ class OperationLogControllerTest {
         doThrow(new RuntimeException()).when(operationLogService).remove(anyLong());
 
         assertThat(mvc.delete().uri("/operation-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -131,7 +141,7 @@ class OperationLogControllerTest {
         this.operationLogService.clear();
 
         assertThat(mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -139,7 +149,7 @@ class OperationLogControllerTest {
         doThrow(new RuntimeException()).when(operationLogService).clear();
 
         assertThat(mvc.delete().uri("/operation-logs").with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
 }

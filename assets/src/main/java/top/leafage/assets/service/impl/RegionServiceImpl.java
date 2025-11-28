@@ -79,19 +79,6 @@ public class RegionServiceImpl implements RegionService {
      * {@inheritDoc}
      */
     @Override
-    public boolean exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-
-        if (id == null) {
-            return regionRepository.existsByName(name);
-        }
-        return regionRepository.existsByNameAndIdNot(name, id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public RegionVO create(RegionDTO dto) {
         Region entity = regionRepository.saveAndFlush(RegionDTO.toEntity(dto));
         return RegionVO.from(entity);

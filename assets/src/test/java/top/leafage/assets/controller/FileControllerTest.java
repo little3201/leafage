@@ -118,7 +118,6 @@ class FileControllerTest {
 
     @Test
     void upload() {
-        when(fileRecordService.exists(anyString(), any())).thenReturn(false);
         when(fileRecordService.upload(any(MultipartFile.class))).thenReturn(vo);
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
@@ -129,8 +128,6 @@ class FileControllerTest {
 
     @Test
     void upload_error() {
-        when(fileRecordService.exists(anyString(), any())).thenReturn(false);
-
         when(fileRecordService.upload(any(MultipartFile.class))).thenThrow(new RuntimeException());
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());

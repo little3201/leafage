@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,21 +25,20 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import top.leafage.hypervisor.domain.vo.AccessLogVO;
+import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.service.AccessLogService;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -59,13 +59,13 @@ class AccessLogControllerTest {
     private AccessLogVO vo;
 
     @BeforeEach
-    void setUp()  {
-        vo = new AccessLogVO(1L, "/users", "POST", "127.0.0.1", "", "", 200, 230L, "");
+    void setUp() {
+        vo = new AccessLogVO(1L, "test", "POST", "127.0.0.1", "", "", 200, 230L, "");
     }
 
     @Test
     void retrieve() {
-        Page<@NonNull AccessLogVO> voPage = new PageImpl<>(List.of(Mockito.mock(AccessLogVO.class)), mock(PageRequest.class), 2L);
+        Page<@NonNull AccessLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -78,7 +78,12 @@ class AccessLogControllerTest {
                 .queryParam("filters", "url:like:test")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(AccessLogVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.url()).isEqualTo("test"));
+
+        verify(accessLogService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
 
     @Test
@@ -118,7 +123,7 @@ class AccessLogControllerTest {
         this.accessLogService.remove(anyLong());
 
         assertThat(mvc.delete().uri("/access-logs/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
@@ -134,7 +139,7 @@ class AccessLogControllerTest {
         this.accessLogService.clear();
 
         assertThat(mvc.delete().uri("/access-logs").with(csrf().asHeader()))
-                .hasStatusOk();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test

@@ -15,7 +15,6 @@
 package top.leafage.hypervisor.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -180,7 +179,7 @@ class UserServiceImplTest {
         when(userRepository.updateEnabledById(anyLong())).thenReturn(1);
 
         boolean enabled = userService.enable(1L);
-assertTrue(enabled);
+        assertTrue(enabled);
     }
 
     @Test
@@ -200,7 +199,7 @@ assertTrue(enabled);
         when(userRepository.updateAccountNonLockedById(anyLong())).thenReturn(1);
 
         boolean unlock = userService.unlock(1L);
-assertTrue(unlock);
+        assertTrue(unlock);
     }
 
     @Test

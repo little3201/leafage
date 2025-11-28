@@ -103,10 +103,6 @@ public class RegionController {
     public ResponseEntity<RegionVO> create(@Valid @RequestBody RegionDTO dto) {
         RegionVO vo;
         try {
-            boolean existed = regionService.exists(dto.getName(), null);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
             vo = regionService.create(dto);
         } catch (Exception e) {
             logger.error("Create region error: ", e);
@@ -126,10 +122,6 @@ public class RegionController {
     public ResponseEntity<RegionVO> modify(@PathVariable Long id, @RequestBody RegionDTO dto) {
         RegionVO vo;
         try {
-            boolean existed = regionService.exists(dto.getName(), id);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
             vo = regionService.modify(id, dto);
         } catch (Exception e) {
             logger.error("Modify region error: ", e);

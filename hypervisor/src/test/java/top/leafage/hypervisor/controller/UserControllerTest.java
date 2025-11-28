@@ -15,6 +15,7 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,17 +55,17 @@ class UserControllerTest {
     @Autowired
     private MockMvcTester mvc;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @MockitoBean
     private UserService userService;
 
-    private ObjectMapper mapper;
     private UserVO vo;
     private UserDTO dto;
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
-
         vo = new UserVO(1L, "test", true, true, true, true);
 
         dto = new UserDTO();
@@ -88,7 +89,10 @@ class UserControllerTest {
                 .queryParam("filters", "username:like:a")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(UserVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.username()).isEqualTo("test"));
 
         verify(userService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
@@ -105,7 +109,7 @@ class UserControllerTest {
                 .queryParam("descending", "true")
                 .queryParam("filters", "scheduler:like:a")
         )
-                .hasStatusOk();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -114,15 +118,17 @@ class UserControllerTest {
 
         assertThat(mvc.get().uri("/users/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(UserVO.class)
+                .satisfies(vo -> assertThat(vo.username()).isEqualTo("test"));
     }
 
     @Test
     void fetch_error() {
-        when(userService.fetch(anyLong())).thenThrow(new EntityNotFoundException());
+        when(userService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/users/{id}", anyLong()))
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -132,8 +138,10 @@ class UserControllerTest {
         assertThat(mvc.post().uri("/users").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader())
         )
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .convertTo(UserVO.class)
+                .satisfies(vo -> assertThat(vo.username()).isEqualTo("test"));
     }
 
     @Test
@@ -142,17 +150,19 @@ class UserControllerTest {
 
         assertThat(mvc.put().uri("/users/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.ACCEPTED)
+                .bodyJson()
+                .convertTo(UserVO.class)
+                .satisfies(vo -> assertThat(vo.username()).isEqualTo("test"));
     }
 
     @Test
     void modify_error() {
-        when(userService.modify(anyLong(), any(UserDTO.class))).thenThrow(new EntityNotFoundException());
+        when(userService.modify(anyLong(), any(UserDTO.class))).thenThrow(new RuntimeException());
 
         assertThat(mvc.put().uri("/users/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -165,10 +175,10 @@ class UserControllerTest {
 
     @Test
     void enable_error() {
-        when(userService.enable(anyLong())).thenThrow(new EntityNotFoundException());
+        when(userService.enable(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.patch().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatus(HttpStatus.NOT_FOUND);
+                .hasStatus5xxServerError();
     }
 
 }

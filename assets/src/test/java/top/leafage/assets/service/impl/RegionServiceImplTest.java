@@ -15,7 +15,6 @@
 
 package top.leafage.assets.service.impl;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,11 +34,12 @@ import top.leafage.assets.repository.RegionRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * region service test
@@ -74,7 +74,7 @@ class RegionServiceImplTest {
                 any(Pageable.class))).thenReturn(page);
 
         Page<RegionVO> voPage = regionService.retrieve(0, 2, "id", true, "test:eq:a");
-assertNotNull(voPage.getContent());
+        assertNotNull(voPage.getContent());
     }
 
     @Test
@@ -83,25 +83,7 @@ assertNotNull(voPage.getContent());
 
         RegionVO vo = regionService.fetch(anyLong());
 
-assertNotNull(vo);
-    }
-
-    @Test
-    void exists() {
-        when(regionRepository.existsByNameAndIdNot(anyString(), anyLong())).thenReturn(true);
-
-        boolean exists = regionService.exists("test", 1L);
-
-assertTrue(exists);
-    }
-
-    @Test
-    void exists_id_null() {
-        when(regionRepository.existsByName(anyString())).thenReturn(true);
-
-        boolean exists = regionService.exists("test", null);
-
-assertTrue(exists);
+        assertNotNull(vo);
     }
 
     @Test
@@ -111,7 +93,7 @@ assertTrue(exists);
         RegionVO vo = regionService.create(mock(RegionDTO.class));
 
         verify(regionRepository).saveAndFlush(any(Region.class));
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
     @Test
@@ -123,7 +105,7 @@ assertNotNull(vo);
         RegionVO vo = regionService.modify(anyLong(), dto);
 
         verify(regionRepository).save(any(Region.class));
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
     @Test

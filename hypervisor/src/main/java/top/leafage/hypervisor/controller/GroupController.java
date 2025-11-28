@@ -65,7 +65,6 @@ public class GroupController {
         this.groupPrivilegesService = groupPrivilegesService;
     }
 
-
     /**
      * Retrieves a paginated list of records.
      *
@@ -185,7 +184,7 @@ public class GroupController {
     @PatchMapping("/{id}/members")
     public ResponseEntity<List<GroupMembers>> relationMembers(@PathVariable Long id, @RequestBody Set<String> usernames) {
         List<GroupMembers> groupMembers = groupMembersService.relation(id, usernames);
-        return ResponseEntity.accepted().body(groupMembers);
+        return ResponseEntity.ok(groupMembers);
     }
 
     /**
@@ -223,7 +222,7 @@ public class GroupController {
     @PatchMapping("/{id}/roles")
     public ResponseEntity<List<GroupRoles>> relationRoles(@PathVariable Long id, @RequestBody Set<Long> roleIds) {
         List<GroupRoles> groupRoles = groupRolesService.relation(id, roleIds);
-        return ResponseEntity.accepted().body(groupRoles);
+        return ResponseEntity.ok(groupRoles);
     }
 
     /**
@@ -275,7 +274,7 @@ public class GroupController {
     public ResponseEntity<GroupPrivileges> relationPrivileges(@PathVariable Long id, @PathVariable Long privilegeId,
                                                               String action) {
         GroupPrivileges groupPrivileges = groupPrivilegesService.relation(id, privilegeId, action);
-        return ResponseEntity.accepted().body(groupPrivileges);
+        return ResponseEntity.ok(groupPrivileges);
     }
 
     /**

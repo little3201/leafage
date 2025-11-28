@@ -35,7 +35,7 @@ import java.util.List;
  * @author wq li
  */
 @RestController
-@RequestMapping(value = "/users", version = "v1")
+@RequestMapping(value = "/users")
 public class UserController {
 
     private final UserService userService;
@@ -48,7 +48,6 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
 
     /**
      * Retrieves a paginated list of records.
@@ -106,7 +105,7 @@ public class UserController {
     public ResponseEntity<UserVO> modify(@PathVariable Long id,
                                          @Valid @RequestBody UserDTO dto) {
         UserVO vo = userService.modify(id, dto);
-        return ResponseEntity.ok(vo);
+        return ResponseEntity.accepted().body(vo);
     }
 
     /**

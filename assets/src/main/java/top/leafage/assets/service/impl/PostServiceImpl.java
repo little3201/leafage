@@ -78,18 +78,6 @@ public class PostServiceImpl implements PostService {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public boolean exists(String title, Long id) {
-        Assert.hasText(title, String.format(_MUST_NOT_BE_EMPTY, "title"));
-        if (id == null) {
-            return postRepository.existsByTitle(title);
-        }
-        return postRepository.existsByTitleAndIdNot(title, id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PostVO create(PostDTO dto) {

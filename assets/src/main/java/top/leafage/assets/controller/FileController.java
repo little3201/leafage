@@ -109,10 +109,6 @@ public class FileController {
     public ResponseEntity<FileRecordVO> upload(MultipartFile file) {
         FileRecordVO vo;
         try {
-            boolean existed = fileRecordService.exists(file.getName(), null);
-            if (existed) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
             vo = fileRecordService.upload(file);
         } catch (Exception e) {
             logger.error("Upload file error: ", e);

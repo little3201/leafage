@@ -15,7 +15,6 @@
 
 package top.leafage.assets.service.impl;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -34,6 +33,8 @@ import top.leafage.assets.repository.CommentRepository;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
@@ -60,7 +61,7 @@ class CommentServiceImplTest {
                 any(Pageable.class))).thenReturn(page);
 
         Page<CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
-assertNotNull(voPage.getContent());
+        assertNotNull(voPage.getContent());
     }
 
     @Test
@@ -68,7 +69,7 @@ assertNotNull(voPage.getContent());
         when(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).thenReturn(anyList());
 
         List<CommentVO> voList = commentService.relation(1L);
-assertNotNull(voList);
+        assertNotNull(voList);
     }
 
     @Test
@@ -76,7 +77,7 @@ assertNotNull(voList);
         when(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).thenReturn(Collections.emptyList());
 
         List<CommentVO> voList = commentService.relation(anyLong());
-assertTrue(voList.isEmpty());
+        assertTrue(voList.isEmpty());
     }
 
     @Test
@@ -92,13 +93,13 @@ assertTrue(voList.isEmpty());
         when(commentRepository.findAllByReplier(anyLong())).thenReturn(List.of(comment, comm));
 
         List<CommentVO> voList = commentService.replies(anyLong());
-assertNotNull(voList);
+        assertNotNull(voList);
     }
 
     @Test
     void replies_empty() {
         List<CommentVO> voList = commentService.replies(anyLong());
-assertTrue(voList.isEmpty());
+        assertTrue(voList.isEmpty());
     }
 
     @Test
@@ -106,7 +107,7 @@ assertTrue(voList.isEmpty());
         when(commentRepository.saveAndFlush(any(Comment.class))).thenReturn(mock(Comment.class));
 
         CommentVO vo = commentService.create(mock(CommentDTO.class));
-assertNotNull(vo);
+        assertNotNull(vo);
     }
 
 }
