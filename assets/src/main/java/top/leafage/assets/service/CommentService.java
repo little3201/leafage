@@ -40,8 +40,8 @@ public interface CommentService extends JpaCrudService<CommentDTO, CommentVO> {
     /**
      * 根据replier查询
      *
-     * @param id the pk.
+     * @param replier the pk.
      * @return 回复的评论
      */
-    List<CommentVO> replies(Long id);
+    List<CommentVO> replies(Long replier);
 }

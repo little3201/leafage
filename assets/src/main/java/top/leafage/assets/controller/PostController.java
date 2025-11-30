@@ -28,6 +28,7 @@ import top.leafage.assets.domain.vo.PostVO;
 import top.leafage.assets.service.PostService;
 import top.leafage.common.poi.ExcelReader;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -65,13 +66,7 @@ public class PostController {
     @GetMapping
     public ResponseEntity<Page<PostVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                  String sortBy, boolean descending, String filters) {
-        Page<PostVO> voPage;
-        try {
-            voPage = postService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve posts error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<PostVO> voPage = postService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
@@ -84,13 +79,7 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts')")
     @GetMapping("/{id}")
     public ResponseEntity<PostVO> fetch(@PathVariable Long id) {
-        PostVO vo;
-        try {
-            vo = postService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch posts error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        PostVO vo = postService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
@@ -103,13 +92,7 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:create')")
     @PostMapping
     public ResponseEntity<PostVO> create(@Valid @RequestBody PostDTO dto) {
-        PostVO vo;
-        try {
-            vo = postService.create(dto);
-        } catch (Exception e) {
-            logger.error("Save posts error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        PostVO vo = postService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
@@ -123,13 +106,7 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:modify')")
     @PutMapping("/{id}")
     public ResponseEntity<PostVO> modify(@PathVariable Long id, @Valid @RequestBody PostDTO dto) {
-        PostVO vo;
-        try {
-            vo = postService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify posts error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
+        PostVO vo = postService.modify(id, dto);
         return ResponseEntity.accepted().body(vo);
     }
 
@@ -142,12 +119,7 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            postService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove posts error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        postService.remove(id);
         return ResponseEntity.ok().build();
     }
 
@@ -160,14 +132,8 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
-        boolean enabled;
-        try {
-            enabled = postService.enable(id);
-        } catch (Exception e) {
-            logger.error("Toggle enabled error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(enabled);
+        boolean enabled = postService.enable(id);
+        return ResponseEntity.ok(enabled);
     }
 
     /**
@@ -177,15 +143,9 @@ public class PostController {
      */
     @PreAuthorize("hasAuthority('SCOPE_posts:import')")
     @PostMapping("/import")
-    public ResponseEntity<List<PostVO>> importFromFile(MultipartFile file) {
-        List<PostVO> voList;
-        try {
-            List<PostDTO> dtoList = ExcelReader.read(file.getInputStream(), PostDTO.class);
-            voList = postService.createAll(dtoList);
-        } catch (Exception e) {
-            logger.error("Import post error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+    public ResponseEntity<List<PostVO>> importFromFile(MultipartFile file) throws IOException {
+        List<PostDTO> dtoList = ExcelReader.read(file.getInputStream(), PostDTO.class);
+        List<PostVO> voList = postService.createAll(dtoList);
         return ResponseEntity.ok().body(voList);
     }
 

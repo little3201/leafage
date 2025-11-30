@@ -59,9 +59,12 @@ public class CommentServiceImpl implements CommentService {
         Specification<@NonNull Comment> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
 
-        return commentRepository.findAll(spec, pageable).map(comment -> {
-            Long count = commentRepository.countByReplier(comment.getId());
-            return CommentVO.from(comment, count);
+        return commentRepository.findAll(spec, pageable).map(entity -> {
+            if (entity.getId() != null) {
+                long count = commentRepository.countByReplier(entity.getId());
+                return CommentVO.from(entity, count);
+            }
+            return CommentVO.from(entity);
         });
     }
 
@@ -83,8 +86,11 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentVO> replies(Long replier) {
         return commentRepository.findAllByReplier(replier)
                 .stream().map(entity -> {
-                    Long count = commentRepository.countByReplier(entity.getId());
-                    return CommentVO.from(entity, count);
+                    if (entity.getId() != null) {
+                        long count = commentRepository.countByReplier(entity.getId());
+                        return CommentVO.from(entity, count);
+                    }
+                    return CommentVO.from(entity);
                 }).toList();
     }
 

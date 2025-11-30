@@ -69,7 +69,7 @@ class RoleServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Role> page = new PageImpl<>(List.of(mock(Role.class)));
+        Page<Role> page = new PageImpl<>(List.of(entity));
 
         when(roleRepository.findAll(ArgumentMatchers.<Specification<Role>>any(),
                 any(Pageable.class))).thenReturn(page);

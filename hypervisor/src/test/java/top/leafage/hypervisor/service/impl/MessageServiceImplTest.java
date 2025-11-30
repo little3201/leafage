@@ -71,7 +71,7 @@ class MessageServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Message> page = new PageImpl<>(List.of(mock(Message.class)));
+        Page<Message> page = new PageImpl<>(List.of(entity));
 
         when(messageRepository.findAll(ArgumentMatchers.<Specification<Message>>any(),
                 any(Pageable.class))).thenReturn(page);

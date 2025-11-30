@@ -14,7 +14,6 @@
  */
 package top.leafage.hypervisor.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -39,8 +39,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -86,7 +85,7 @@ class UserControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "username:like:a")
+                .queryParam("filters", "username:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -107,7 +106,7 @@ class UserControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "scheduler:like:a")
+                .queryParam("filters", "scheduler:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -166,6 +165,22 @@ class UserControllerTest {
     }
 
     @Test
+    void remove() {
+        this.userService.remove(anyLong());
+
+        assertThat(mvc.delete().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void remove_error() {
+        doThrow(new RuntimeException()).when(userService).remove(anyLong());
+
+        assertThat(mvc.delete().uri("/users/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatus5xxServerError();
+    }
+
+    @Test
     void enable() {
         when(userService.enable(anyLong())).thenReturn(true);
 
@@ -181,4 +196,33 @@ class UserControllerTest {
                 .hasStatus5xxServerError();
     }
 
+    @Test
+    void unlock() {
+        when(userService.unlock(anyLong())).thenReturn(true);
+
+        assertThat(mvc.patch().uri("/users/{id}/unlock", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
+    }
+
+    @Test
+    void unlock_error() {
+        when(userService.unlock(anyLong())).thenThrow(new RuntimeException());
+
+        assertThat(mvc.patch().uri("/users/{id}/unlock", anyLong()).with(csrf().asHeader()))
+                .hasStatus5xxServerError();
+    }
+
+    @Test
+    void importFromFile() {
+        when(userService.createAll(anyList())).thenReturn(List.of(vo));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        assertThat(mvc.post().uri("/users/import").multipart().file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(UserVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.username()).isEqualTo("test"));
+    }
 }

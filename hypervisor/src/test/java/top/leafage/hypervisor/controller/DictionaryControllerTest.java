@@ -27,12 +27,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
 import top.leafage.hypervisor.domain.dto.DictionaryDTO;
 import top.leafage.hypervisor.domain.vo.DictionaryVO;
+import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.service.DictionaryService;
 
 import java.util.List;
@@ -88,7 +90,7 @@ class DictionaryControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -109,7 +111,7 @@ class DictionaryControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -209,6 +211,20 @@ class DictionaryControllerTest {
 
         assertThat(mvc.patch().uri("/dictionaries/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
+    }
+
+    @Test
+    void importFromFile() {
+        when(dictionaryService.createAll(anyList())).thenReturn(List.of(vo));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        assertThat(mvc.post().uri("/dictionaries/import").multipart().file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(DictionaryVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
 }

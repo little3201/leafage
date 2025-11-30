@@ -26,13 +26,16 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
 import top.leafage.common.data.domain.TreeNode;
 import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import top.leafage.hypervisor.domain.vo.DictionaryVO;
 import top.leafage.hypervisor.domain.vo.PrivilegeVO;
+import top.leafage.hypervisor.domain.vo.RoleVO;
 import top.leafage.hypervisor.service.PrivilegeService;
 import top.leafage.hypervisor.service.RolePrivilegesService;
 
@@ -97,7 +100,7 @@ class PrivilegeControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -118,7 +121,7 @@ class PrivilegeControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -140,6 +143,18 @@ class PrivilegeControllerTest {
 
         assertThat(mvc.get().uri("/privileges/{id}", anyLong()))
                 .hasStatus5xxServerError();
+    }
+
+    @Test
+    void subset() {
+        when(privilegeService.subset(anyLong())).thenReturn(List.of(vo));
+
+        assertThat(mvc.get().uri("/privileges/{id}/subset", anyLong()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(PrivilegeVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -187,6 +202,20 @@ class PrivilegeControllerTest {
 
         assertThat(mvc.patch().uri("/privileges/{id}", anyLong()).with(csrf().asHeader()))
                 .hasStatusOk();
+    }
+
+    @Test
+    void importFromFile() {
+        when(privilegeService.createAll(anyList())).thenReturn(List.of(vo));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        assertThat(mvc.post().uri("/privileges/import").multipart().file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(PrivilegeVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
 }

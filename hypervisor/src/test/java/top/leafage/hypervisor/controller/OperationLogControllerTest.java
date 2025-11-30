@@ -75,7 +75,7 @@ class OperationLogControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "operation:like:a")
+                .queryParam("filters", "operation:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -96,7 +96,7 @@ class OperationLogControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "operation:like:a")
+                .queryParam("filters", "operation:like:test")
         )
                 .hasStatus5xxServerError();
     }

@@ -42,6 +42,15 @@ public class FileRecord extends JpaAbstractAuditable<@NonNull String, @NonNull L
 
     private float size;
 
+    public FileRecord() {
+    }
+
+    public FileRecord(String name, String path, String mimeType, float size) {
+        this.name = name;
+        this.path = path;
+        this.mimeType = mimeType;
+        this.size = size;
+    }
 
     public String getName() {
         return name;

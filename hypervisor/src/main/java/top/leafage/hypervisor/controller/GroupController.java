@@ -226,6 +226,18 @@ public class GroupController {
     }
 
     /**
+     * 根据group查询关联roles
+     *
+     * @param id group id
+     * @return 查询到的数据集，异常时返回204状态码
+     */
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<List<GroupRoles>> roles(@PathVariable Long id) {
+        List<GroupRoles> roles = groupRolesService.roles(id);
+        return ResponseEntity.ok(roles);
+    }
+
+    /**
      * 删除 group-roles关联
      *
      * @param id      group id
@@ -236,18 +248,6 @@ public class GroupController {
     public ResponseEntity<Void> removeRoles(@PathVariable Long id, @RequestParam Set<Long> roleIds) {
         groupRolesService.removeRelation(id, roleIds);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * 根据group查询关联roles
-     *
-     * @param id group id
-     * @return 查询到的数据集，异常时返回204状态码
-     */
-    @GetMapping("/{id}/roles")
-    public ResponseEntity<List<GroupRoles>> roles(@PathVariable Long id) {
-        List<GroupRoles> roles = groupRolesService.roles(id);
-        return ResponseEntity.ok(roles);
     }
 
     /**

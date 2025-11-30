@@ -68,7 +68,7 @@ class SchedulerLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<SchedulerLog> page = new PageImpl<>(List.of(mock(SchedulerLog.class)));
+        Page<SchedulerLog> page = new PageImpl<>(List.of(entity));
 
         when(schedulerLogRepository.findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(),
                 any(Pageable.class))).thenReturn(page);

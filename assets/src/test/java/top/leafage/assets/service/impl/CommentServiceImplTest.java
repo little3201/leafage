@@ -15,6 +15,7 @@
 
 package top.leafage.assets.service.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -33,11 +34,12 @@ import top.leafage.assets.repository.CommentRepository;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * comment 接口测试
@@ -53,23 +55,33 @@ class CommentServiceImplTest {
     @InjectMocks
     private CommentServiceImpl commentService;
 
+    private Comment entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new Comment(1L, "test", 1L);
+    }
+
     @Test
     void retrieve() {
-        Page<Comment> page = new PageImpl<>(List.of(mock(Comment.class)));
+        Page<Comment> page = new PageImpl<>(List.of(entity));
 
         when(commentRepository.findAll(ArgumentMatchers.<Specification<Comment>>any(),
                 any(Pageable.class))).thenReturn(page);
 
-        Page<CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "");
-        assertNotNull(voPage.getContent());
+        Page<CommentVO> voPage = commentService.retrieve(0, 2, "id", true, "body:like:test");
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(commentRepository).findAll(ArgumentMatchers.<Specification<Comment>>any(), any(Pageable.class));
     }
 
     @Test
     void relation() {
-        when(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).thenReturn(anyList());
+        when(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).thenReturn(List.of(entity));
 
         List<CommentVO> voList = commentService.relation(1L);
-        assertNotNull(voList);
+        assertEquals(1, voList.size());
+        verify(commentRepository).findAllByPostIdAndReplierIsNull(anyLong());
     }
 
     @Test
@@ -82,18 +94,11 @@ class CommentServiceImplTest {
 
     @Test
     void replies() {
-        Comment comment = new Comment();
-        comment.setBody("评论信息");
-        comment.setPostId(1L);
-
-        Comment comm = new Comment();
-        comm.setBody("评论信息2222");
-        comm.setPostId(1L);
-        comm.setReplier(comment.getReplier());
-        when(commentRepository.findAllByReplier(anyLong())).thenReturn(List.of(comment, comm));
+        when(commentRepository.findAllByReplier(anyLong())).thenReturn(List.of(entity));
 
         List<CommentVO> voList = commentService.replies(anyLong());
-        assertNotNull(voList);
+        assertEquals(1, voList.size());
+        verify(commentRepository).findAllByReplier(anyLong());
     }
 
     @Test
@@ -104,10 +109,10 @@ class CommentServiceImplTest {
 
     @Test
     void create() {
-        when(commentRepository.saveAndFlush(any(Comment.class))).thenReturn(mock(Comment.class));
+        when(commentRepository.saveAndFlush(any(Comment.class))).thenReturn(entity);
 
         CommentVO vo = commentService.create(mock(CommentDTO.class));
-        assertNotNull(vo);
+        assertEquals("test", vo.body());
     }
 
 }

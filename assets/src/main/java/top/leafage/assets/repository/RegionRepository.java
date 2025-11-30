@@ -17,7 +17,10 @@ package top.leafage.assets.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import top.leafage.assets.domain.Region;
 
 /**
@@ -37,10 +40,13 @@ public interface RegionRepository extends JpaRepository<Region, Long>, JpaSpecif
     boolean existsByName(String name);
 
     /**
-     * existsByName.
+     * Toggles the enabled status of a record by its ID.
      *
-     * @param name a {@link String} object
-     * @return a boolean
+     * @param id The ID of the record.
+     * @return result.
      */
-    boolean existsByNameAndIdNot(String name, Long id);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Region t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    int updateEnabledById(Long id);
 }

@@ -72,7 +72,7 @@ class GroupServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Group> page = new PageImpl<>(List.of(mock(Group.class)));
+        Page<Group> page = new PageImpl<>(List.of(entity));
 
         when(groupRepository.findAll(ArgumentMatchers.<Specification<Group>>any(),
                 any(Pageable.class))).thenReturn(page);
@@ -192,7 +192,6 @@ class GroupServiceImplTest {
         boolean enabled = groupService.enable(1L);
         assertTrue(enabled);
     }
-
 
     @Test
     void enable_not_found() {

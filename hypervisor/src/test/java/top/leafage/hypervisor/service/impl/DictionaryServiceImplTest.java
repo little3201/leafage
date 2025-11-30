@@ -40,7 +40,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * dictionary controller test
@@ -72,7 +73,7 @@ class DictionaryServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Dictionary> page = new PageImpl<>(List.of(mock(Dictionary.class)));
+        Page<Dictionary> page = new PageImpl<>(List.of(entity));
 
         when(dictionaryRepository.findAll(ArgumentMatchers.<Specification<Dictionary>>any(),
                 any(Pageable.class))).thenReturn(page);
@@ -107,10 +108,10 @@ class DictionaryServiceImplTest {
 
     @Test
     void subset() {
-        when(dictionaryRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(mock(Dictionary.class)));
+        when(dictionaryRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(entity));
 
         List<DictionaryVO> voList = dictionaryService.subset(1L);
-        assertNotNull(voList);
+        assertEquals(1, voList.size());
     }
 
     @Test
@@ -179,6 +180,17 @@ class DictionaryServiceImplTest {
     }
 
     @Test
+    void remove_not_found() {
+        when(dictionaryRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> dictionaryService.remove(anyLong())
+        );
+        assertEquals("dictionary not found: 0", exception.getMessage());
+    }
+
+    @Test
     void enable() {
         when(dictionaryRepository.existsById(anyLong())).thenReturn(true);
         when(dictionaryRepository.updateEnabledById(anyLong())).thenReturn(1);
@@ -187,4 +199,14 @@ class DictionaryServiceImplTest {
         assertTrue(enabled);
     }
 
+    @Test
+    void enable_not_found() {
+        when(dictionaryRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> dictionaryService.enable(1L)
+        );
+        assertEquals("dictionary not found: 1", exception.getMessage());
+    }
 }

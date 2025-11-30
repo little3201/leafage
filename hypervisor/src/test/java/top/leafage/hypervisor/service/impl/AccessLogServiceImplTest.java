@@ -67,7 +67,7 @@ class AccessLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<AccessLog> page = new PageImpl<>(List.of(mock(AccessLog.class)));
+        Page<AccessLog> page = new PageImpl<>(List.of(entity));
 
         when(accessLogRepository.findAll(ArgumentMatchers.<Specification<AccessLog>>any(),
                 any(Pageable.class))).thenReturn(page);

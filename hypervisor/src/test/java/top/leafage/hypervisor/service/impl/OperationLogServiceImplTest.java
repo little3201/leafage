@@ -70,7 +70,7 @@ class OperationLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<OperationLog> page = new PageImpl<>(List.of(mock(OperationLog.class)));
+        Page<OperationLog> page = new PageImpl<>(List.of(entity));
 
         when(operationLogRepository.findAll(ArgumentMatchers.<Specification<OperationLog>>any(),
                 any(Pageable.class))).thenReturn(page);

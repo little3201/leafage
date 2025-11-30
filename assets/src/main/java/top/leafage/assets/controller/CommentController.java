@@ -61,13 +61,7 @@ public class CommentController {
     @GetMapping
     public ResponseEntity<Page<CommentVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                     String sortBy, boolean descending, String filters) {
-        Page<CommentVO> voPage;
-        try {
-            voPage = commentService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve comment error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<CommentVO> voPage = commentService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
@@ -79,13 +73,7 @@ public class CommentController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<List<CommentVO>> relation(@PathVariable Long id) {
-        List<CommentVO> voList;
-        try {
-            voList = commentService.relation(id);
-        } catch (Exception e) {
-            logger.error("Retrieve comment by posts error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        List<CommentVO> voList = commentService.relation(id);
         return ResponseEntity.ok(voList);
     }
 
@@ -98,13 +86,7 @@ public class CommentController {
      */
     @GetMapping("/{id}/replies")
     public ResponseEntity<List<CommentVO>> replies(@PathVariable Long id) {
-        List<CommentVO> voList;
-        try {
-            voList = commentService.replies(id);
-        } catch (Exception e) {
-            logger.error("Retrieve comment replies error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        List<CommentVO> voList = commentService.replies(id);
         return ResponseEntity.ok(voList);
     }
 
@@ -116,13 +98,7 @@ public class CommentController {
      */
     @PostMapping
     public ResponseEntity<CommentVO> create(@Valid @RequestBody CommentDTO dto) {
-        CommentVO vo;
-        try {
-            vo = commentService.create(dto);
-        } catch (Exception e) {
-            logger.error("Create comment error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        CommentVO vo = commentService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 

@@ -15,6 +15,7 @@
 
 package top.leafage.assets.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class FileRecordServiceImpl implements FileRecordService {
 
         return fileRecordRepository.findById(id)
                 .map(FileRecordVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("file record not found: " + id));
     }
 
     @Override
@@ -79,6 +80,10 @@ public class FileRecordServiceImpl implements FileRecordService {
 
     @Override
     public void remove(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+        if (!fileRecordRepository.existsById(id)) {
+            throw new EntityNotFoundException("file record not found: " + id);
+        }
         fileRecordRepository.deleteById(id);
     }
 }

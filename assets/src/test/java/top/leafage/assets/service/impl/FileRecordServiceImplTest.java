@@ -15,6 +15,8 @@
 
 package top.leafage.assets.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -33,10 +35,10 @@ import top.leafage.assets.repository.FileRecordRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -54,41 +56,77 @@ class FileRecordServiceImplTest {
     private FileRecordServiceImpl fileRecordService;
 
 
+    private FileRecord entity;
+
+    @BeforeEach
+    void setUp() {
+        entity = new FileRecord("test", "test", "test", 121L);
+    }
+
     @Test
     void retrieve() {
-        Page<FileRecord> page = new PageImpl<>(List.of(mock(FileRecord.class)));
+        Page<FileRecord> page = new PageImpl<>(List.of(entity));
 
         when(fileRecordRepository.findAll(ArgumentMatchers.<Specification<FileRecord>>any(),
                 any(Pageable.class))).thenReturn(page);
 
-        Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "test");
-        assertNotNull(voPage.getContent());
+        Page<FileRecordVO> voPage = fileRecordService.retrieve(0, 2, "id", true, "name:like:test");
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(fileRecordRepository).findAll(ArgumentMatchers.<Specification<FileRecord>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        when(fileRecordRepository.findById(anyLong())).thenReturn(Optional.of(mock(FileRecord.class)));
+        when(fileRecordRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         FileRecordVO vo = fileRecordService.fetch(anyLong());
-
         assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(fileRecordRepository).findById(anyLong());
+    }
+
+    @Test
+    void fetch_not_found() {
+        when(fileRecordRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> fileRecordService.fetch(anyLong())
+        );
+        assertEquals("file record not found: 0", exception.getMessage());
+        verify(fileRecordRepository).findById(anyLong());
     }
 
     @Test
     void upload() {
-        when(fileRecordRepository.saveAndFlush(any(FileRecord.class))).thenReturn(mock(FileRecord.class));
+        when(fileRecordRepository.saveAndFlush(any(FileRecord.class))).thenReturn(entity);
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
         FileRecordVO vo = fileRecordService.upload(file);
 
-        verify(fileRecordRepository).saveAndFlush(any(FileRecord.class));
         assertNotNull(vo);
+        assertEquals("test", vo.name());
+        verify(fileRecordRepository).saveAndFlush(any(FileRecord.class));
     }
 
     @Test
     void remove() {
-        fileRecordService.remove(11L);
+        when(fileRecordRepository.existsById(anyLong())).thenReturn(true);
 
+        fileRecordService.remove(11L);
         verify(fileRecordRepository).deleteById(anyLong());
     }
+
+    @Test
+    void remove_not_found() {
+        when(fileRecordRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> fileRecordService.remove(anyLong())
+        );
+        assertEquals("file record not found: 0", exception.getMessage());
+    }
+
 }

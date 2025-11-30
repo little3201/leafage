@@ -69,7 +69,7 @@ class AuditLogServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<AuditLog> page = new PageImpl<>(List.of(mock(AuditLog.class)));
+        Page<AuditLog> page = new PageImpl<>(List.of(entity));
 
         when(auditLogRepository.findAll(ArgumentMatchers.<Specification<AuditLog>>any(),
                 any(Pageable.class))).thenReturn(page);

@@ -52,6 +52,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, JpaSpec
      * @param replier 回复id
      * @return 记录数
      */
-    Long countByReplier(Long replier);
+    long countByReplier(Long replier);
 
 }

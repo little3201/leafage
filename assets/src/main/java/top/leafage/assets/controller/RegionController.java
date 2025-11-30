@@ -29,6 +29,7 @@ import top.leafage.assets.domain.vo.RegionVO;
 import top.leafage.assets.service.RegionService;
 import top.leafage.common.poi.ExcelReader;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -65,13 +66,7 @@ public class RegionController {
     @GetMapping
     public ResponseEntity<Page<RegionVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                    String sortBy, boolean descending, String filters) {
-        Page<RegionVO> voPage;
-        try {
-            voPage = regionService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve region error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<RegionVO> voPage = regionService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
@@ -83,13 +78,7 @@ public class RegionController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<RegionVO> fetch(@PathVariable Long id) {
-        RegionVO vo;
-        try {
-            vo = regionService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch region error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        RegionVO vo = regionService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
@@ -101,13 +90,7 @@ public class RegionController {
      */
     @PostMapping
     public ResponseEntity<RegionVO> create(@Valid @RequestBody RegionDTO dto) {
-        RegionVO vo;
-        try {
-            vo = regionService.create(dto);
-        } catch (Exception e) {
-            logger.error("Create region error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        RegionVO vo = regionService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(vo);
     }
 
@@ -120,13 +103,7 @@ public class RegionController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<RegionVO> modify(@PathVariable Long id, @RequestBody RegionDTO dto) {
-        RegionVO vo;
-        try {
-            vo = regionService.modify(id, dto);
-        } catch (Exception e) {
-            logger.error("Modify region error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
+        RegionVO vo = regionService.modify(id, dto);
         return ResponseEntity.accepted().body(vo);
     }
 
@@ -137,12 +114,7 @@ public class RegionController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            regionService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove region error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+        regionService.remove(id);
         return ResponseEntity.ok().build();
     }
 
@@ -155,14 +127,8 @@ public class RegionController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_regions:enable')")
     @PatchMapping("/{id}")
     public ResponseEntity<Boolean> enable(@PathVariable Long id) {
-        boolean enabled;
-        try {
-            enabled = regionService.enable(id);
-        } catch (Exception e) {
-            logger.error("Toggle enabled error: ", e);
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        return ResponseEntity.accepted().body(enabled);
+        boolean enabled = regionService.enable(id);
+        return ResponseEntity.ok(enabled);
     }
 
     /**
@@ -172,15 +138,9 @@ public class RegionController {
      */
     @PreAuthorize("hasAuthority('SCOPE_regions:import')")
     @PostMapping("/import")
-    public ResponseEntity<List<RegionVO>> importFromFile(MultipartFile file) {
-        List<RegionVO> voList;
-        try {
-            List<RegionDTO> dtoList = ExcelReader.read(file.getInputStream(), RegionDTO.class);
-            voList = regionService.createAll(dtoList);
-        } catch (Exception e) {
-            logger.error("Import region error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
+    public ResponseEntity<List<RegionVO>> importFromFile(MultipartFile file) throws IOException {
+        List<RegionDTO> dtoList = ExcelReader.read(file.getInputStream(), RegionDTO.class);
+        List<RegionVO> voList = regionService.createAll(dtoList);
         return ResponseEntity.ok().body(voList);
     }
 

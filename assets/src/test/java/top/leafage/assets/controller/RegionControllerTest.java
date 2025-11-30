@@ -15,6 +15,7 @@
 
 package top.leafage.assets.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +24,16 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
 import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.CommentVO;
+import top.leafage.assets.domain.vo.PostVO;
 import top.leafage.assets.domain.vo.RegionVO;
 import top.leafage.assets.service.RegionService;
 
@@ -71,7 +76,7 @@ class RegionControllerTest {
         dto.setSuperiorId(1L);
         dto.setDescription("description");
 
-        vo = new RegionVO(1L, "test", "029", 712000, "");
+        vo = new RegionVO(1L, "test", "029", 712000, "description");
     }
 
     @Test
@@ -88,10 +93,14 @@ class RegionControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(RegionVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -103,9 +112,9 @@ class RegionControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "content:like:a")
+                .queryParam("filters", "content:like:test")
         )
-                .hasStatus2xxSuccessful();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -114,7 +123,9 @@ class RegionControllerTest {
 
         assertThat(mvc.get().uri("/regions/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(RegionVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -122,7 +133,7 @@ class RegionControllerTest {
         when(regionService.fetch(anyLong())).thenThrow(new RuntimeException());
 
         assertThat(mvc.get().uri("/regions/{id}", anyLong()))
-                .hasStatus2xxSuccessful();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -131,8 +142,10 @@ class RegionControllerTest {
 
         assertThat(mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .convertTo(RegionVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -141,7 +154,7 @@ class RegionControllerTest {
 
         assertThat(mvc.post().uri("/regions").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -150,8 +163,10 @@ class RegionControllerTest {
 
         assertThat(mvc.put().uri("/regions/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.ACCEPTED)
+                .bodyJson()
+                .convertTo(RegionVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -160,7 +175,7 @@ class RegionControllerTest {
 
         assertThat(mvc.put().uri("/regions/{id}", anyLong()).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -176,6 +191,29 @@ class RegionControllerTest {
         doThrow(new RuntimeException()).when(regionService).remove(anyLong());
 
         assertThat(mvc.delete().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatus4xxClientError();
+                .hasStatus5xxServerError();
+    }
+
+
+    @Test
+    void enable() {
+        when(regionService.enable(anyLong())).thenReturn(true);
+
+        assertThat(mvc.patch().uri("/regions/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
+    }
+
+    @Test
+    void importFromFile() {
+        when(regionService.createAll(anyList())).thenReturn(List.of(vo));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        assertThat(mvc.post().uri("/regions/import").multipart().file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(RegionVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 }

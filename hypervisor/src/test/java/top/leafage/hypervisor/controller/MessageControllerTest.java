@@ -39,8 +39,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 /**
@@ -87,7 +86,7 @@ class MessageControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "title:like:a")
+                .queryParam("filters", "title:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -108,7 +107,7 @@ class MessageControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "title:like:a")
+                .queryParam("filters", "title:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -177,4 +176,21 @@ class MessageControllerTest {
         )
                 .hasStatus5xxServerError();
     }
+
+    @Test
+    void remove() {
+        this.messageService.remove(anyLong());
+
+        assertThat(mvc.delete().uri("/messages/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void remove_error() {
+        doThrow(new RuntimeException()).when(messageService).remove(anyLong());
+
+        assertThat(mvc.delete().uri("/messages/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatus5xxServerError();
+    }
+
 }

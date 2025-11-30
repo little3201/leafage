@@ -14,6 +14,7 @@
  */
 package top.leafage.assets.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -87,10 +90,13 @@ class PostControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "title:like:a")
+                .queryParam("filters", "title:like:test")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(PostVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
     }
 
     @Test
@@ -103,7 +109,7 @@ class PostControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "title:like:a")
+                .queryParam("filters", "title:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -114,7 +120,9 @@ class PostControllerTest {
 
         assertThat(mvc.get().uri("/posts/{id}", anyLong()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(PostVO.class)
+                .satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
     }
 
     @Test
@@ -130,8 +138,10 @@ class PostControllerTest {
 
         assertThat(mvc.post().uri("/posts").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .convertTo(PostVO.class)
+                .satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
     }
 
     @Test
@@ -149,8 +159,10 @@ class PostControllerTest {
 
         assertThat(mvc.put().uri("/posts/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.ACCEPTED)
+                .bodyJson()
+                .convertTo(PostVO.class)
+                .satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
     }
 
     @Test
@@ -172,8 +184,30 @@ class PostControllerTest {
     @Test
     void remove_error() {
         doThrow(new RuntimeException()).when(postService).remove(anyLong());
+
         assertThat(mvc.delete().uri("/posts/{id}", 1L).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 
+    @Test
+    void enable() {
+        when(postService.enable(anyLong())).thenReturn(true);
+
+        assertThat(mvc.patch().uri("/posts/{id}", anyLong()).with(csrf().asHeader()))
+                .hasStatusOk();
+    }
+
+    @Test
+    void importFromFile() {
+        when(postService.createAll(anyList())).thenReturn(List.of(vo));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        assertThat(mvc.post().uri("/posts/import").multipart().file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(PostVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.title()).isEqualTo("test"));
+    }
 }

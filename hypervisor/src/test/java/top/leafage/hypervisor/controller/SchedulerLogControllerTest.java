@@ -77,7 +77,7 @@ class SchedulerLogControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "scheduler:like:a")
+                .queryParam("filters", "scheduler:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -98,7 +98,7 @@ class SchedulerLogControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "scheduler:like:a")
+                .queryParam("filters", "scheduler:like:test")
         )
                 .hasStatus5xxServerError();
     }

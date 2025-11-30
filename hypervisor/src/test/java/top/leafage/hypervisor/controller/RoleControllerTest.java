@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -95,7 +96,7 @@ class RoleControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "false")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatusOk()
                 .bodyJson().extractingPath("$.content")
@@ -116,7 +117,7 @@ class RoleControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -208,6 +209,20 @@ class RoleControllerTest {
     }
 
     @Test
+    void importFromFile() {
+        when(roleService.createAll(anyList())).thenReturn(List.of(vo));
+
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        assertThat(mvc.post().uri("/roles/import").multipart().file(file).with(csrf().asHeader()))
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(InstanceOfAssertFactories.list(RoleVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
+    }
+
+    @Test
     void members() {
         when(roleMembersService.members(anyLong())).thenReturn(List.of(mock(RoleMembers.class)));
 
@@ -257,13 +272,12 @@ class RoleControllerTest {
         roleMembersService.removeRelation(anyLong(), anySet());
 
         assertThat(mvc.delete().uri("/roles/{id}/members", 1L)
-                .queryParam("usernames", String.valueOf(Set.of("create")))
+                .queryParam("usernames", "test")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(csrf().asHeader())
         )
                 .hasStatus(HttpStatus.NO_CONTENT);
     }
-
 
     @Test
     void privileges() {

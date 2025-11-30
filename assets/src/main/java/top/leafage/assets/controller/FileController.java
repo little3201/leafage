@@ -15,7 +15,6 @@
 
 package top.leafage.assets.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import top.leafage.assets.domain.vo.FileRecordVO;
 import top.leafage.assets.service.FileRecordService;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -69,13 +68,7 @@ public class FileController {
     @GetMapping
     public ResponseEntity<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                                        String sortBy, boolean descending, String filters) {
-        Page<FileRecordVO> voPage;
-        try {
-            voPage = fileRecordService.retrieve(page, size, sortBy, descending, filters);
-        } catch (Exception e) {
-            logger.error("Retrieve file error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        Page<FileRecordVO> voPage = fileRecordService.retrieve(page, size, sortBy, descending, filters);
         return ResponseEntity.ok(voPage);
     }
 
@@ -88,13 +81,7 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
     public ResponseEntity<FileRecordVO> fetch(@PathVariable Long id) {
-        FileRecordVO vo;
-        try {
-            vo = fileRecordService.fetch(id);
-        } catch (Exception e) {
-            logger.error("Fetch file error: ", e);
-            return ResponseEntity.noContent().build();
-        }
+        FileRecordVO vo = fileRecordService.fetch(id);
         return ResponseEntity.ok(vo);
     }
 
@@ -107,14 +94,8 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
     public ResponseEntity<FileRecordVO> upload(MultipartFile file) {
-        FileRecordVO vo;
-        try {
-            vo = fileRecordService.upload(file);
-        } catch (Exception e) {
-            logger.error("Upload file error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
+        FileRecordVO vo = fileRecordService.upload(file);
+        return ResponseEntity.ok(vo);
     }
 
     /**
@@ -125,34 +106,26 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> download(@PathVariable Long id, HttpServletResponse response) {
-        response.setContentType("application/octet-stream");
-        try {
-            FileRecordVO vo = fileRecordService.fetch(id);
-            Resource resource = new FileSystemResource(vo.path());
+    public ResponseEntity<Resource> download(@PathVariable Long id, HttpServletResponse response) throws IOException {
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        FileRecordVO vo = fileRecordService.fetch(id);
+        Resource resource = new FileSystemResource(vo.path());
 
-            if (!resource.exists() || !resource.isReadable()) {
-                logger.warn("文件不可访问: path={}", vo.path());
-                return ResponseEntity.notFound().build();
-            }
-
-            String fileName = vo.name();
-            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
-                    .replaceAll("\\+", "%20");
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"; " +
-                            "filename*=UTF-8''" + encodedFileName)
-                    .contentLength(resource.contentLength())
-                    .body(resource);
-        } catch (EntityNotFoundException e) {
-            logger.warn("文件记录不存在: id={}", id);
+        if (!resource.exists() || !resource.isReadable()) {
+            logger.warn("resource not exists or not readable: path={}", vo.path());
             return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            logger.error("下载文件异常: id={}", id, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
+        String fileName = vo.name();
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"; " +
+                        "filename*=UTF-8''" + encodedFileName)
+                .contentLength(resource.contentLength())
+                .body(resource);
     }
 
     /**
@@ -164,12 +137,7 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remove(@PathVariable Long id) {
-        try {
-            fileRecordService.remove(id);
-        } catch (Exception e) {
-            logger.error("Remove file error: ", e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-        }
-        return ResponseEntity.ok().build();
+        fileRecordService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 }

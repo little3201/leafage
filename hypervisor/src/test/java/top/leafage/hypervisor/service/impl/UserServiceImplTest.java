@@ -69,7 +69,7 @@ class UserServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<User> page = new PageImpl<>(List.of(mock(User.class)));
+        Page<User> page = new PageImpl<>(List.of(entity));
 
         when(userRepository.findAll(ArgumentMatchers.<Specification<User>>any(),
                 any(Pageable.class))).thenReturn(page);

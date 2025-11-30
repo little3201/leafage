@@ -15,6 +15,7 @@
 
 package top.leafage.assets.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,18 +60,17 @@ class CommentControllerTest {
     @MockitoBean
     private CommentService commentService;
 
-    private CommentVO vo;
-
     private CommentDTO dto;
+    private CommentVO vo;
 
     @BeforeEach
     void setUp() {
-        vo = new CommentVO(1L, 2L, "body", 1L, 0);
-
         dto = new CommentDTO();
         dto.setPostId(1L);
-        dto.setBody("content");
+        dto.setBody("body");
         dto.setReplier(1L);
+
+        vo = new CommentVO(1L, 2L, "test", 1L, 0);
     }
 
     @Test
@@ -82,10 +82,15 @@ class CommentControllerTest {
         assertThat(mvc.get().uri("/comments")
                 .queryParam("page", "0")
                 .queryParam("size", "2")
+                .queryParam("sortBy", "id")
+                .queryParam("descending", "false")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatusOk()
-                .body().isNotNull()
-                .hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(CommentVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.body()).isEqualTo("test"));
     }
 
     @Test
@@ -97,9 +102,9 @@ class CommentControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "content:like:a")
+                .queryParam("filters", "name:like:test")
         )
-                .hasStatus(HttpStatus.NO_CONTENT);
+                .hasStatus5xxServerError();
     }
 
     @Test
@@ -142,8 +147,10 @@ class CommentControllerTest {
 
         assertThat(mvc.post().uri("/comments").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(dto)).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .convertTo(CommentVO.class)
+                .satisfies(vo -> assertThat(vo.body()).isEqualTo("test"));
     }
 
     @Test

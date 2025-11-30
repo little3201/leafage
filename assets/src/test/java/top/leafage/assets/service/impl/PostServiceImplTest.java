@@ -15,6 +15,7 @@
 package top.leafage.assets.service.impl;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,12 +36,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -58,72 +58,120 @@ class PostServiceImplTest {
     private PostServiceImpl postsService;
 
     private PostDTO dto;
+    private Post entity;
 
     @BeforeEach
     void setUp() {
         dto = new PostDTO();
-        dto.setTitle("title");
+        dto.setTitle("test");
         dto.setSummary("excerpt");
         dto.setBody("body");
         dto.setTags(Set.of("code"));
+
+        entity = PostDTO.toEntity(dto);
     }
 
     @Test
     void retrieve() {
-        Page<Post> page = new PageImpl<>(List.of(mock(Post.class)));
+        Page<Post> page = new PageImpl<>(List.of(entity));
 
         when(postRepository.findAll(ArgumentMatchers.<Specification<Post>>any(),
                 any(Pageable.class))).thenReturn(page);
 
-        Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "name:like:a");
-        assertNotNull(voPage.getContent());
+        Page<PostVO> voPage = postsService.retrieve(0, 2, "id", true, "title:like:test");
+        assertEquals(1, voPage.getTotalElements());
+        assertEquals(1, voPage.getContent().size());
+        verify(postRepository).findAll(ArgumentMatchers.<Specification<Post>>any(), any(Pageable.class));
     }
 
     @Test
     void fetch() {
-        when(postRepository.findById(anyLong())).thenReturn(Optional.of(mock(Post.class)));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(entity));
 
         PostVO vo = postsService.fetch(anyLong());
-
         assertNotNull(vo);
+        assertEquals("test", vo.title());
+        verify(postRepository).findById(anyLong());
     }
 
     @Test
     void fetch_posts_null() {
         when(postRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        PostVO vo = postsService.fetch(anyLong());
-
-        assertNull(vo);
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> postsService.fetch(anyLong())
+        );
+        assertEquals("post not found: 0", exception.getMessage());
+        verify(postRepository).findById(anyLong());
     }
 
     @Test
     void create() {
-        when(postRepository.saveAndFlush(any(Post.class))).thenReturn(mock(Post.class));
+        when(postRepository.existsByTitle("test")).thenReturn(false);
+        when(postRepository.saveAndFlush(any(Post.class))).thenReturn(entity);
 
         PostVO vo = postsService.create(dto);
-
-        verify(postRepository).saveAndFlush(any(Post.class));
         assertNotNull(vo);
+        assertEquals("test", vo.title());
+        verify(postRepository).saveAndFlush(any(Post.class));
+    }
+
+    @Test
+    void create_name_conflict() {
+        when(postRepository.existsByTitle("test")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> postsService.create(dto)
+        );
+        assertEquals("title already exists: test", exception.getMessage());
+        verify(postRepository, never()).save(any());
     }
 
     @Test
     void modify() {
-        when(postRepository.findById(anyLong())).thenReturn(Optional.of(mock(Post.class)));
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(postRepository.existsByTitle("demo")).thenReturn(false);
+        when(postRepository.save(any(Post.class))).thenReturn(entity);
 
-        when(postRepository.save(any(Post.class))).thenReturn(mock(Post.class));
-
+        dto.setTitle("demo");
         PostVO vo = postsService.modify(1L, dto);
-
-        verify(postRepository).save(any(Post.class));
         assertNotNull(vo);
+        assertEquals("demo", vo.title());
+        verify(postRepository).save(any(Post.class));
+    }
+
+    @Test
+    void modify_username_conflict() {
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(entity));
+        when(postRepository.existsByTitle("demo")).thenReturn(true);
+
+        dto.setTitle("demo");
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> postsService.modify(1L, dto)
+        );
+        assertEquals("title already exists: demo", exception.getMessage());
     }
 
     @Test
     void remove() {
-        postsService.remove(anyLong());
+        when(postRepository.existsById(anyLong())).thenReturn(true);
 
+        postsService.remove(anyLong());
         verify(postRepository).deleteById(anyLong());
+    }
+
+    @Test
+    void remove_not_found() {
+        when(postRepository.existsById(anyLong())).thenReturn(false);
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> postsService.remove(anyLong())
+        );
+        assertEquals("post not found: 0", exception.getMessage());
     }
 
 }

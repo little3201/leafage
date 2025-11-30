@@ -15,6 +15,7 @@
 
 package top.leafage.assets.controller;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -63,7 +66,7 @@ class FileControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new FileRecordVO(1L, "test", "", "", 3121.23f);
+        vo = new FileRecordVO(1L, "test", "src/test/resources/test.txt", "", 3121.23f);
     }
 
     @Test
@@ -78,10 +81,13 @@ class FileControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatusOk()
-                .body().isNotNull().hasSize(1);
+                .bodyJson().extractingPath("$.content")
+                .convertTo(InstanceOfAssertFactories.list(FileRecordVO.class))
+                .hasSize(1)
+                .element(0).satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -94,7 +100,7 @@ class FileControllerTest {
                 .queryParam("size", "2")
                 .queryParam("sortBy", "id")
                 .queryParam("descending", "true")
-                .queryParam("filters", "name:like:a")
+                .queryParam("filters", "name:like:test")
         )
                 .hasStatus5xxServerError();
     }
@@ -105,7 +111,9 @@ class FileControllerTest {
 
         assertThat(mvc.get().uri("/files/{id}", 1L))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(FileRecordVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -117,13 +125,32 @@ class FileControllerTest {
     }
 
     @Test
+    void download() {
+        when(fileRecordService.fetch(anyLong())).thenReturn(vo);
+
+        assertThat(mvc.get().uri("/files/{id}/download", 1L))
+                .hasStatusOk()
+                .contentType().isEqualTo(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+    }
+
+    @Test
+    void download_error() {
+        when(fileRecordService.fetch(anyLong())).thenThrow(new RuntimeException());
+
+        assertThat(mvc.get().uri("/files/{id}/download", 1L))
+                .hasStatus5xxServerError();
+    }
+
+    @Test
     void upload() {
         when(fileRecordService.upload(any(MultipartFile.class))).thenReturn(vo);
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
-        assertThat(mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
+        assertThat(mvc.post().uri("/files").multipart().file(file).with(csrf().asHeader()))
                 .hasStatusOk()
-                .body().isNotNull();
+                .bodyJson()
+                .convertTo(FileRecordVO.class)
+                .satisfies(vo -> assertThat(vo.name()).isEqualTo("test"));
     }
 
     @Test
@@ -131,7 +158,7 @@ class FileControllerTest {
         when(fileRecordService.upload(any(MultipartFile.class))).thenThrow(new RuntimeException());
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
-        assertThat(mvc.post().multipart().uri("/files").file(file).with(csrf().asHeader()))
+        assertThat(mvc.post().uri("/files").multipart().file(file).with(csrf().asHeader()))
                 .hasStatus5xxServerError();
     }
 
@@ -140,8 +167,7 @@ class FileControllerTest {
         fileRecordService.remove(anyLong());
 
         assertThat(mvc.delete().uri("/files/{id}", anyLong()).with(csrf().asHeader()))
-                .hasStatusOk()
-                .body().isNotNull();
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test

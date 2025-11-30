@@ -15,6 +15,7 @@
 
 package top.leafage.assets.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -72,7 +73,17 @@ public class RegionServiceImpl implements RegionService {
 
         return regionRepository.findById(id)
                 .map(RegionVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("region not found: " + id));
+    }
+
+
+    @Override
+    public boolean enable(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+        if (!regionRepository.existsById(id)) {
+            throw new EntityNotFoundException("region not found: " + id);
+        }
+        return regionRepository.updateEnabledById(id) > 0;
     }
 
     /**
@@ -80,6 +91,9 @@ public class RegionServiceImpl implements RegionService {
      */
     @Override
     public RegionVO create(RegionDTO dto) {
+        if (regionRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
         Region entity = regionRepository.saveAndFlush(RegionDTO.toEntity(dto));
         return RegionVO.from(entity);
     }
@@ -91,13 +105,15 @@ public class RegionServiceImpl implements RegionService {
     public RegionVO modify(Long id, RegionDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        return regionRepository.findById(id)
-                .map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return regionRepository.save(existing);
-                })
-                .map(RegionVO::from)
-                .orElseThrow();
+        Region existing = regionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("region not found: " + id));
+        if (!existing.getName().equals(dto.getName()) &&
+                regionRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("name already exists: " + dto.getName());
+        }
+        copier.copy(dto, existing, null);
+        Region entity = regionRepository.save(existing);
+        return RegionVO.from(entity);
     }
 
     /**
@@ -106,6 +122,9 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+        if (!regionRepository.existsById(id)) {
+            throw new EntityNotFoundException("region not found: " + id);
+        }
         regionRepository.deleteById(id);
     }
 

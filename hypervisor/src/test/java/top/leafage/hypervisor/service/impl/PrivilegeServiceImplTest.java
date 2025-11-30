@@ -89,7 +89,7 @@ class PrivilegeServiceImplTest {
 
     @Test
     void retrieve() {
-        Page<Privilege> page = new PageImpl<>(List.of(new Privilege()));
+        Page<Privilege> page = new PageImpl<>(List.of(entity));
 
         when(privilegeRepository.findAll(ArgumentMatchers.<Specification<Privilege>>any(),
                 any(Pageable.class))).thenReturn(page);
@@ -112,7 +112,7 @@ class PrivilegeServiceImplTest {
 
     @Test
     void subset() {
-        when(privilegeRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(mock(Privilege.class)));
+        when(privilegeRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(entity));
 
         List<PrivilegeVO> voList = privilegeService.subset(1L);
         assertEquals(1, voList.size());

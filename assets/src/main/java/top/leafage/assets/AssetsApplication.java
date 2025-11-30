@@ -16,12 +16,15 @@ package top.leafage.assets;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
+import top.leafage.common.handler.GlobalExceptionHandler;
 
 /**
  * assets application.
  *
  * @author wq li
  */
+@Import(GlobalExceptionHandler.class)
 @SpringBootApplication
 public class AssetsApplication {
 

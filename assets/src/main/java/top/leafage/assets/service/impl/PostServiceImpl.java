@@ -14,6 +14,7 @@
  */
 package top.leafage.assets.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
@@ -72,7 +73,7 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.findById(id)
                 .map(PostVO::from)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("post not found: " + id));
     }
 
     /**
@@ -81,6 +82,9 @@ public class PostServiceImpl implements PostService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PostVO create(PostDTO dto) {
+        if (postRepository.existsByTitle(dto.getTitle())) {
+            throw new IllegalArgumentException("title already exists: " + dto.getTitle());
+        }
         Post entity = postRepository.saveAndFlush(PostDTO.toEntity(dto));
         return PostVO.from(entity);
     }
@@ -92,13 +96,15 @@ public class PostServiceImpl implements PostService {
     public PostVO modify(Long id, PostDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
-        return postRepository.findById(id)
-                .map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return postRepository.save(existing);
-                })
-                .map(PostVO::from)
-                .orElseThrow();
+        Post existing = postRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("post not found: " + id));
+        if (!existing.getTitle().equals(dto.getTitle()) &&
+                postRepository.existsByTitle(dto.getTitle())) {
+            throw new IllegalArgumentException("title already exists: " + dto.getTitle());
+        }
+        copier.copy(dto, existing, null);
+        Post entity = postRepository.save(existing);
+        return PostVO.from(entity);
     }
 
     /**
@@ -107,7 +113,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
+        if (!postRepository.existsById(id)) {
+            throw new EntityNotFoundException("post not found: " + id);
+        }
         postRepository.deleteById(id);
     }
 
