@@ -63,7 +63,7 @@ class SchedulerLogServiceImplTest {
         entity = new SchedulerLog();
         entity.setName("test");
         entity.setStartTime(Instant.now());
-        entity.setDescription("description");
+        entity.setRecord("description");
     }
 
     @Test

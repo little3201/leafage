@@ -15,8 +15,9 @@ public record SchedulerLogVO(
         String name,
         Instant startTime,
         Integer executedTimes,
+        String status,
         Instant nextExecuteTime,
-        String description
+        String record
 ) {
     public static SchedulerLogVO from(SchedulerLog entity) {
         return new SchedulerLogVO(
@@ -24,8 +25,9 @@ public record SchedulerLogVO(
                 entity.getName(),
                 entity.getStartTime(),
                 entity.getExecutedTimes(),
+                entity.getStatus().name(),
                 entity.getNextExecuteTime(),
-                entity.getDescription()
+                entity.getRecord()
         );
     }
 }

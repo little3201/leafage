@@ -41,8 +41,6 @@ public class AccessLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lo
 
     private InetAddress ip;
 
-    private String location;
-
     private String params;
 
     private String body;
@@ -76,14 +74,6 @@ public class AccessLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lo
 
     public void setIp(InetAddress ip) {
         this.ip = ip;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getParams() {

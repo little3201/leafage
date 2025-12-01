@@ -45,8 +45,6 @@ public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lon
 
     private InetAddress ip;
 
-    private String location;
-
     private Integer statusCode;
 
     private Long operatedTimes;
@@ -90,14 +88,6 @@ public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lon
 
     public void setIp(InetAddress ip) {
         this.ip = ip;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public Integer getStatusCode() {

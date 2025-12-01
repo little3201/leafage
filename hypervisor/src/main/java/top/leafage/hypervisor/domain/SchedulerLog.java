@@ -40,7 +40,7 @@ public class SchedulerLog extends JpaAbstractAuditable<@NonNull String, @NonNull
 
     private Instant nextExecuteTime;
 
-    private String description;
+    private String record;
 
     @Enumerated(EnumType.STRING)
     private ScheduleStatus status;
@@ -78,12 +78,12 @@ public class SchedulerLog extends JpaAbstractAuditable<@NonNull String, @NonNull
         this.nextExecuteTime = nextExecuteTime;
     }
 
-    public String getDescription() {
-        return description;
+    public String getRecord() {
+        return record;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setRecord(String record) {
+        this.record = record;
     }
 
     public ScheduleStatus getStatus() {
