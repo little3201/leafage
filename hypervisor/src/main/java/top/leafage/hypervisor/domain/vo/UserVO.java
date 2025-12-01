@@ -26,19 +26,36 @@ import top.leafage.hypervisor.domain.User;
 public record UserVO(
         Long id,
         String username,
-        boolean accountNonExpired,
-        boolean accountNonLocked,
-        boolean credentialsNonExpired,
+        String fullName,
+        String email,
+        String status,
         boolean enabled
 ) {
     public static UserVO from(User entity) {
         return new UserVO(
                 entity.getId(),
                 entity.getUsername(),
-                entity.isAccountNonExpired(),
-                entity.isAccountNonLocked(),
-                entity.isCredentialsNonExpired(),
+                entity.getFullName(),
+                mask(entity.getEmail()),
+                "ACTIVE",
                 entity.isEnabled()
         );
+    }
+
+    private static String mask(String email) {
+        if (email == null || email.isEmpty()) {
+            return "";
+        }
+
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 3) {
+            return email; // 邮箱太短不脱敏
+        }
+
+        String prefix = email.substring(0, 3);
+        String suffix = email.substring(atIndex);
+        int starCount = atIndex - 3;
+
+        return prefix + "*".repeat(starCount) + suffix;
     }
 }

@@ -39,7 +39,7 @@ public class User extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
     @Column(nullable = false)
     private String password;
 
-    private String name;
+    private String fullName;
 
     private String email;
 
@@ -55,10 +55,10 @@ public class User extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
     public User() {
     }
 
-    public User(String username, String password, String name, String email) {
+    public User(String username, String password, String fullName, String email) {
         this.username = username;
         this.password = password;
-        this.name = name;
+        this.fullName = fullName;
         this.email = email;
     }
 
@@ -78,12 +78,12 @@ public class User extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getEmail() {

@@ -24,9 +24,11 @@ import org.springframework.security.web.csrf.CsrfLogoutHandler;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcherEntry;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -77,12 +79,12 @@ public class SecurityConfiguration {
                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML);
         textHtmlMatcher.setUseEquals(true);
 
-        List<RequestMatcherEntry<@NonNull AuthenticationEntryPoint>> entryPoints = new ArrayList<>();
-        RequestMatcherEntry<@NonNull AuthenticationEntryPoint> requestMatcherEntry = new RequestMatcherEntry<>(textHtmlMatcher,
-                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-        entryPoints.add(requestMatcherEntry);
+        LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> entryPoints = new LinkedHashMap<>();
+        entryPoints.put(textHtmlMatcher, authenticationEntryPoint);
 
-        return new DelegatingAuthenticationEntryPoint(authenticationEntryPoint, entryPoints);
+        DelegatingAuthenticationEntryPoint delegatingAuthenticationEntryPoint = new DelegatingAuthenticationEntryPoint(entryPoints);
+        delegatingAuthenticationEntryPoint.setDefaultEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+        return delegatingAuthenticationEntryPoint;
     }
 
     private LogoutHandler logoutHandler(CsrfTokenRepository csrfTokenRepository) {
