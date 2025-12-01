@@ -65,7 +65,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new UserVO(1L, "test", true, true, true, true);
+        vo = new UserVO(1L, "test", "test", "test@example.com", "ACTIVE", true);
 
         dto = new UserDTO();
         dto.setUsername("test");
