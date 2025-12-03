@@ -17,6 +17,8 @@ package top.leafage.assets.domain.vo;
 
 import top.leafage.assets.domain.FileRecord;
 
+import java.time.LocalDateTime;
+
 /**
  * vo class for file record.
  *
@@ -25,17 +27,27 @@ import top.leafage.assets.domain.FileRecord;
 public record FileRecordVO(
         Long id,
         String name,
+        String extension,
         String path,
-        String mimeType,
-        float size
+        String contentType,
+        long size,
+        boolean directory,
+        boolean regularFile,
+        boolean symbolicLink,
+        LocalDateTime lastModifiedDate
 ) {
     public static FileRecordVO from(FileRecord entity) {
         return new FileRecordVO(
                 entity.getId(),
                 entity.getName(),
+                entity.getExtension(),
                 entity.getPath(),
-                entity.getMimeType(),
-                entity.getSize()
+                entity.getContentType(),
+                entity.getSize(),
+                entity.isDirectory(),
+                entity.isRegularFile(),
+                entity.isSymbolicLink(),
+                entity.getLastModifiedDate().isPresent() ? entity.getLastModifiedDate().get() : null
         );
     }
 }

@@ -40,7 +40,7 @@ public class Region extends JpaAbstractAuditable<@NonNull String, @NonNull Long>
 
     private String areaCode;
 
-    private Integer postalCode;
+    private String postalCode;
 
     private String description;
 
@@ -49,7 +49,7 @@ public class Region extends JpaAbstractAuditable<@NonNull String, @NonNull Long>
     public Region() {
     }
 
-    public Region(String name, Long superiorId, String areaCode, Integer postalCode, String description) {
+    public Region(String name, Long superiorId, String areaCode, String postalCode, String description) {
         this.name = name;
         this.superiorId = superiorId;
         this.areaCode = areaCode;
@@ -81,11 +81,11 @@ public class Region extends JpaAbstractAuditable<@NonNull String, @NonNull Long>
         this.areaCode = areaCode;
     }
 
-    public Integer getPostalCode() {
+    public String getPostalCode() {
         return postalCode;
     }
 
-    public void setPostalCode(Integer postalCode) {
+    public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
 

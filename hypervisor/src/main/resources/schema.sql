@@ -22,7 +22,7 @@ CREATE TABLE "public"."access_logs"
 )
 ;
 COMMENT
-ON COLUMN "public"."access_logs"."id" IS 'the pk.';
+ON COLUMN "public"."access_logs"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."access_logs"."url" IS '接口';
 COMMENT
@@ -77,7 +77,7 @@ CREATE TABLE "public"."audit_logs"
 )
 ;
 COMMENT
-ON COLUMN "public"."audit_logs"."id" IS 'the pk.，自增';
+ON COLUMN "public"."audit_logs"."id" IS '主键，自增';
 COMMENT
 ON COLUMN "public"."audit_logs"."operation" IS '操作类型';
 COMMENT
@@ -119,7 +119,7 @@ CREATE TABLE "public"."authorities"
 )
 ;
 COMMENT
-ON COLUMN "public"."authorities"."id" IS 'the pk.';
+ON COLUMN "public"."authorities"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."authorities"."username" IS '用户名';
 COMMENT
@@ -145,7 +145,7 @@ CREATE TABLE "public"."dictionaries"
 )
 ;
 COMMENT
-ON COLUMN "public"."dictionaries"."id" IS 'the pk.';
+ON COLUMN "public"."dictionaries"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."dictionaries"."name" IS '名称';
 COMMENT
@@ -185,7 +185,7 @@ CREATE TABLE "public"."file_records"
 )
 ;
 COMMENT
-ON COLUMN "public"."file_records"."id" IS 'the pk.';
+ON COLUMN "public"."file_records"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."file_records"."name" IS '名称';
 COMMENT
@@ -221,7 +221,7 @@ CREATE TABLE "public"."group_authorities"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_authorities"."id" IS 'the pk.';
+ON COLUMN "public"."group_authorities"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."group_authorities"."group_id" IS '用户组ID';
 COMMENT
@@ -241,7 +241,7 @@ CREATE TABLE "public"."group_members"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_members"."id" IS 'the pk.';
+ON COLUMN "public"."group_members"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."group_members"."group_id" IS '用户组ID';
 COMMENT
@@ -261,7 +261,7 @@ CREATE TABLE "public"."group_privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_privilege_actions"."id" IS 'the pk.';
+ON COLUMN "public"."group_privilege_actions"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."group_privilege_actions"."group_privilege_id" IS '分组权限ID';
 COMMENT
@@ -281,7 +281,7 @@ CREATE TABLE "public"."group_privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_privileges"."id" IS 'the pk.';
+ON COLUMN "public"."group_privileges"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."group_privileges"."group_id" IS '分组ID';
 COMMENT
@@ -301,7 +301,7 @@ CREATE TABLE "public"."group_roles"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_roles"."id" IS 'the pk.';
+ON COLUMN "public"."group_roles"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."group_roles"."group_id" IS '用户组ID';
 COMMENT
@@ -327,7 +327,7 @@ CREATE TABLE "public"."groups"
 )
 ;
 COMMENT
-ON COLUMN "public"."groups"."id" IS 'the pk.';
+ON COLUMN "public"."groups"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."groups"."group_name" IS '名称';
 COMMENT
@@ -367,7 +367,7 @@ CREATE TABLE "public"."messages"
 )
 ;
 COMMENT
-ON COLUMN "public"."messages"."id" IS 'the pk.';
+ON COLUMN "public"."messages"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."messages"."title" IS '标题';
 COMMENT
@@ -419,7 +419,7 @@ CREATE TABLE "public"."operation_logs"
 )
 ;
 COMMENT
-ON COLUMN "public"."operation_logs"."id" IS 'the pk.';
+ON COLUMN "public"."operation_logs"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."operation_logs"."operation" IS '操作';
 COMMENT
@@ -471,7 +471,7 @@ CREATE TABLE "public"."privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."privilege_actions"."id" IS 'the pk.';
+ON COLUMN "public"."privilege_actions"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."privilege_actions"."privilege_id" IS '权限ID';
 COMMENT
@@ -501,7 +501,7 @@ CREATE TABLE "public"."privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."privileges"."id" IS 'the pk.';
+ON COLUMN "public"."privileges"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."privileges"."superior_id" IS '上级ID';
 COMMENT
@@ -541,7 +541,7 @@ CREATE TABLE "public"."role_members"
 )
 ;
 COMMENT
-ON COLUMN "public"."role_members"."id" IS 'the pk.';
+ON COLUMN "public"."role_members"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."role_members"."role_id" IS '角色ID';
 COMMENT
@@ -561,7 +561,7 @@ CREATE TABLE "public"."role_privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."role_privilege_actions"."id" IS 'the pk.';
+ON COLUMN "public"."role_privilege_actions"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."role_privilege_actions"."role_privilege_id" IS '角色权限ID';
 COMMENT
@@ -581,7 +581,7 @@ CREATE TABLE "public"."role_privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."role_privileges"."id" IS 'the pk.';
+ON COLUMN "public"."role_privileges"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."role_privileges"."role_id" IS '角色ID';
 COMMENT
@@ -606,7 +606,7 @@ CREATE TABLE "public"."roles"
 )
 ;
 COMMENT
-ON COLUMN "public"."roles"."id" IS 'the pk.';
+ON COLUMN "public"."roles"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."roles"."name" IS '名称';
 COMMENT
@@ -636,7 +636,7 @@ CREATE TABLE "public"."user_privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."user_privilege_actions"."id" IS 'the pk.';
+ON COLUMN "public"."user_privilege_actions"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."user_privilege_actions"."user_privilege_id" IS '用户权限ID';
 COMMENT
@@ -656,7 +656,7 @@ CREATE TABLE "public"."user_privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."user_privileges"."id" IS 'the pk.';
+ON COLUMN "public"."user_privileges"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."user_privileges"."username" IS '账号';
 COMMENT
@@ -687,7 +687,7 @@ CREATE TABLE "public"."users"
 )
 ;
 COMMENT
-ON COLUMN "public"."users"."id" IS 'the pk.';
+ON COLUMN "public"."users"."id" IS '主键';
 COMMENT
 ON COLUMN "public"."users"."username" IS '用户名';
 COMMENT

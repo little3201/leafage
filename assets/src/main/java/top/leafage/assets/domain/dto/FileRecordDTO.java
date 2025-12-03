@@ -15,51 +15,6 @@
 
 package top.leafage.assets.domain.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
 public class FileRecordDTO {
 
-    @NotBlank
-    private String name;
-
-    @NotBlank
-    private String path;
-
-    @NotBlank
-    private String mimeType;
-
-    private float size;
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public float getSize() {
-        return size;
-    }
-
-    public void setSize(float size) {
-        this.size = size;
-    }
 }

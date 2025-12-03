@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import top.leafage.assets.domain.FileRecord;
 import top.leafage.assets.domain.vo.FileRecordVO;
@@ -54,6 +55,9 @@ public class FileRecordServiceImpl implements FileRecordService {
 
         Specification<@NonNull FileRecord> spec = (root, query, cb) ->
                 buildPredicate(filters, cb, root).orElse(null);
+        if (!StringUtils.hasText(filters) || !filters.contains("superiorId")) {
+            spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
+        }
 
         return fileRecordRepository.findAll(spec, pageable)
                 .map(FileRecordVO::from);
@@ -70,12 +74,23 @@ public class FileRecordServiceImpl implements FileRecordService {
 
     @Override
     public FileRecordVO upload(MultipartFile file) {
-        FileRecord fileRecord = new FileRecord();
-        fileRecord.setName(file.getName());
-        fileRecord.setMimeType(Objects.requireNonNull(file.getContentType()));
-        fileRecord.setSize(file.getSize());
-        fileRecord = fileRecordRepository.saveAndFlush(fileRecord);
-        return FileRecordVO.from(fileRecord);
+        FileRecord record = new FileRecord();
+        record.setName(file.getName());
+        if (file.getOriginalFilename() != null) {
+            String originalFilename = file.getOriginalFilename();
+            int lastDot = originalFilename.lastIndexOf('.');
+            if (lastDot > 0) {
+                record.setExtension(originalFilename.substring(lastDot + 1));
+            }
+        }
+        record.setPath("");
+        record.setContentType(Objects.requireNonNull(file.getContentType()));
+        record.setSize(file.getSize());
+        record.setDirectory(false);
+        record.setRegularFile(true);
+        record.setSymbolicLink(false);
+        FileRecord entity = fileRecordRepository.saveAndFlush(record);
+        return FileRecordVO.from(entity);
     }
 
     @Override

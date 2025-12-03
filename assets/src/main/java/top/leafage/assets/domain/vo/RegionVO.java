@@ -26,8 +26,9 @@ public record RegionVO(
         Long id,
         String name,
         String areaCode,
-        Integer postalCode,
-        String description
+        String postalCode,
+        String description,
+        boolean enabled
 ) {
     public static RegionVO from(Region entity) {
         return new RegionVO(
@@ -35,7 +36,8 @@ public record RegionVO(
                 entity.getName(),
                 entity.getAreaCode(),
                 entity.getPostalCode(),
-                entity.getDescription()
+                entity.getDescription(),
+                entity.isEnabled()
         );
     }
 }

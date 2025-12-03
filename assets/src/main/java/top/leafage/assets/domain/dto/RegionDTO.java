@@ -32,7 +32,7 @@ public class RegionDTO {
 
     private String areaCode;
 
-    private Integer postalCode;
+    private String postalCode;
 
     private String description;
 
@@ -71,11 +71,11 @@ public class RegionDTO {
         this.areaCode = areaCode;
     }
 
-    public Integer getPostalCode() {
+    public String getPostalCode() {
         return postalCode;
     }
 
-    public void setPostalCode(Integer postalCode) {
+    public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
 
