@@ -17,11 +17,11 @@
 
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.Privilege;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.Privilege;
 
 /**
  * privilege repository
@@ -46,15 +46,6 @@ public interface PrivilegeRepository extends R2dbcRepository<Privilege, Long> {
      * @return true-是，false-否
      */
     Mono<Boolean> existsByName(String name);
-
-    /**
-     * 是否已存在
-     *
-     * @param name 名称
-     * @param id   主键
-     * @return true-是，false-否
-     */
-    Mono<Boolean> existsByNameAndIdNot(String name, Long id);
 
     /**
      * 统计

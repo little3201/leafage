@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024.  little3201.
+ * Copyright (c) 2024-2025.  little3201.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,27 +11,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+package top.leafage.assets.domain.vo;
 
-package top.leafage.exploiter.vo;
-
-import top.leafage.exploiter.domain.superclass.ConnectionModel;
+import top.leafage.assets.domain.Tag;
 
 /**
- * vo class for connection.
+ * vo class for tag.
  *
  * @author wq li
  */
-public class ConnectionVO extends ConnectionModel {
-
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+public record TagVO(
+        Long id,
+        String name
+) {
+    public static TagVO from(Tag entity) {
+        return new TagVO(
+                entity.getId(),
+                entity.getName()
+        );
     }
 }

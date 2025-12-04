@@ -16,13 +16,16 @@
  */
 package top.leafage.assets.domain;
 
+import org.jspecify.annotations.NonNull;
 import top.leafage.assets.domain.superclass.PostModel;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
 import org.springframework.data.relational.core.mapping.Table;
+import top.leafage.common.data.domain.AbstractAuditable;
 
 import java.time.Instant;
+import java.util.Set;
 
 /**
  * entity class for posts.
@@ -30,52 +33,59 @@ import java.time.Instant;
  * @author wq li
  */
 @Table(name = "posts")
-public class Post extends PostModel {
+public class Post extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    private Long id;
+    private String title;
 
-    private String status;
+    private String summary;
 
-    @Column(value = "published_at")
+    private String body;
+
+    private Set<String> tags;
+
     private Instant publishedAt;
 
-    @InsertOnlyProperty
-    @CreatedBy
-    @Column(value = "created_by")
-    private String createdBy;
 
-    @InsertOnlyProperty
-    @CreatedDate
-    @Column(value = "created_date")
-    private Instant createdDate;
-
-    @LastModifiedBy
-    @Column(value = "last_modified_by")
-    private String lastModifiedBy;
-
-    @LastModifiedDate
-    @Column(value = "last_modified_date")
-    private Instant lastModifiedDate;
-
-
-    public Long getId() {
-        return id;
+    public Post() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Post(String title, String summary, String body, Set<String> tags) {
+        this.title = title;
+        this.summary = summary;
+        this.body = body;
+        this.tags = tags;
     }
 
-    public String getStatus() {
-        return status;
+    public String getTitle() {
+        return title;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public Set<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
     }
 
     public Instant getPublishedAt() {
@@ -84,37 +94,5 @@ public class Post extends PostModel {
 
     public void setPublishedAt(Instant publishedAt) {
         this.publishedAt = publishedAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 }

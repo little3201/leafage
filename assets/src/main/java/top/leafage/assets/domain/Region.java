@@ -17,11 +17,13 @@
 
 package top.leafage.assets.domain;
 
+import org.jspecify.annotations.NonNull;
 import top.leafage.assets.domain.superclass.RegionModel;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
 import org.springframework.data.relational.core.mapping.Table;
+import top.leafage.common.data.domain.AbstractAuditable;
 
 import java.time.Instant;
 
@@ -31,70 +33,76 @@ import java.time.Instant;
  * @author wq li
  */
 @Table(name = "regions")
-public class Region extends RegionModel {
+public class Region extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    private Long id;
+    private String name;
 
-    @InsertOnlyProperty
-    @CreatedBy
-    @Column(value = "created_by")
-    private String createdBy;
+    private Long superiorId;
 
-    @InsertOnlyProperty
-    @CreatedDate
-    @Column(value = "created_date")
-    private Instant createdDate;
+    private String areaCode;
 
-    @LastModifiedBy
-    @Column(value = "last_modified_by")
-    private String lastModifiedBy;
+    private String postalCode;
 
-    @LastModifiedDate
-    @Column(value = "last_modified_date")
-    private Instant lastModifiedDate;
+    private String description;
 
+    private boolean enabled = true;
 
-    public Long getId() {
-        return id;
+    public Region() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Region(String name, Long superiorId, String areaCode, String postalCode, String description) {
+        this.name = name;
+        this.superiorId = superiorId;
+        this.areaCode = areaCode;
+        this.postalCode = postalCode;
+        this.description = description;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public String getName() {
+        return name;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Instant getCreatedDate() {
-        return createdDate;
+    public Long getSuperiorId() {
+        return superiorId;
     }
 
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
     }
 
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
+    public String getAreaCode() {
+        return areaCode;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
     }
 
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
+    public String getPostalCode() {
+        return postalCode;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

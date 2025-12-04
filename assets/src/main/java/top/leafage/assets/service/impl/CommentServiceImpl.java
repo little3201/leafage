@@ -17,16 +17,15 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Comment;
-import top.leafage.assets.dto.CommentDTO;
-import top.leafage.assets.repository.CommentRepository;
-import top.leafage.assets.service.CommentService;
-import top.leafage.assets.vo.CommentVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.CommentDTO;
+import top.leafage.assets.domain.vo.CommentVO;
+import top.leafage.assets.repository.CommentRepository;
+import top.leafage.assets.service.CommentService;
 
 
 /**
@@ -53,10 +52,10 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Flux<CommentVO> comments(Long postId) {
-        Assert.notNull(postId, "postId must not be null.");
+        Assert.notNull(postId, String.format(_MUST_NOT_BE_NULL, "postId"));
 
         return commentRepository.findByPostIdAndReplierIsNull(postId)
-                .map(c -> convertToVO(c, CommentVO.class));
+                .map(CommentVO::from);
     }
 
     /**
@@ -64,10 +63,10 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Flux<CommentVO> replies(Long replier) {
-        Assert.notNull(replier, "replier must not be null.");
+        Assert.notNull(replier, String.format(_MUST_NOT_BE_NULL, "replier"));
 
         return commentRepository.findByReplier(replier)
-                .map(c -> convertToVO(c, CommentVO.class));
+                .map(CommentVO::from);
     }
 
     /**
@@ -76,8 +75,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<CommentVO> create(CommentDTO dto) {
-        return commentRepository.save(convertToDomain(dto, Comment.class))
-                .map(c -> convertToVO(c, CommentVO.class));
+        return commentRepository.save(CommentDTO.toEntity(dto))
+                .map(CommentVO::from);
     }
 
 }

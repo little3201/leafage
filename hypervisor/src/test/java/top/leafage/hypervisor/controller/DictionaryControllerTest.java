@@ -17,15 +17,11 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.domain.dto.DictionaryDTO;
-import top.leafage.hypervisor.service.DictionaryService;
-import top.leafage.hypervisor.domain.vo.DictionaryVO;
-import top.leafage.hypervisor.domain.vo.UserVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,11 +30,14 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.dto.DictionaryDTO;
+import top.leafage.hypervisor.domain.vo.DictionaryVO;
+import top.leafage.hypervisor.domain.vo.UserVO;
+import top.leafage.hypervisor.service.DictionaryService;
 
 import java.util.List;
 
@@ -52,7 +51,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  **/
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(DictionaryController.class)
 class DictionaryControllerTest {
 
@@ -68,19 +66,16 @@ class DictionaryControllerTest {
     @BeforeEach
     void setUp() {
         dto = new DictionaryDTO();
-        dto.setName("Gender");
+        dto.setName("test");
         dto.setDescription("描述");
 
-        vo = new DictionaryVO();
-        vo.setId(1L);
-        vo.setName("test");
-        vo.setDescription("性别-男");
+        vo = new DictionaryVO(1L, "test", null, "description", true);
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<DictionaryVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull DictionaryVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
@@ -93,7 +88,7 @@ class DictionaryControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(DictionaryVO.class);
+                .expectBodyList(DictionaryVO.class).hasSize(1).contains(vo);
     }
 
     @Test
@@ -152,7 +147,6 @@ class DictionaryControllerTest {
 
     @Test
     void create() {
-        given(this.dictionaryService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.dictionaryService.create(any(DictionaryDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
@@ -163,7 +157,6 @@ class DictionaryControllerTest {
 
     @Test
     void create_error() {
-        given(this.dictionaryService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.dictionaryService.create(any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/dictionaries").bodyValue(dto)
@@ -173,7 +166,6 @@ class DictionaryControllerTest {
 
     @Test
     void modify() {
-        given(this.dictionaryService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/dictionaries/{id}", 1L)
@@ -186,7 +178,6 @@ class DictionaryControllerTest {
 
     @Test
     void modify_error() {
-        given(this.dictionaryService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.dictionaryService.modify(anyLong(), any(DictionaryDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/dictionaries/{id}", 1L)

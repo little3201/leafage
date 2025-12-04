@@ -17,10 +17,6 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.RegionDTO;
-import top.leafage.assets.service.RegionService;
-import top.leafage.assets.vo.RegionVO;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,9 +26,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.RegionVO;
+import top.leafage.assets.service.RegionService;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
-
-import javax.management.openmbean.KeyAlreadyExistsException;
 
 /**
  * region controller
@@ -102,14 +99,9 @@ public class RegionController {
      * @return 修改后的信息
      */
     @PostMapping
-    public Mono<RegionVO> create(@RequestBody @Valid RegionDTO dto) {
-        return regionService.exists(dto.getName(), null).flatMap(exists -> {
-            if (exists) {
-                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
-            } else {
-                return regionService.create(dto);
-            }
-        }).doOnError(e -> logger.error("Create region occurred an error: ", e));
+    public Mono<RegionVO> create(@RequestBody @Validated RegionDTO dto) {
+        return regionService.create(dto)
+                .doOnError(e -> logger.error("Create region occurred an error: ", e));
     }
 
     /**
@@ -120,14 +112,9 @@ public class RegionController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<RegionVO> modify(@PathVariable Long id, @RequestBody @Valid RegionDTO dto) {
-        return regionService.exists(dto.getName(), id).flatMap(exists -> {
-            if (exists) {
-                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
-            } else {
-                return regionService.modify(id, dto);
-            }
-        }).doOnError(e -> logger.error("Modify region occurred an error: ", e));
+    public Mono<RegionVO> modify(@PathVariable Long id, @RequestBody @Validated RegionDTO dto) {
+        return regionService.modify(id, dto)
+                .doOnError(e -> logger.error("Modify region occurred an error: ", e));
     }
 
     /**

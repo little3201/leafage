@@ -17,9 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Group;
-import top.leafage.hypervisor.domain.dto.GroupDTO;
-import top.leafage.hypervisor.repository.GroupRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,9 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.Group;
+import top.leafage.hypervisor.domain.dto.GroupDTO;
+import top.leafage.hypervisor.repository.GroupRepository;
 
 import java.util.List;
 
@@ -65,9 +65,9 @@ class GroupServiceImplTest {
     void setUp() {
         dto = new GroupDTO();
         dto.setName("test");
+        dto.setDescription("description");
 
-        entity = new Group();
-        entity.setName("test");
+        entity = GroupDTO.toEntity(dto);
     }
 
     @Test
@@ -132,17 +132,4 @@ class GroupServiceImplTest {
         StepVerifier.create(groupService.remove(anyLong())).verifyComplete();
     }
 
-    @Test
-    void exists() {
-        given(this.groupRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(groupService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.groupRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(groupService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
-    }
 }

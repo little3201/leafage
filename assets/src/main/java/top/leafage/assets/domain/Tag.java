@@ -16,13 +16,9 @@
  */
 package top.leafage.assets.domain;
 
-import top.leafage.assets.domain.superclass.TagModel;
-import org.springframework.data.annotation.*;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
+import top.leafage.common.data.domain.AbstractAuditable;
 
 /**
  * entity class for tag.
@@ -30,70 +26,16 @@ import java.time.Instant;
  * @author wq li
  */
 @Table(name = "tags")
-public class Tag extends TagModel {
+public class Tag extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    private Long id;
-
-    @InsertOnlyProperty
-    @CreatedBy
-    @Column(value = "created_by")
-    private String createdBy;
-
-    @InsertOnlyProperty
-    @CreatedDate
-    @Column(value = "created_date")
-    private Instant createdDate;
-
-    @LastModifiedBy
-    @Column(value = "last_modified_by")
-    private String lastModifiedBy;
-
-    @LastModifiedDate
-    @Column(value = "last_modified_date")
-    private Instant lastModifiedDate;
+    private String name;
 
 
-    public Long getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setName(String name) {
+        this.name = name;
     }
 }

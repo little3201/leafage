@@ -17,15 +17,11 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.domain.dto.UserDTO;
-import top.leafage.hypervisor.service.UserService;
-import top.leafage.hypervisor.domain.vo.PrivilegeVO;
-import top.leafage.hypervisor.domain.vo.UserVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,13 +30,15 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.dto.UserDTO;
+import top.leafage.hypervisor.domain.vo.PrivilegeVO;
+import top.leafage.hypervisor.domain.vo.UserVO;
+import top.leafage.hypervisor.service.UserService;
 
-import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -53,7 +51,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(UserController.class)
 class UserControllerTest {
 
@@ -70,23 +67,17 @@ class UserControllerTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setAvatar("avatar.jpg");
-        dto.setName("john steven");
-        dto.setAccountExpiresAt(Instant.now());
-        dto.setCredentialsExpiresAt(Instant.now());
+        dto.setFullName("Tom");
+        dto.setEmail("test@example.com");
 
-        vo = new UserVO();
-        vo.setId(1L);
-        vo.setUsername("test");
-        vo.setAccountExpiresAt(Instant.now());
-        vo.setName("john steven");
+        vo = new UserVO(1L, "test", "test", "test@example.com", "ACTIVE", true);
     }
 
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<UserVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull UserVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.userService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
@@ -152,7 +143,6 @@ class UserControllerTest {
 
     @Test
     void created() {
-        given(this.userService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.userService.create(any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/users").bodyValue(dto).exchange()
@@ -162,7 +152,6 @@ class UserControllerTest {
 
     @Test
     void modify() {
-        given(this.userService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.userService.modify(anyLong(), any(UserDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()
@@ -172,7 +161,6 @@ class UserControllerTest {
 
     @Test
     void modify_error() {
-        given(this.userService.exists(anyString(), anyLong())).willReturn(Mono.just(false));
         given(this.userService.modify(anyLong(), any(UserDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/users/{id}", 1L).bodyValue(dto).exchange()

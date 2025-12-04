@@ -17,11 +17,6 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Post;
-import top.leafage.assets.domain.PostBody;
-import top.leafage.assets.dto.PostDTO;
-import top.leafage.assets.repository.PostBodyRepository;
-import top.leafage.assets.repository.PostRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +30,9 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.assets.domain.Post;
+import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.repository.PostRepository;
 
 import java.util.Set;
 
@@ -56,9 +54,6 @@ class PostServiceImplTest {
 
     @Mock
     private R2dbcEntityTemplate r2dbcEntityTemplate;
-
-    @Mock
-    private PostBodyRepository postBodyRepository;
 
     @InjectMocks
     private PostServiceImpl postsService;
@@ -102,30 +97,13 @@ class PostServiceImplTest {
     void fetch() {
         given(this.postRepository.findById(anyLong())).willReturn(Mono.just(mock(Post.class)));
 
-        given(this.postBodyRepository.getByPostId(anyLong())).willReturn(Mono.just(mock(PostBody.class)));
-
         StepVerifier.create(this.postsService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
-    @Test
-    void exists() {
-        given(this.postRepository.existsByTitleAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(postsService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.postRepository.existsByTitle(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(postsService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
-    }
 
     @Test
     void create() {
         given(this.postRepository.save(any(Post.class))).willReturn(Mono.just(mock(Post.class)));
-
-        given(this.postBodyRepository.save(any(PostBody.class))).willReturn(Mono.empty());
 
         StepVerifier.create(this.postsService.create(mock(PostDTO.class))).verifyComplete();
     }
@@ -136,29 +114,14 @@ class PostServiceImplTest {
 
         given(this.postRepository.save(any(Post.class))).willReturn(Mono.just(mock(Post.class)));
 
-        given(this.postBodyRepository.getByPostId(anyLong())).willReturn(Mono.just(mock(PostBody.class)));
-
-        given(this.postBodyRepository.save(any(PostBody.class))).willReturn(Mono.empty());
-
         StepVerifier.create(this.postsService.modify(1L, dto)).verifyComplete();
     }
 
     @Test
     void remove() {
-        given(this.postBodyRepository.getByPostId(anyLong())).willReturn(Mono.just(mock(PostBody.class)));
-
-        given(this.postBodyRepository.deleteById(anyLong())).willReturn(Mono.empty());
-
         given(this.postRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
         StepVerifier.create(postsService.remove(anyLong())).verifyComplete();
-    }
-
-    @Test
-    void search() {
-        given(this.postRepository.findAllByTitle(anyString())).willReturn(Flux.just(mock(Post.class)));
-
-        StepVerifier.create(postsService.search("test")).expectNextCount(1).verifyComplete();
     }
 
 }

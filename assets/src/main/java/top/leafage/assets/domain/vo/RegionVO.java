@@ -13,24 +13,31 @@
  * limitations under the License.
  */
 
-package top.leafage.assets.vo;
+package top.leafage.assets.domain.vo;
 
-import top.leafage.assets.domain.superclass.FileRecordModel;
+import top.leafage.assets.domain.Region;
 
 /**
- * vo class for file record.
+ * vo class for region.
  *
  * @author wq li
  */
-public class FileRecordVO extends FileRecordModel {
-
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+public record RegionVO(
+        Long id,
+        String name,
+        String areaCode,
+        String postalCode,
+        String description,
+        boolean enabled
+) {
+    public static RegionVO from(Region entity) {
+        return new RegionVO(
+                entity.getId(),
+                entity.getName(),
+                entity.getAreaCode(),
+                entity.getPostalCode(),
+                entity.getDescription(),
+                entity.isEnabled()
+        );
     }
 }

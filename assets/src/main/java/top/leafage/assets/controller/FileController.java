@@ -17,12 +17,9 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.service.FileRecordService;
-import top.leafage.assets.service.FileStorageService;
-import top.leafage.assets.vo.FileRecordVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.PathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -36,11 +33,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.vo.FileRecordVO;
+import top.leafage.assets.service.FileRecordService;
 
 import java.io.FileNotFoundException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
 
 /**
  * file controller.
@@ -55,16 +53,14 @@ public class FileController {
     private final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     private final FileRecordService fileRecordService;
-    private final FileStorageService fileStorageService;
 
     /**
      * <p>Constructor for RegionController.</p>
      * <p>
      * //     * @param regionService a {@link FileRecordService} object
      */
-    public FileController(FileRecordService fileRecordService, FileStorageService fileStorageService) {
+    public FileController(FileRecordService fileRecordService) {
         this.fileRecordService = fileRecordService;
-        this.fileStorageService = fileStorageService;
     }
 
     /**
@@ -106,15 +102,7 @@ public class FileController {
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
     public Mono<FileRecordVO> upload(FilePart file) {
-        return fileRecordService.exists(file.filename(), null)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.error(new FileAlreadyExistsException("File already exists: " + file.filename()));
-                    } else {
-                        return fileStorageService.upload(file)
-                                .flatMap(fileRecordService::create);
-                    }
-                })
+        return fileRecordService.upload(file)
                 .doOnSuccess(vo -> logger.debug("File uploaded successfully: {}", file.filename()))
                 .doOnError(e -> logger.error("Upload file error: {}", file.filename(), e));
     }
@@ -131,8 +119,8 @@ public class FileController {
         return fileRecordService.fetch(id)
                 .switchIfEmpty(Mono.error(new FileNotFoundException("File not found.")))
                 .flatMap(vo -> {
-                    Resource resource = new PathResource(vo.getPath());
-                    String fileName = URLEncoder.encode(vo.getName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+                    Resource resource = new FileSystemResource(vo.path());
+                    String fileName = URLEncoder.encode(vo.name(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
                     response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
                     response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=" + fileName + ";filename*=UTF_8''" + fileName);

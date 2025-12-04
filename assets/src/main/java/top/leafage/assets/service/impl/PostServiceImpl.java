@@ -17,13 +17,7 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Post;
-import top.leafage.assets.domain.PostBody;
-import top.leafage.assets.dto.PostDTO;
-import top.leafage.assets.repository.PostBodyRepository;
-import top.leafage.assets.repository.PostRepository;
-import top.leafage.assets.service.PostService;
-import top.leafage.assets.vo.PostVO;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +27,12 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+import top.leafage.assets.domain.Post;
+import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.domain.vo.PostVO;
+import top.leafage.assets.repository.PostRepository;
+import top.leafage.assets.service.PostService;
 
 import java.util.NoSuchElementException;
 
@@ -48,19 +45,17 @@ import java.util.NoSuchElementException;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostBodyRepository postBodyRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
+    private static final BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
 
 
     /**
      * <p>Constructor for PostServiceImpl.</p>
      *
-     * @param postRepository     a {@link PostRepository} object
-     * @param postBodyRepository a {@link PostBodyRepository} object
+     * @param postRepository a {@link PostRepository} object
      */
-    public PostServiceImpl(PostRepository postRepository, PostBodyRepository postBodyRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
+    public PostServiceImpl(PostRepository postRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
         this.postRepository = postRepository;
-        this.postBodyRepository = postBodyRepository;
         this.r2dbcEntityTemplate = r2dbcEntityTemplate;
     }
 
@@ -75,7 +70,7 @@ public class PostServiceImpl implements PostService {
         return r2dbcEntityTemplate.select(Post.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()
-                .map(post -> convertToVO(post, PostVO.class))
+                .map(PostVO::from)
                 .collectList()
                 .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Post.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
@@ -89,13 +84,8 @@ public class PostServiceImpl implements PostService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return postRepository.findById(id)
-                .flatMap(post -> postBodyRepository.getByPostId(post.getId())
-                        .map(postBody -> {
-                            PostVO vo = convertToVO(post, PostVO.class);
-                            vo.setBody(postBody.getBody());
-                            return vo;
-                        })
-                );
+                .switchIfEmpty(Mono.error(NoSuchElementException::new))
+                .map(PostVO::from);
     }
 
     /**
@@ -104,13 +94,13 @@ public class PostServiceImpl implements PostService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Mono<PostVO> create(PostDTO dto) {
-        return postRepository.save(convertToDomain(dto, Post.class))
-                .flatMap(p -> {
-                    PostBody postBody = new PostBody();
-                    postBody.setPostId(p.getId());
-                    postBody.setBody(dto.getBody());
-                    return postBodyRepository.save(postBody)
-                            .map(pc -> convertToVO(p, PostVO.class));
+        return postRepository.existsByTitle(dto.getTitle())
+                .flatMap(exists -> {
+                    if (exists) {
+                        throw new IllegalArgumentException("title already exists: " + dto.getTitle());
+                    }
+                    return postRepository.save(PostDTO.toEntity(dto))
+                            .map(PostVO::from);
                 });
     }
 
@@ -124,17 +114,11 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .map(post -> convert(dto, post))
-                .flatMap(postRepository::save)
-                .flatMap(p -> postBodyRepository.getByPostId(p.getId())
-                        .defaultIfEmpty(new PostBody())
-                        .doOnNext(postBody -> {
-                            postBody.setPostId(p.getId());
-                            postBody.setBody(dto.getBody());
-                        })
-                        .flatMap(postBodyRepository::save)
-                        .map(pc -> convertToVO(p, PostVO.class))
-                );
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return postRepository.save(existing);
+                })
+                .map(PostVO::from);
     }
 
     /**
@@ -143,35 +127,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
-        return postBodyRepository.getByPostId(id)
-                .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .flatMap(postBody -> postBodyRepository.deleteById(postBody.getId()))
-                .then(postRepository.deleteById(id));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Flux<PostVO> search(String keyword) {
-        Assert.hasText(keyword, "keyword must not be empty.");
-
-        return postRepository.findAllByTitle(keyword)
-                .map(post -> convertToVO(post, PostVO.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Mono<Boolean> exists(String title, Long id) {
-        Assert.hasText(title, "title must not be empty.");
-
-        if (id == null) {
-            return postRepository.existsByTitle(title);
-        }
-        return postRepository.existsByTitleAndIdNot(title, id);
+        return postRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new NoSuchElementException("post not found: " + id));
+                    }
+                    return postRepository.deleteById(id);
+                });
     }
 
 }

@@ -17,9 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Dictionary;
-import top.leafage.hypervisor.domain.dto.DictionaryDTO;
-import top.leafage.hypervisor.repository.DictionaryRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,9 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.Dictionary;
+import top.leafage.hypervisor.domain.dto.DictionaryDTO;
+import top.leafage.hypervisor.repository.DictionaryRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -62,12 +62,10 @@ class DictionaryServiceImplTest {
     @BeforeEach
     void setUp() {
         dto = new DictionaryDTO();
-        dto.setName("Gender");
+        dto.setName("test");
         dto.setDescription("描述");
 
-        entity = new Dictionary();
-        entity.setName("Gender");
-        entity.setDescription("描述");
+        entity = DictionaryDTO.toEntity(dto);
     }
 
     @Test
@@ -117,20 +115,6 @@ class DictionaryServiceImplTest {
         given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(mock(Dictionary.class)));
 
         StepVerifier.create(dictionaryService.modify(anyLong(), dto)).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void exists() {
-        given(this.dictionaryRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(dictionaryService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.dictionaryRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(dictionaryService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test

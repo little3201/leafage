@@ -17,9 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.User;
-import top.leafage.hypervisor.domain.dto.UserDTO;
-import top.leafage.hypervisor.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,8 +29,9 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.time.Instant;
+import top.leafage.hypervisor.domain.User;
+import top.leafage.hypervisor.domain.dto.UserDTO;
+import top.leafage.hypervisor.repository.UserRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -64,13 +62,10 @@ class UserServiceImplTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setName("john steven");
-        dto.setCredentialsExpiresAt(Instant.now());
+        dto.setFullName("test");
+        dto.setEmail("test@example.com");
 
-        entity = new User();
-        entity.setUsername("test");
-        entity.setName("john steven");
-        entity.setCredentialsExpiresAt(Instant.now());
+        entity = UserDTO.toEntity(dto, "123");
     }
 
     @Test
@@ -117,20 +112,6 @@ class UserServiceImplTest {
         given(this.userRepository.save(any(User.class))).willReturn(Mono.just(mock(User.class)));
 
         StepVerifier.create(userService.create(mock(UserDTO.class))).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void exists() {
-        given(this.userRepository.existsByUsernameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(userService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.userRepository.existsByUsername(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(userService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test

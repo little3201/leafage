@@ -17,9 +17,9 @@
 
 package top.leafage.hypervisor.service;
 
+import top.leafage.common.data.reactive.ReactiveCrudService;
 import top.leafage.hypervisor.domain.dto.MessageDTO;
 import top.leafage.hypervisor.domain.vo.MessageVO;
-import top.leafage.common.data.reactive.ReactiveCrudService;
 
 /**
  * message service

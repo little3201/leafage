@@ -44,9 +44,9 @@ import java.util.NoSuchElementException;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final BeanCopier copier = BeanCopier.create(UserDTO.class, User.class, false);
     private final UserRepository userRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(UserDTO.class, User.class, false);
 
     /**
      * <p>Constructor for UserServiceImpl.</p>
@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
             if (exists) {
                 return userRepository.deleteById(id);
             }
-            throw new NoSuchElementException("user not found: " + id);
+            return Mono.error(new NoSuchElementException("user not found: " + id));
         });
     }
 

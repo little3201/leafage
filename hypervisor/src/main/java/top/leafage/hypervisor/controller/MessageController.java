@@ -86,7 +86,7 @@ public class MessageController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<MessageVO> create(@RequestBody @Valid MessageDTO dto) {
+    public Mono<MessageVO> create(@RequestBody @Validated MessageDTO dto) {
         return messageService.create(dto)
                 .doOnError(e -> logger.error("Create message occurred an error: ", e));
     }

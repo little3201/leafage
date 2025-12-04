@@ -17,9 +17,6 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.FileRecord;
-import top.leafage.assets.dto.FileRecordDTO;
-import top.leafage.assets.repository.FileRecordRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,8 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.assets.domain.FileRecord;
+import top.leafage.assets.repository.FileRecordRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -56,14 +55,10 @@ class FileRecordServiceImplTest {
     @InjectMocks
     private FileRecordServiceImpl fileRecordService;
 
-    private FileRecordDTO dto;
     private FileRecord entity;
 
     @BeforeEach
     void setUp() {
-        dto = new FileRecordDTO();
-        dto.setName("test");
-
         entity = new FileRecord();
         entity.setName("test");
     }
@@ -93,27 +88,6 @@ class FileRecordServiceImplTest {
                 .willReturn(Mono.just(mock(FileRecord.class)));
 
         StepVerifier.create(fileRecordService.fetch(anyLong())).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void exists() {
-        given(this.fileRecordRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(fileRecordService.exists("test.xlsx", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.fileRecordRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(fileRecordService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void create() {
-        given(this.fileRecordRepository.save(any(FileRecord.class))).willReturn(Mono.just(mock(FileRecord.class)));
-
-        StepVerifier.create(fileRecordService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

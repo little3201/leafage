@@ -17,24 +17,21 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.TagDTO;
-import top.leafage.assets.service.TagService;
-import top.leafage.assets.vo.TagVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.vo.TagVO;
+import top.leafage.assets.service.TagService;
 
 import java.util.List;
 
@@ -48,7 +45,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(TagController.class)
 class TagControllerTest {
 
@@ -58,24 +54,17 @@ class TagControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private TagDTO dto;
     private TagVO vo;
 
     @BeforeEach
     void setUp() {
-        // 构造请求对象
-        dto = new TagDTO();
-        dto.setName("test");
-
-        vo = new TagVO();
-        vo.setId(1L);
-        vo.setName(dto.getName());
+        vo = new TagVO(1L, "test");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<TagVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull TagVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.tagService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(Mono.just(page));
 
@@ -122,56 +111,6 @@ class TagControllerTest {
         given(this.tagService.fetch(anyLong())).willThrow(new RuntimeException());
 
         webTestClient.get().uri("/tags/{id}", 1L)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    void create() {
-        given(this.tagService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
-        given(this.tagService.create(any(TagDTO.class))).willReturn(Mono.just(vo));
-
-        webTestClient.mutateWith(csrf()).post().uri("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.name").isEqualTo("test");
-    }
-
-    @Test
-    void create_error() {
-        given(this.tagService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
-        given(this.tagService.create(any(TagDTO.class))).willThrow(new RuntimeException());
-
-        webTestClient.mutateWith(csrf()).post().uri("/tags")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    void modify() {
-        given(this.tagService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
-        given(this.tagService.modify(anyLong(), any(TagDTO.class))).willReturn(Mono.just(vo));
-
-        webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.name").isEqualTo("test");
-    }
-
-    @Test
-    void modify_error() {
-        given(this.tagService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
-        given(this.tagService.modify(anyLong(), any(TagDTO.class))).willThrow(new RuntimeException());
-
-        webTestClient.mutateWith(csrf()).put().uri("/tags/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(dto)
                 .exchange()
                 .expectStatus().is5xxServerError();
     }

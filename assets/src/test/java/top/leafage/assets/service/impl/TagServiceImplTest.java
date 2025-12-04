@@ -17,9 +17,6 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Tag;
-import top.leafage.assets.dto.TagDTO;
-import top.leafage.assets.repository.TagRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,8 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.assets.domain.Tag;
+import top.leafage.assets.repository.TagRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -56,14 +55,10 @@ class TagServiceImplTest {
     @InjectMocks
     private TagServiceImpl tagService;
 
-    private TagDTO dto;
     private Tag entity;
 
     @BeforeEach
     void setUp() {
-        dto = new TagDTO();
-        dto.setName("test");
-
         entity = new Tag();
         entity.setName("test");
     }
@@ -93,36 +88,6 @@ class TagServiceImplTest {
                 .willReturn(Mono.just(mock(Tag.class)));
 
         StepVerifier.create(tagService.fetch(anyLong())).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void exists() {
-        given(this.tagRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(tagService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.tagRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(tagService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void create() {
-        given(this.tagRepository.save(any(Tag.class))).willReturn(Mono.just(mock(Tag.class)));
-
-        StepVerifier.create(tagService.create(mock(TagDTO.class))).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void modify() {
-        given(this.tagRepository.findById(anyLong())).willReturn(Mono.just(mock(Tag.class)));
-
-        given(this.tagRepository.save(any(Tag.class))).willReturn(Mono.just(mock(Tag.class)));
-
-        StepVerifier.create(tagService.modify(1L, dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test

@@ -17,12 +17,12 @@
 
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.User;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.User;
 
 /**
  * user repository
@@ -39,14 +39,6 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
      * @return true-是，false-否
      */
     Mono<Boolean> existsByUsername(String username);
-
-    /**
-     * 是否已存在
-     *
-     * @param username user
-     * @return true-是，false-否
-     */
-    Mono<Boolean> existsByUsernameAndIdNot(String username, Long id);
 
     /**
      * Toggles the enabled status of a record by its ID.

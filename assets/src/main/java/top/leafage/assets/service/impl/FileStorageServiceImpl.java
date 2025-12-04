@@ -1,6 +1,5 @@
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.dto.FileRecordDTO;
 import top.leafage.assets.service.FileStorageService;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaTypeFactory;
@@ -18,15 +17,8 @@ import reactor.core.publisher.Mono;
 public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
-    public Mono<FileRecordDTO> upload(FilePart file) {
-        return DataBufferUtils.join(file.content())
-                .map(dataBuffer -> {
-                    FileRecordDTO dto = new FileRecordDTO();
-                    dto.setName(file.filename());
-                    dto.setMimeType(MediaTypeFactory.getMediaType(file.filename()).toString());
-                    dto.setSize(dataBuffer.readableByteCount());
-                    return dto;
-                });
+    public Mono<Void> upload(FilePart file) {
+        return Mono.empty();
     }
 
     @Override

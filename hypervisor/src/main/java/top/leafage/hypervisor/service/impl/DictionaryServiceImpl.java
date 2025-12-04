@@ -44,9 +44,9 @@ import java.util.NoSuchElementException;
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
 
+    private static final BeanCopier copier = BeanCopier.create(DictionaryDTO.class, Dictionary.class, false);
     private final DictionaryRepository dictionaryRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(DictionaryDTO.class, Dictionary.class, false);
 
     /**
      * <p>Constructor for DictionaryServiceImpl.</p>
@@ -104,8 +104,14 @@ public class DictionaryServiceImpl implements DictionaryService {
      */
     @Override
     public Mono<DictionaryVO> create(DictionaryDTO dto) {
-        return dictionaryRepository.save(DictionaryDTO.toEntity(dto))
-                .map(DictionaryVO::from);
+        return dictionaryRepository.existsByName(dto.getName())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalArgumentException("name already exists: " + dto.getName()));
+                    }
+                    return dictionaryRepository.save(DictionaryDTO.toEntity(dto))
+                            .map(DictionaryVO::from);
+                });
     }
 
     /**
@@ -117,18 +123,33 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         return dictionaryRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return existing;
-                })
-                .flatMap(dictionaryRepository::save)
-                .map(DictionaryVO::from);
+                .flatMap(existing -> {
+                    if (!existing.getName().equals(dto.getName())) {
+                        return dictionaryRepository.existsByName(dto.getName())
+                                .flatMap(exists -> {
+                                    if (exists) {
+                                        return Mono.error(new IllegalArgumentException("name already exists: " + dto.getName()));
+                                    }
+                                    return dictionaryRepository.save(DictionaryDTO.toEntity(dto))
+                                            .map(DictionaryVO::from);
+                                });
+                    } else {
+                        copier.copy(dto, existing, null);
+                        return dictionaryRepository.save(existing)
+                                .map(DictionaryVO::from);
+                    }
+                });
     }
 
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
-        return dictionaryRepository.deleteById(id);
+        return dictionaryRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new NoSuchElementException("dictionary not found: " + id));
+                    }
+                    return dictionaryRepository.deleteById(id);
+                });
     }
 }

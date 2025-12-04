@@ -17,11 +17,6 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Tag;
-import top.leafage.assets.dto.TagDTO;
-import top.leafage.assets.repository.TagRepository;
-import top.leafage.assets.service.TagService;
-import top.leafage.assets.vo.TagVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,9 +26,12 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.Tag;
+import top.leafage.assets.domain.vo.TagVO;
+import top.leafage.assets.repository.TagRepository;
+import top.leafage.assets.service.TagService;
 
-
-import javax.naming.NotContextException;
+import java.util.NoSuchElementException;
 
 /**
  * tag service impl
@@ -67,7 +65,7 @@ public class TagServiceImpl implements TagService {
         return r2dbcEntityTemplate.select(Tag.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()
-                .map(tag -> convertToVO(tag, TagVO.class))
+                .map(TagVO::from)
                 .collectList()
                 .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Tag.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
@@ -81,42 +79,8 @@ public class TagServiceImpl implements TagService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return tagRepository.findById(id)
-                .map(c -> convertToVO(c, TagVO.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-        if (id == null) {
-            return tagRepository.existsByName(name);
-        }
-        return tagRepository.existsByNameAndIdNot(name, id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Mono<TagVO> create(TagDTO dto) {
-        return tagRepository.save(convertToDomain(dto, Tag.class))
-                .map(c -> convertToVO(c, TagVO.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Mono<TagVO> modify(Long id, TagDTO dto) {
-        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
-        return tagRepository.findById(id)
-                .switchIfEmpty(Mono.error(NotContextException::new))
-                .map(tag -> convert(dto, tag))
-                .flatMap(tagRepository::save)
-                .map(c -> convertToVO(c, TagVO.class));
+                .switchIfEmpty(Mono.error(NoSuchElementException::new))
+                .map(TagVO::from);
     }
 
     /**
@@ -125,8 +89,13 @@ public class TagServiceImpl implements TagService {
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-
-        return tagRepository.deleteById(id);
+        return tagRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new NoSuchElementException("tag not found: " + id));
+                    }
+                    return tagRepository.deleteById(id);
+                });
     }
 
 }

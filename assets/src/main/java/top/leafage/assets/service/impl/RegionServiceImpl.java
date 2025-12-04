@@ -17,11 +17,7 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Region;
-import top.leafage.assets.dto.RegionDTO;
-import top.leafage.assets.repository.RegionRepository;
-import top.leafage.assets.service.RegionService;
-import top.leafage.assets.vo.RegionVO;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+import top.leafage.assets.domain.Region;
+import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.RegionVO;
+import top.leafage.assets.repository.RegionRepository;
+import top.leafage.assets.service.RegionService;
 
 import java.util.NoSuchElementException;
 
@@ -46,6 +46,7 @@ public class RegionServiceImpl implements RegionService {
 
     private final RegionRepository regionRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
+    private static final BeanCopier copier = BeanCopier.create(RegionDTO.class, Region.class, false);
 
     /**
      * <p>Constructor for RegionServiceImpl.</p>
@@ -69,7 +70,7 @@ public class RegionServiceImpl implements RegionService {
         return r2dbcEntityTemplate.select(Region.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()
-                .map(region -> convertToVO(region, RegionVO.class))
+                .map(RegionVO::from)
                 .collectList()
                 .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Region.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
@@ -83,20 +84,7 @@ public class RegionServiceImpl implements RegionService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return regionRepository.findById(id)
-                .map(r -> convertToVO(r, RegionVO.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-
-        if (id == null) {
-            return regionRepository.existsByName(name);
-        }
-        return regionRepository.existsByNameAndIdNot(name, id);
+                .map(RegionVO::from);
     }
 
     /**
@@ -107,7 +95,7 @@ public class RegionServiceImpl implements RegionService {
         Assert.notNull(superiorId, "superiorId must not be null.");
 
         return regionRepository.findBySuperiorId(superiorId)
-                .map(r -> convertToVO(r, RegionVO.class));
+                .map(RegionVO::from);
     }
 
     /**
@@ -115,8 +103,14 @@ public class RegionServiceImpl implements RegionService {
      */
     @Override
     public Mono<RegionVO> create(RegionDTO dto) {
-        return regionRepository.save(convertToDomain(dto, Region.class))
-                .map(r -> convertToVO(r, RegionVO.class));
+        return regionRepository.existsByName(dto.getName())
+                .flatMap(exists -> {
+                    if (exists) {
+                        throw new IllegalArgumentException("name already exists: " + dto.getName());
+                    }
+                    return regionRepository.save(RegionDTO.toEntity(dto))
+                            .map(RegionVO::from);
+                });
     }
 
     /**
@@ -127,9 +121,11 @@ public class RegionServiceImpl implements RegionService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return regionRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .map(region -> convert(dto, region))
-                .flatMap(regionRepository::save)
-                .map(r -> convertToVO(r, RegionVO.class));
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return regionRepository.save(existing)
+                            .map(RegionVO::from);
+                });
     }
 
     /**
@@ -138,7 +134,13 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
-        return regionRepository.deleteById(id);
+        return regionRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new NoSuchElementException("region not found: " + id));
+                    }
+                    return regionRepository.deleteById(id);
+                });
     }
 
 }

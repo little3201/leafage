@@ -17,9 +17,8 @@
 
 package top.leafage.assets.service;
 
-import top.leafage.assets.dto.PostDTO;
-import top.leafage.assets.vo.PostVO;
-import reactor.core.publisher.Flux;
+import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.domain.vo.PostVO;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 
 /**
@@ -29,11 +28,4 @@ import top.leafage.common.data.reactive.ReactiveCrudService;
  */
 public interface PostService extends ReactiveCrudService<PostDTO, PostVO> {
 
-    /**
-     * 全文搜索
-     *
-     * @param keyword 关键字
-     * @return 匹配结果
-     */
-    Flux<PostVO> search(String keyword);
 }

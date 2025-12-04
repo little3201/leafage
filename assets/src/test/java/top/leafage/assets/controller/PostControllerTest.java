@@ -17,14 +17,11 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.PostDTO;
-import top.leafage.assets.service.PostService;
-import top.leafage.assets.vo.PostVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,13 +29,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.domain.vo.PostVO;
+import top.leafage.assets.service.PostService;
 
-import java.util.Collections;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -50,7 +49,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(PostController.class)
 class PostControllerTest {
 
@@ -65,22 +63,19 @@ class PostControllerTest {
 
     @BeforeEach
     void setUp() {
-        // 构造请求对象
         dto = new PostDTO();
         dto.setTitle("test");
-        dto.setTags(Collections.singleton("java"));
-        dto.setSummary("内容信息");
+        dto.setBody("body");
+        dto.setSummary("summary");
+        dto.setTags(Set.of("Code"));
 
-        vo = new PostVO();
-        vo.setId(1L);
-        vo.setTitle(dto.getTitle());
-        vo.setTags(dto.getTags());
+        vo = new PostVO(1L, "test", "summary", "body", Set.of("Code"), LocalDateTime.now());
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<PostVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull PostVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.postService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString()))
                 .willReturn(Mono.just(page));
@@ -133,31 +128,7 @@ class PostControllerTest {
     }
 
     @Test
-    void search() {
-        given(this.postService.search(anyString())).willReturn(Flux.just(vo));
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/search")
-                        .queryParam("keyword", "test")
-                        .build())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(PostVO.class);
-    }
-
-    @Test
-    void search_error() {
-        given(this.postService.search(anyString())).willThrow(new RuntimeException());
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/posts/search")
-                        .queryParam("keyword", "test")
-                        .build())
-                .exchange()
-                .expectStatus().is5xxServerError();
-    }
-
-    @Test
     void create() {
-        given(this.postService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.create(any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
@@ -170,7 +141,6 @@ class PostControllerTest {
 
     @Test
     void create_error() {
-        given(this.postService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.create(any(PostDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/posts")
@@ -182,7 +152,6 @@ class PostControllerTest {
 
     @Test
     void modify() {
-        given(this.postService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.modify(anyLong(), any(PostDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1L)
@@ -195,7 +164,6 @@ class PostControllerTest {
 
     @Test
     void modify_error() {
-        given(this.postService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.postService.modify(anyLong(), any(PostDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/posts/{id}", 1L)

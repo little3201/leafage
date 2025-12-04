@@ -17,8 +17,10 @@
 
 package top.leafage.assets.service;
 
-import top.leafage.assets.dto.FileRecordDTO;
-import top.leafage.assets.vo.FileRecordVO;
+import org.jspecify.annotations.NonNull;
+import org.springframework.http.codec.multipart.FilePart;
+import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.vo.FileRecordVO;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 
 /**
@@ -26,5 +28,13 @@ import top.leafage.common.data.reactive.ReactiveCrudService;
  *
  * @author wq li
  */
-public interface FileRecordService extends ReactiveCrudService<FileRecordDTO, FileRecordVO> {
+public interface FileRecordService extends ReactiveCrudService<Object, FileRecordVO> {
+
+    /**
+     * 上传
+     *
+     * @param file the file.
+     * @return file record.
+     */
+    Mono<@NonNull FileRecordVO> upload(FilePart file);
 }

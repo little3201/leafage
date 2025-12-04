@@ -17,10 +17,6 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.PostDTO;
-import top.leafage.assets.service.PostService;
-import top.leafage.assets.vo.PostVO;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,9 +26,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.domain.vo.PostVO;
+import top.leafage.assets.service.PostService;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
-
-import javax.management.openmbean.KeyAlreadyExistsException;
 
 
 /**
@@ -76,18 +73,6 @@ public class PostController {
     }
 
     /**
-     * 关键字查询
-     *
-     * @param keyword 关键字
-     * @return 查询到数据集，异常时返回204
-     */
-    @GetMapping("/search")
-    public Flux<PostVO> search(@RequestParam String keyword) {
-        return postService.search(keyword)
-                .doOnError(e -> logger.error("Search posts error: ", e));
-    }
-
-    /**
      * 根据 id 查询
      *
      * @param id 主键
@@ -106,14 +91,9 @@ public class PostController {
      * @return 添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public Mono<PostVO> create(@RequestBody @Valid PostDTO dto) {
-        return postService.exists(dto.getTitle(), null).flatMap(exists -> {
-            if (exists) {
-                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getTitle()));
-            } else {
-                return postService.create(dto);
-            }
-        }).doOnError(e -> logger.error("Create post occurred an error: ", e));
+    public Mono<PostVO> create(@RequestBody @Validated PostDTO dto) {
+        return postService.create(dto)
+                .doOnError(e -> logger.error("Create post occurred an error: ", e));
     }
 
     /**
@@ -124,14 +104,9 @@ public class PostController {
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO dto) {
-        return postService.exists(dto.getTitle(), id).flatMap(exists -> {
-            if (exists) {
-                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getTitle()));
-            } else {
-                return postService.modify(id, dto);
-            }
-        }).doOnError(e -> logger.error("Modify post occurred an error: ", e));
+    public Mono<PostVO> modify(@PathVariable Long id, @RequestBody @Validated PostDTO dto) {
+        return postService.modify(id, dto)
+                .doOnError(e -> logger.error("Modify post occurred an error: ", e));
     }
 
 

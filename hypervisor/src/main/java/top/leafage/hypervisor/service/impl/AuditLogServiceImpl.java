@@ -17,10 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.AuditLog;
-import top.leafage.hypervisor.repository.AuditLogRepository;
-import top.leafage.hypervisor.service.AuditLogService;
-import top.leafage.hypervisor.domain.vo.AuditLogVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +26,10 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.AuditLog;
+import top.leafage.hypervisor.domain.vo.AuditLogVO;
+import top.leafage.hypervisor.repository.AuditLogRepository;
+import top.leafage.hypervisor.service.AuditLogService;
 
 import java.util.NoSuchElementException;
 
@@ -89,7 +89,7 @@ public class AuditLogServiceImpl implements AuditLogService {
             if (exists) {
                 return auditLogRepository.deleteById(id);
             }
-            throw new NoSuchElementException("audit log not found: " + id);
+            return Mono.error(new NoSuchElementException("audit log not found: " + id));
         });
     }
 }

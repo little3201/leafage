@@ -29,7 +29,7 @@ public class UserDTO {
     private String username;
 
     @NotBlank
-    private String name;
+    private String fullName;
 
     @Email
     private String email;
@@ -39,7 +39,7 @@ public class UserDTO {
         return new User(
                 dto.getUsername(),
                 password,
-                dto.getName(),
+                dto.getFullName(),
                 dto.getEmail()
         );
     }
@@ -52,12 +52,12 @@ public class UserDTO {
         this.username = username;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getEmail() {

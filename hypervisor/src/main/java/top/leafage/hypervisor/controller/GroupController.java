@@ -17,13 +17,6 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.domain.GroupMembers;
-import top.leafage.hypervisor.domain.GroupPrivileges;
-import top.leafage.hypervisor.domain.dto.GroupDTO;
-import top.leafage.hypervisor.service.GroupMembersService;
-import top.leafage.hypervisor.service.GroupPrivilegesService;
-import top.leafage.hypervisor.service.GroupService;
-import top.leafage.hypervisor.domain.vo.GroupVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +28,14 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
+import top.leafage.hypervisor.domain.GroupMembers;
+import top.leafage.hypervisor.domain.GroupPrivileges;
+import top.leafage.hypervisor.domain.dto.GroupDTO;
+import top.leafage.hypervisor.domain.vo.GroupVO;
+import top.leafage.hypervisor.service.GroupMembersService;
+import top.leafage.hypervisor.service.GroupPrivilegesService;
+import top.leafage.hypervisor.service.GroupService;
 
-import javax.management.openmbean.KeyAlreadyExistsException;
 import java.util.Set;
 
 /**
@@ -101,7 +100,7 @@ public class GroupController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<GroupVO> create(@RequestBody @Valid GroupDTO dto) {
+    public Mono<GroupVO> create(@RequestBody @Validated GroupDTO dto) {
         return groupService.create(dto)
                 .doOnError(e -> logger.error("Create group occurred an error: ", e));
     }
@@ -114,7 +113,7 @@ public class GroupController {
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<GroupVO> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO dto) {
+    public Mono<GroupVO> modify(@PathVariable Long id, @RequestBody @Validated GroupDTO dto) {
         return groupService.modify(id, dto)
                 .doOnError(e -> logger.error("Modify group occurred an error: ", e));
     }

@@ -17,9 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.Message;
-import top.leafage.hypervisor.domain.dto.MessageDTO;
-import top.leafage.hypervisor.repository.MessageRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,9 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.Message;
+import top.leafage.hypervisor.domain.dto.MessageDTO;
+import top.leafage.hypervisor.repository.MessageRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -62,16 +62,11 @@ class MessageServiceImplTest {
     @BeforeEach
     void setUp() {
         dto = new MessageDTO();
-        dto.setTitle("标题");
-        dto.setSummary("这个是摘要内容");
+        dto.setTitle("test");
         dto.setBody("这个是正文内容");
         dto.setReceiver("test");
 
-        entity = new Message();
-        entity.setTitle("标题");
-        entity.setSummary("这个是摘要内容");
-        entity.setBody("这个是正文内容");
-        entity.setReceiver("test");
+        entity = MessageDTO.toEntity(dto);
     }
 
     @Test
@@ -99,20 +94,6 @@ class MessageServiceImplTest {
         given(this.messageRepository.save(any(Message.class))).willReturn(Mono.just(mock(Message.class)));
 
         StepVerifier.create(messageService.fetch(1L)).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void exists() {
-        given(this.messageRepository.existsByTitleAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(messageService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.messageRepository.existsByTitle(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(messageService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test

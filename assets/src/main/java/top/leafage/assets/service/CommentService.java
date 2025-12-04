@@ -17,8 +17,8 @@
 
 package top.leafage.assets.service;
 
-import top.leafage.assets.dto.CommentDTO;
-import top.leafage.assets.vo.CommentVO;
+import top.leafage.assets.domain.dto.CommentDTO;
+import top.leafage.assets.domain.vo.CommentVO;
 import reactor.core.publisher.Flux;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 

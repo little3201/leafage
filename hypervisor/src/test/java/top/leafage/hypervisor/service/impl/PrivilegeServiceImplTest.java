@@ -17,13 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.GroupMembers;
-import top.leafage.hypervisor.domain.GroupPrivileges;
-import top.leafage.hypervisor.domain.Privilege;
-import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
-import top.leafage.hypervisor.repository.GroupMembersRepository;
-import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
-import top.leafage.hypervisor.repository.PrivilegeRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +30,13 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.GroupMembers;
+import top.leafage.hypervisor.domain.GroupPrivileges;
+import top.leafage.hypervisor.domain.Privilege;
+import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import top.leafage.hypervisor.repository.GroupMembersRepository;
+import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
+import top.leafage.hypervisor.repository.PrivilegeRepository;
 
 import java.util.List;
 
@@ -75,10 +75,11 @@ class PrivilegeServiceImplTest {
     void setUp() {
         dto = new PrivilegeDTO();
         dto.setName("test");
+        dto.setIcon("test");
+        dto.setPath("/test");
+        dto.setSuperiorId(1L);
 
-        entity = new Privilege();
-        entity.setId(1L);
-        entity.setName("test");
+        entity = PrivilegeDTO.toEntity(dto);
     }
 
     @Test
@@ -172,17 +173,4 @@ class PrivilegeServiceImplTest {
         StepVerifier.create(privilegeService.tree("test")).expectNextCount(1).verifyComplete();
     }
 
-    @Test
-    void exists() {
-        given(this.privilegeRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(privilegeService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.privilegeRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(privilegeService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
-    }
 }

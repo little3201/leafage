@@ -17,13 +17,9 @@
 
 package top.leafage.assets.domain;
 
-import top.leafage.assets.domain.superclass.CommentModel;
-import org.springframework.data.annotation.*;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
+import top.leafage.common.data.domain.AbstractAuditable;
 
 /**
  * entity class for comment.
@@ -31,70 +27,45 @@ import java.time.Instant;
  * @author wq li
  */
 @Table(name = "comments")
-public class Comment extends CommentModel {
+public class Comment extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    private Long id;
+    private Long postId;
 
-    @InsertOnlyProperty
-    @CreatedBy
-    @Column(value = "created_by")
-    private String createdBy;
+    private String body;
 
-    @InsertOnlyProperty
-    @CreatedDate
-    @Column(value = "created_date")
-    private Instant createdDate;
-
-    @LastModifiedBy
-    @Column(value = "last_modified_by")
-    private String lastModifiedBy;
-
-    @LastModifiedDate
-    @Column(value = "last_modified_date")
-    private Instant lastModifiedDate;
+    private Long replier;
 
 
-    public Long getId() {
-        return id;
+    public Comment() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Comment(Long postId, String body, Long replier) {
+        this.postId = postId;
+        this.body = body;
+        this.replier = replier;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public Long getPostId() {
+        return postId;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setPostId(Long postId) {
+        this.postId = postId;
     }
 
-    public Instant getCreatedDate() {
-        return createdDate;
+    public String getBody() {
+        return body;
     }
 
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
+    public void setBody(String body) {
+        this.body = body;
     }
 
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
+    public Long getReplier() {
+        return replier;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setReplier(Long replier) {
+        this.replier = replier;
     }
 }

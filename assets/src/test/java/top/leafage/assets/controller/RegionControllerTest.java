@@ -17,14 +17,11 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.RegionDTO;
-import top.leafage.assets.service.RegionService;
-import top.leafage.assets.vo.RegionVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,10 +29,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.RegionVO;
+import top.leafage.assets.service.RegionService;
 
 import java.util.List;
 
@@ -49,7 +48,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  **/
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(RegionController.class)
 class RegionControllerTest {
 
@@ -64,24 +62,20 @@ class RegionControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new RegionVO();
-        vo.setId(1L);
-        vo.setName("test");
-        vo.setAreaCode("023333");
-        vo.setPostalCode(232);
-        vo.setDescription("region");
-
         dto = new RegionDTO();
         dto.setName("test");
-        dto.setAreaCode("023333");
-        dto.setPostalCode(232);
-        dto.setDescription("region");
+        dto.setAreaCode("23234");
+        dto.setPostalCode("712000");
+        dto.setSuperiorId(1L);
+        dto.setDescription("description");
+
+        vo = new RegionVO(1L, "test", "029", "712000", "description", true);
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<RegionVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull RegionVO> voPage = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.regionService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(Mono.just(voPage));
 
@@ -153,7 +147,6 @@ class RegionControllerTest {
 
     @Test
     void create() {
-        given(this.regionService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.create(any(RegionDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/regions")
@@ -166,7 +159,6 @@ class RegionControllerTest {
 
     @Test
     void create_error() {
-        given(this.regionService.exists(anyString(), isNull())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.create(any(RegionDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/regions")
@@ -178,7 +170,6 @@ class RegionControllerTest {
 
     @Test
     void modify() {
-        given(this.regionService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1L)
@@ -191,7 +182,6 @@ class RegionControllerTest {
 
     @Test
     void modify_error() {
-        given(this.regionService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
         given(this.regionService.modify(anyLong(), any(RegionDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).put().uri("/regions/{id}", 1L)

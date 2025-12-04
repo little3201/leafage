@@ -17,8 +17,7 @@
 
 package top.leafage.assets.service;
 
-import top.leafage.assets.dto.TagDTO;
-import top.leafage.assets.vo.TagVO;
+import top.leafage.assets.domain.vo.TagVO;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 
 /**
@@ -26,6 +25,6 @@ import top.leafage.common.data.reactive.ReactiveCrudService;
  *
  * @author wq li
  */
-public interface TagService extends ReactiveCrudService<TagDTO, TagVO> {
+public interface TagService extends ReactiveCrudService<Object, TagVO> {
 
 }

@@ -17,8 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.SchedulerLog;
-import top.leafage.hypervisor.repository.SchedulerLogRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +30,8 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.SchedulerLog;
+import top.leafage.hypervisor.repository.SchedulerLogRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -62,6 +62,7 @@ class SchedulerLogServiceImplTest {
         entity = new SchedulerLog();
         entity.setName("test");
         entity.setRecord("test");
+        entity.setStatus(SchedulerLog.ScheduleStatus.SUCCESS);
         entity.setExecutedTimes(12);
     }
 

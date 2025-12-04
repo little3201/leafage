@@ -17,24 +17,22 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.service.AccessLogService;
-import top.leafage.hypervisor.domain.vo.AccessLogVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.vo.AccessLogVO;
+import top.leafage.hypervisor.service.AccessLogService;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
@@ -47,7 +45,6 @@ import static org.mockito.BDDMockito.given;
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(AccessLogController.class)
 class AccessLogControllerTest {
 
@@ -61,18 +58,13 @@ class AccessLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new AccessLogVO();
-        vo.setId(1L);
-        vo.setIp(InetAddress.getByName("12.1.2.1"));
-        vo.setLocation("某国某城市");
-        vo.setBody("更新个人资料");
-        vo.setParams("test");
+        vo = new AccessLogVO(1L, "test", "POST", "127.0.0.1", "", "", 200, 230L, "");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<AccessLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull AccessLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.accessLogService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/access-logs")

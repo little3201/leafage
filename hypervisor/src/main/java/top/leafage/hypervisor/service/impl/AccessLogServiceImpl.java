@@ -88,7 +88,7 @@ public class AccessLogServiceImpl implements AccessLogService {
             if (exists) {
                 return accessLogRepository.deleteById(id);
             }
-            throw new NoSuchElementException("access log not found: " + id);
+            return Mono.error(new NoSuchElementException("access log not found: " + id));
         });
     }
 

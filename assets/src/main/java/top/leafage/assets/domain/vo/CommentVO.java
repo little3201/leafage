@@ -13,28 +13,33 @@
  * limitations under the License.
  */
 
-package top.leafage.assets.domain.superclass;
+package top.leafage.assets.domain.vo;
 
-
-import jakarta.validation.constraints.NotBlank;
+import top.leafage.assets.domain.Comment;
 
 /**
- * superclass class for tag
+ * vo class for comment.
  *
  * @author wq li
  */
-public abstract class TagModel {
-
-    @NotBlank
-    private String name;
-
-
-    public String getName() {
-        return name;
+public record CommentVO(
+        Long id,
+        Long postId,
+        String body,
+        Long replier,
+        long count
+) {
+    public static CommentVO from(Comment entity) {
+        return from(entity, 0);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public static CommentVO from(Comment entity, long count) {
+        return new CommentVO(
+                entity.getId(),
+                entity.getPostId(),
+                entity.getBody(),
+                entity.getReplier(),
+                count
+        );
     }
-
 }

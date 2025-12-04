@@ -114,7 +114,7 @@ public class PrivilegeController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<PrivilegeVO> create(@RequestBody @Valid PrivilegeDTO dto) {
+    public Mono<PrivilegeVO> create(@RequestBody @Validated PrivilegeDTO dto) {
         return privilegeService.create(dto)
                 .doOnError(e -> logger.error("Create privilege occurred an error: ", e));
     }
@@ -127,7 +127,7 @@ public class PrivilegeController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
+    public Mono<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Validated PrivilegeDTO dto) {
         return privilegeService.modify(id, dto)
                 .doOnError(e -> logger.error("Modify privilege occurred an error: ", e));
     }

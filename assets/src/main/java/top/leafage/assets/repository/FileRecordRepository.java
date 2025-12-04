@@ -35,12 +35,4 @@ public interface FileRecordRepository extends R2dbcRepository<FileRecord, Long> 
      * @return true-是，false-否
      */
     Mono<Boolean> existsByName(String name);
-
-    /**
-     * 是否已存在
-     *
-     * @param name 名称
-     * @return true-是，false-否
-     */
-    Mono<Boolean> existsByNameAndIdNot(String name, Long id);
 }

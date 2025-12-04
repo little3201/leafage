@@ -17,9 +17,6 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.domain.dto.DictionaryDTO;
-import top.leafage.hypervisor.service.DictionaryService;
-import top.leafage.hypervisor.domain.vo.DictionaryVO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +28,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
-
-import javax.management.openmbean.KeyAlreadyExistsException;
+import top.leafage.hypervisor.domain.dto.DictionaryDTO;
+import top.leafage.hypervisor.domain.vo.DictionaryVO;
+import top.leafage.hypervisor.service.DictionaryService;
 
 /**
  * dictionary controller
@@ -102,7 +100,7 @@ public class DictionaryController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<DictionaryVO> create(@RequestBody @Valid DictionaryDTO dto) {
+    public Mono<DictionaryVO> create(@RequestBody @Validated DictionaryDTO dto) {
         return dictionaryService.create(dto)
                 .doOnError(e -> logger.error("Create dictionary occurred an error: ", e));
     }
@@ -115,7 +113,7 @@ public class DictionaryController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
+    public Mono<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Validated DictionaryDTO dto) {
         return dictionaryService.modify(id, dto)
                 .doOnError(e -> logger.error("Modify dictionary occurred an error: ", e));
     }

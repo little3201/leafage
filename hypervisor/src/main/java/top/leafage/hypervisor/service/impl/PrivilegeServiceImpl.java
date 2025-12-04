@@ -54,11 +54,11 @@ import static top.leafage.common.data.reactive.ReactiveModelToTreeNodeConverter.
 @Service
 public class PrivilegeServiceImpl implements PrivilegeService {
 
+    private static final BeanCopier copier = BeanCopier.create(PrivilegeDTO.class, Privilege.class, false);
     private final PrivilegeRepository privilegeRepository;
     private final GroupPrivilegesRepository groupPrivilegesRepository;
     private final GroupMembersRepository groupMembersRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(PrivilegeDTO.class, Privilege.class, false);
 
     /**
      * <p>Constructor for PrivilegeServiceImpl.</p>

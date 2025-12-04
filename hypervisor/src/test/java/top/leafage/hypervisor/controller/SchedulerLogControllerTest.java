@@ -17,25 +17,25 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.service.SchedulerLogService;
-import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
+import top.leafage.hypervisor.service.SchedulerLogService;
 
 import java.net.UnknownHostException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -47,7 +47,6 @@ import static org.mockito.BDDMockito.given;
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(SchedulerLogController.class)
 class SchedulerLogControllerTest {
 
@@ -61,18 +60,13 @@ class SchedulerLogControllerTest {
 
     @BeforeEach
     void setUp() throws UnknownHostException {
-        vo = new SchedulerLogVO();
-        vo.setId(1L);
-        vo.setName("test");
-        vo.setRecord("test");
-        vo.setNextExecuteTime(Instant.now());
-        vo.setExecutedTimes(12);
+        vo = new SchedulerLogVO(1L, "test", Instant.now(), 232, "PENDING", Instant.now().plus(12, ChronoUnit.HOURS), "description");
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<SchedulerLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull SchedulerLogVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.schedulerLogService.retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString())).willReturn(Mono.just(page));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/scheduler-logs")

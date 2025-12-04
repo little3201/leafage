@@ -15,18 +15,43 @@
  *
  */
 
-package top.leafage.assets.dto;
+package top.leafage.assets.domain.dto;
 
-import top.leafage.assets.domain.superclass.PostModel;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import top.leafage.assets.domain.Comment;
 
 /**
- * dto class for post
+ * dto class for comment
  *
  * @author wq li
  */
-public class PostDTO extends PostModel {
+public class CommentDTO {
 
+    @NotNull
+    private Long postId;
+
+    @NotBlank
     private String body;
+
+    private Long replier;
+
+
+    public static Comment toEntity(CommentDTO dto) {
+        return new Comment(
+                dto.getPostId(),
+                dto.getBody(),
+                dto.getReplier()
+        );
+    }
+
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Long postId) {
+        this.postId = postId;
+    }
 
     public String getBody() {
         return body;
@@ -34,5 +59,13 @@ public class PostDTO extends PostModel {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Long getReplier() {
+        return replier;
+    }
+
+    public void setReplier(Long replier) {
+        this.replier = replier;
     }
 }

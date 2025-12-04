@@ -17,11 +17,13 @@
 
 package top.leafage.assets.domain;
 
+import org.jspecify.annotations.NonNull;
 import top.leafage.assets.domain.superclass.FileRecordModel;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
 import org.springframework.data.relational.core.mapping.Table;
+import top.leafage.common.data.domain.AbstractAuditable;
 
 import java.time.Instant;
 
@@ -31,70 +33,111 @@ import java.time.Instant;
  * @author wq li
  */
 @Table(name = "file_records")
-public class FileRecord extends FileRecordModel {
+public class FileRecord extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
-    /**
-     * Primary key.
-     */
-    @Id
-    private Long id;
+    private Long superiorId;
 
-    @InsertOnlyProperty
-    @CreatedBy
-    @Column(value = "created_by")
-    private String createdBy;
+    private String name;
 
-    @InsertOnlyProperty
-    @CreatedDate
-    @Column(value = "created_date")
-    private Instant createdDate;
+    private String extension;
 
-    @LastModifiedBy
-    @Column(value = "last_modified_by")
-    private String lastModifiedBy;
+    private String path;
 
-    @LastModifiedDate
-    @Column(value = "last_modified_date")
-    private Instant lastModifiedDate;
+    private String contentType;
+
+    private long size;
+
+    private boolean directory;
+
+    private boolean regularFile;
+
+    private boolean symbolicLink;
 
 
-    public Long getId() {
-        return id;
+    public FileRecord() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public FileRecord(Long superiorId, String name, String extension, String path, String contentType, long size, boolean directory, boolean regularFile, boolean symbolicLink) {
+        this.superiorId = superiorId;
+        this.name = name;
+        this.extension = extension;
+        this.path = path;
+        this.contentType = contentType;
+        this.size = size;
+        this.directory = directory;
+        this.regularFile = regularFile;
+        this.symbolicLink = symbolicLink;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public Long getSuperiorId() {
+        return superiorId;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
     }
 
-    public Instant getCreatedDate() {
-        return createdDate;
+    public String getName() {
+        return name;
     }
 
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLastModifiedBy() {
-        return lastModifiedBy;
+    public String getExtension() {
+        return extension;
     }
 
-    public void setLastModifiedBy(String lastModifiedBy) {
-        this.lastModifiedBy = lastModifiedBy;
+    public void setExtension(String extension) {
+        this.extension = extension;
     }
 
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
+    public String getPath() {
+        return path;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public boolean isDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(boolean directory) {
+        this.directory = directory;
+    }
+
+    public boolean isRegularFile() {
+        return regularFile;
+    }
+
+    public void setRegularFile(boolean regularFile) {
+        this.regularFile = regularFile;
+    }
+
+    public boolean isSymbolicLink() {
+        return symbolicLink;
+    }
+
+    public void setSymbolicLink(boolean symbolicLink) {
+        this.symbolicLink = symbolicLink;
     }
 }

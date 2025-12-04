@@ -43,9 +43,9 @@ import java.util.NoSuchElementException;
 @Service
 public class MessageServiceImpl implements MessageService {
 
+    private static final BeanCopier copier = BeanCopier.create(MessageDTO.class, Message.class, false);
     private final MessageRepository messageRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(MessageDTO.class, Message.class, false);
 
     /**
      * <p>Constructor for MessageServiceImpl.</p>

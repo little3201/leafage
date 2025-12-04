@@ -1,7 +1,6 @@
 package top.leafage.assets.service;
 
 
-import top.leafage.assets.dto.FileRecordDTO;
 import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +17,7 @@ public interface FileStorageService {
      * @param file 文件
      * @return 结果
      */
-    Mono<FileRecordDTO> upload(FilePart file);
+    Mono<Void> upload(FilePart file);
 
     /**
      * 是否存在

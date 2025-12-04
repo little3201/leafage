@@ -17,16 +17,15 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.CommentDTO;
-import top.leafage.assets.service.CommentService;
-import top.leafage.assets.vo.CommentVO;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.CommentDTO;
+import top.leafage.assets.service.CommentService;
+import top.leafage.assets.domain.vo.CommentVO;
 
 /**
  * comment controller
@@ -83,7 +82,7 @@ public class CommentController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<CommentVO> create(@RequestBody @Valid CommentDTO dto) {
+    public Mono<CommentVO> create(@RequestBody @Validated CommentDTO dto) {
         return commentService.create(dto)
                 .doOnError(e -> logger.error("Create comment occurred an error: ", e));
     }

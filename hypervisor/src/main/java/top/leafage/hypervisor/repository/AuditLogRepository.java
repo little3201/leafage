@@ -17,9 +17,9 @@
 
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.AuditLog;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
+import top.leafage.hypervisor.domain.AuditLog;
 
 /**
  * audit log repository

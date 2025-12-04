@@ -18,7 +18,7 @@
 package top.leafage.assets.service.impl;
 
 import top.leafage.assets.domain.Comment;
-import top.leafage.assets.dto.CommentDTO;
+import top.leafage.assets.domain.dto.CommentDTO;
 import top.leafage.assets.repository.CommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

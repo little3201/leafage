@@ -17,9 +17,6 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.Region;
-import top.leafage.assets.dto.RegionDTO;
-import top.leafage.assets.repository.RegionRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +30,9 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.assets.domain.Region;
+import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.repository.RegionRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -64,13 +64,13 @@ class RegionServiceImplTest {
         dto = new RegionDTO();
         dto.setName("西安市");
         dto.setAreaCode("029");
-        dto.setPostalCode(710000);
+        dto.setPostalCode("710000");
         dto.setSuperiorId(1L);
 
         entity = new Region();
         entity.setName("西安市");
         entity.setAreaCode("029");
-        entity.setPostalCode(710000);
+        entity.setPostalCode("710000");
         entity.setSuperiorId(1L);
     }
 
@@ -105,20 +105,6 @@ class RegionServiceImplTest {
         given(this.regionRepository.findBySuperiorId(anyLong())).willReturn(Flux.just(mock(Region.class)));
 
         StepVerifier.create(regionService.subset(anyLong())).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
-    void exists() {
-        given(this.regionRepository.existsByNameAndIdNot(anyString(), anyLong())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(regionService.exists("test", 1L)).expectNext(Boolean.TRUE).verifyComplete();
-    }
-
-    @Test
-    void exists_id_null() {
-        given(this.regionRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.TRUE));
-
-        StepVerifier.create(regionService.exists("test", null)).expectNext(Boolean.TRUE).verifyComplete();
     }
 
     @Test

@@ -17,8 +17,8 @@
 
 package top.leafage.assets.service;
 
-import top.leafage.assets.dto.RegionDTO;
-import top.leafage.assets.vo.RegionVO;
+import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.RegionVO;
 import reactor.core.publisher.Flux;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 

@@ -17,20 +17,22 @@
 
 package top.leafage.assets.service.impl;
 
-import top.leafage.assets.domain.FileRecord;
-import top.leafage.assets.dto.FileRecordDTO;
-import top.leafage.assets.repository.FileRecordRepository;
-import top.leafage.assets.service.FileRecordService;
-import top.leafage.assets.vo.FileRecordVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.FileRecord;
+import top.leafage.assets.domain.vo.FileRecordVO;
+import top.leafage.assets.repository.FileRecordRepository;
+import top.leafage.assets.service.FileRecordService;
+
+import java.util.Objects;
 
 
 /**
@@ -60,7 +62,7 @@ public class FileRecordServiceImpl implements FileRecordService {
         return r2dbcEntityTemplate.select(FileRecord.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()
-                .map(record -> convertToVO(record, FileRecordVO.class))
+                .map(FileRecordVO::from)
                 .collectList()
                 .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), FileRecord.class))
                 .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
@@ -74,25 +76,7 @@ public class FileRecordServiceImpl implements FileRecordService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return fileRecordRepository.findById(id)
-                .map(f -> convertToVO(f, FileRecordVO.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Mono<Boolean> exists(String name, Long id) {
-        Assert.hasText(name, String.format(_MUST_NOT_BE_EMPTY, "name"));
-        if (id == null) {
-            return fileRecordRepository.existsByName(name);
-        }
-        return fileRecordRepository.existsByNameAndIdNot(name, id);
-    }
-
-    @Override
-    public Mono<FileRecordVO> create(FileRecordDTO dto) {
-        return fileRecordRepository.save(convertToDomain(dto, FileRecord.class))
-                .map(f -> convertToVO(f, FileRecordVO.class));
+                .map(FileRecordVO::from);
     }
 
     /**
@@ -104,4 +88,23 @@ public class FileRecordServiceImpl implements FileRecordService {
         return fileRecordRepository.deleteById(id);
     }
 
+    @Override
+    public Mono<FileRecordVO> upload(FilePart file) {
+        FileRecord record = new FileRecord();
+
+        String filename = file.filename();
+        record.setName(filename);
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot > 0) {
+            record.setExtension(filename.substring(lastDot + 1));
+        }
+        record.setPath("");
+        record.setContentType(Objects.requireNonNull(file.headers().getContentType()).getType());
+        record.setSize(file.headers().size());
+        record.setDirectory(false);
+        record.setRegularFile(true);
+        record.setSymbolicLink(false);
+        return fileRecordRepository.save(record)
+                .map(FileRecordVO::from);
+    }
 }

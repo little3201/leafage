@@ -15,47 +15,39 @@
  *
  */
 
-package top.leafage.assets.domain.superclass;
+package top.leafage.assets.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.data.relational.core.mapping.Column;
+import top.leafage.assets.domain.Region;
 
 /**
- * region superclass
+ * dto class for region
  *
  * @author wq li
  */
-public abstract class RegionModel {
+public class RegionDTO {
 
     @NotBlank
-    @Column(value = "name")
     private String name;
 
-    /**
-     * 上级
-     */
-    @Column(value = "superior_id")
     private Long superiorId;
 
-    private boolean enabled = true;
-
-    /**
-     * 区号
-     */
-    @Column(value = "area_code")
     private String areaCode;
 
-    /**
-     * 邮编
-     */
-    @Column(value = "postal_code")
-    private Integer postalCode;
+    private String postalCode;
 
-    /**
-     * 描述
-     */
     private String description;
 
+
+    public static Region toEntity(RegionDTO dto) {
+        return new Region(
+                dto.getName(),
+                dto.getSuperiorId(),
+                dto.getAreaCode(),
+                dto.getPostalCode(),
+                dto.getDescription()
+        );
+    }
 
     public String getName() {
         return name;
@@ -73,14 +65,6 @@ public abstract class RegionModel {
         this.superiorId = superiorId;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public String getAreaCode() {
         return areaCode;
     }
@@ -89,11 +73,11 @@ public abstract class RegionModel {
         this.areaCode = areaCode;
     }
 
-    public Integer getPostalCode() {
+    public String getPostalCode() {
         return postalCode;
     }
 
-    public void setPostalCode(Integer postalCode) {
+    public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
     }
 

@@ -17,14 +17,11 @@
 
 package top.leafage.hypervisor.controller;
 
-import top.leafage.hypervisor.domain.dto.MessageDTO;
-import top.leafage.hypervisor.service.MessageService;
-import top.leafage.hypervisor.domain.vo.MessageVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,9 +29,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.dto.MessageDTO;
+import top.leafage.hypervisor.domain.vo.MessageVO;
+import top.leafage.hypervisor.service.MessageService;
 
 import java.util.List;
 
@@ -48,7 +47,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  **/
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(MessageController.class)
 class MessageControllerTest {
 
@@ -63,16 +61,10 @@ class MessageControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new MessageVO();
-        vo.setId(1L);
-        vo.setTitle("标题");
-        vo.setSummary("这个是摘要内容");
-        vo.setBody("这个是正文内容");
-        vo.setReceiver("test");
+        vo = new MessageVO(1L, "test", "test", "admin", false);
 
         dto = new MessageDTO();
         dto.setTitle("标题");
-        dto.setSummary("这个是摘要内容");
         dto.setBody("这个是正文内容");
         dto.setReceiver("test");
     }
@@ -80,7 +72,7 @@ class MessageControllerTest {
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<MessageVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull MessageVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.messageService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(Mono.just(page));
 
@@ -130,7 +122,6 @@ class MessageControllerTest {
 
     @Test
     void create() {
-        given(this.messageService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.messageService.create(any(MessageDTO.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
@@ -141,7 +132,6 @@ class MessageControllerTest {
 
     @Test
     void create_error() {
-        given(this.messageService.exists(anyString(), isNull())).willReturn(Mono.just(false));
         given(this.messageService.create(any(MessageDTO.class))).willThrow(new RuntimeException());
 
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)

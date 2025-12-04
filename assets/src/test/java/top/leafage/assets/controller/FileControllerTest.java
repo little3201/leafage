@@ -17,15 +17,11 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.FileRecordDTO;
-import top.leafage.assets.service.FileRecordService;
-import top.leafage.assets.service.FileStorageService;
-import top.leafage.assets.vo.FileRecordVO;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,13 +31,16 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.vo.FileRecordVO;
+import top.leafage.assets.service.FileRecordService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -53,38 +52,26 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(FileController.class)
 class FileControllerTest {
 
     @MockitoBean
     private FileRecordService fileRecordService;
 
-    @MockitoBean
-    private FileStorageService fileStorageService;
-
     @Autowired
     private WebTestClient webTestClient;
 
-    private FileRecordDTO dto;
     private FileRecordVO vo;
 
     @BeforeEach
     void setUp() {
-        // 构造请求对象
-        dto = new FileRecordDTO();
-        dto.setName("test");
-
-        vo = new FileRecordVO();
-        vo.setId(1L);
-        vo.setName(dto.getName());
-        vo.setPath("src/test/resources/test.txt");
+        vo = new FileRecordVO(1L, "test", ".txt", "src/test/resources/test.txt", "text/plain", 312123, false, true, false, LocalDateTime.now());
     }
 
     @Test
     void retrieve() {
         Pageable pageable = PageRequest.of(0, 2);
-        Page<FileRecordVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
+        Page<@NonNull FileRecordVO> page = new PageImpl<>(List.of(vo), pageable, 1L);
         given(this.fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).willReturn(Mono.just(page));
 
@@ -140,9 +127,7 @@ class FileControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "test".getBytes());
 
-        given(this.fileRecordService.exists("test.xlsx", null)).willReturn(Mono.just(Boolean.FALSE));
-        given(this.fileStorageService.upload(any(FilePart.class))).willReturn(Mono.just(dto));
-        given(this.fileRecordService.create(any(FileRecordDTO.class))).willReturn(Mono.just(vo));
+        given(this.fileRecordService.upload(any(FilePart.class))).willReturn(Mono.just(vo));
 
         webTestClient.mutateWith(csrf()).post().uri("/files")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -157,9 +142,7 @@ class FileControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[0]);
 
-        given(this.fileRecordService.exists(anyString(), anyLong())).willReturn(Mono.just(Boolean.FALSE));
-        given(this.fileStorageService.upload(any(FilePart.class))).willReturn(Mono.just(dto));
-        given(this.fileRecordService.create(any(FileRecordDTO.class))).willReturn(Mono.just(vo));
+        given(this.fileRecordService.upload(any(FilePart.class))).willThrow(new NoSuchElementException());
 
         webTestClient.mutateWith(csrf()).post().uri("/files")
                 .contentType(MediaType.MULTIPART_FORM_DATA)

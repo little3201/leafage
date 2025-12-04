@@ -17,8 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.AuditLog;
-import top.leafage.hypervisor.repository.AuditLogRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +30,8 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.AuditLog;
+import top.leafage.hypervisor.repository.AuditLogRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -60,10 +60,11 @@ class AuditLogServiceImplTest {
     @BeforeEach
     void setUp() {
         entity = new AuditLog();
-        entity.setLocation("test");
-        entity.setOldValue("test");
         entity.setOperation("test");
         entity.setResource("test");
+        entity.setOldValue("old");
+        entity.setNewValue("new");
+        entity.setStatusCode(200);
     }
 
     @Test

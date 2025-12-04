@@ -17,18 +17,14 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.TagDTO;
-import top.leafage.assets.service.TagService;
-import top.leafage.assets.vo.TagVO;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import javax.management.openmbean.KeyAlreadyExistsException;
+import top.leafage.assets.domain.vo.TagVO;
+import top.leafage.assets.service.TagService;
 
 
 /**
@@ -78,41 +74,6 @@ public class TagController {
     public Mono<TagVO> fetch(@PathVariable Long id) {
         return tagService.fetch(id)
                 .doOnError(e -> logger.error("Fetch tag error: ", e));
-    }
-
-    /**
-     * 添加信息
-     *
-     * @param dto 要添加的数据
-     * @return 添加后的信息
-     */
-    @PostMapping
-    public Mono<TagVO> create(@RequestBody @Valid TagDTO dto) {
-        return tagService.exists(dto.getName(), null).flatMap(exists -> {
-            if (exists) {
-                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
-            } else {
-                return tagService.create(dto);
-            }
-        }).doOnError(e -> logger.error("Create tag occurred an error: ", e));
-    }
-
-    /**
-     * 修改信息
-     *
-     * @param id  主键
-     * @param dto 要修改的数据
-     * @return 修改后的信息
-     */
-    @PutMapping("/{id}")
-    public Mono<TagVO> modify(@PathVariable Long id, @RequestBody @Valid TagDTO dto) {
-        return tagService.exists(dto.getName(), id).flatMap(exists -> {
-            if (exists) {
-                return Mono.error(new KeyAlreadyExistsException("Already exists: " + dto.getName()));
-            } else {
-                return tagService.modify(id, dto);
-            }
-        }).doOnError(e -> logger.error("Modify tag occurred an error: ", e));
     }
 
     /**

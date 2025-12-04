@@ -17,12 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.GroupAuthorities;
-import top.leafage.hypervisor.domain.GroupPrivileges;
-import top.leafage.hypervisor.domain.Privilege;
-import top.leafage.hypervisor.repository.GroupAuthoritiesRepository;
-import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
-import top.leafage.hypervisor.repository.PrivilegeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +25,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.GroupAuthorities;
+import top.leafage.hypervisor.domain.GroupPrivileges;
+import top.leafage.hypervisor.domain.Privilege;
+import top.leafage.hypervisor.repository.GroupAuthoritiesRepository;
+import top.leafage.hypervisor.repository.GroupPrivilegesRepository;
+import top.leafage.hypervisor.repository.PrivilegeRepository;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;

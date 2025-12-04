@@ -17,10 +17,10 @@
 
 package top.leafage.hypervisor.repository;
 
-import top.leafage.hypervisor.domain.Message;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.Message;
 
 /**
  * message repository
@@ -37,14 +37,5 @@ public interface MessageRepository extends R2dbcRepository<Message, Long> {
      * @return true-是，false-否
      */
     Mono<Boolean> existsByTitle(String title);
-
-    /**
-     * 是否已存在
-     *
-     * @param title 标题
-     * @param id    主键
-     * @return true-是，false-否
-     */
-    Mono<Boolean> existsByTitleAndIdNot(String title, Long id);
 
 }

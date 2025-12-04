@@ -17,8 +17,6 @@
 
 package top.leafage.hypervisor.service.impl;
 
-import top.leafage.hypervisor.domain.AccessLog;
-import top.leafage.hypervisor.repository.AccessLogRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +30,8 @@ import org.springframework.data.relational.core.query.Query;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import top.leafage.hypervisor.domain.AccessLog;
+import top.leafage.hypervisor.repository.AccessLogRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -61,6 +61,7 @@ class AccessLogServiceImplTest {
     void setUp() {
         entity = new AccessLog();
         entity.setUrl("test");
+        entity.setHttpMethod("test");
         entity.setParams("test");
         entity.setBody("test");
     }

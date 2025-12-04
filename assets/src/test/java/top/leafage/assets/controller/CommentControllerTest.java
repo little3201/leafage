@@ -17,19 +17,17 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.dto.CommentDTO;
+import top.leafage.assets.domain.dto.CommentDTO;
 import top.leafage.assets.service.CommentService;
-import top.leafage.assets.vo.CommentVO;
-import top.leafage.assets.vo.TagVO;
+import top.leafage.assets.domain.vo.CommentVO;
+import top.leafage.assets.domain.vo.TagVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,7 +43,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  * @author wq li
  */
 @WithMockUser
-@ExtendWith(SpringExtension.class)
 @WebFluxTest(CommentController.class)
 class CommentControllerTest {
 
@@ -62,12 +59,10 @@ class CommentControllerTest {
     void setUp() {
         dto = new CommentDTO();
         dto.setPostId(1L);
-        dto.setContent("test");
+        dto.setBody("body");
+        dto.setReplier(1L);
 
-        vo = new CommentVO();
-        vo.setId(1L);
-        vo.setPostId(dto.getPostId());
-        vo.setContent(dto.getContent());
+        vo = new CommentVO(1L, 2L, "test", 1L, 0);
     }
 
     @Test
