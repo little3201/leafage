@@ -1,0 +1,177 @@
+/*
+ *  Copyright 2018-2025 little3201.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
+package top.leafage.assets.service.impl;
+
+import top.leafage.assets.domain.Post;
+import top.leafage.assets.domain.PostBody;
+import top.leafage.assets.dto.PostDTO;
+import top.leafage.assets.repository.PostBodyRepository;
+import top.leafage.assets.repository.PostRepository;
+import top.leafage.assets.service.PostService;
+import top.leafage.assets.vo.PostVO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+
+import java.util.NoSuchElementException;
+
+/**
+ * post service impl
+ *
+ * @author wq li
+ */
+@Service
+public class PostServiceImpl implements PostService {
+
+    private final PostRepository postRepository;
+    private final PostBodyRepository postBodyRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
+
+
+    /**
+     * <p>Constructor for PostServiceImpl.</p>
+     *
+     * @param postRepository     a {@link PostRepository} object
+     * @param postBodyRepository a {@link PostBodyRepository} object
+     */
+    public PostServiceImpl(PostRepository postRepository, PostBodyRepository postBodyRepository, R2dbcEntityTemplate r2dbcEntityTemplate) {
+        this.postRepository = postRepository;
+        this.postBodyRepository = postBodyRepository;
+        this.r2dbcEntityTemplate = r2dbcEntityTemplate;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Mono<Page<PostVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+        Pageable pageable = pageable(page, size, sortBy, descending);
+        Criteria criteria = buildCriteria(filters, Post.class);
+
+        return r2dbcEntityTemplate.select(Post.class)
+                .matching(Query.query(criteria).with(pageable))
+                .all()
+                .map(post -> convertToVO(post, PostVO.class))
+                .collectList()
+                .zipWith(r2dbcEntityTemplate.count(Query.query(criteria), Post.class))
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Mono<PostVO> fetch(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        return postRepository.findById(id)
+                .flatMap(post -> postBodyRepository.getByPostId(post.getId())
+                        .map(postBody -> {
+                            PostVO vo = convertToVO(post, PostVO.class);
+                            vo.setBody(postBody.getBody());
+                            return vo;
+                        })
+                );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Mono<PostVO> create(PostDTO dto) {
+        return postRepository.save(convertToDomain(dto, Post.class))
+                .flatMap(p -> {
+                    PostBody postBody = new PostBody();
+                    postBody.setPostId(p.getId());
+                    postBody.setBody(dto.getBody());
+                    return postBodyRepository.save(postBody)
+                            .map(pc -> convertToVO(p, PostVO.class));
+                });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Mono<PostVO> modify(Long id, PostDTO dto) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        return postRepository.findById(id)
+                .switchIfEmpty(Mono.error(NoSuchElementException::new))
+                .map(post -> convert(dto, post))
+                .flatMap(postRepository::save)
+                .flatMap(p -> postBodyRepository.getByPostId(p.getId())
+                        .defaultIfEmpty(new PostBody())
+                        .doOnNext(postBody -> {
+                            postBody.setPostId(p.getId());
+                            postBody.setBody(dto.getBody());
+                        })
+                        .flatMap(postBodyRepository::save)
+                        .map(pc -> convertToVO(p, PostVO.class))
+                );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Mono<Void> remove(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        return postBodyRepository.getByPostId(id)
+                .switchIfEmpty(Mono.error(NoSuchElementException::new))
+                .flatMap(postBody -> postBodyRepository.deleteById(postBody.getId()))
+                .then(postRepository.deleteById(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Flux<PostVO> search(String keyword) {
+        Assert.hasText(keyword, "keyword must not be empty.");
+
+        return postRepository.findAllByTitle(keyword)
+                .map(post -> convertToVO(post, PostVO.class));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Mono<Boolean> exists(String title, Long id) {
+        Assert.hasText(title, "title must not be empty.");
+
+        if (id == null) {
+            return postRepository.existsByTitle(title);
+        }
+        return postRepository.existsByTitleAndIdNot(title, id);
+    }
+
+}

@@ -4,3 +4,6 @@ spring:
     username: postgres
     password: zx110119
     driver-class-name: org.postgresql.Driver
+
+app:
+  base-uri: http://127.0.0.1:9000
