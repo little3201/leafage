@@ -17,9 +17,9 @@
 
 package top.leafage.assets.service;
 
+import reactor.core.publisher.Flux;
 import top.leafage.assets.domain.dto.RegionDTO;
 import top.leafage.assets.domain.vo.RegionVO;
-import reactor.core.publisher.Flux;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 
 /**
@@ -32,7 +32,7 @@ public interface RegionService extends ReactiveCrudService<RegionDTO, RegionVO> 
     /**
      * 获取下级
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 数据集
      */
     Flux<RegionVO> subset(Long id);

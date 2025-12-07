@@ -33,7 +33,7 @@ public interface GroupAuthoritiesRepository extends R2dbcRepository<GroupAuthori
     /**
      * 根据group删除
      *
-     * @param groupId   group 主键
+     * @param groupId   group the pk.
      * @param authority 权限
      */
     Mono<Void> deleteByGroupIdAndAuthority(Long groupId, String authority);

@@ -49,8 +49,8 @@ public interface GroupPrivilegesService {
     /**
      * group-privileges关联
      *
-     * @param groupId     group 主键
-     * @param privilegeId privilege 主键
+     * @param groupId     group the pk.
+     * @param privilegeId privilege the pk.
      * @param actions     按钮
      * @return 数据集
      */
@@ -59,8 +59,8 @@ public interface GroupPrivilegesService {
     /**
      * 移除group-privileges关系
      *
-     * @param groupId     group 主键
-     * @param privilegeId privilege 主键
+     * @param groupId     group the pk.
+     * @param privilegeId privilege the pk.
      * @param actions     按钮
      * @return 数据集
      */

@@ -17,6 +17,7 @@
 
 package top.leafage.hypervisor.service;
 
+import reactor.core.publisher.Mono;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 import top.leafage.hypervisor.domain.dto.EmptyLoggingDTO;
 import top.leafage.hypervisor.domain.vo.OperationLogVO;
@@ -28,4 +29,10 @@ import top.leafage.hypervisor.domain.vo.OperationLogVO;
  */
 public interface OperationLogService extends ReactiveCrudService<EmptyLoggingDTO, OperationLogVO> {
 
+    /**
+     * clear all
+     *
+     * @return Void
+     */
+    Mono<Void> clear();
 }

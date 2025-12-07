@@ -44,9 +44,9 @@ import java.util.NoSuchElementException;
 @Service
 public class PostServiceImpl implements PostService {
 
+    private static final BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
     private final PostRepository postRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(PostDTO.class, Post.class, false);
 
 
     /**
@@ -114,6 +114,19 @@ public class PostServiceImpl implements PostService {
 
         return postRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
+                .flatMap(existing -> {
+                    if (!existing.getTitle().equals(dto.getTitle())) {
+                        return Mono.just(existing);
+                    }
+
+                    return postRepository.existsByTitle(dto.getTitle())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("post title already exists: " + dto.getTitle()));
+                                }
+                                return Mono.just(existing);
+                            });
+                })
                 .flatMap(existing -> {
                     copier.copy(dto, existing, null);
                     return postRepository.save(existing);

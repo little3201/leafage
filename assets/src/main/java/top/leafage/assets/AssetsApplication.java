@@ -27,12 +27,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class AssetsApplication {
-
-    /**
-     * <p>main.</p>
-     *
-     * @param args an array of {@link java.lang.String} tuple
-     */
+    
     public static void main(String[] args) {
         SpringApplication.run(AssetsApplication.class, args);
     }

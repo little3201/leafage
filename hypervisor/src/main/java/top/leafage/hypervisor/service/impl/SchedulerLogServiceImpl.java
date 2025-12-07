@@ -92,4 +92,9 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
             return Mono.error(new NoSuchElementException("scheduler log not found: " + id));
         });
     }
+
+    @Override
+    public Mono<Void> clear() {
+        return schedulerLogRepository.deleteAll();
+    }
 }

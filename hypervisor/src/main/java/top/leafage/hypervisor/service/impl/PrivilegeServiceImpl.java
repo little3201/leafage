@@ -145,25 +145,28 @@ public class PrivilegeServiceImpl implements PrivilegeService {
      * {@inheritDoc}
      */
     @Override
-    public Mono<PrivilegeVO> create(PrivilegeDTO dto) {
-        return privilegeRepository.save(PrivilegeDTO.toEntity(dto))
-                .map(PrivilegeVO::from);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Mono<PrivilegeVO> modify(Long id, PrivilegeDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return privilegeRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return existing;
+                .flatMap(existing -> {
+                    if (!existing.getName().equals(dto.getName())) {
+                        return Mono.just(existing);
+                    }
+
+                    return privilegeRepository.existsByName(dto.getName())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("privilege name already exists: " + dto.getName()));
+                                }
+                                return Mono.just(existing);
+                            });
                 })
-                .flatMap(privilegeRepository::save)
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return privilegeRepository.save(existing);
+                })
                 .map(PrivilegeVO::from);
     }
 

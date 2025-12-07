@@ -92,8 +92,14 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Mono<UserVO> create(UserDTO dto) {
-        return userRepository.save(UserDTO.toEntity(dto, "{noop}12345678"))
-                .map(UserVO::from);
+        return userRepository.existsByUsername(dto.getUsername())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalArgumentException("username already exists: " + dto.getUsername()));
+                    }
+                    return userRepository.save(UserDTO.toEntity(dto, "{noop}12345678"))
+                            .map(UserVO::from);
+                });
     }
 
     /**
@@ -105,11 +111,23 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return existing;
+                .flatMap(existing -> {
+                    if (existing.getUsername().equals(dto.getUsername())) {
+                        return Mono.just(existing);
+                    }
+
+                    return userRepository.existsByUsername(dto.getUsername())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("username already exists: " + dto.getUsername()));
+                                }
+                                return Mono.just(existing);
+                            });
                 })
-                .flatMap(userRepository::save)
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return userRepository.save(existing);
+                })
                 .map(UserVO::from);
     }
 

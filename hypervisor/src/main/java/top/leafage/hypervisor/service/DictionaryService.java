@@ -32,7 +32,7 @@ public interface DictionaryService extends ReactiveCrudService<DictionaryDTO, Di
     /**
      * 获取下级
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 数据集
      */
     Flux<DictionaryVO> subset(Long id);

@@ -93,7 +93,39 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public Mono<MessageVO> create(MessageDTO dto) {
-        return messageRepository.save(MessageDTO.toEntity(dto))
+        return messageRepository.existsByTitle(dto.getTitle())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalArgumentException("title already exists: " + dto.getTitle()));
+                    }
+                    return messageRepository.save(MessageDTO.toEntity(dto))
+                            .map(MessageVO::from);
+                });
+    }
+
+    @Override
+    public Mono<MessageVO> modify(Long id, MessageDTO dto) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        return messageRepository.findById(id)
+                .switchIfEmpty(Mono.error(NoSuchElementException::new))
+                .flatMap(existing -> {
+                    if (!existing.getTitle().equals(dto.getTitle())) {
+                        return Mono.just(existing);
+                    }
+
+                    return messageRepository.existsByTitle(dto.getTitle())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("title already exists: " + dto.getTitle()));
+                                }
+                                return Mono.just(existing);
+                            });
+                })
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return messageRepository.save(existing);
+                })
                 .map(MessageVO::from);
     }
 

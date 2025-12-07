@@ -89,7 +89,12 @@ public class OperationLogServiceImpl implements OperationLogService {
             if (exists) {
                 return operationLogRepository.deleteById(id);
             }
-            return Mono.error(new NoSuchElementException("operation log not found: " + id);
+            return Mono.error(new NoSuchElementException("operation log not found: " + id));
         });
+    }
+
+    @Override
+    public Mono<Void> clear() {
+        return operationLogRepository.deleteAll();
     }
 }

@@ -43,7 +43,7 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
     /**
      * Toggles the enabled status of a record by its ID.
      *
-     * @param id The ID of the record.
+     * @param id the pk.
      * @return result.
      */
     @Modifying
@@ -53,7 +53,7 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
     /**
      * Toggles the accountNonLocked status of a record by its ID.
      *
-     * @param id The ID of the record.
+     * @param id the pk.
      * @return result.
      */
     @Modifying

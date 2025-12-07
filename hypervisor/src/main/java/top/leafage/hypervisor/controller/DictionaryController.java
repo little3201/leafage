@@ -20,16 +20,15 @@ package top.leafage.hypervisor.controller;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
 import top.leafage.hypervisor.domain.dto.DictionaryDTO;
-import top.leafage.hypervisor.domain.vo.DictionaryVO;
 import top.leafage.hypervisor.service.DictionaryService;
 
 /**
@@ -37,7 +36,6 @@ import top.leafage.hypervisor.service.DictionaryService;
  *
  * @author wq li
  */
-@Validated
 @RestController
 @RequestMapping("/dictionaries")
 public class DictionaryController {
@@ -63,34 +61,38 @@ public class DictionaryController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<Page<DictionaryVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                             String sortBy, boolean descending, String filters) {
+    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
+                                         String sortBy, boolean descending, String filters) {
         return dictionaryService.retrieve(page, size, sortBy, descending, filters)
-                .doOnError(e -> logger.error("Retrieve dictionaries error: ", e));
+                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<DictionaryVO> fetch(@PathVariable Long id) {
+    public Mono<ServerResponse> fetch(@PathVariable Long id) {
         return dictionaryService.fetch(id)
-                .doOnError(e -> logger.error("Fetch dictionary error: ", e));
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
     /**
      * 查询下级数据
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public Flux<DictionaryVO> subset(@PathVariable Long id) {
+    public Mono<ServerResponse> subset(@PathVariable Long id) {
         return dictionaryService.subset(id)
-                .doOnError(e -> logger.error("Retrieve dictionary subset error: ", e));
+                .collectList()
+                .flatMap(voList -> ServerResponse.ok().bodyValue(voList))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
@@ -100,34 +102,52 @@ public class DictionaryController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<DictionaryVO> create(@RequestBody @Validated DictionaryDTO dto) {
+    public Mono<ServerResponse> create(@RequestBody @Valid DictionaryDTO dto) {
         return dictionaryService.create(dto)
-                .doOnError(e -> logger.error("Create dictionary occurred an error: ", e));
+                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 修改信息
      *
-     * @param id  dictionary 主键
+     * @param id  dictionary the pk.
      * @param dto 要修改的数据
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Validated DictionaryDTO dto) {
+    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
         return dictionaryService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify dictionary occurred an error: ", e));
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 删除
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<Void> remove(@PathVariable Long id) {
+    public Mono<ServerResponse> remove(@PathVariable Long id) {
         return dictionaryService.remove(id)
-                .doOnError(e -> logger.error("Remove dictionary error: ", e));
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
+    }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
+    @PatchMapping("/{id}")
+    public Mono<ServerResponse> enable(@PathVariable Long id) {
+        return dictionaryService.enable(id)
+                .flatMap(b -> ServerResponse.ok().bodyValue(b))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
@@ -137,12 +157,11 @@ public class DictionaryController {
      */
     @PreAuthorize("hasAuthority('SCOPE_dictionaries:import')")
     @PostMapping("/import")
-    public Flux<DictionaryVO> importFromFile(FilePart file) {
+    public Mono<ServerResponse> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, DictionaryDTO.class)
                 .flatMapMany(dictionaryService::createAll)
-                .onErrorMap(e -> {
-                    logger.error("Failed import from file: ", e);
-                    return new RuntimeException("Failed import from file", e);
-                });
+                .collectList()
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 }

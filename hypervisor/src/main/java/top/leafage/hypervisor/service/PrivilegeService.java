@@ -44,7 +44,7 @@ public interface PrivilegeService extends ReactiveCrudService<PrivilegeDTO, Priv
     /**
      * 获取下级
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 数据集
      */
     Flux<PrivilegeVO> subset(Long id);

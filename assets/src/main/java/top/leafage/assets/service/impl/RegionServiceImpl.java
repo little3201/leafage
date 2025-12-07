@@ -44,9 +44,9 @@ import java.util.NoSuchElementException;
 @Service
 public class RegionServiceImpl implements RegionService {
 
+    private static final BeanCopier copier = BeanCopier.create(RegionDTO.class, Region.class, false);
     private final RegionRepository regionRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(RegionDTO.class, Region.class, false);
 
     /**
      * <p>Constructor for RegionServiceImpl.</p>
@@ -119,13 +119,27 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public Mono<RegionVO> modify(Long id, RegionDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
         return regionRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
                 .flatMap(existing -> {
+                    if (!existing.getName().equals(dto.getName())) {
+                        return Mono.just(existing);
+                    }
+
+                    return regionRepository.existsByName(dto.getName())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("region name already exists: " + dto.getName()));
+                                }
+                                return Mono.just(existing);
+                            });
+                })
+                .flatMap(existing -> {
                     copier.copy(dto, existing, null);
-                    return regionRepository.save(existing)
-                            .map(RegionVO::from);
-                });
+                    return regionRepository.save(existing);
+                })
+                .map(RegionVO::from);
     }
 
     /**

@@ -125,20 +125,22 @@ public class DictionaryServiceImpl implements DictionaryService {
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
                 .flatMap(existing -> {
                     if (!existing.getName().equals(dto.getName())) {
-                        return dictionaryRepository.existsByName(dto.getName())
-                                .flatMap(exists -> {
-                                    if (exists) {
-                                        return Mono.error(new IllegalArgumentException("name already exists: " + dto.getName()));
-                                    }
-                                    return dictionaryRepository.save(DictionaryDTO.toEntity(dto))
-                                            .map(DictionaryVO::from);
-                                });
-                    } else {
-                        copier.copy(dto, existing, null);
-                        return dictionaryRepository.save(existing)
-                                .map(DictionaryVO::from);
+                        return Mono.just(existing);
                     }
-                });
+
+                    return dictionaryRepository.existsByName(dto.getName())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("dictionary name already exists: " + dto.getName()));
+                                }
+                                return Mono.just(existing);
+                            });
+                })
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return dictionaryRepository.save(existing);
+                })
+                .map(DictionaryVO::from);
     }
 
     @Override

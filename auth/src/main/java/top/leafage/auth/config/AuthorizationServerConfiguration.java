@@ -68,6 +68,7 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 public class AuthorizationServerConfiguration {
 
+
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) {
@@ -89,7 +90,7 @@ public class AuthorizationServerConfiguration {
                         )
                 );
 
-        return http.build();
+        return http.cors(Customizer.withDefaults()).build();
     }
 
     @Bean
@@ -100,7 +101,7 @@ public class AuthorizationServerConfiguration {
                         authorize.requestMatchers("/actuator/**", "/assets/**", "/login").permitAll()
                                 .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.loginPage("/login"));
-        return http.build();
+        return http.cors(Customizer.withDefaults()).build();
     }
 
     @Bean
@@ -185,4 +186,5 @@ public class AuthorizationServerConfiguration {
         }
         return keyPair;
     }
+
 }

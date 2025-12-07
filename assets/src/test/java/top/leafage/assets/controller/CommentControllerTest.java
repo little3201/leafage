@@ -17,10 +17,6 @@
 
 package top.leafage.assets.controller;
 
-import top.leafage.assets.domain.dto.CommentDTO;
-import top.leafage.assets.service.CommentService;
-import top.leafage.assets.domain.vo.CommentVO;
-import top.leafage.assets.domain.vo.TagVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +27,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.dto.CommentDTO;
+import top.leafage.assets.domain.vo.CommentVO;
+import top.leafage.assets.service.CommentService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -72,7 +71,7 @@ class CommentControllerTest {
         webTestClient.get().uri("/comments/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(TagVO.class);
+                .expectBodyList(CommentVO.class);
     }
 
     @Test
@@ -90,7 +89,7 @@ class CommentControllerTest {
 
         webTestClient.get().uri("/comments/{id}/replies", 1L)
                 .exchange()
-                .expectStatus().isOk().expectBodyList(TagVO.class);
+                .expectStatus().isOk().expectBodyList(CommentVO.class);
     }
 
     @Test

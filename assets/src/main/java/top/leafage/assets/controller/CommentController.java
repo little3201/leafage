@@ -17,22 +17,22 @@
 
 package top.leafage.assets.controller;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import top.leafage.assets.domain.dto.CommentDTO;
 import top.leafage.assets.service.CommentService;
-import top.leafage.assets.domain.vo.CommentVO;
 
 /**
  * comment controller
  *
  * @author wq li
  */
-@Validated
 @RestController
 @RequestMapping("/comments")
 public class CommentController {
@@ -57,9 +57,10 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{postId}")
-    public Flux<CommentVO> comments(@PathVariable Long postId) {
+    public Mono<ServerResponse> comments(@PathVariable Long postId) {
         return commentService.comments(postId)
-                .doOnError(e -> logger.error("Retrieve comments error: ", e));
+                .collectList()
+                .flatMap(voList -> ServerResponse.ok().bodyValue(voList));
     }
 
 
@@ -70,9 +71,10 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{id}/replies")
-    public Flux<CommentVO> replies(@PathVariable Long id) {
+    public Mono<ServerResponse> replies(@PathVariable Long id) {
         return commentService.replies(id)
-                .doOnError(e -> logger.error("Retrieve comment repliers error: ", e));
+                .collectList()
+                .flatMap(voList -> ServerResponse.ok().bodyValue(voList));
     }
 
     /**
@@ -82,21 +84,24 @@ public class CommentController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<CommentVO> create(@RequestBody @Validated CommentDTO dto) {
+    public Mono<ServerResponse> create(@RequestBody @Valid CommentDTO dto) {
         return commentService.create(dto)
-                .doOnError(e -> logger.error("Create comment occurred an error: ", e));
+                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 删除信息
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<Void> remove(@PathVariable Long id) {
+    public Mono<ServerResponse> remove(@PathVariable Long id) {
         return commentService.remove(id)
-                .doOnError(e -> logger.error("Remove comment occurred an error: ", e));
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
 }

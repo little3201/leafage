@@ -50,7 +50,7 @@ public interface GroupMembersService {
     /**
      * group-user关系
      *
-     * @param groupId   group 主键
+     * @param groupId   group the pk.
      * @param usernames username集合
      * @return 是否成功： true - 是， false - 否
      */

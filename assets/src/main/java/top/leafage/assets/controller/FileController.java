@@ -21,24 +21,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
-import top.leafage.assets.domain.vo.FileRecordVO;
 import top.leafage.assets.service.FileRecordService;
 
 import java.io.FileNotFoundException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * file controller.
@@ -74,23 +73,25 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping
-    public Mono<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                             String sortBy, boolean descending, String filters) {
+    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
+                                         String sortBy, boolean descending, String filters) {
         return fileRecordService.retrieve(page, size, sortBy, descending, filters)
-                .doOnError(e -> logger.error("Retrieve file records error: ", e));
+                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 主键 ID
+     * @param id the pk. ID
      * @return 查询的数据
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
-    public Mono<FileRecordVO> fetch(@PathVariable Long id) {
+    public Mono<ServerResponse> fetch(@PathVariable Long id) {
         return fileRecordService.fetch(id)
-                .doOnError(e -> logger.error("Fetch file record error: ", e));
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
     /**
@@ -101,45 +102,51 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
-    public Mono<FileRecordVO> upload(FilePart file) {
+    public Mono<ServerResponse> upload(FilePart file) {
         return fileRecordService.upload(file)
-                .doOnSuccess(vo -> logger.debug("File uploaded successfully: {}", file.filename()))
-                .doOnError(e -> logger.error("Upload file error: {}", file.filename(), e));
+                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 主键 ID
+     * @param id the pk. ID
      * @return 查询的数据
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")
-    public Mono<Void> download(@PathVariable Long id, ServerHttpResponse response) {
+    public Mono<ServerResponse> download(@PathVariable Long id) {
         return fileRecordService.fetch(id)
                 .switchIfEmpty(Mono.error(new FileNotFoundException("File not found.")))
                 .flatMap(vo -> {
-                    Resource resource = new FileSystemResource(vo.path());
-                    String fileName = URLEncoder.encode(vo.name(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-                    response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                    response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=" + fileName + ";filename*=UTF_8''" + fileName);
+                    Path filePath = Paths.get(vo.path());
+                    String encodedName = URLEncoder.encode(vo.name(), StandardCharsets.UTF_8)
+                            .replaceAll("\\+", "%20");
 
-                    Flux<DataBuffer> content = DataBufferUtils.readInputStream(resource::getInputStream, new DefaultDataBufferFactory(), 4096);
-                    return response.writeWith(content);
-                });
+                    Resource resource = new FileSystemResource(filePath);
+                    return ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                            .header(HttpHeaders.CONTENT_DISPOSITION,
+                                    "attachment; filename=\"" + encodedName + "\"; " +
+                                            "filename*=UTF-8''" + encodedName)
+                            .body(BodyInserters.fromResource(resource));
+                })
+                .onErrorResume(e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     /**
      * 删除信息
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 如果删除成功，返回200状态码，否则返回417状态码
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")
     @DeleteMapping("/{id}")
-    public Mono<Void> remove(@PathVariable Long id) {
+    public Mono<ServerResponse> remove(@PathVariable Long id) {
         return fileRecordService.remove(id)
-                .doOnEach(e -> logger.error("Remove file error: {}", e));
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 }

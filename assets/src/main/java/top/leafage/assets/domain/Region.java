@@ -18,14 +18,8 @@
 package top.leafage.assets.domain;
 
 import org.jspecify.annotations.NonNull;
-import top.leafage.assets.domain.superclass.RegionModel;
-import org.springframework.data.annotation.*;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.InsertOnlyProperty;
 import org.springframework.data.relational.core.mapping.Table;
 import top.leafage.common.data.domain.AbstractAuditable;
-
-import java.time.Instant;
 
 /**
  * entity class for region.

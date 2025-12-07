@@ -20,18 +20,15 @@ package top.leafage.hypervisor.controller;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
-import top.leafage.hypervisor.domain.GroupMembers;
-import top.leafage.hypervisor.domain.GroupPrivileges;
 import top.leafage.hypervisor.domain.dto.GroupDTO;
-import top.leafage.hypervisor.domain.vo.GroupVO;
 import top.leafage.hypervisor.service.GroupMembersService;
 import top.leafage.hypervisor.service.GroupPrivilegesService;
 import top.leafage.hypervisor.service.GroupService;
@@ -43,7 +40,6 @@ import java.util.Set;
  *
  * @author wq li
  */
-@Validated
 @RestController
 @RequestMapping("/groups")
 public class GroupController {
@@ -75,22 +71,24 @@ public class GroupController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<Page<GroupVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                        String sortBy, boolean descending, String filters) {
+    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
+                                         String sortBy, boolean descending, String filters) {
         return groupService.retrieve(page, size, sortBy, descending, filters)
-                .doOnError(e -> logger.error("Retrieve groups error: ", e));
+                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 主键 ID
+     * @param id the pk. ID
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<GroupVO> fetch(@PathVariable Long id) {
+    public Mono<ServerResponse> fetch(@PathVariable Long id) {
         return groupService.fetch(id)
-                .doOnError(e -> logger.error("Fetch group error: ", e));
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
     /**
@@ -100,34 +98,52 @@ public class GroupController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<GroupVO> create(@RequestBody @Validated GroupDTO dto) {
+    public Mono<ServerResponse> create(@RequestBody @Valid GroupDTO dto) {
         return groupService.create(dto)
-                .doOnError(e -> logger.error("Create group occurred an error: ", e));
+                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 修改
      *
-     * @param id  主键
+     * @param id  the pk.
      * @param dto 要修改的数据
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<GroupVO> modify(@PathVariable Long id, @RequestBody @Validated GroupDTO dto) {
+    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid GroupDTO dto) {
         return groupService.modify(id, dto)
-                .doOnError(e -> logger.error("Modify group occurred an error: ", e));
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 删除
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<Void> remove(@PathVariable Long id) {
+    public Mono<ServerResponse> remove(@PathVariable Long id) {
         return groupService.remove(id)
-                .doOnError(e -> logger.error("Remove group error: ", e));
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
+    }
+
+    /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
+    @PatchMapping("/{id}")
+    public Mono<ServerResponse> enable(@PathVariable Long id) {
+        return groupService.enable(id)
+                .flatMap(b -> ServerResponse.ok().bodyValue(b))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
@@ -137,9 +153,11 @@ public class GroupController {
      * @return 查询到的数据集
      */
     @GetMapping("/{id}/members")
-    public Flux<GroupMembers> members(@PathVariable Long id) {
+    public Mono<ServerResponse> members(@PathVariable Long id) {
         return groupMembersService.members(id)
-                .doOnError(e -> logger.error("Retrieve group members occurred an error: ", e));
+                .collectList()
+                .flatMap(members -> ServerResponse.ok().bodyValue(members))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
@@ -149,9 +167,10 @@ public class GroupController {
      * @return 查询到的数据集
      */
     @PatchMapping("/{id}/privileges/{privilegeId}")
-    public Mono<GroupPrivileges> relation(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
+    public Mono<ServerResponse> relation(@PathVariable Long id, @PathVariable Long privilegeId, @RequestBody Set<String> actions) {
         return groupPrivilegesService.relation(id, privilegeId, actions)
-                .doOnError(e -> logger.error("Relation group privileges occurred an error: ", e));
+                .flatMap(groupPrivileges -> ServerResponse.ok().bodyValue(groupPrivileges))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
@@ -161,9 +180,11 @@ public class GroupController {
      * @return 查询到的数据集
      */
     @DeleteMapping("/{id}/privileges/{privilegeId}")
-    public Mono<Void> removeRelation(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
+    public Mono<ServerResponse> removeRelation(@PathVariable Long id, @PathVariable Long privilegeId, Set<String> actions) {
         return groupPrivilegesService.removeRelation(id, privilegeId, actions)
-                .doOnError(e -> logger.error("Remove group privileges occurred an error: ", e));
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
     /**
@@ -173,12 +194,11 @@ public class GroupController {
      */
     @PreAuthorize("hasAuthority('SCOPE_groups:import')")
     @PostMapping("/import")
-    public Flux<GroupVO> importFromFile(FilePart file) {
+    public Mono<ServerResponse> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, GroupDTO.class)
                 .flatMapMany(groupService::createAll)
-                .onErrorMap(e -> {
-                    logger.error("Failed import from file: ", e);
-                    return new RuntimeException("Failed import from file", e);
-                });
+                .collectList()
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 }

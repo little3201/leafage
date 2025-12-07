@@ -17,9 +17,9 @@
 
 package top.leafage.assets.service;
 
+import reactor.core.publisher.Flux;
 import top.leafage.assets.domain.dto.CommentDTO;
 import top.leafage.assets.domain.vo.CommentVO;
-import reactor.core.publisher.Flux;
 import top.leafage.common.data.reactive.ReactiveCrudService;
 
 /**
@@ -40,7 +40,7 @@ public interface CommentService extends ReactiveCrudService<CommentDTO, CommentV
     /**
      * 查询回复
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 回复的评论
      */
     Flux<CommentVO> replies(Long id);

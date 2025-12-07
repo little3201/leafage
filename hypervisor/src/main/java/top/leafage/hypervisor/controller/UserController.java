@@ -17,10 +17,10 @@
 
 package top.leafage.hypervisor.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,7 +34,6 @@ import top.leafage.hypervisor.service.UserService;
  *
  * @author wq li
  */
-@Validated
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -67,7 +66,7 @@ public class UserController {
     /**
      * 根据 id 查询
      *
-     * @param id user 主键
+     * @param id user the pk.
      * @return 查询的数据
      */
     @GetMapping("/{id}")
@@ -85,7 +84,7 @@ public class UserController {
      * @return 修改后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Validated UserDTO dto) {
+    public Mono<ServerResponse> create(@RequestBody @Valid UserDTO dto) {
         return userService.create(dto)
                 .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
                 .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
@@ -94,12 +93,12 @@ public class UserController {
     /**
      * 修改信息
      *
-     * @param id  user 主键
+     * @param id  user the pk.
      * @param dto 要修改的数据
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Validated UserDTO dto) {
+    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
         return userService.modify(id, dto)
                 .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
                 .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
@@ -108,7 +107,7 @@ public class UserController {
     /**
      * 删除信息
      *
-     * @param id user 主键
+     * @param id user the pk.
      * @return 200状态码
      */
     @DeleteMapping("/{id}")

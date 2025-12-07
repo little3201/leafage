@@ -20,12 +20,12 @@ package top.leafage.hypervisor.controller;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import top.leafage.hypervisor.domain.dto.MessageDTO;
-import top.leafage.hypervisor.domain.vo.MessageVO;
 import top.leafage.hypervisor.service.MessageService;
 
 import java.security.Principal;
@@ -35,7 +35,6 @@ import java.security.Principal;
  *
  * @author wq li
  */
-@Validated
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
@@ -61,22 +60,24 @@ public class MessageController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<Page<MessageVO>> retrieve(@RequestParam int page, @RequestParam int size,
-                                          String sortBy, boolean descending, Principal principal) {
+    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
+                                         String sortBy, boolean descending, Principal principal) {
         return messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()))
-                .doOnError(e -> logger.error("Retrieve messages error: ", e));
+                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
     }
 
     /**
      * 根据 id 查询
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<MessageVO> fetch(@PathVariable Long id) {
+    public Mono<ServerResponse> fetch(@PathVariable Long id) {
         return messageService.fetch(id)
-                .doOnError(e -> logger.error("Fetch message error: ", e));
+                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
     /**
@@ -86,21 +87,24 @@ public class MessageController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<MessageVO> create(@RequestBody @Validated MessageDTO dto) {
+    public Mono<ServerResponse> create(@RequestBody @Valid MessageDTO dto) {
         return messageService.create(dto)
-                .doOnError(e -> logger.error("Create message occurred an error: ", e));
+                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
+                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
     }
 
     /**
      * 删除
      *
-     * @param id 主键
+     * @param id the pk.
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<Void> remove(@PathVariable Long id) {
+    public Mono<ServerResponse> remove(@PathVariable Long id) {
         return messageService.remove(id)
-                .doOnError(e -> logger.error("Remove message error: ", e));
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(ResponseStatusException.class,
+                        e -> ServerResponse.notFound().build());
     }
 
 }

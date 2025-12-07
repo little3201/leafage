@@ -46,10 +46,10 @@ import java.util.NoSuchElementException;
 @Service
 public class GroupServiceImpl implements GroupService {
 
+    private static final BeanCopier copier = BeanCopier.create(GroupDTO.class, Group.class, false);
     private final GroupRepository groupRepository;
     private final GroupMembersRepository groupMembersRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private static final BeanCopier copier = BeanCopier.create(GroupDTO.class, Group.class, false);
 
     /**
      * <p>Constructor for GroupServiceImpl.</p>
@@ -104,8 +104,14 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public Mono<GroupVO> create(GroupDTO dto) {
-        return groupRepository.save(GroupDTO.toEntity(dto))
-                .map(GroupVO::from);
+        return groupRepository.existsByName(dto.getName())
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalArgumentException("name already exists: " + dto.getName()));
+                    }
+                    return groupRepository.save(GroupDTO.toEntity(dto))
+                            .map(GroupVO::from);
+                });
     }
 
     /**
@@ -117,11 +123,23 @@ public class GroupServiceImpl implements GroupService {
 
         return groupRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoSuchElementException::new))
-                .map(existing -> {
-                    copier.copy(dto, existing, null);
-                    return existing;
+                .flatMap(existing -> {
+                    if (!existing.getName().equals(dto.getName())) {
+                        return Mono.just(existing);
+                    }
+
+                    return groupRepository.existsByName(dto.getName())
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new IllegalArgumentException("group name already exists: " + dto.getName()));
+                                }
+                                return Mono.just(existing);
+                            });
                 })
-                .flatMap(groupRepository::save)
+                .flatMap(existing -> {
+                    copier.copy(dto, existing, null);
+                    return groupRepository.save(existing);
+                })
                 .map(GroupVO::from);
     }
 
