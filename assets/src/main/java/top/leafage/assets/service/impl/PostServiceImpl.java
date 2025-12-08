@@ -50,7 +50,7 @@ public class PostServiceImpl implements PostService {
 
 
     /**
-     * <p>Constructor for PostServiceImpl.</p>
+     * Constructor for PostServiceImpl.
      *
      * @param postRepository a {@link PostRepository} object
      */

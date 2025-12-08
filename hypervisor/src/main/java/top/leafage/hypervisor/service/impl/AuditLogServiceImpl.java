@@ -46,7 +46,7 @@ public class AuditLogServiceImpl implements AuditLogService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for AuditLogServiceImpl.</p>
+     * Constructor for AuditLogServiceImpl.
      *
      * @param auditLogRepository a {@link AuditLogRepository} object
      */

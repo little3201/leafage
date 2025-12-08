@@ -42,7 +42,7 @@ public class GroupMembersServiceImpl implements GroupMembersService {
     private final GroupMembersRepository groupMembersRepository;
 
     /**
-     * <p>Constructor for GroupMembersServiceImpl.</p>
+     * Constructor for GroupMembersServiceImpl.
      *
      * @param groupMembersRepository a {@link GroupMembersRepository} object
      */

@@ -49,7 +49,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for DictionaryServiceImpl.</p>
+     * Constructor for DictionaryServiceImpl.
      *
      * @param dictionaryRepository a {@link DictionaryRepository} object
      */

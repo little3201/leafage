@@ -46,7 +46,7 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
     private final GroupAuthoritiesRepository groupAuthoritiesRepository;
 
     /**
-     * <p>Constructor for GroupPrivilegesServiceImpl.</p>
+     * Constructor for GroupPrivilegesServiceImpl.
      *
      * @param groupPrivilegesRepository a {@link GroupPrivilegesRepository} object
      */

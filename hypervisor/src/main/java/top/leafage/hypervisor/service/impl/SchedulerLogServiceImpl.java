@@ -46,7 +46,7 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for SchedulerLogServiceImpl.</p>
+     * Constructor for SchedulerLogServiceImpl.
      *
      * @param schedulerLogRepository a {@link SchedulerLogRepository} object
      */

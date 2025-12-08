@@ -17,12 +17,10 @@
 
 package top.leafage.hypervisor.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.vo.AccessLogVO;
 import top.leafage.hypervisor.service.AccessLogService;
 
 /**
@@ -34,12 +32,10 @@ import top.leafage.hypervisor.service.AccessLogService;
 @RequestMapping("/access-logs")
 public class AccessLogController {
 
-    private final Logger logger = LoggerFactory.getLogger(AccessLogController.class);
-
     private final AccessLogService accessLogService;
 
     /**
-     * <p>Constructor for AccessLogController.</p>
+     * Constructor for AccessLogController.
      *
      * @param accessLogService a {@link AccessLogService} object
      */
@@ -55,10 +51,9 @@ public class AccessLogController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return accessLogService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<AccessLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                            String sortBy, boolean descending, String filters) {
+        return accessLogService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -68,11 +63,8 @@ public class AccessLogController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return accessLogService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<AccessLogVO> fetch(@PathVariable Long id) {
+        return accessLogService.fetch(id);
     }
 
     /**
@@ -82,11 +74,8 @@ public class AccessLogController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return accessLogService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return accessLogService.remove(id);
     }
 
     /**
@@ -95,10 +84,7 @@ public class AccessLogController {
      * @return 200状态码
      */
     @DeleteMapping("/clear")
-    public Mono<ServerResponse> clear() {
-        return accessLogService.clear()
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> clear() {
+        return accessLogService.clear();
     }
 }

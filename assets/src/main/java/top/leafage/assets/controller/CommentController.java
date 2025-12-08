@@ -18,14 +18,11 @@
 package top.leafage.assets.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.assets.domain.dto.CommentDTO;
+import top.leafage.assets.domain.vo.CommentVO;
 import top.leafage.assets.service.CommentService;
 
 /**
@@ -37,12 +34,10 @@ import top.leafage.assets.service.CommentService;
 @RequestMapping("/comments")
 public class CommentController {
 
-    private final Logger logger = LoggerFactory.getLogger(CommentController.class);
-
     private final CommentService commentService;
 
     /**
-     * <p>Constructor for CommentController.</p>
+     * Constructor for CommentController.
      *
      * @param commentService a {@link CommentService} object
      */
@@ -57,10 +52,8 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{postId}")
-    public Mono<ServerResponse> comments(@PathVariable Long postId) {
-        return commentService.comments(postId)
-                .collectList()
-                .flatMap(voList -> ServerResponse.ok().bodyValue(voList));
+    public Flux<CommentVO> comments(@PathVariable Long postId) {
+        return commentService.comments(postId);
     }
 
 
@@ -71,10 +64,8 @@ public class CommentController {
      * @return 关联的评论
      */
     @GetMapping("/{id}/replies")
-    public Mono<ServerResponse> replies(@PathVariable Long id) {
-        return commentService.replies(id)
-                .collectList()
-                .flatMap(voList -> ServerResponse.ok().bodyValue(voList));
+    public Flux<CommentVO> replies(@PathVariable Long id) {
+        return commentService.replies(id);
     }
 
     /**
@@ -84,10 +75,8 @@ public class CommentController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid CommentDTO dto) {
-        return commentService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<CommentVO> create(@RequestBody @Valid CommentDTO dto) {
+        return commentService.create(dto);
     }
 
     /**
@@ -97,11 +86,8 @@ public class CommentController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return commentService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return commentService.remove(id);
     }
 
 }

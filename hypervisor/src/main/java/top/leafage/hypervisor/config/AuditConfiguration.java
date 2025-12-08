@@ -26,7 +26,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 
 /**
- * <p>AuditConfiguration class.</p>
+ * AuditConfiguration class.
  *
  * @author wq li
  */
@@ -35,7 +35,7 @@ import org.springframework.security.core.context.SecurityContext;
 public class AuditConfiguration {
 
     /**
-     * <p>auditorProvider.</p>
+     * auditorProvider.
      *
      * @return a {@link ReactiveAuditorAware} object
      */

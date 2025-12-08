@@ -18,20 +18,20 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.leafage.common.data.domain.TreeNode;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
 import top.leafage.hypervisor.domain.dto.PrivilegeDTO;
+import top.leafage.hypervisor.domain.vo.PrivilegeVO;
 import top.leafage.hypervisor.service.PrivilegeService;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * privilege controller
@@ -42,12 +42,10 @@ import java.security.Principal;
 @RequestMapping("/privileges")
 public class PrivilegeController {
 
-    private final Logger logger = LoggerFactory.getLogger(PrivilegeController.class);
-
     private final PrivilegeService privilegeService;
 
     /**
-     * <p>Constructor for PrivilegeController.</p>
+     * Constructor for PrivilegeController.
      *
      * @param privilegeService a {@link PrivilegeService} object
      */
@@ -63,10 +61,9 @@ public class PrivilegeController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return privilegeService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<PrivilegeVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                            String sortBy, boolean descending, String filters) {
+        return privilegeService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -75,10 +72,8 @@ public class PrivilegeController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/tree")
-    public Mono<ServerResponse> tree(Principal principal) {
-        return privilegeService.tree(principal.getName())
-                .flatMap(treeNodes -> ServerResponse.ok().bodyValue(treeNodes))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<List<TreeNode<Long>>> tree(Principal principal) {
+        return privilegeService.tree(principal.getName());
     }
 
     /**
@@ -88,11 +83,8 @@ public class PrivilegeController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return privilegeService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<PrivilegeVO> fetch(@PathVariable Long id) {
+        return privilegeService.fetch(id);
     }
 
     /**
@@ -101,10 +93,8 @@ public class PrivilegeController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{superiorId}/subset")
-    public Mono<ServerResponse> subset(@PathVariable Long superiorId) {
-        return privilegeService.subset(superiorId).collectList()
-                .flatMap(voList -> ServerResponse.ok().bodyValue(voList))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Flux<PrivilegeVO> subset(@PathVariable Long superiorId) {
+        return privilegeService.subset(superiorId);
     }
 
     /**
@@ -114,10 +104,8 @@ public class PrivilegeController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid PrivilegeDTO dto) {
-        return privilegeService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<PrivilegeVO> create(@RequestBody @Valid PrivilegeDTO dto) {
+        return privilegeService.create(dto);
     }
 
     /**
@@ -128,10 +116,8 @@ public class PrivilegeController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
-        return privilegeService.modify(id, dto)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<PrivilegeVO> modify(@PathVariable Long id, @RequestBody @Valid PrivilegeDTO dto) {
+        return privilegeService.modify(id, dto);
     }
 
     /**
@@ -142,10 +128,8 @@ public class PrivilegeController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
     @PatchMapping("/{id}")
-    public Mono<ServerResponse> enable(@PathVariable Long id) {
-        return privilegeService.enable(id)
-                .flatMap(b -> ServerResponse.ok().bodyValue(b))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<Boolean> enable(@PathVariable Long id) {
+        return privilegeService.enable(id);
     }
 
     /**
@@ -155,11 +139,8 @@ public class PrivilegeController {
      */
     @PreAuthorize("hasAuthority('SCOPE_privileges:import')")
     @PostMapping("/import")
-    public Mono<ServerResponse> importFromFile(FilePart file) {
+    public Flux<PrivilegeVO> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, PrivilegeDTO.class)
-                .flatMapMany(privilegeService::createAll)
-                .collectList()
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+                .flatMapMany(privilegeService::createAll);
     }
 }

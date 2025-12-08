@@ -61,7 +61,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for PrivilegeServiceImpl.</p>
+     * Constructor for PrivilegeServiceImpl.
      *
      * @param privilegeRepository a {@link PrivilegeRepository} object
      */

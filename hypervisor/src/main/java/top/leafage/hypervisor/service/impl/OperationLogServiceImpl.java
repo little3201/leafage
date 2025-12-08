@@ -46,7 +46,7 @@ public class OperationLogServiceImpl implements OperationLogService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for OperationLogServiceImpl.</p>
+     * Constructor for OperationLogServiceImpl.
      *
      * @param operationLogRepository a {@link OperationLogRepository} object
      */

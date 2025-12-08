@@ -18,16 +18,14 @@
 package top.leafage.assets.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.assets.domain.dto.RegionDTO;
+import top.leafage.assets.domain.vo.RegionVO;
 import top.leafage.assets.service.RegionService;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
 
@@ -40,12 +38,10 @@ import top.leafage.common.poi.reactive.ReactiveExcelReader;
 @RequestMapping("/regions")
 public class RegionController {
 
-    private final Logger logger = LoggerFactory.getLogger(RegionController.class);
-
     private final RegionService regionService;
 
     /**
-     * <p>Constructor for RegionController.</p>
+     * Constructor for RegionController.
      *
      * @param regionService a {@link RegionService} object
      */
@@ -61,10 +57,9 @@ public class RegionController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
+    public Mono<Page<RegionVO>> retrieve(@RequestParam int page, @RequestParam int size,
                                          String sortBy, boolean descending, String filters) {
-        return regionService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+        return regionService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -74,11 +69,8 @@ public class RegionController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return regionService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<RegionVO> fetch(@PathVariable Long id) {
+        return regionService.fetch(id);
     }
 
     /**
@@ -88,10 +80,8 @@ public class RegionController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public Mono<ServerResponse> subset(@PathVariable Long id) {
-        return regionService.subset(id)
-                .collectList()
-                .flatMap(voList -> ServerResponse.ok().bodyValue(voList));
+    public Flux<RegionVO> subset(@PathVariable Long id) {
+        return regionService.subset(id);
     }
 
     /**
@@ -101,10 +91,8 @@ public class RegionController {
      * @return 修改后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid RegionDTO dto) {
-        return regionService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<RegionVO> create(@RequestBody @Valid RegionDTO dto) {
+        return regionService.create(dto);
     }
 
     /**
@@ -115,10 +103,8 @@ public class RegionController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid RegionDTO dto) {
-        return regionService.modify(id, dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<RegionVO> modify(@PathVariable Long id, @RequestBody @Valid RegionDTO dto) {
+        return regionService.modify(id, dto);
     }
 
     /**
@@ -128,11 +114,8 @@ public class RegionController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return regionService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return regionService.remove(id);
     }
 
     /**
@@ -142,11 +125,8 @@ public class RegionController {
      */
     @PreAuthorize("hasAuthority('SCOPE_schemas:import')")
     @PostMapping("/import")
-    public Mono<ServerResponse> importFromFile(FilePart file) {
+    public Flux<RegionVO> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, RegionDTO.class)
-                .flatMapMany(regionService::createAll)
-                .collectList()
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+                .flatMapMany(regionService::createAll);
     }
 }

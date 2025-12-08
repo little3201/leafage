@@ -52,7 +52,7 @@ public class GroupServiceImpl implements GroupService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for GroupServiceImpl.</p>
+     * Constructor for GroupServiceImpl.
      *
      * @param groupRepository a {@link GroupRepository} object
      */

@@ -18,14 +18,11 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import top.leafage.hypervisor.domain.dto.MessageDTO;
+import top.leafage.hypervisor.domain.vo.MessageVO;
 import top.leafage.hypervisor.service.MessageService;
 
 import java.security.Principal;
@@ -39,12 +36,10 @@ import java.security.Principal;
 @RequestMapping("/messages")
 public class MessageController {
 
-    private final Logger logger = LoggerFactory.getLogger(MessageController.class);
-
     private final MessageService messageService;
 
     /**
-     * <p>Constructor for MessageController.</p>
+     * Constructor for MessageController.
      *
      * @param messageService a {@link MessageService} object
      */
@@ -60,10 +55,9 @@ public class MessageController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, Principal principal) {
-        return messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()))
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<MessageVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                          String sortBy, boolean descending, Principal principal) {
+        return messageService.retrieve(page, size, sortBy, descending, String.format("receiver:eq:%s", principal.getName()));
     }
 
     /**
@@ -73,11 +67,8 @@ public class MessageController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return messageService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<MessageVO> fetch(@PathVariable Long id) {
+        return messageService.fetch(id);
     }
 
     /**
@@ -87,10 +78,8 @@ public class MessageController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid MessageDTO dto) {
-        return messageService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<MessageVO> create(@RequestBody @Valid MessageDTO dto) {
+        return messageService.create(dto);
     }
 
     /**
@@ -100,11 +89,8 @@ public class MessageController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return messageService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return messageService.remove(id);
     }
 
 }

@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for UserServiceImpl.</p>
+     * Constructor for UserServiceImpl.
      *
      * @param userRepository a {@link UserRepository} object
      */

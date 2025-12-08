@@ -49,7 +49,7 @@ public class RegionServiceImpl implements RegionService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for RegionServiceImpl.</p>
+     * Constructor for RegionServiceImpl.
      *
      * @param regionRepository a {@link RegionRepository} object
      */

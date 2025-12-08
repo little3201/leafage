@@ -17,12 +17,10 @@
 
 package top.leafage.hypervisor.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.vo.AuditLogVO;
 import top.leafage.hypervisor.service.AuditLogService;
 
 /**
@@ -34,12 +32,10 @@ import top.leafage.hypervisor.service.AuditLogService;
 @RequestMapping("/audit-logs")
 public class AuditLogController {
 
-    private final Logger logger = LoggerFactory.getLogger(AuditLogController.class);
-
     private final AuditLogService auditLogService;
 
     /**
-     * <p>Constructor for AuditLogController.</p>
+     * Constructor for AuditLogController.
      *
      * @param auditLogService a {@link AuditLogService} object
      */
@@ -55,10 +51,9 @@ public class AuditLogController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return auditLogService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<AuditLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                           String sortBy, boolean descending, String filters) {
+        return auditLogService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -68,11 +63,8 @@ public class AuditLogController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return auditLogService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<AuditLogVO> fetch(@PathVariable Long id) {
+        return auditLogService.fetch(id);
     }
 
     /**
@@ -82,10 +74,7 @@ public class AuditLogController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return auditLogService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return auditLogService.remove(id);
     }
 }

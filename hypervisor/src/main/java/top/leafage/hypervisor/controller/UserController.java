@@ -18,15 +18,15 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
 import top.leafage.hypervisor.domain.dto.UserDTO;
+import top.leafage.hypervisor.domain.vo.UserVO;
 import top.leafage.hypervisor.service.UserService;
 
 /**
@@ -41,7 +41,7 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * <p>Constructor for UserController.</p>
+     * Constructor for UserController.
      *
      * @param userService a {@link UserService} object
      */
@@ -50,17 +50,16 @@ public class UserController {
     }
 
     /**
-     * <p>retrieve.</p>
+     * retrieve.
      *
      * @param page a int
      * @param size a int
      * @return a {@link org.springframework.http.ResponseEntity} object
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return userService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<UserVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                       String sortBy, boolean descending, String filters) {
+        return userService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -70,11 +69,8 @@ public class UserController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return userService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<UserVO> fetch(@PathVariable Long id) {
+        return userService.fetch(id);
     }
 
     /**
@@ -84,10 +80,8 @@ public class UserController {
      * @return 修改后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid UserDTO dto) {
-        return userService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<UserVO> create(@RequestBody @Valid UserDTO dto) {
+        return userService.create(dto);
     }
 
     /**
@@ -98,10 +92,8 @@ public class UserController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
-        return userService.modify(id, dto)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<UserVO> modify(@PathVariable Long id, @RequestBody @Valid UserDTO dto) {
+        return userService.modify(id, dto);
     }
 
     /**
@@ -111,11 +103,8 @@ public class UserController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return userService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return userService.remove(id);
     }
 
     /**
@@ -126,10 +115,8 @@ public class UserController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
     @PatchMapping("/{id}")
-    public Mono<ServerResponse> enable(@PathVariable Long id) {
-        return userService.enable(id)
-                .flatMap(b -> ServerResponse.ok().bodyValue(b))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<Boolean> enable(@PathVariable Long id) {
+        return userService.enable(id);
     }
 
     /**
@@ -140,10 +127,8 @@ public class UserController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:unlock')")
     @PatchMapping("/{id}/unlock")
-    public Mono<ServerResponse> unlock(@PathVariable Long id) {
-        return userService.unlock(id)
-                .flatMap(b -> ServerResponse.ok().bodyValue(b))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<Boolean> unlock(@PathVariable Long id) {
+        return userService.unlock(id);
     }
 
     /**
@@ -153,12 +138,9 @@ public class UserController {
      */
     @PreAuthorize("hasAuthority('SCOPE_users:import')")
     @PostMapping("/import")
-    public Mono<ServerResponse> importFromFile(FilePart file) {
+    public Flux<UserVO> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, UserDTO.class)
-                .flatMapMany(userService::createAll)
-                .collectList()
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+                .flatMapMany(userService::createAll);
     }
 
 }

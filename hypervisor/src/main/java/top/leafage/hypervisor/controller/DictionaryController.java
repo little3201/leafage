@@ -18,17 +18,15 @@
 package top.leafage.hypervisor.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
 import top.leafage.hypervisor.domain.dto.DictionaryDTO;
+import top.leafage.hypervisor.domain.vo.DictionaryVO;
 import top.leafage.hypervisor.service.DictionaryService;
 
 /**
@@ -40,12 +38,10 @@ import top.leafage.hypervisor.service.DictionaryService;
 @RequestMapping("/dictionaries")
 public class DictionaryController {
 
-    private final Logger logger = LoggerFactory.getLogger(DictionaryController.class);
-
     private final DictionaryService dictionaryService;
 
     /**
-     * <p>Constructor for DictionaryController.</p>
+     * Constructor for DictionaryController.
      *
      * @param dictionaryService a {@link DictionaryService} object
      */
@@ -61,10 +57,9 @@ public class DictionaryController {
      * @return 查询的数据集
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return dictionaryService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<DictionaryVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                             String sortBy, boolean descending, String filters) {
+        return dictionaryService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -74,11 +69,8 @@ public class DictionaryController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return dictionaryService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<DictionaryVO> fetch(@PathVariable Long id) {
+        return dictionaryService.fetch(id);
     }
 
     /**
@@ -88,11 +80,8 @@ public class DictionaryController {
      * @return 查询到的数据，否则返回空
      */
     @GetMapping("/{id}/subset")
-    public Mono<ServerResponse> subset(@PathVariable Long id) {
-        return dictionaryService.subset(id)
-                .collectList()
-                .flatMap(voList -> ServerResponse.ok().bodyValue(voList))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Flux<DictionaryVO> subset(@PathVariable Long id) {
+        return dictionaryService.subset(id);
     }
 
     /**
@@ -102,10 +91,8 @@ public class DictionaryController {
      * @return 添加后的信息
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid DictionaryDTO dto) {
-        return dictionaryService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<DictionaryVO> create(@RequestBody @Valid DictionaryDTO dto) {
+        return dictionaryService.create(dto);
     }
 
     /**
@@ -116,10 +103,8 @@ public class DictionaryController {
      * @return 修改后的信息
      */
     @PutMapping("/{id}")
-    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
-        return dictionaryService.modify(id, dto)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<DictionaryVO> modify(@PathVariable Long id, @RequestBody @Valid DictionaryDTO dto) {
+        return dictionaryService.modify(id, dto);
     }
 
     /**
@@ -129,11 +114,8 @@ public class DictionaryController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return dictionaryService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return dictionaryService.remove(id);
     }
 
     /**
@@ -144,10 +126,8 @@ public class DictionaryController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
     @PatchMapping("/{id}")
-    public Mono<ServerResponse> enable(@PathVariable Long id) {
-        return dictionaryService.enable(id)
-                .flatMap(b -> ServerResponse.ok().bodyValue(b))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<Boolean> enable(@PathVariable Long id) {
+        return dictionaryService.enable(id);
     }
 
     /**
@@ -157,11 +137,8 @@ public class DictionaryController {
      */
     @PreAuthorize("hasAuthority('SCOPE_dictionaries:import')")
     @PostMapping("/import")
-    public Mono<ServerResponse> importFromFile(FilePart file) {
+    public Flux<DictionaryVO> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, DictionaryDTO.class)
-                .flatMapMany(dictionaryService::createAll)
-                .collectList()
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+                .flatMapMany(dictionaryService::createAll);
     }
 }

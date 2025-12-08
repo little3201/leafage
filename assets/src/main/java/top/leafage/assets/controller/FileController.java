@@ -17,10 +17,9 @@
 
 package top.leafage.assets.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,8 +28,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import top.leafage.assets.domain.vo.FileRecordVO;
 import top.leafage.assets.service.FileRecordService;
 
 import java.io.FileNotFoundException;
@@ -48,15 +47,12 @@ import java.nio.file.Paths;
 @RequestMapping("/files")
 public class FileController {
 
-
-    private final Logger logger = LoggerFactory.getLogger(FileController.class);
-
     private final FileRecordService fileRecordService;
 
     /**
-     * <p>Constructor for RegionController.</p>
-     * <p>
-     * //     * @param regionService a {@link FileRecordService} object
+     * Constructor for RegionController.
+     *
+     * @param fileRecordService a {@link FileRecordService} object
      */
     public FileController(FileRecordService fileRecordService) {
         this.fileRecordService = fileRecordService;
@@ -73,10 +69,9 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return fileRecordService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<FileRecordVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                             String sortBy, boolean descending, String filters) {
+        return fileRecordService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -87,11 +82,8 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return fileRecordService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<FileRecordVO> fetch(@PathVariable Long id) {
+        return fileRecordService.fetch(id);
     }
 
     /**
@@ -102,10 +94,8 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
-    public Mono<ServerResponse> upload(FilePart file) {
-        return fileRecordService.upload(file)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<FileRecordVO> upload(FilePart file) {
+        return fileRecordService.upload(file);
     }
 
     /**
@@ -143,10 +133,7 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:remove')")
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return fileRecordService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return fileRecordService.remove(id);
     }
 }

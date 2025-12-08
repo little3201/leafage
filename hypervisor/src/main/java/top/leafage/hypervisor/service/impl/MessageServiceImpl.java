@@ -48,7 +48,7 @@ public class MessageServiceImpl implements MessageService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for MessageServiceImpl.</p>
+     * Constructor for MessageServiceImpl.
      *
      * @param messageRepository a {@link MessageRepository} object
      */

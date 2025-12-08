@@ -45,7 +45,7 @@ public class AccessLogServiceImpl implements AccessLogService {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     /**
-     * <p>Constructor for AccessLogServiceImpl.</p>
+     * Constructor for AccessLogServiceImpl.
      *
      * @param accessLogRepository a {@link AccessLogRepository} object
      */

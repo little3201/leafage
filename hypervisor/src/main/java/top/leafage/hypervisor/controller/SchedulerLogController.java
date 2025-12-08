@@ -17,12 +17,10 @@
 
 package top.leafage.hypervisor.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import top.leafage.hypervisor.domain.vo.SchedulerLogVO;
 import top.leafage.hypervisor.service.SchedulerLogService;
 
 /**
@@ -34,12 +32,10 @@ import top.leafage.hypervisor.service.SchedulerLogService;
 @RequestMapping("/scheduler-logs")
 public class SchedulerLogController {
 
-    private final Logger logger = LoggerFactory.getLogger(SchedulerLogController.class);
-
     private final SchedulerLogService schedulerLogService;
 
     /**
-     * <p>Constructor for SchedulerLogController.</p>
+     * Constructor for SchedulerLogController.
      *
      * @param schedulerLogService a {@link SchedulerLogService} object
      */
@@ -55,10 +51,9 @@ public class SchedulerLogController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return schedulerLogService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<SchedulerLogVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                               String sortBy, boolean descending, String filters) {
+        return schedulerLogService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -68,11 +63,8 @@ public class SchedulerLogController {
      * @return 查询的数据
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return schedulerLogService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<SchedulerLogVO> fetch(@PathVariable Long id) {
+        return schedulerLogService.fetch(id);
     }
 
     /**
@@ -82,11 +74,8 @@ public class SchedulerLogController {
      * @return 200状态码
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return schedulerLogService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return schedulerLogService.remove(id);
     }
 
     /**
@@ -95,10 +84,7 @@ public class SchedulerLogController {
      * @return 200状态码
      */
     @DeleteMapping("/clear")
-    public Mono<ServerResponse> clear() {
-        return schedulerLogService.clear()
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> clear() {
+        return schedulerLogService.clear();
     }
 }

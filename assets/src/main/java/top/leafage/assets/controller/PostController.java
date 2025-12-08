@@ -18,16 +18,14 @@
 package top.leafage.assets.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.leafage.assets.domain.dto.PostDTO;
+import top.leafage.assets.domain.vo.PostVO;
 import top.leafage.assets.service.PostService;
 import top.leafage.common.poi.reactive.ReactiveExcelReader;
 
@@ -41,12 +39,10 @@ import top.leafage.common.poi.reactive.ReactiveExcelReader;
 @RequestMapping("/posts")
 public class PostController {
 
-    private final Logger logger = LoggerFactory.getLogger(PostController.class);
-
     private final PostService postService;
 
     /**
-     * <p>Constructor for PostController.</p>
+     * Constructor for PostController.
      *
      * @param postService a {@link PostService} object
      */
@@ -65,10 +61,9 @@ public class PostController {
      * @return 查询到数据集，异常时返回204
      */
     @GetMapping
-    public Mono<ServerResponse> retrieve(@RequestParam int page, @RequestParam int size,
-                                         String sortBy, boolean descending, String filters) {
-        return postService.retrieve(page, size, sortBy, descending, filters)
-                .flatMap(voPage -> ServerResponse.ok().bodyValue(voPage));
+    public Mono<Page<PostVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                       String sortBy, boolean descending, String filters) {
+        return postService.retrieve(page, size, sortBy, descending, filters);
     }
 
     /**
@@ -78,11 +73,8 @@ public class PostController {
      * @return 查询到数据，异常时返回204
      */
     @GetMapping("/{id}")
-    public Mono<ServerResponse> fetch(@PathVariable Long id) {
-        return postService.fetch(id)
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<PostVO> fetch(@PathVariable Long id) {
+        return postService.fetch(id);
     }
 
     /**
@@ -92,10 +84,8 @@ public class PostController {
      * @return 添加后的信息，否则返回417状态码
      */
     @PostMapping
-    public Mono<ServerResponse> create(@RequestBody @Valid PostDTO dto) {
-        return postService.create(dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<PostVO> create(@RequestBody @Valid PostDTO dto) {
+        return postService.create(dto);
     }
 
     /**
@@ -106,10 +96,8 @@ public class PostController {
      * @return 修改后的信息，否则返回417状态码
      */
     @PutMapping("/{id}")
-    public Mono<ServerResponse> modify(@PathVariable Long id, @RequestBody @Valid PostDTO dto) {
-        return postService.modify(id, dto)
-                .flatMap(vo -> ServerResponse.status(HttpStatus.CREATED).bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+    public Mono<PostVO> modify(@PathVariable Long id, @RequestBody @Valid PostDTO dto) {
+        return postService.modify(id, dto);
     }
 
 
@@ -120,11 +108,8 @@ public class PostController {
      * @return 查询到数据，异常时返回204
      */
     @DeleteMapping("/{id}")
-    public Mono<ServerResponse> remove(@PathVariable Long id) {
-        return postService.remove(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(ResponseStatusException.class,
-                        e -> ServerResponse.notFound().build());
+    public Mono<Void> remove(@PathVariable Long id) {
+        return postService.remove(id);
     }
 
     /**
@@ -134,11 +119,8 @@ public class PostController {
      */
     @PreAuthorize("hasAuthority('SCOPE_schemas:import')")
     @PostMapping("/import")
-    public Mono<ServerResponse> importFromFile(FilePart file) {
+    public Flux<PostVO> importFromFile(FilePart file) {
         return ReactiveExcelReader.read(file, PostDTO.class)
-                .flatMapMany(postService::createAll)
-                .collectList()
-                .flatMap(vo -> ServerResponse.ok().bodyValue(vo))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+                .flatMapMany(postService::createAll);
     }
 }

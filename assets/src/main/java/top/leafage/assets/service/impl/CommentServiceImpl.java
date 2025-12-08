@@ -39,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     /**
-     * <p>Constructor for CommentServiceImpl.</p>
+     * Constructor for CommentServiceImpl.
      *
      * @param commentRepository a {@link CommentRepository} object
      */
