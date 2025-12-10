@@ -17,6 +17,8 @@
 
 package top.leafage.assets.repository;
 
+import org.springframework.data.r2dbc.repository.Modifying;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -48,9 +50,12 @@ public interface RegionRepository extends R2dbcRepository<Region, Long> {
     Flux<Region> findBySuperiorId(Long superiorId);
 
     /**
-     * 统计
+     * Toggles the enabled status of a schema by its ID.
      *
-     * @return 记录数
+     * @param id The ID of the schema.
+     * @return 1 if the update was successful, 0 otherwise.
      */
-    Mono<Long> countBySuperiorIdIsNullAndEnabledTrue();
+    @Modifying
+    @Query("UPDATE regions SET enabled = NOT enabled WHERE id = :id")
+    Mono<Integer> updateEnabledById(Long id);
 }

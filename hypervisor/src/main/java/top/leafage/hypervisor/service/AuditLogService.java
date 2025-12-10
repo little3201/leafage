@@ -18,7 +18,6 @@
 package top.leafage.hypervisor.service;
 
 import top.leafage.common.data.reactive.ReactiveCrudService;
-import top.leafage.hypervisor.domain.dto.EmptyLoggingDTO;
 import top.leafage.hypervisor.domain.vo.AuditLogVO;
 
 /**
@@ -26,6 +25,6 @@ import top.leafage.hypervisor.domain.vo.AuditLogVO;
  *
  * @author wq li
  */
-public interface AuditLogService extends ReactiveCrudService<EmptyLoggingDTO, AuditLogVO> {
+public interface AuditLogService extends ReactiveCrudService<Object, AuditLogVO> {
 
 }

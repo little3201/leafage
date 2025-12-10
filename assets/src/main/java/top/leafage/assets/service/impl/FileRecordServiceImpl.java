@@ -26,6 +26,7 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import top.leafage.assets.domain.FileRecord;
 import top.leafage.assets.domain.vo.FileRecordVO;
@@ -58,7 +59,9 @@ public class FileRecordServiceImpl implements FileRecordService {
     public Mono<Page<FileRecordVO>> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, FileRecord.class);
-
+        if (!StringUtils.hasText(filters) || !filters.contains("superiorId")) {
+            criteria = criteria.and("superiorId").isNull();
+        }
         return r2dbcEntityTemplate.select(FileRecord.class)
                 .matching(Query.query(criteria).with(pageable))
                 .all()

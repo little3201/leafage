@@ -25,6 +25,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -102,6 +103,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<DictionaryVO> create(DictionaryDTO dto) {
         return dictionaryRepository.existsByName(dto.getName())
@@ -117,6 +119,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<DictionaryVO> modify(Long id, DictionaryDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -143,6 +146,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                 .map(DictionaryVO::from);
     }
 
+    @Transactional
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

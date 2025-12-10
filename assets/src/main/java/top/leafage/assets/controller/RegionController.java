@@ -119,6 +119,18 @@ public class RegionController {
     }
 
     /**
+     * Enable a record when enabled is false or disable when enabled is ture.
+     *
+     * @param id The record ID.
+     * @return 200 status code if successful, or 417 status code if an error occurs.
+     */
+    @PreAuthorize("hasAuthority('SCOPE_regions:enable')")
+    @PatchMapping("/{id}")
+    public Mono<Boolean> enable(@PathVariable Long id) {
+        return regionService.enable(id);
+    }
+
+    /**
      * Import the records.
      *
      * @return 200 status code if successful, or 417 status code if an error occurs.

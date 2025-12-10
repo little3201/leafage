@@ -24,6 +24,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import top.leafage.hypervisor.domain.AccessLog;
@@ -80,6 +81,7 @@ public class AccessLogServiceImpl implements AccessLogService {
                 .map(AccessLogVO::from);
     }
 
+    @Transactional
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -92,6 +94,7 @@ public class AccessLogServiceImpl implements AccessLogService {
         });
     }
 
+    @Transactional
     @Override
     public Mono<Void> clear() {
         return accessLogRepository.deleteAll();

@@ -24,6 +24,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
@@ -102,6 +103,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<GroupVO> create(GroupDTO dto) {
         return groupRepository.existsByName(dto.getName())
@@ -117,6 +119,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<GroupVO> modify(Long id, GroupDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -146,6 +149,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<Void> remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

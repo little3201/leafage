@@ -18,6 +18,7 @@
 package top.leafage.hypervisor.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -73,6 +74,7 @@ public class GroupMembersServiceImpl implements GroupMembersService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<Boolean> relation(Long groupId, Set<String> usernames) {
         Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));

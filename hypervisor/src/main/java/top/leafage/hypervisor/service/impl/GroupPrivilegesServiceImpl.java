@@ -18,6 +18,7 @@
 package top.leafage.hypervisor.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
@@ -79,6 +80,7 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public Mono<GroupPrivileges> relation(Long groupId, Long privilegeId, Set<String> actions) {
         Assert.notNull(groupId, "groupId must not be null.");

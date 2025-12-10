@@ -8,10 +8,6 @@ spring:
   profiles:
     active: dev
 
-  web:
-    resources:
-      add-mappings: false
-
   security:
     oauth2:
       resource-server:

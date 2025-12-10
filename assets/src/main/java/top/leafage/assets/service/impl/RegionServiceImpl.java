@@ -25,6 +25,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -85,6 +86,21 @@ public class RegionServiceImpl implements RegionService {
 
         return regionRepository.findById(id)
                 .map(RegionVO::from);
+    }
+
+    @Transactional
+    @Override
+    public Mono<Boolean> enable(Long id) {
+        Assert.notNull(id, ID_MUST_NOT_BE_NULL);
+
+        return regionRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (!exists) {
+                        return Mono.error(new NoSuchElementException("region not found: " + id));
+                    }
+                    return regionRepository.updateEnabledById(id)
+                            .map(count -> count > 0);
+                });
     }
 
     /**

@@ -19,7 +19,6 @@ package top.leafage.hypervisor.service;
 
 import reactor.core.publisher.Mono;
 import top.leafage.common.data.reactive.ReactiveCrudService;
-import top.leafage.hypervisor.domain.dto.EmptyLoggingDTO;
 import top.leafage.hypervisor.domain.vo.AccessLogVO;
 
 /**
@@ -27,7 +26,7 @@ import top.leafage.hypervisor.domain.vo.AccessLogVO;
  *
  * @author wq li
  */
-public interface AccessLogService extends ReactiveCrudService<EmptyLoggingDTO, AccessLogVO> {
+public interface AccessLogService extends ReactiveCrudService<Object, AccessLogVO> {
 
     /**
      * clear all
