@@ -42,19 +42,21 @@ public record UserVO(
     }
 
     private static String mask(String email) {
-        if (email == null || email.isEmpty()) {
-            return "";
+        int atIndex = email.lastIndexOf('@');
+        if (atIndex <= 0) {
+            // 没有@或@在开头，非法邮箱，直接返回原值或空
+            return email;
         }
 
-        int atIndex = email.indexOf('@');
-        if (atIndex <= 3) {
-            return email; // 邮箱太短不脱敏
+        String prefix = email.substring(0, atIndex); // @前的用户名部分
+        String domain = email.substring(atIndex);    // 包含@的域名部分
+
+        if (prefix.length() <= 1) {
+            // 用户名只有1个字符，如 a@qq.com
+            return prefix.charAt(0) + "****" + domain;
+        } else {
+            // 用户名 ≥2 个字符，保留第一个，后面全部变*
+            return prefix.charAt(0) + "****" + domain;
         }
-
-        String prefix = email.substring(0, 3);
-        String suffix = email.substring(atIndex);
-        int starCount = atIndex - 3;
-
-        return prefix + "*".repeat(starCount) + suffix;
     }
 }

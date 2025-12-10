@@ -17,6 +17,7 @@
 
 package top.leafage.assets.config;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.ReactiveAuditorAware;
@@ -40,7 +41,7 @@ public class AuditConfiguration {
      * @return a {@link ReactiveAuditorAware} object
      */
     @Bean
-    public ReactiveAuditorAware<String> auditorProvider() {
+    public ReactiveAuditorAware<@NonNull String> auditorProvider() {
         return () -> ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)

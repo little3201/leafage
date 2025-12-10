@@ -56,6 +56,34 @@ public class User extends AbstractAuditable<@NonNull String, @NonNull Long> {
         this.password = password;
     }
 
+    public enum UserStatus {
+        NORMAL,           // 正常
+        DISABLED,         // 已禁用
+        LOCKED,           // 已锁定
+        ACCOUNT_EXPIRED,  // 账户已过期
+        CREDENTIALS_EXPIRED; // 密码已过期
+
+        public static UserStatus of(boolean enabled,
+                                    boolean accountNonExpired,
+                                    boolean accountNonLocked,
+                                    boolean credentialsNonExpired) {
+
+            if (!enabled) {
+                return DISABLED;
+            }
+            if (!accountNonExpired) {
+                return ACCOUNT_EXPIRED;
+            }
+            if (!accountNonLocked) {
+                return LOCKED;
+            }
+            if (!credentialsNonExpired) {
+                return CREDENTIALS_EXPIRED;
+            }
+            return NORMAL;
+        }
+    }
+
     public String getUsername() {
         return username;
     }
