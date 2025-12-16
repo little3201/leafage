@@ -3,8 +3,8 @@ package top.leafage.hypervisor.task;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import top.leafage.hypervisor.service.OperationLogService;
-import top.leafage.hypervisor.service.SchedulerLogService;
+import top.leafage.hypervisor.system.service.OperationLogService;
+import top.leafage.hypervisor.system.service.SchedulerLogService;
 
 @Component
 public class LoggingTask {

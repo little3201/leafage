@@ -49,9 +49,7 @@
     <modules>
         <module>gateway</module>
         <module>auth</module>
-        <module>assets</module>
         <module>hypervisor</module>
-        <module>exploiter</module>
     </modules>
 
     <dependencyManagement>

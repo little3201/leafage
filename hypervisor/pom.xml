@@ -44,6 +44,10 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+        </dependency>
+        <dependency>
             <groupId>top.leafage</groupId>
             <artifactId>leafage-common</artifactId>
         </dependency>

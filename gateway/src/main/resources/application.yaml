@@ -25,20 +25,6 @@ spring:
               filters:
                 - StripPrefix=1
                 - TokenRelay=
-            - id: exploiter
-              uri: http://localhost:8763
-              predicates:
-                - Path=/exploiter/**
-              filters:
-                - StripPrefix=1
-                - TokenRelay=
-            - id: assets
-              uri: http://localhost:8764
-              predicates:
-                - Path=/assets/**
-              filters:
-                - StripPrefix=1
-                - TokenRelay=
 
 management:
   endpoints:
