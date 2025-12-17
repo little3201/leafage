@@ -37,6 +37,7 @@ public class Post extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
 
     private String summary;
 
+    @Column(columnDefinition = "text")
     private String body;
 
     @ElementCollection(fetch = FetchType.EAGER)

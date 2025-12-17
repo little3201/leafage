@@ -26,8 +26,8 @@ import top.leafage.common.data.domain.TreeNode;
 import top.leafage.hypervisor.system.domain.Privilege;
 import top.leafage.hypervisor.system.domain.dto.PrivilegeDTO;
 import top.leafage.hypervisor.system.domain.vo.PrivilegeVO;
-import top.leafage.hypervisor.system.service.PrivilegeService;
 import top.leafage.hypervisor.system.repository.*;
+import top.leafage.hypervisor.system.service.PrivilegeService;
 
 import java.util.*;
 import java.util.function.Function;
@@ -79,7 +79,13 @@ public class PrivilegeServiceImpl implements PrivilegeService {
         spec = spec.and((root, query, cb) -> cb.isNull(root.get("superiorId")));
 
         return privilegeRepository.findAll(spec, pageable)
-                .map(PrivilegeVO::from);
+                .map(entity -> {
+                    if (entity.getId() != null) {
+                        long count = privilegeRepository.countBySuperiorId(entity.getId());
+                        return PrivilegeVO.from(entity, count);
+                    }
+                    return PrivilegeVO.from(entity);
+                });
     }
 
     /**

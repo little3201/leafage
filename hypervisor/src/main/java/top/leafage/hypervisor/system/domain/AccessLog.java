@@ -16,6 +16,7 @@
 package top.leafage.hypervisor.system.domain;
 
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -39,6 +40,7 @@ public class AccessLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lo
 
     private String httpMethod;
 
+    @Column(columnDefinition = "inet")
     private InetAddress ip;
 
     private String params;

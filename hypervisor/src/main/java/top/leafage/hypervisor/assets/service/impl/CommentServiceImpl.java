@@ -97,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
     /**
      * {@inheritDoc}
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     @Override
     public CommentVO create(CommentDTO dto) {
         Comment entity = commentRepository.saveAndFlush(CommentDTO.toEntity(dto));

@@ -33,6 +33,7 @@ public record PrivilegeVO(
         String icon,
         Set<String> actions,
         String description,
+        boolean enabled,
         long count
 ) {
     public static PrivilegeVO from(Privilege entity) {
@@ -50,6 +51,7 @@ public record PrivilegeVO(
                 entity.getIcon(),
                 entity.getActions(),
                 entity.getDescription(),
+                entity.isEnabled(),
                 count
         );
     }

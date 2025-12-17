@@ -79,7 +79,7 @@ public class PostServiceImpl implements PostService {
     /**
      * {@inheritDoc}
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     @Override
     public PostVO create(PostDTO dto) {
         if (postRepository.existsByTitle(dto.getTitle())) {
