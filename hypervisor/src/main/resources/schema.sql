@@ -22,37 +22,37 @@ CREATE TABLE "public"."access_logs"
 )
 ;
 COMMENT
-ON COLUMN "public"."access_logs"."id" IS '主键';
+    ON COLUMN "public"."access_logs"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."access_logs"."url" IS '接口';
+    ON COLUMN "public"."access_logs"."url" IS '接口';
 COMMENT
-ON COLUMN "public"."access_logs"."http_method" IS 'http方法';
+    ON COLUMN "public"."access_logs"."http_method" IS 'http方法';
 COMMENT
-ON COLUMN "public"."access_logs"."params" IS '参数';
+    ON COLUMN "public"."access_logs"."params" IS '参数';
 COMMENT
-ON COLUMN "public"."access_logs"."body" IS '请求体';
+    ON COLUMN "public"."access_logs"."body" IS '请求体';
 COMMENT
-ON COLUMN "public"."access_logs"."ip" IS 'IP地址';
+    ON COLUMN "public"."access_logs"."ip" IS 'IP地址';
 COMMENT
-ON COLUMN "public"."access_logs"."location" IS '位置';
+    ON COLUMN "public"."access_logs"."location" IS '位置';
 COMMENT
-ON COLUMN "public"."access_logs"."status_code" IS 'HTTP状态码';
+    ON COLUMN "public"."access_logs"."status_code" IS 'HTTP状态码';
 COMMENT
-ON COLUMN "public"."access_logs"."response_times" IS '响应时长';
+    ON COLUMN "public"."access_logs"."response_times" IS '响应时长';
 COMMENT
-ON COLUMN "public"."access_logs"."response_message" IS '响应消息';
+    ON COLUMN "public"."access_logs"."response_message" IS '响应消息';
 COMMENT
-ON COLUMN "public"."access_logs"."enabled" IS '是否启用';
+    ON COLUMN "public"."access_logs"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."access_logs"."created_by" IS '创建者';
+    ON COLUMN "public"."access_logs"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."access_logs"."created_date" IS '创建时间';
+    ON COLUMN "public"."access_logs"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."access_logs"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."access_logs"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."access_logs"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."access_logs"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."access_logs" IS '访问日志表';
+    ON TABLE "public"."access_logs" IS '访问日志表';
 
 -- ----------------------------
 -- Table structure for audit_logs
@@ -77,35 +77,35 @@ CREATE TABLE "public"."audit_logs"
 )
 ;
 COMMENT
-ON COLUMN "public"."audit_logs"."id" IS '主键，自增';
+    ON COLUMN "public"."audit_logs"."id" IS '主键，自增';
 COMMENT
-ON COLUMN "public"."audit_logs"."operation" IS '操作类型';
+    ON COLUMN "public"."audit_logs"."operation" IS '操作类型';
 COMMENT
-ON COLUMN "public"."audit_logs"."resource" IS '操作资源';
+    ON COLUMN "public"."audit_logs"."resource" IS '操作资源';
 COMMENT
-ON COLUMN "public"."audit_logs"."old_value" IS '旧值（JSON 格式）';
+    ON COLUMN "public"."audit_logs"."old_value" IS '旧值（JSON 格式）';
 COMMENT
-ON COLUMN "public"."audit_logs"."new_value" IS '新值（JSON 格式）';
+    ON COLUMN "public"."audit_logs"."new_value" IS '新值（JSON 格式）';
 COMMENT
-ON COLUMN "public"."audit_logs"."ip" IS 'IP 地址';
+    ON COLUMN "public"."audit_logs"."ip" IS 'IP 地址';
 COMMENT
-ON COLUMN "public"."audit_logs"."location" IS '位置';
+    ON COLUMN "public"."audit_logs"."location" IS '位置';
 COMMENT
-ON COLUMN "public"."audit_logs"."status_code" IS '状态码';
+    ON COLUMN "public"."audit_logs"."status_code" IS '状态码';
 COMMENT
-ON COLUMN "public"."audit_logs"."enabled" IS '是否启用';
+    ON COLUMN "public"."audit_logs"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."audit_logs"."created_by" IS '创建者';
+    ON COLUMN "public"."audit_logs"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."audit_logs"."created_date" IS '创建时间';
+    ON COLUMN "public"."audit_logs"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."audit_logs"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."audit_logs"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."audit_logs"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."audit_logs"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON COLUMN "public"."audit_logs"."operated_times" IS '操作时长';
+    ON COLUMN "public"."audit_logs"."operated_times" IS '操作时长';
 COMMENT
-ON TABLE "public"."audit_logs" IS '审计日志表';
+    ON TABLE "public"."audit_logs" IS '审计日志表';
 
 -- ----------------------------
 -- Table structure for authorities
@@ -119,13 +119,13 @@ CREATE TABLE "public"."authorities"
 )
 ;
 COMMENT
-ON COLUMN "public"."authorities"."id" IS '主键';
+    ON COLUMN "public"."authorities"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."authorities"."username" IS '用户名';
+    ON COLUMN "public"."authorities"."username" IS '用户名';
 COMMENT
-ON COLUMN "public"."authorities"."authority" IS '权限';
+    ON COLUMN "public"."authorities"."authority" IS '权限';
 COMMENT
-ON TABLE "public"."authorities" IS '用户权限表';
+    ON TABLE "public"."authorities" IS '用户权限表';
 
 -- ----------------------------
 -- Table structure for dictionaries
@@ -145,25 +145,25 @@ CREATE TABLE "public"."dictionaries"
 )
 ;
 COMMENT
-ON COLUMN "public"."dictionaries"."id" IS '主键';
+    ON COLUMN "public"."dictionaries"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."dictionaries"."name" IS '名称';
+    ON COLUMN "public"."dictionaries"."name" IS '名称';
 COMMENT
-ON COLUMN "public"."dictionaries"."superior_id" IS '上级ID';
+    ON COLUMN "public"."dictionaries"."superior_id" IS '上级ID';
 COMMENT
-ON COLUMN "public"."dictionaries"."description" IS '描述';
+    ON COLUMN "public"."dictionaries"."description" IS '描述';
 COMMENT
-ON COLUMN "public"."dictionaries"."enabled" IS '是否启用';
+    ON COLUMN "public"."dictionaries"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."dictionaries"."created_by" IS '创建者';
+    ON COLUMN "public"."dictionaries"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."dictionaries"."created_date" IS '创建时间';
+    ON COLUMN "public"."dictionaries"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."dictionaries"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."dictionaries"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."dictionaries"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."dictionaries"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."dictionaries" IS '字典表';
+    ON TABLE "public"."dictionaries" IS '字典表';
 
 -- ----------------------------
 -- Table structure for file_records
@@ -185,29 +185,29 @@ CREATE TABLE "public"."file_records"
 )
 ;
 COMMENT
-ON COLUMN "public"."file_records"."id" IS '主键';
+    ON COLUMN "public"."file_records"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."file_records"."name" IS '名称';
+    ON COLUMN "public"."file_records"."name" IS '名称';
 COMMENT
-ON COLUMN "public"."file_records"."type" IS '类型';
+    ON COLUMN "public"."file_records"."type" IS '类型';
 COMMENT
-ON COLUMN "public"."file_records"."path" IS '路径';
+    ON COLUMN "public"."file_records"."path" IS '路径';
 COMMENT
-ON COLUMN "public"."file_records"."size" IS '大小';
+    ON COLUMN "public"."file_records"."size" IS '大小';
 COMMENT
-ON COLUMN "public"."file_records"."description" IS '描述';
+    ON COLUMN "public"."file_records"."description" IS '描述';
 COMMENT
-ON COLUMN "public"."file_records"."enabled" IS '是否启用';
+    ON COLUMN "public"."file_records"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."file_records"."created_by" IS '创建者';
+    ON COLUMN "public"."file_records"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."file_records"."created_date" IS '创建时间';
+    ON COLUMN "public"."file_records"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."file_records"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."file_records"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."file_records"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."file_records"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."file_records" IS '文件记录表';
+    ON TABLE "public"."file_records" IS '文件记录表';
 
 -- ----------------------------
 -- Table structure for group_authorities
@@ -221,13 +221,13 @@ CREATE TABLE "public"."group_authorities"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_authorities"."id" IS '主键';
+    ON COLUMN "public"."group_authorities"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."group_authorities"."group_id" IS '用户组ID';
+    ON COLUMN "public"."group_authorities"."group_id" IS '用户组ID';
 COMMENT
-ON COLUMN "public"."group_authorities"."authority" IS '权限';
+    ON COLUMN "public"."group_authorities"."authority" IS '权限';
 COMMENT
-ON TABLE "public"."group_authorities" IS '用户组权限关系表';
+    ON TABLE "public"."group_authorities" IS '用户组权限关系表';
 
 -- ----------------------------
 -- Table structure for group_members
@@ -241,13 +241,13 @@ CREATE TABLE "public"."group_members"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_members"."id" IS '主键';
+    ON COLUMN "public"."group_members"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."group_members"."group_id" IS '用户组ID';
+    ON COLUMN "public"."group_members"."group_id" IS '用户组ID';
 COMMENT
-ON COLUMN "public"."group_members"."username" IS '用户名';
+    ON COLUMN "public"."group_members"."username" IS '用户名';
 COMMENT
-ON TABLE "public"."group_members" IS '用户组成员关系表';
+    ON TABLE "public"."group_members" IS '用户组成员关系表';
 
 -- ----------------------------
 -- Table structure for group_privilege_actions
@@ -261,13 +261,13 @@ CREATE TABLE "public"."group_privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_privilege_actions"."id" IS '主键';
+    ON COLUMN "public"."group_privilege_actions"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."group_privilege_actions"."group_privilege_id" IS '分组权限ID';
+    ON COLUMN "public"."group_privilege_actions"."group_privilege_id" IS '分组权限ID';
 COMMENT
-ON COLUMN "public"."group_privilege_actions"."action" IS '权限ID';
+    ON COLUMN "public"."group_privilege_actions"."action" IS '权限ID';
 COMMENT
-ON TABLE "public"."group_privilege_actions" IS '分组权限操作表';
+    ON TABLE "public"."group_privilege_actions" IS '分组权限操作表';
 
 -- ----------------------------
 -- Table structure for group_privileges
@@ -281,13 +281,13 @@ CREATE TABLE "public"."group_privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_privileges"."id" IS '主键';
+    ON COLUMN "public"."group_privileges"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."group_privileges"."group_id" IS '分组ID';
+    ON COLUMN "public"."group_privileges"."group_id" IS '分组ID';
 COMMENT
-ON COLUMN "public"."group_privileges"."privilege_id" IS '权限ID';
+    ON COLUMN "public"."group_privileges"."privilege_id" IS '权限ID';
 COMMENT
-ON TABLE "public"."group_privileges" IS '分组权限关系表';
+    ON TABLE "public"."group_privileges" IS '分组权限关系表';
 
 -- ----------------------------
 -- Table structure for group_roles
@@ -301,13 +301,13 @@ CREATE TABLE "public"."group_roles"
 )
 ;
 COMMENT
-ON COLUMN "public"."group_roles"."id" IS '主键';
+    ON COLUMN "public"."group_roles"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."group_roles"."group_id" IS '用户组ID';
+    ON COLUMN "public"."group_roles"."group_id" IS '用户组ID';
 COMMENT
-ON COLUMN "public"."group_roles"."role_id" IS '角色ID';
+    ON COLUMN "public"."group_roles"."role_id" IS '角色ID';
 COMMENT
-ON TABLE "public"."group_roles" IS '用户组角色关系表';
+    ON TABLE "public"."group_roles" IS '用户组角色关系表';
 
 -- ----------------------------
 -- Table structure for groups
@@ -327,25 +327,25 @@ CREATE TABLE "public"."groups"
 )
 ;
 COMMENT
-ON COLUMN "public"."groups"."id" IS '主键';
+    ON COLUMN "public"."groups"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."groups"."group_name" IS '名称';
+    ON COLUMN "public"."groups"."group_name" IS '名称';
 COMMENT
-ON COLUMN "public"."groups"."description" IS '描述';
+    ON COLUMN "public"."groups"."description" IS '描述';
 COMMENT
-ON COLUMN "public"."groups"."enabled" IS '是否启用';
+    ON COLUMN "public"."groups"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."groups"."created_by" IS '创建者';
+    ON COLUMN "public"."groups"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."groups"."created_date" IS '创建时间';
+    ON COLUMN "public"."groups"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."groups"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."groups"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."groups"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."groups"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON COLUMN "public"."groups"."superior_id" IS '上级ID';
+    ON COLUMN "public"."groups"."superior_id" IS '上级ID';
 COMMENT
-ON TABLE "public"."groups" IS '用户组表';
+    ON TABLE "public"."groups" IS '用户组表';
 
 -- ----------------------------
 -- Table structure for messages
@@ -355,7 +355,7 @@ CREATE TABLE "public"."messages"
 (
     "id"                 int8         NOT NULL GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
     "title"              varchar(64)  NOT NULL,
-    "body"            text,
+    "body"               text,
     "unread"             bool         NOT NULL DEFAULT false,
     "receiver"           varchar(64)  NOT NULL,
     "description"        varchar(255),
@@ -367,29 +367,29 @@ CREATE TABLE "public"."messages"
 )
 ;
 COMMENT
-ON COLUMN "public"."messages"."id" IS '主键';
+    ON COLUMN "public"."messages"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."messages"."title" IS '标题';
+    ON COLUMN "public"."messages"."title" IS '标题';
 COMMENT
-ON COLUMN "public"."messages"."body" IS '内容';
+    ON COLUMN "public"."messages"."body" IS '内容';
 COMMENT
-ON COLUMN "public"."messages"."unread" IS '是否未读';
+    ON COLUMN "public"."messages"."unread" IS '是否未读';
 COMMENT
-ON COLUMN "public"."messages"."receiver" IS '接收者';
+    ON COLUMN "public"."messages"."receiver" IS '接收者';
 COMMENT
-ON COLUMN "public"."messages"."description" IS '描述';
+    ON COLUMN "public"."messages"."description" IS '描述';
 COMMENT
-ON COLUMN "public"."messages"."enabled" IS '是否启用';
+    ON COLUMN "public"."messages"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."messages"."created_by" IS '创建者';
+    ON COLUMN "public"."messages"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."messages"."created_date" IS '创建时间';
+    ON COLUMN "public"."messages"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."messages"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."messages"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."messages"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."messages"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."messages" IS '消息表';
+    ON TABLE "public"."messages" IS '消息表';
 
 -- ----------------------------
 -- Table structure for operation_logs
@@ -403,7 +403,7 @@ CREATE TABLE "public"."operation_logs"
     "browser"            varchar(50),
     "ip"                 inet,
     "location"           varchar(50),
-    "body"            varchar(1000),
+    "body"               varchar(1000),
     "user_agent"         varchar(255),
     "status_code"        int4,
     "response_message"   varchar(255),
@@ -419,45 +419,45 @@ CREATE TABLE "public"."operation_logs"
 )
 ;
 COMMENT
-ON COLUMN "public"."operation_logs"."id" IS '主键';
+    ON COLUMN "public"."operation_logs"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."operation_logs"."operation" IS '操作';
+    ON COLUMN "public"."operation_logs"."operation" IS '操作';
 COMMENT
-ON COLUMN "public"."operation_logs"."os" IS '操作系统';
+    ON COLUMN "public"."operation_logs"."os" IS '操作系统';
 COMMENT
-ON COLUMN "public"."operation_logs"."browser" IS '浏览器';
+    ON COLUMN "public"."operation_logs"."browser" IS '浏览器';
 COMMENT
-ON COLUMN "public"."operation_logs"."ip" IS 'IP地址';
+    ON COLUMN "public"."operation_logs"."ip" IS 'IP地址';
 COMMENT
-ON COLUMN "public"."operation_logs"."location" IS '位置';
+    ON COLUMN "public"."operation_logs"."location" IS '位置';
 COMMENT
-ON COLUMN "public"."operation_logs"."body" IS '内容';
+    ON COLUMN "public"."operation_logs"."body" IS '内容';
 COMMENT
-ON COLUMN "public"."operation_logs"."user_agent" IS '用户代理信息';
+    ON COLUMN "public"."operation_logs"."user_agent" IS '用户代理信息';
 COMMENT
-ON COLUMN "public"."operation_logs"."status_code" IS 'HTTP状态码';
+    ON COLUMN "public"."operation_logs"."status_code" IS 'HTTP状态码';
 COMMENT
-ON COLUMN "public"."operation_logs"."response_message" IS '响应消息';
+    ON COLUMN "public"."operation_logs"."response_message" IS '响应消息';
 COMMENT
-ON COLUMN "public"."operation_logs"."referer" IS '来源页面';
+    ON COLUMN "public"."operation_logs"."referer" IS '来源页面';
 COMMENT
-ON COLUMN "public"."operation_logs"."session_id" IS '会话标识符';
+    ON COLUMN "public"."operation_logs"."session_id" IS '会话标识符';
 COMMENT
-ON COLUMN "public"."operation_logs"."device_type" IS '设备类型';
+    ON COLUMN "public"."operation_logs"."device_type" IS '设备类型';
 COMMENT
-ON COLUMN "public"."operation_logs"."enabled" IS '是否启用';
+    ON COLUMN "public"."operation_logs"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."operation_logs"."created_by" IS '创建者';
+    ON COLUMN "public"."operation_logs"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."operation_logs"."created_date" IS '创建时间';
+    ON COLUMN "public"."operation_logs"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."operation_logs"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."operation_logs"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."operation_logs"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."operation_logs"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON COLUMN "public"."operation_logs"."operated_times" IS '操作时长';
+    ON COLUMN "public"."operation_logs"."operated_times" IS '操作时长';
 COMMENT
-ON TABLE "public"."operation_logs" IS '访问日志表';
+    ON TABLE "public"."operation_logs" IS '访问日志表';
 
 -- ----------------------------
 -- Table structure for privilege_actions
@@ -471,13 +471,13 @@ CREATE TABLE "public"."privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."privilege_actions"."id" IS '主键';
+    ON COLUMN "public"."privilege_actions"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."privilege_actions"."privilege_id" IS '权限ID';
+    ON COLUMN "public"."privilege_actions"."privilege_id" IS '权限ID';
 COMMENT
-ON COLUMN "public"."privilege_actions"."action" IS '操作';
+    ON COLUMN "public"."privilege_actions"."action" IS '操作';
 COMMENT
-ON TABLE "public"."privilege_actions" IS '权限操作表';
+    ON TABLE "public"."privilege_actions" IS '权限操作表';
 
 -- ----------------------------
 -- Table structure for privileges
@@ -501,33 +501,33 @@ CREATE TABLE "public"."privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."privileges"."id" IS '主键';
+    ON COLUMN "public"."privileges"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."privileges"."superior_id" IS '上级ID';
+    ON COLUMN "public"."privileges"."superior_id" IS '上级ID';
 COMMENT
-ON COLUMN "public"."privileges"."name" IS '名称';
+    ON COLUMN "public"."privileges"."name" IS '名称';
 COMMENT
-ON COLUMN "public"."privileges"."path" IS '路径';
+    ON COLUMN "public"."privileges"."path" IS '路径';
 COMMENT
-ON COLUMN "public"."privileges"."redirect" IS '跳转路径';
+    ON COLUMN "public"."privileges"."redirect" IS '跳转路径';
 COMMENT
-ON COLUMN "public"."privileges"."component" IS '组件路径';
+    ON COLUMN "public"."privileges"."component" IS '组件路径';
 COMMENT
-ON COLUMN "public"."privileges"."icon" IS '图标';
+    ON COLUMN "public"."privileges"."icon" IS '图标';
 COMMENT
-ON COLUMN "public"."privileges"."description" IS '描述';
+    ON COLUMN "public"."privileges"."description" IS '描述';
 COMMENT
-ON COLUMN "public"."privileges"."enabled" IS '是否启用';
+    ON COLUMN "public"."privileges"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."privileges"."created_by" IS '创建者';
+    ON COLUMN "public"."privileges"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."privileges"."created_date" IS '创建时间';
+    ON COLUMN "public"."privileges"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."privileges"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."privileges"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."privileges"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."privileges"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."privileges" IS '权限表';
+    ON TABLE "public"."privileges" IS '权限表';
 
 -- ----------------------------
 -- Table structure for role_members
@@ -541,13 +541,13 @@ CREATE TABLE "public"."role_members"
 )
 ;
 COMMENT
-ON COLUMN "public"."role_members"."id" IS '主键';
+    ON COLUMN "public"."role_members"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."role_members"."role_id" IS '角色ID';
+    ON COLUMN "public"."role_members"."role_id" IS '角色ID';
 COMMENT
-ON COLUMN "public"."role_members"."username" IS '用户名';
+    ON COLUMN "public"."role_members"."username" IS '用户名';
 COMMENT
-ON TABLE "public"."role_members" IS '角色成员关系表';
+    ON TABLE "public"."role_members" IS '角色成员关系表';
 
 -- ----------------------------
 -- Table structure for role_privilege_actions
@@ -561,13 +561,13 @@ CREATE TABLE "public"."role_privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."role_privilege_actions"."id" IS '主键';
+    ON COLUMN "public"."role_privilege_actions"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."role_privilege_actions"."role_privilege_id" IS '角色权限ID';
+    ON COLUMN "public"."role_privilege_actions"."role_privilege_id" IS '角色权限ID';
 COMMENT
-ON COLUMN "public"."role_privilege_actions"."action" IS '权限ID';
+    ON COLUMN "public"."role_privilege_actions"."action" IS '权限ID';
 COMMENT
-ON TABLE "public"."role_privilege_actions" IS '角色权限操作表';
+    ON TABLE "public"."role_privilege_actions" IS '角色权限操作表';
 
 -- ----------------------------
 -- Table structure for role_privileges
@@ -581,13 +581,13 @@ CREATE TABLE "public"."role_privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."role_privileges"."id" IS '主键';
+    ON COLUMN "public"."role_privileges"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."role_privileges"."role_id" IS '角色ID';
+    ON COLUMN "public"."role_privileges"."role_id" IS '角色ID';
 COMMENT
-ON COLUMN "public"."role_privileges"."privilege_id" IS '权限ID';
+    ON COLUMN "public"."role_privileges"."privilege_id" IS '权限ID';
 COMMENT
-ON TABLE "public"."role_privileges" IS '角色权限关系表';
+    ON TABLE "public"."role_privileges" IS '角色权限关系表';
 
 -- ----------------------------
 -- Table structure for roles
@@ -606,23 +606,23 @@ CREATE TABLE "public"."roles"
 )
 ;
 COMMENT
-ON COLUMN "public"."roles"."id" IS '主键';
+    ON COLUMN "public"."roles"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."roles"."name" IS '名称';
+    ON COLUMN "public"."roles"."name" IS '名称';
 COMMENT
-ON COLUMN "public"."roles"."description" IS '描述';
+    ON COLUMN "public"."roles"."description" IS '描述';
 COMMENT
-ON COLUMN "public"."roles"."enabled" IS '是否启用';
+    ON COLUMN "public"."roles"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."roles"."created_by" IS '创建者';
+    ON COLUMN "public"."roles"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."roles"."created_date" IS '创建时间';
+    ON COLUMN "public"."roles"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."roles"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."roles"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."roles"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."roles"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."roles" IS '角色表';
+    ON TABLE "public"."roles" IS '角色表';
 
 -- ----------------------------
 -- Table structure for user_privilege_actions
@@ -636,13 +636,13 @@ CREATE TABLE "public"."user_privilege_actions"
 )
 ;
 COMMENT
-ON COLUMN "public"."user_privilege_actions"."id" IS '主键';
+    ON COLUMN "public"."user_privilege_actions"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."user_privilege_actions"."user_privilege_id" IS '用户权限ID';
+    ON COLUMN "public"."user_privilege_actions"."user_privilege_id" IS '用户权限ID';
 COMMENT
-ON COLUMN "public"."user_privilege_actions"."action" IS '权限ID';
+    ON COLUMN "public"."user_privilege_actions"."action" IS '权限ID';
 COMMENT
-ON TABLE "public"."user_privilege_actions" IS '用户权限操作表';
+    ON TABLE "public"."user_privilege_actions" IS '用户权限操作表';
 
 -- ----------------------------
 -- Table structure for user_privileges
@@ -656,13 +656,13 @@ CREATE TABLE "public"."user_privileges"
 )
 ;
 COMMENT
-ON COLUMN "public"."user_privileges"."id" IS '主键';
+    ON COLUMN "public"."user_privileges"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."user_privileges"."username" IS '账号';
+    ON COLUMN "public"."user_privileges"."username" IS '账号';
 COMMENT
-ON COLUMN "public"."user_privileges"."privilege_id" IS '权限ID';
+    ON COLUMN "public"."user_privileges"."privilege_id" IS '权限ID';
 COMMENT
-ON TABLE "public"."user_privileges" IS '用户权限关系表';
+    ON TABLE "public"."user_privileges" IS '用户权限关系表';
 
 -- ----------------------------
 -- Table structure for users
@@ -673,7 +673,7 @@ CREATE TABLE "public"."users"
     "id"                     int8         NOT NULL GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
     "username"               varchar(64)  NOT NULL,
     "password"               varchar(100) NOT NULL,
-    "name"              varchar(64),
+    "name"                   varchar(64),
     "email"                  varchar(64),
     "avatar"                 varchar(255),
     "enabled"                bool         NOT NULL DEFAULT true,
@@ -687,43 +687,45 @@ CREATE TABLE "public"."users"
 )
 ;
 COMMENT
-ON COLUMN "public"."users"."id" IS '主键';
+    ON COLUMN "public"."users"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."users"."username" IS '用户名';
+    ON COLUMN "public"."users"."username" IS '用户名';
 COMMENT
-ON COLUMN "public"."users"."password" IS '密码';
+    ON COLUMN "public"."users"."password" IS '密码';
 COMMENT
-ON COLUMN "public"."users"."name" IS '姓名';
+    ON COLUMN "public"."users"."name" IS '姓名';
 COMMENT
-ON COLUMN "public"."users"."email" IS '邮箱';
+    ON COLUMN "public"."users"."email" IS '邮箱';
 COMMENT
-ON COLUMN "public"."users"."avatar" IS '头像';
+    ON COLUMN "public"."users"."avatar" IS '头像';
 COMMENT
-ON COLUMN "public"."users"."enabled" IS '是否启用';
+    ON COLUMN "public"."users"."enabled" IS '是否启用';
 COMMENT
-ON COLUMN "public"."users"."account_non_locked" IS '是否未锁定';
+    ON COLUMN "public"."users"."account_non_locked" IS '是否未锁定';
 COMMENT
-ON COLUMN "public"."users"."account_expires_at" IS '失效时间';
+    ON COLUMN "public"."users"."account_expires_at" IS '失效时间';
 COMMENT
-ON COLUMN "public"."users"."credentials_expires_at" IS '密码失效时间';
+    ON COLUMN "public"."users"."credentials_expires_at" IS '密码失效时间';
 COMMENT
-ON COLUMN "public"."users"."created_by" IS '创建者';
+    ON COLUMN "public"."users"."created_by" IS '创建者';
 COMMENT
-ON COLUMN "public"."users"."created_date" IS '创建时间';
+    ON COLUMN "public"."users"."created_date" IS '创建时间';
 COMMENT
-ON COLUMN "public"."users"."last_modified_by" IS '最后修改者';
+    ON COLUMN "public"."users"."last_modified_by" IS '最后修改者';
 COMMENT
-ON COLUMN "public"."users"."last_modified_date" IS '最后修改时间';
+    ON COLUMN "public"."users"."last_modified_date" IS '最后修改时间';
 COMMENT
-ON TABLE "public"."users" IS '用户表';
+    ON TABLE "public"."users" IS '用户表';
 
 
 -- ----------------------------
 -- Indexes structure for table authorities
 -- ----------------------------
 CREATE UNIQUE INDEX "ix_auth_username" ON "public"."authorities" USING btree (
-    "username" "pg_catalog"."text_ops" ASC NULLS LAST,
-    "authority" "pg_catalog"."text_ops" ASC NULLS LAST
+                                                                              "username" "pg_catalog"."text_ops" ASC
+                                                                              NULLS LAST,
+                                                                              "authority" "pg_catalog"."text_ops" ASC
+                                                                              NULLS LAST
     );
 
 
@@ -812,3 +814,544 @@ ALTER TABLE "public"."user_privileges"
     ADD CONSTRAINT "fk_user_privileges_privilege_id" FOREIGN KEY ("privilege_id") REFERENCES "public"."privileges" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE "public"."user_privileges"
     ADD CONSTRAINT "fk_user_privileges_username" FOREIGN KEY ("username") REFERENCES "public"."users" ("username") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+
+-- ----------------------------
+-- Table structure for connections
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."connections";
+CREATE TABLE "public"."connections"
+(
+    "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "host"               varchar(255),
+    "port"               int4,
+    "name"               varchar(255),
+    "username"           varchar(255),
+    "password"           varchar(255),
+    "enabled"            bool         NOT NULL DEFAULT true,
+    "created_by"         varchar(64),
+    "created_date"       timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_modified_by"   varchar(64),
+    "last_modified_date" timestamp(6)
+)
+;
+COMMENT
+    ON COLUMN "public"."connections"."id" IS '主键';
+COMMENT
+    ON COLUMN "public"."connections"."host" IS '主机';
+COMMENT
+    ON COLUMN "public"."connections"."port" IS '端口';
+COMMENT
+    ON COLUMN "public"."connections"."name" IS '库名称';
+COMMENT
+    ON COLUMN "public"."connections"."username" IS '账号';
+COMMENT
+    ON COLUMN "public"."connections"."password" IS '密码';
+COMMENT
+    ON COLUMN "public"."connections"."enabled" IS '是否启用';
+COMMENT
+    ON COLUMN "public"."connections"."created_by" IS '创建者';
+COMMENT
+    ON COLUMN "public"."connections"."created_date" IS '创建时间';
+COMMENT
+    ON COLUMN "public"."connections"."last_modified_by" IS '最后修改者';
+COMMENT
+    ON COLUMN "public"."connections"."last_modified_date" IS '最后修改时间';
+COMMENT
+    ON TABLE "public"."connections" IS '数据库连接表';
+
+-- ----------------------------
+-- Table structure for schemas
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."schemas";
+CREATE TABLE "public"."schemas"
+(
+    "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "name"               varchar(64),
+    "package_path"       varchar(127),
+    "prefix"             varchar(64),
+    "templates"          varchar[],
+    "enabled"            bool         NOT NULL DEFAULT true,
+    "created_by"         varchar(64),
+    "created_date"       timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_modified_by"   varchar(64),
+    "last_modified_date" timestamp(6),
+    "connection_id"      int8
+)
+;
+COMMENT
+    ON COLUMN "public"."schemas"."id" IS '主键，自动生成';
+COMMENT
+    ON COLUMN "public"."schemas"."name" IS '表名称';
+COMMENT
+    ON COLUMN "public"."schemas"."package_path" IS '包名';
+COMMENT
+    ON COLUMN "public"."schemas"."prefix" IS '前缀';
+COMMENT
+    ON COLUMN "public"."schemas"."templates" IS '模板';
+COMMENT
+    ON COLUMN "public"."schemas"."enabled" IS '是否启用';
+COMMENT
+    ON COLUMN "public"."schemas"."created_by" IS '创建者';
+COMMENT
+    ON COLUMN "public"."schemas"."created_date" IS '创建时间';
+COMMENT
+    ON COLUMN "public"."schemas"."last_modified_by" IS '最后修改者';
+COMMENT
+    ON COLUMN "public"."schemas"."last_modified_date" IS '最后修改时间';
+COMMENT
+    ON COLUMN "public"."schemas"."connection_id" IS 'connection主键';
+COMMENT
+    ON TABLE "public"."schemas" IS 'schema配置表';
+
+-- ----------------------------
+-- Table structure for fields
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."fields";
+CREATE TABLE "public"."fields"
+(
+    "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "name"               varchar(64),
+    "data_type"          varchar(64),
+    "length"             int2,
+    "field_type"         varchar(16),
+    "form_type"          varchar(16),
+    "ts_type"            varchar(16),
+    "schema_id"          int8         NOT NULL,
+    "nullable"           bool,
+    "is_unique"          bool,
+    "query_type"         varchar(255),
+    "sortable"           bool,
+    "queryable"          bool,
+    "editable"           bool,
+    "enabled"            bool         NOT NULL DEFAULT true,
+    "created_by"         varchar(64),
+    "created_date"       timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_modified_by"   varchar(64),
+    "last_modified_date" timestamp(6)
+)
+;
+COMMENT
+    ON COLUMN "public"."fields"."id" IS '主键，自动生成';
+COMMENT
+    ON COLUMN "public"."fields"."name" IS '属性命';
+COMMENT
+    ON COLUMN "public"."fields"."data_type" IS '字段类型';
+COMMENT
+    ON COLUMN "public"."fields"."length" IS '字段长度';
+COMMENT
+    ON COLUMN "public"."fields"."field_type" IS '属性类型';
+COMMENT
+    ON COLUMN "public"."fields"."form_type" IS '表单类型';
+COMMENT
+    ON COLUMN "public"."fields"."ts_type" IS 'ts类型';
+COMMENT
+    ON COLUMN "public"."fields"."schema_id" IS 'schema主键';
+COMMENT
+    ON COLUMN "public"."fields"."nullable" IS '是否允许为空';
+COMMENT
+    ON COLUMN "public"."fields"."is_unique" IS '是否唯一';
+COMMENT
+    ON COLUMN "public"."fields"."query_type" IS '查询类型';
+COMMENT
+    ON COLUMN "public"."fields"."sortable" IS '是否可排序';
+COMMENT
+    ON COLUMN "public"."fields"."queryable" IS '是否可查询';
+COMMENT
+    ON COLUMN "public"."fields"."editable" IS '是否可编辑';
+COMMENT
+    ON COLUMN "public"."fields"."enabled" IS '是否启用';
+COMMENT
+    ON COLUMN "public"."fields"."created_by" IS '创建者';
+COMMENT
+    ON COLUMN "public"."fields"."created_date" IS '创建时间';
+COMMENT
+    ON COLUMN "public"."fields"."last_modified_by" IS '最后修改者';
+COMMENT
+    ON COLUMN "public"."fields"."last_modified_date" IS '最后修改时间';
+COMMENT
+    ON TABLE "public"."fields" IS '属性配置表';
+
+
+-- ----------------------------
+-- Table structure for scripts
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."scripts";
+CREATE TABLE "public"."scripts"
+(
+    "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "name"               varchar(64),
+    "icon"               varchar(255),
+    "version"            varchar(16),
+    "body"               text,
+    "enabled"            bool         NOT NULL DEFAULT true,
+    "created_by"         varchar(64),
+    "created_date"       timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_modified_by"   varchar(64),
+    "last_modified_date" timestamp(6),
+    "type"               varchar(16)
+)
+;
+COMMENT
+    ON COLUMN "public"."scripts"."id" IS '主键，自动生成';
+COMMENT
+    ON COLUMN "public"."scripts"."name" IS '名称';
+COMMENT
+    ON COLUMN "public"."scripts"."icon" IS '图标';
+COMMENT
+    ON COLUMN "public"."scripts"."version" IS '版本';
+COMMENT
+    ON COLUMN "public"."scripts"."body" IS '内容';
+COMMENT
+    ON COLUMN "public"."scripts"."enabled" IS '是否启用';
+COMMENT
+    ON COLUMN "public"."scripts"."created_by" IS '创建者';
+COMMENT
+    ON COLUMN "public"."scripts"."created_date" IS '创建时间';
+COMMENT
+    ON COLUMN "public"."scripts"."last_modified_by" IS '最后修改者';
+COMMENT
+    ON COLUMN "public"."scripts"."last_modified_date" IS '最后修改时间';
+COMMENT
+    ON COLUMN "public"."scripts"."type" IS '类型';
+COMMENT
+    ON TABLE "public"."scripts" IS '脚本配置表';
+
+-- ----------------------------
+-- Table structure for samples
+-- ----------------------------
+DROP TABLE IF EXISTS "public"."samples";
+CREATE TABLE "public"."samples"
+(
+    "id"                 int8         NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "name"               varchar(64)  NOT NULL,
+    "suffix"             varchar(16)  NOT NULL,
+    "body"               text,
+    "type"               varchar(16),
+    "version"            varchar(16)  NOT NULL,
+    "enabled"            bool         NOT NULL DEFAULT true,
+    "created_by"         varchar(64),
+    "created_date"       timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_modified_by"   varchar(64),
+    "last_modified_date" timestamp(6)
+)
+;
+COMMENT
+    ON COLUMN "public"."samples"."id" IS '主键，自动生成';
+COMMENT
+    ON COLUMN "public"."samples"."name" IS '表名称';
+COMMENT
+    ON COLUMN "public"."samples"."suffix" IS '文件后缀';
+COMMENT
+    ON COLUMN "public"."samples"."body" IS '模板内容';
+COMMENT
+    ON COLUMN "public"."samples"."type" IS '类型';
+COMMENT
+    ON COLUMN "public"."samples"."version" IS '版本号';
+COMMENT
+    ON COLUMN "public"."samples"."enabled" IS '是否启用';
+COMMENT
+    ON COLUMN "public"."samples"."created_by" IS '创建者';
+COMMENT
+    ON COLUMN "public"."samples"."created_date" IS '创建时间';
+COMMENT
+    ON COLUMN "public"."samples"."last_modified_by" IS '最后修改者';
+COMMENT
+    ON COLUMN "public"."samples"."last_modified_date" IS '最后修改时间';
+COMMENT
+    ON TABLE "public"."samples" IS '模板表';
+
+
+-- ----------------------------
+-- Indexes structure for table samples
+-- ----------------------------
+CREATE UNIQUE INDEX "ix_samples_name_suffix_version" ON "public"."samples" USING btree (
+                                                                                        "name"
+                                                                                        "pg_catalog"."text_ops"
+                                                                                        ASC NULLS LAST,
+                                                                                        "suffix"
+                                                                                        "pg_catalog"."text_ops"
+                                                                                        ASC NULLS LAST,
+                                                                                        "version"
+                                                                                        "pg_catalog"."text_ops"
+                                                                                        ASC NULLS LAST
+    );
+
+-- ----------------------------
+-- Uniques structure for table samples
+-- ----------------------------
+ALTER TABLE "public"."samples"
+    ADD CONSTRAINT "samples_name_suffix_version_key" UNIQUE ("name", "suffix", "version");
+
+-- ----------------------------
+-- Primary Key structure for table samples
+-- ----------------------------
+ALTER TABLE "public"."samples"
+    ADD CONSTRAINT "samples_pkey" PRIMARY KEY ("id");
+
+-- ----------------------------
+-- Foreign Keys structure for table schemas
+-- ----------------------------
+ALTER TABLE "public"."schemas"
+    ADD CONSTRAINT "fk_schemas_connection_id" FOREIGN KEY ("connection_id") REFERENCES "public"."connections" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+
+-- Drop table if exists tags
+DROP TABLE IF EXISTS tags;
+
+-- Table structure tags
+CREATE TABLE tags
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name               varchar(127) NOT NULL UNIQUE,
+    enabled            boolean      NOT NULL DEFAULT true,
+    created_by         varchar(50),
+    created_date       timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE tags IS '标签表';
+COMMENT
+    ON COLUMN tags.id IS '主键';
+COMMENT
+    ON COLUMN tags.name IS '名称';
+COMMENT
+    ON COLUMN tags.enabled IS '是否启用';
+COMMENT
+    ON COLUMN tags.created_by IS '创建者';
+COMMENT
+    ON COLUMN tags.created_date IS '创建时间';
+COMMENT
+    ON COLUMN tags.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN tags.last_modified_date IS '最后修改时间';
+
+
+-- Drop table if exists posts
+DROP TABLE IF EXISTS posts;
+
+-- Table structure posts
+CREATE TABLE posts
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title              varchar(127) NOT NULL,
+    excerpt            varchar(127),
+    enabled            boolean      NOT NULL DEFAULT true,
+    created_by         varchar(50),
+    created_date       timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE posts IS '帖子表';
+COMMENT
+    ON COLUMN posts.id IS '主键';
+COMMENT
+    ON COLUMN posts.title IS '标题';
+COMMENT
+    ON COLUMN posts.excerpt IS '概述';
+COMMENT
+    ON COLUMN posts.enabled IS '是否启用';
+COMMENT
+    ON COLUMN posts.created_by IS '创建者';
+COMMENT
+    ON COLUMN posts.created_date IS '创建时间';
+COMMENT
+    ON COLUMN posts.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN posts.last_modified_date IS '最后修改时间';
+
+
+-- Drop table if exists tags
+DROP TABLE IF EXISTS tag_posts;
+
+-- Table structure tags
+CREATE TABLE tag_posts
+(
+    id      bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tag_id  bigint NOT NULL,
+    post_id bigint NOT NULL,
+    CONSTRAINT fk_tag_posts_tags FOREIGN KEY (tag_id) REFERENCES tags (id),
+    CONSTRAINT fk_tag_posts_posts FOREIGN KEY (post_id) REFERENCES posts (id)
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE tag_posts IS '标签帖子关联表';
+COMMENT
+    ON COLUMN tag_posts.id IS '主键';
+COMMENT
+    ON COLUMN tag_posts.tag_id IS 'tag主键';
+COMMENT
+    ON COLUMN tag_posts.post_id IS 'post主键';
+
+
+-- Drop table if exists post_content
+DROP TABLE IF EXISTS post_content;
+
+-- Table structure post_content
+CREATE TABLE post_content
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    post_id            bigint    NOT NULL UNIQUE,
+    body               text,
+    enabled            boolean   NOT NULL DEFAULT true,
+    created_by         varchar(50),
+    created_date       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp,
+    CONSTRAINT fk_post_content_posts FOREIGN KEY (post_id) REFERENCES posts (id)
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE post_content IS '帖子内容表';
+COMMENT
+    ON COLUMN post_content.id IS '主键';
+COMMENT
+    ON COLUMN post_content.post_id IS '帖子ID';
+COMMENT
+    ON COLUMN post_content.body IS '内容';
+COMMENT
+    ON COLUMN posts.enabled IS '是否启用';
+COMMENT
+    ON COLUMN post_content.created_by IS '创建者';
+COMMENT
+    ON COLUMN post_content.created_date IS '创建时间';
+COMMENT
+    ON COLUMN post_content.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN post_content.last_modified_date IS '最后修改时间';
+
+
+-- Drop table if exists comments
+DROP TABLE IF EXISTS comments;
+
+-- Table structure comments
+CREATE TABLE comments
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    post_id            bigint    NOT NULL,
+    location           varchar(255),
+    body               varchar(512),
+    created_by         varchar(50),
+    created_date       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp,
+    CONSTRAINT fk_comments_posts FOREIGN KEY (post_id) REFERENCES posts (id)
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE comments IS '评论表';
+COMMENT
+    ON COLUMN comments.id IS '主键';
+COMMENT
+    ON COLUMN comments.post_id IS '帖子ID';
+COMMENT
+    ON COLUMN comments.location IS '位置';
+COMMENT
+    ON COLUMN comments.body IS '内容';
+COMMENT
+    ON COLUMN comments.created_by IS '创建者';
+COMMENT
+    ON COLUMN comments.created_date IS '创建时间';
+COMMENT
+    ON COLUMN comments.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN comments.last_modified_date IS '最后修改时间';
+
+
+-- Drop table if exists regions
+DROP TABLE IF EXISTS regions;
+
+-- Table structure regions
+CREATE TABLE regions
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name               varchar(50) NOT NULL,
+    superior_id        bigint,
+    area_code          varchar(4),
+    postal_code        int4,
+    description        varchar(255),
+    enabled            boolean     NOT NULL DEFAULT true,
+    created_by         varchar(50),
+    created_date       timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp
+);
+
+-- Add comment to the table and columns
+COMMENT
+    ON TABLE regions IS '地区表';
+COMMENT
+    ON COLUMN regions.id IS '主键';
+COMMENT
+    ON COLUMN regions.name IS '名称';
+COMMENT
+    ON COLUMN regions.superior_id IS '上级ID';
+COMMENT
+    ON COLUMN regions.area_code IS '区号';
+COMMENT
+    ON COLUMN regions.postal_code IS '邮政编码';
+COMMENT
+    ON COLUMN regions.description IS '描述';
+COMMENT
+    ON COLUMN regions.enabled IS '是否启用';
+COMMENT
+    ON COLUMN regions.created_by IS '创建者';
+COMMENT
+    ON COLUMN regions.created_date IS '创建时间';
+COMMENT
+    ON COLUMN regions.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN regions.last_modified_date IS '最后修改时间';
+
+
+-- ----------------------------
+-- Table structure for file_records
+-- ----------------------------
+DROP TABLE IF EXISTS file_records;
+CREATE TABLE file_records
+(
+    id                 bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name               varchar(50)  NOT NULL,
+    type               varchar(255),
+    path               varchar(255),
+    size               float4,
+    description        varchar(255),
+    enabled            bool         NOT NULL DEFAULT true,
+    created_by         varchar(50),
+    created_date       timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by   varchar(50),
+    last_modified_date timestamp(6)
+);
+COMMENT
+    ON COLUMN file_records.id IS '主键';
+COMMENT
+    ON COLUMN file_records.name IS '名称';
+COMMENT
+    ON COLUMN file_records.content_type IS '类型';
+COMMENT
+    ON COLUMN file_records.path IS '路径';
+COMMENT
+    ON COLUMN file_records.size IS '大小';
+COMMENT
+    ON COLUMN file_records.description IS '描述';
+COMMENT
+    ON COLUMN file_records.enabled IS '是否启用';
+COMMENT
+    ON COLUMN file_records.created_by IS '创建者';
+COMMENT
+    ON COLUMN file_records.created_date IS '创建时间';
+COMMENT
+    ON COLUMN file_records.last_modified_by IS '最后修改者';
+COMMENT
+    ON COLUMN file_records.last_modified_date IS '最后修改时间';
+COMMENT
+    ON TABLE file_records IS '文件记录表';
