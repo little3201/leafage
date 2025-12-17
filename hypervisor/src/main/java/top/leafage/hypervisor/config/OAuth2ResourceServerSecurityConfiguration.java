@@ -38,10 +38,9 @@ public class OAuth2ResourceServerSecurityConfiguration {
      *
      * @param http a {@link HttpSecurity} object
      * @return a {@link SecurityFilterChain} object
-     * @throws java.lang.Exception if any.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers("/actuator/**").permitAll()
