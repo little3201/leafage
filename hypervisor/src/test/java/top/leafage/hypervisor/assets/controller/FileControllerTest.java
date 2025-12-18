@@ -143,7 +143,7 @@ class FileControllerTest {
 
     @Test
     void upload() {
-        when(fileRecordService.upload(any(MultipartFile.class))).thenReturn(vo);
+        when(fileRecordService.upload(any(MultipartFile.class), anyLong())).thenReturn(vo);
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
         assertThat(mvc.post().uri("/files").multipart().file(file).with(csrf().asHeader()))
@@ -155,7 +155,7 @@ class FileControllerTest {
 
     @Test
     void upload_error() {
-        when(fileRecordService.upload(any(MultipartFile.class))).thenThrow(new RuntimeException());
+        when(fileRecordService.upload(any(MultipartFile.class), anyLong())).thenThrow(new RuntimeException());
 
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello World".getBytes());
         assertThat(mvc.post().uri("/files").multipart().file(file).with(csrf().asHeader()))

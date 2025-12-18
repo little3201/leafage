@@ -49,9 +49,9 @@ public class AccessLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lo
 
     private Integer statusCode;
 
-    private Long responseTimes;
+    private Long duration;
 
-    private String responseMessage;
+    private String response;
 
 
     public String getUrl() {
@@ -102,19 +102,19 @@ public class AccessLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lo
         this.statusCode = statusCode;
     }
 
-    public Long getResponseTimes() {
-        return responseTimes;
+    public Long getDuration() {
+        return duration;
     }
 
-    public void setResponseTimes(Long responseTimes) {
-        this.responseTimes = responseTimes;
+    public void setDuration(Long responseTimes) {
+        this.duration = responseTimes;
     }
 
-    public String getResponseMessage() {
-        return responseMessage;
+    public String getResponse() {
+        return response;
     }
 
-    public void setResponseMessage(String responseMessage) {
-        this.responseMessage = responseMessage;
+    public void setResponse(String responseMessage) {
+        this.response = responseMessage;
     }
 }

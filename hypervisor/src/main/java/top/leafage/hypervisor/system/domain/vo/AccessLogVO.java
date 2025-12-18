@@ -30,8 +30,8 @@ public record AccessLogVO(
         String params,
         String body,
         Integer statusCode,
-        Long responseTimes,
-        String responseMessage
+        Long duration,
+        String response
 ) {
     public static AccessLogVO from(AccessLog entity) {
         return new AccessLogVO(
@@ -42,8 +42,8 @@ public record AccessLogVO(
                 entity.getParams(),
                 entity.getBody(),
                 entity.getStatusCode(),
-                entity.getResponseTimes(),
-                entity.getResponseMessage()
+                entity.getDuration(),
+                entity.getResponse()
         );
     }
 }

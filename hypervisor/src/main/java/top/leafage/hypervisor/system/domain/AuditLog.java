@@ -36,9 +36,11 @@ import java.net.InetAddress;
 @Table(name = "audit_logs")
 public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
 
-    private String operation;
-
     private String resource;
+
+    private String action;
+
+    private Long targetId;
 
     private String oldValue;
 
@@ -49,16 +51,8 @@ public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lon
 
     private Integer statusCode;
 
-    private Long operatedTimes;
+    private Long duration;
 
-
-    public String getOperation() {
-        return operation;
-    }
-
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
 
     public String getResource() {
         return resource;
@@ -66,6 +60,22 @@ public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lon
 
     public void setResource(String resource) {
         this.resource = resource;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String operation) {
+        this.action = operation;
+    }
+
+    public Long getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(Long objPk) {
+        this.targetId = objPk;
     }
 
     public String getOldValue() {
@@ -100,11 +110,11 @@ public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lon
         this.statusCode = statusCode;
     }
 
-    public Long getOperatedTimes() {
-        return operatedTimes;
+    public Long getDuration() {
+        return duration;
     }
 
-    public void setOperatedTimes(Long operatedTimes) {
-        this.operatedTimes = operatedTimes;
+    public void setDuration(Long operatedTimes) {
+        this.duration = operatedTimes;
     }
 }

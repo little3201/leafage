@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 create table access_logs
 (
     id                 bigint generated always as identity
@@ -22,8 +23,8 @@ create table access_logs
     body               varchar(255),
     ip                 inet,
     status_code        integer,
-    response_times     bigint,
-    response_message   varchar(255),
+    duration           bigint,
+    response           varchar(255),
     enabled            boolean      default true              not null,
     created_by         varchar(255),
     created_date       timestamp(6) default CURRENT_TIMESTAMP not null,
@@ -47,9 +48,7 @@ comment on column access_logs.ip is 'IP地址';
 
 comment on column access_logs.status_code is 'HTTP状态码';
 
-comment on column access_logs.response_times is '响应时长';
-
-comment on column access_logs.response_message is '响应消息';
+comment on column access_logs.response is '响应';
 
 comment on column access_logs.enabled is '是否启用';
 
@@ -73,14 +72,13 @@ create table audit_logs
     old_value          varchar(255),
     new_value          varchar(255),
     ip                 inet                                   not null,
-    location           varchar(100),
     status_code        integer                                not null,
     enabled            boolean      default true              not null,
     created_by         varchar(255),
     created_date       timestamp(6) default CURRENT_TIMESTAMP not null,
     last_modified_by   varchar(255),
     last_modified_date timestamp(6),
-    operated_times     bigint                                 not null
+    duration           bigint                                 not null
 );
 
 comment on table audit_logs is '审计日志表';
@@ -97,8 +95,6 @@ comment on column audit_logs.new_value is '新值（JSON 格式）';
 
 comment on column audit_logs.ip is 'IP 地址';
 
-comment on column audit_logs.location is '位置';
-
 comment on column audit_logs.status_code is '状态码';
 
 comment on column audit_logs.enabled is '是否启用';
@@ -110,8 +106,6 @@ comment on column audit_logs.created_date is '创建时间';
 comment on column audit_logs.last_modified_by is '最后修改者';
 
 comment on column audit_logs.last_modified_date is '最后修改时间';
-
-comment on column audit_logs.operated_times is '操作时长';
 
 alter table audit_logs
     owner to postgres;
@@ -604,14 +598,11 @@ create table operation_logs
         primary key,
     module             varchar(255),
     params             varchar(255),
-    browser            varchar(50),
     ip                 inet,
     action             varchar(255),
     body               varchar(255),
     user_agent         varchar(255),
-    referer            varchar(255),
     session_id         varchar(255),
-    device_type        varchar(20),
     enabled            boolean      default true              not null,
     created_by         varchar(255),
     created_date       timestamp(6) default CURRENT_TIMESTAMP not null,
@@ -628,8 +619,6 @@ comment on column operation_logs.module is '模块';
 
 comment on column operation_logs.params is '参数';
 
-comment on column operation_logs.browser is '浏览器';
-
 comment on column operation_logs.ip is 'IP地址';
 
 comment on column operation_logs.action is '操作';
@@ -638,11 +627,7 @@ comment on column operation_logs.body is '内容';
 
 comment on column operation_logs.user_agent is '用户代理信息';
 
-comment on column operation_logs.referer is '来源页面';
-
 comment on column operation_logs.session_id is '会话标识符';
-
-comment on column operation_logs.device_type is '设备类型';
 
 comment on column operation_logs.enabled is '是否启用';
 
@@ -994,7 +979,7 @@ create table scheduler_logs
             primary key,
     name               varchar(255)                           not null,
     start_time         timestamp(6) with time zone,
-    executed_times     integer      default 0,
+    duration           integer      default 0,
     next_execute_time  timestamp(6) with time zone,
     status             varchar(255)
         constraint scheduler_log_status_check
@@ -1015,8 +1000,6 @@ comment on column scheduler_logs.id is '主键，自增';
 comment on column scheduler_logs.name is '名称';
 
 comment on column scheduler_logs.start_time is '开始时间';
-
-comment on column scheduler_logs.executed_times is '执行时长';
 
 comment on column scheduler_logs.next_execute_time is '下次执行时间';
 

@@ -30,7 +30,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
-import top.leafage.hypervisor.system.controller.UserController;
 import top.leafage.hypervisor.system.domain.dto.UserDTO;
 import top.leafage.hypervisor.system.domain.vo.UserVO;
 import top.leafage.hypervisor.system.service.UserService;
@@ -70,7 +69,7 @@ class UserControllerTest {
 
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setName("John");
+        dto.setFullName("John");
         dto.setEmail("steven@demo.com");
     }
 

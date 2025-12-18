@@ -29,7 +29,7 @@ public record SchedulerLogVO(
         Long id,
         String name,
         Instant startTime,
-        Integer executedTimes,
+        Long duration,
         String status,
         Instant nextExecuteTime,
         String record
@@ -39,7 +39,7 @@ public record SchedulerLogVO(
                 entity.getId(),
                 entity.getName(),
                 entity.getStartTime(),
-                entity.getExecutedTimes(),
+                entity.getDuration(),
                 entity.getStatus().name(),
                 entity.getNextExecuteTime(),
                 entity.getRecord()

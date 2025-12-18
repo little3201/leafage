@@ -93,8 +93,8 @@ public class FileController {
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
     @PostMapping
-    public ResponseEntity<FileRecordVO> upload(MultipartFile file) {
-        FileRecordVO vo = fileRecordService.upload(file);
+    public ResponseEntity<FileRecordVO> upload(MultipartFile file, Long superiorId) {
+        FileRecordVO vo = fileRecordService.upload(file, superiorId);
         return ResponseEntity.ok(vo);
     }
 

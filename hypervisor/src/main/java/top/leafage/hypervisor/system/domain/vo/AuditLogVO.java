@@ -24,24 +24,26 @@ import top.leafage.hypervisor.system.domain.AuditLog;
  */
 public record AuditLogVO(
         Long id,
-        String operation,
         String resource,
+        String action,
+        Long targetId,
         String oldValue,
         String newValue,
         String ip,
         Integer statusCode,
-        Long operatedTimes
+        Long duration
 ) {
     public static AuditLogVO from(AuditLog entity) {
         return new AuditLogVO(
                 entity.getId(),
-                entity.getOperation(),
                 entity.getResource(),
+                entity.getAction(),
+                entity.getTargetId(),
                 entity.getOldValue(),
                 entity.getNewValue(),
                 entity.getIp() == null ? null : entity.getIp().getHostAddress(),
                 entity.getStatusCode(),
-                entity.getOperatedTimes()
+                entity.getDuration()
         );
     }
 }

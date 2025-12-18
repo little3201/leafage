@@ -75,9 +75,11 @@ public class FileRecordServiceImpl implements FileRecordService {
 
     @Transactional
     @Override
-    public FileRecordVO upload(MultipartFile file) {
+    public FileRecordVO upload(MultipartFile file, Long superiorId) {
         FileRecord record = new FileRecord();
+        record.setSuperiorId(superiorId);
         record.setName(file.getName());
+        // get extension
         if (file.getOriginalFilename() != null) {
             String originalFilename = file.getOriginalFilename();
             int lastDot = originalFilename.lastIndexOf('.');

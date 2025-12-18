@@ -30,7 +30,6 @@ import org.springframework.data.jpa.domain.Specification;
 import top.leafage.hypervisor.system.domain.AuditLog;
 import top.leafage.hypervisor.system.domain.vo.AuditLogVO;
 import top.leafage.hypervisor.system.repository.AuditLogRepository;
-import top.leafage.hypervisor.system.service.impl.AuditLogServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +60,7 @@ class AuditLogServiceImplTest {
     @BeforeEach
     void setUp() {
         entity = new AuditLog();
-        entity.setOperation("test");
+        entity.setAction("test");
         entity.setResource("test");
         entity.setOldValue("old");
         entity.setNewValue("new");

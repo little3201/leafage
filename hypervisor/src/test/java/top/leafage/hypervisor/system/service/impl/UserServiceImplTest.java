@@ -30,7 +30,6 @@ import top.leafage.hypervisor.system.domain.User;
 import top.leafage.hypervisor.system.domain.dto.UserDTO;
 import top.leafage.hypervisor.system.domain.vo.UserVO;
 import top.leafage.hypervisor.system.repository.UserRepository;
-import top.leafage.hypervisor.system.service.impl.UserServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +61,7 @@ class UserServiceImplTest {
     void setUp() {
         dto = new UserDTO();
         dto.setUsername("test");
-        dto.setName("test");
+        dto.setFullName("test");
         dto.setEmail("test@example.com");
 
         entity = UserDTO.toEntity(dto, "123");

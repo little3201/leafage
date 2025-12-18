@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
 
         return userRepository.findById(id)
-                .map(UserVO::from)
+                .map(entity -> UserVO.from(entity, false))
                 .orElseThrow(() -> new EntityNotFoundException("user not found: " + id));
     }
 

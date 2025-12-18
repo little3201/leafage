@@ -17,6 +17,8 @@ package top.leafage.hypervisor.system.domain.vo;
 
 import top.leafage.hypervisor.system.domain.OperationLog;
 
+import java.time.LocalDateTime;
+
 /**
  * vo class for operation log.
  *
@@ -31,7 +33,9 @@ public record OperationLogVO(
         String ip,
         String sessionId,
         String userAgent,
-        int statusCode
+        int statusCode,
+        String operator,
+        LocalDateTime operatedAt
 ) {
     public static OperationLogVO from(OperationLog entity) {
         return new OperationLogVO(
@@ -43,7 +47,9 @@ public record OperationLogVO(
                 entity.getIp() == null ? null : entity.getIp().getHostAddress(),
                 entity.getSessionId(),
                 entity.getUserAgent(),
-                entity.getStatusCode()
+                entity.getStatusCode(),
+                entity.getCreatedBy().orElse(null),
+                entity.getCreatedDate().orElse(null)
         );
     }
 }

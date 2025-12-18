@@ -36,7 +36,7 @@ public class SchedulerLog extends JpaAbstractAuditable<@NonNull String, @NonNull
 
     private Instant startTime;
 
-    private Integer executedTimes;
+    private Long duration;
 
     private Instant nextExecuteTime;
 
@@ -62,12 +62,12 @@ public class SchedulerLog extends JpaAbstractAuditable<@NonNull String, @NonNull
         this.startTime = startTime;
     }
 
-    public Integer getExecutedTimes() {
-        return executedTimes;
+    public Long getDuration() {
+        return duration;
     }
 
-    public void setExecutedTimes(Integer executedTimes) {
-        this.executedTimes = executedTimes;
+    public void setDuration(Long executedTimes) {
+        this.duration = executedTimes;
     }
 
     public Instant getNextExecuteTime() {

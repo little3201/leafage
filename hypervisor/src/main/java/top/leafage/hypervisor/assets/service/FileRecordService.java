@@ -30,7 +30,8 @@ public interface FileRecordService extends JpaCrudService<Object, FileRecordVO> 
      * upload.
      *
      * @param file the file.
+     * @param superiorId the superior id.
      * @return the result.
      */
-    FileRecordVO upload(MultipartFile file);
+    FileRecordVO upload(MultipartFile file, Long superiorId);
 }
