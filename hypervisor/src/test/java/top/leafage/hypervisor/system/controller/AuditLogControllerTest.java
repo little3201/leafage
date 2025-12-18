@@ -59,7 +59,7 @@ class AuditLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new AuditLogVO(1L, "test", "test", "test", "test", "127.0.0.1", 200, 2132L);
+        vo = new AuditLogVO(1L, "test", "test", 1L,"test", "test", "127.0.0.1", 200, 2132L);
     }
 
     @Test
@@ -80,7 +80,7 @@ class AuditLogControllerTest {
                 .bodyJson().extractingPath("$.content")
                 .convertTo(InstanceOfAssertFactories.list(AuditLogVO.class))
                 .hasSize(1)
-                .element(0).satisfies(vo -> assertThat(vo.operation()).isEqualTo("test"));
+                .element(0).satisfies(vo -> assertThat(vo.action()).isEqualTo("test"));
 
         verify(auditLogService).retrieve(anyInt(), anyInt(), anyString(), anyBoolean(), anyString());
     }
@@ -108,7 +108,7 @@ class AuditLogControllerTest {
                 .hasStatusOk()
                 .bodyJson()
                 .convertTo(AuditLogVO.class)
-                .satisfies(vo -> assertThat(vo.operation()).isEqualTo("test"));
+                .satisfies(vo -> assertThat(vo.action()).isEqualTo("test"));
     }
 
     @Test

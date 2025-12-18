@@ -35,6 +35,7 @@ import tools.jackson.databind.ObjectMapper;
 import top.leafage.hypervisor.assets.domain.vo.FileRecordVO;
 import top.leafage.hypervisor.assets.service.FileRecordService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,7 +67,7 @@ class FileControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new FileRecordVO(1L, "test", "src/test/resources/test.txt", "", 3121.23f);
+        vo = new FileRecordVO(1L, "test", "src/test/resources/test.txt", "", "", 3121L, false, true, false, LocalDateTime.now());
     }
 
     @Test

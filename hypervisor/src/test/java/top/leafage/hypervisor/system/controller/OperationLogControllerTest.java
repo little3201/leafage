@@ -28,10 +28,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import top.leafage.hypervisor.system.controller.OperationLogController;
 import top.leafage.hypervisor.system.domain.vo.OperationLogVO;
 import top.leafage.hypervisor.system.service.OperationLogService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ class OperationLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new OperationLogVO(1L, "test", "create", "filters=test", "test", "127.0.0.1", "test", "test", 200);
+        vo = new OperationLogVO(1L, "test", "create", "filters=test", "test", "127.0.0.1", "test", "test", 200, "", LocalDateTime.now());
     }
 
     @Test
