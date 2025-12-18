@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2025.  little3201.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 -- ----------------------------
 -- Table structure for oauth2_authorization
 -- ----------------------------
@@ -40,55 +55,55 @@ CREATE TABLE "public"."oauth2_authorization"
 )
 ;
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."id" IS '主键';
+    ON COLUMN "public"."oauth2_authorization"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."registered_client_id" IS 'client id';
+    ON COLUMN "public"."oauth2_authorization"."registered_client_id" IS 'client id';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."principal_name" IS '认证账号';
+    ON COLUMN "public"."oauth2_authorization"."principal_name" IS '认证账号';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."authorization_grant_type" IS '授权类型';
+    ON COLUMN "public"."oauth2_authorization"."authorization_grant_type" IS '授权类型';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."attributes" IS '参数';
+    ON COLUMN "public"."oauth2_authorization"."attributes" IS '参数';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."state" IS '状态';
+    ON COLUMN "public"."oauth2_authorization"."state" IS '状态';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."authorization_code_value" IS 'authorization code';
+    ON COLUMN "public"."oauth2_authorization"."authorization_code_value" IS 'authorization code';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."authorization_code_issued_at" IS 'authorization code生效时间';
+    ON COLUMN "public"."oauth2_authorization"."authorization_code_issued_at" IS 'authorization code生效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."authorization_code_expires_at" IS 'authorization code失效时间';
+    ON COLUMN "public"."oauth2_authorization"."authorization_code_expires_at" IS 'authorization code失效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."authorization_code_metadata" IS 'authorization code 元数据';
+    ON COLUMN "public"."oauth2_authorization"."authorization_code_metadata" IS 'authorization code 元数据';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."access_token_value" IS 'access token';
+    ON COLUMN "public"."oauth2_authorization"."access_token_value" IS 'access token';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."access_token_issued_at" IS 'access token 生效时间';
+    ON COLUMN "public"."oauth2_authorization"."access_token_issued_at" IS 'access token 生效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."access_token_expires_at" IS 'access_token 失效时间';
+    ON COLUMN "public"."oauth2_authorization"."access_token_expires_at" IS 'access_token 失效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."access_token_metadata" IS 'access token元数据';
+    ON COLUMN "public"."oauth2_authorization"."access_token_metadata" IS 'access token元数据';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."access_token_type" IS 'access token 类型';
+    ON COLUMN "public"."oauth2_authorization"."access_token_type" IS 'access token 类型';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."access_token_scopes" IS 'access token 域';
+    ON COLUMN "public"."oauth2_authorization"."access_token_scopes" IS 'access token 域';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."oidc_id_token_value" IS 'oidc token';
+    ON COLUMN "public"."oauth2_authorization"."oidc_id_token_value" IS 'oidc token';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."oidc_id_token_issued_at" IS 'oidc token 生效时间';
+    ON COLUMN "public"."oauth2_authorization"."oidc_id_token_issued_at" IS 'oidc token 生效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."oidc_id_token_expires_at" IS 'oidc token 失效时间';
+    ON COLUMN "public"."oauth2_authorization"."oidc_id_token_expires_at" IS 'oidc token 失效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."oidc_id_token_metadata" IS 'oidc token 元数据';
+    ON COLUMN "public"."oauth2_authorization"."oidc_id_token_metadata" IS 'oidc token 元数据';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."refresh_token_value" IS 'refresh token';
+    ON COLUMN "public"."oauth2_authorization"."refresh_token_value" IS 'refresh token';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."refresh_token_issued_at" IS 'refresh token 生效时间';
+    ON COLUMN "public"."oauth2_authorization"."refresh_token_issued_at" IS 'refresh token 生效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."refresh_token_expires_at" IS 'refresh token 失效时间';
+    ON COLUMN "public"."oauth2_authorization"."refresh_token_expires_at" IS 'refresh token 失效时间';
 COMMENT
-ON COLUMN "public"."oauth2_authorization"."refresh_token_metadata" IS 'refresh token 元数据';
+    ON COLUMN "public"."oauth2_authorization"."refresh_token_metadata" IS 'refresh token 元数据';
 COMMENT
-ON TABLE "public"."oauth2_authorization" IS 'authorization 表';
+    ON TABLE "public"."oauth2_authorization" IS 'authorization 表';
 
 -- ----------------------------
 -- Table structure for oauth2_authorization_consent
@@ -102,13 +117,13 @@ CREATE TABLE "public"."oauth2_authorization_consent"
 )
 ;
 COMMENT
-ON COLUMN "public"."oauth2_authorization_consent"."registered_client_id" IS '客户端id';
+    ON COLUMN "public"."oauth2_authorization_consent"."registered_client_id" IS '客户端id';
 COMMENT
-ON COLUMN "public"."oauth2_authorization_consent"."principal_name" IS '认证账号';
+    ON COLUMN "public"."oauth2_authorization_consent"."principal_name" IS '认证账号';
 COMMENT
-ON COLUMN "public"."oauth2_authorization_consent"."authorities" IS '权限';
+    ON COLUMN "public"."oauth2_authorization_consent"."authorities" IS '权限';
 COMMENT
-ON TABLE "public"."oauth2_authorization_consent" IS 'consent 表';
+    ON TABLE "public"."oauth2_authorization_consent" IS 'consent 表';
 
 -- ----------------------------
 -- Table structure for oauth2_registered_client
@@ -132,33 +147,33 @@ CREATE TABLE "public"."oauth2_registered_client"
 )
 ;
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."id" IS '主键';
+    ON COLUMN "public"."oauth2_registered_client"."id" IS '主键';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_id" IS 'ID';
+    ON COLUMN "public"."oauth2_registered_client"."client_id" IS 'ID';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_id_issued_at" IS '生效时间';
+    ON COLUMN "public"."oauth2_registered_client"."client_id_issued_at" IS '生效时间';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_secret" IS '密钥';
+    ON COLUMN "public"."oauth2_registered_client"."client_secret" IS '密钥';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_secret_expires_at" IS '密钥失效时间';
+    ON COLUMN "public"."oauth2_registered_client"."client_secret_expires_at" IS '密钥失效时间';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_name" IS '名称';
+    ON COLUMN "public"."oauth2_registered_client"."client_name" IS '名称';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_authentication_methods" IS '认证方法';
+    ON COLUMN "public"."oauth2_registered_client"."client_authentication_methods" IS '认证方法';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."authorization_grant_types" IS '授权方式';
+    ON COLUMN "public"."oauth2_registered_client"."authorization_grant_types" IS '授权方式';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."redirect_uris" IS '跳转连接';
+    ON COLUMN "public"."oauth2_registered_client"."redirect_uris" IS '跳转连接';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."post_logout_redirect_uris" IS '后置退出跳转连接';
+    ON COLUMN "public"."oauth2_registered_client"."post_logout_redirect_uris" IS '后置退出跳转连接';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."scopes" IS '作用域';
+    ON COLUMN "public"."oauth2_registered_client"."scopes" IS '作用域';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."client_settings" IS '客户端设置';
+    ON COLUMN "public"."oauth2_registered_client"."client_settings" IS '客户端设置';
 COMMENT
-ON COLUMN "public"."oauth2_registered_client"."token_settings" IS 'token 设置';
+    ON COLUMN "public"."oauth2_registered_client"."token_settings" IS 'token 设置';
 COMMENT
-ON TABLE "public"."oauth2_registered_client" IS 'client 表';
+    ON TABLE "public"."oauth2_registered_client" IS 'client 表';
 
 -- ----------------------------
 -- Table structure for persistent_logins
@@ -173,30 +188,15 @@ CREATE TABLE "public"."persistent_logins"
 )
 ;
 COMMENT
-ON COLUMN "public"."persistent_logins"."username" IS '用户名';
+    ON COLUMN "public"."persistent_logins"."username" IS '用户名';
 COMMENT
-ON COLUMN "public"."persistent_logins"."series" IS '系列';
+    ON COLUMN "public"."persistent_logins"."series" IS '系列';
 COMMENT
-ON COLUMN "public"."persistent_logins"."token" IS '令牌';
+    ON COLUMN "public"."persistent_logins"."token" IS '令牌';
 COMMENT
-ON COLUMN "public"."persistent_logins"."last_used" IS '最后使用时间';
+    ON COLUMN "public"."persistent_logins"."last_used" IS '最后使用时间';
 COMMENT
-ON TABLE "public"."persistent_logins" IS '持久化登录表';
-
-/*
- * Copyright (c) 2025.  little3201.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *       https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+    ON TABLE "public"."persistent_logins" IS '持久化登录表';
 
 -- ----------------------------
 -- Primary Key structure for table oauth2_authorization_consent
