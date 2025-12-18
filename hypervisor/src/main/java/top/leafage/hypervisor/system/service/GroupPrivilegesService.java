@@ -29,7 +29,7 @@ public interface GroupPrivilegesService {
     /**
      * 查询关联privilege
      *
-     * @param groupId group主键
+     * @param groupId the pk of group.
      * @return 数据集
      */
     List<GroupPrivileges> privileges(Long groupId);
@@ -55,8 +55,8 @@ public interface GroupPrivilegesService {
     /**
      * 移除group-privilege关系
      *
-     * @param groupId     group主键
-     * @param privilegeId privilege主键
+     * @param groupId     the pk of group.
+     * @param privilegeId the pk of privilege.
      * @param action      操作
      */
     void removeRelation(Long groupId, Long privilegeId, String action);

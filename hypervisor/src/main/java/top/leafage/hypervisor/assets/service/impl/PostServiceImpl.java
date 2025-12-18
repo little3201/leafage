@@ -92,6 +92,7 @@ public class PostServiceImpl implements PostService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public PostVO modify(Long id, PostDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -110,6 +111,7 @@ public class PostServiceImpl implements PostService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

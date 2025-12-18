@@ -30,18 +30,18 @@ import java.util.List;
 public interface CommentService extends JpaCrudService<CommentDTO, CommentVO> {
 
     /**
-     * 根据posts查询
+     * relation.
      *
-     * @param id 帖子代码
-     * @return 关联的评论
+     * @param id the pk.
+     * @return the result.
      */
     List<CommentVO> relation(Long id);
 
     /**
-     * 根据replier查询
+     * find replier by id.
      *
      * @param replier the pk.
-     * @return 回复的评论
+     * @return the result.
      */
     List<CommentVO> replies(Long replier);
 }

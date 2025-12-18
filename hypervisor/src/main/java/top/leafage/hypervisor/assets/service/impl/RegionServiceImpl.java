@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.assets.domain.Region;
 import top.leafage.hypervisor.assets.domain.dto.RegionDTO;
@@ -76,7 +77,7 @@ public class RegionServiceImpl implements RegionService {
                 .orElseThrow(() -> new EntityNotFoundException("region not found: " + id));
     }
 
-
+    @Transactional
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -89,6 +90,7 @@ public class RegionServiceImpl implements RegionService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public RegionVO create(RegionDTO dto) {
         if (regionRepository.existsByName(dto.getName())) {
@@ -101,6 +103,7 @@ public class RegionServiceImpl implements RegionService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public RegionVO modify(Long id, RegionDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -119,6 +122,7 @@ public class RegionServiceImpl implements RegionService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

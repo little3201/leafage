@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.User;
 import top.leafage.hypervisor.system.domain.dto.UserDTO;
@@ -74,6 +75,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("user not found: " + id));
     }
 
+    @Transactional
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -83,6 +85,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.updateEnabledById(id) > 0;
     }
 
+    @Transactional
     @Override
     public boolean unlock(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -95,6 +98,7 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public UserVO create(UserDTO dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
@@ -110,6 +114,7 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public UserVO modify(Long id, UserDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -134,6 +139,7 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

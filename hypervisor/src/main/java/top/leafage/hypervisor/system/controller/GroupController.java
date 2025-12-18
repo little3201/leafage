@@ -148,7 +148,7 @@ public class GroupController {
     }
 
     /**
-     * enable/disable..
+     * enable.
      *
      * @param id the pk..
      * @return the result.
@@ -190,7 +190,7 @@ public class GroupController {
     /**
      * 删除 group-users关联
      *
-     * @param id        group主键
+     * @param id        the pk of group.
      * @param usernames username集合
      * @return 操作结果
      */

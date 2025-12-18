@@ -19,7 +19,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import top.leafage.hypervisor.system.domain.Role;
 
 /**
@@ -31,20 +30,19 @@ import top.leafage.hypervisor.system.domain.Role;
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
 
     /**
-     * 是否存在
+     * is exists.
      *
-     * @param name 名称
-     * @return true-存在，false-否
+     * @param name name.
+     * @return if exists return true or false.
      */
     boolean existsByName(String name);
 
     /**
-     * Toggles the enabled status of a record by its ID.
+     * enable a record by pk.
      *
-     * @param id The ID of the record.
+     * @param id the pk.
      * @return result.
      */
-    @Transactional
     @Modifying
     @Query("UPDATE Role t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
     int updateEnabledById(Long id);

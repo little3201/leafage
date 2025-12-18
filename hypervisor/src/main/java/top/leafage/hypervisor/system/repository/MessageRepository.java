@@ -29,10 +29,10 @@ import top.leafage.hypervisor.system.domain.Message;
 public interface MessageRepository extends JpaRepository<Message, Long>, JpaSpecificationExecutor<Message> {
 
     /**
-     * 是否存在
+     * is exists.
      *
-     * @param title 标题
-     * @return true-存在，false-否
+     * @param title the title.
+     * @return if exists return true or false.
      */
     boolean existsByTitle(String title);
 }

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.Role;
 import top.leafage.hypervisor.system.domain.dto.RoleDTO;
@@ -74,6 +75,7 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(() -> new EntityNotFoundException("role not found: " + id));
     }
 
+    @Transactional
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -86,6 +88,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public RoleVO create(RoleDTO dto) {
         if (roleRepository.existsByName(dto.getName())) {
@@ -98,6 +101,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public RoleVO modify(Long id, RoleDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -116,6 +120,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import top.leafage.common.data.domain.TreeNode;
@@ -94,6 +95,7 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new EntityNotFoundException("group not found: " + id));
     }
 
+    @Transactional
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -106,6 +108,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public GroupVO create(GroupDTO dto) {
         if (groupRepository.existsByName(dto.getName())) {
@@ -118,6 +121,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public GroupVO modify(Long id, GroupDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -137,6 +141,7 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

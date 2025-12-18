@@ -16,6 +16,7 @@
 package top.leafage.hypervisor.system.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import top.leafage.hypervisor.system.domain.GroupAuthorities;
@@ -56,6 +57,7 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
         return groupPrivilegesRepository.findAllByPrivilegeId(privilegeId);
     }
 
+    @Transactional
     @Override
     public GroupPrivileges relation(Long groupId, Long privilegeId, String action) {
         Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
@@ -70,6 +72,7 @@ public class GroupPrivilegesServiceImpl implements GroupPrivilegesService {
         return groupPrivilegesRepository.saveAndFlush(groupPrivilege);
     }
 
+    @Transactional
     @Override
     public void removeRelation(Long groupId, Long privilegeId, String action) {
         groupPrivilegesRepository.findByGroupIdAndPrivilegeId(groupId, privilegeId)

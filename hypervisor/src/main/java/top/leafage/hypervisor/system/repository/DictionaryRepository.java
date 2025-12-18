@@ -20,7 +20,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import top.leafage.hypervisor.system.domain.Dictionary;
 
 import java.util.List;
@@ -34,28 +33,27 @@ import java.util.List;
 public interface DictionaryRepository extends JpaRepository<Dictionary, Long>, JpaSpecificationExecutor<Dictionary> {
 
     /**
-     * 是否存在
+     * is exists.
      *
-     * @param name 名称
-     * @return true-存在，false-否
+     * @param name name.
+     * @return if exists return true or false.
      */
     boolean existsByName(String name);
 
     /**
-     * 查询下级信息
+     * find by superior id.
      *
-     * @param superiorId 上级主键
+     * @param superiorId the pk of superior.
      * @return the result.
      */
     List<Dictionary> findAllBySuperiorId(Long superiorId);
 
     /**
-     * Toggles the enabled status of a record by its ID.
+     * enable a record by pk..
      *
-     * @param id The ID of the record.
+     * @param id the pk.
      * @return result.
      */
-    @Transactional
     @Modifying
     @Query("UPDATE Dictionary t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
     int updateEnabledById(Long id);

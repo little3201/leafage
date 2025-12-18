@@ -16,6 +16,7 @@
 package top.leafage.hypervisor.system.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import top.leafage.hypervisor.system.domain.GroupAuthorities;
@@ -82,6 +83,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public RolePrivileges relation(Long roleId, Long privilegeId, String action) {
         Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
@@ -97,6 +99,7 @@ public class RolePrivilegesServiceImpl implements RolePrivilegesService {
         return rolePrivilegesRepository.saveAndFlush(rolePrivilege);
     }
 
+    @Transactional
     @Override
     public void removeRelation(Long roleId, Long privilegeId, String action) {
         Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));

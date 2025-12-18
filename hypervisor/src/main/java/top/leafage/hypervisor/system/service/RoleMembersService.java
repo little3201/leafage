@@ -30,7 +30,7 @@ public interface RoleMembersService {
     /**
      * 查询关联 members
      *
-     * @param roleId role主键
+     * @param roleId the pk of role.
      * @return 数据集
      */
     List<RoleMembers> members(Long roleId);
@@ -38,7 +38,7 @@ public interface RoleMembersService {
     /**
      * 查询关联role
      *
-     * @param username 用户名
+     * @param username username.
      * @return 数据集
      */
     List<RoleMembers> roles(String username);
@@ -46,7 +46,7 @@ public interface RoleMembersService {
     /**
      * 保存role-members
      *
-     * @param roleId role主键
+     * @param roleId the pk of role.
      * @param users  user集合
      * @return 结果集
      */
@@ -55,7 +55,7 @@ public interface RoleMembersService {
     /**
      * 移除role-members关系
      *
-     * @param roleId    role主键
+     * @param roleId    the pk of role.
      * @param usernames username集合
      */
     void removeRelation(Long roleId, Set<String> usernames);

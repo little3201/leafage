@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.Message;
 import top.leafage.hypervisor.system.domain.dto.MessageDTO;
@@ -78,6 +79,7 @@ public class MessageServiceImpl implements MessageService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public MessageVO create(MessageDTO dto) {
         if (messageRepository.existsByTitle(dto.getTitle())) {
@@ -90,6 +92,7 @@ public class MessageServiceImpl implements MessageService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public MessageVO modify(Long id, MessageDTO dto) {
         Message existing = messageRepository.findById(id)
@@ -106,6 +109,7 @@ public class MessageServiceImpl implements MessageService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

@@ -30,26 +30,26 @@ import java.util.Optional;
 public interface RolePrivilegesRepository extends JpaRepository<RolePrivileges, Long> {
 
     /**
-     * 根据role查privilege
+     * find by role id.
      *
-     * @param roleId privilege主键
-     * @return 关联数据集
+     * @param roleId the pk of privilege.
+     * @return the result.
      */
     List<RolePrivileges> findAllByRoleId(Long roleId);
 
     /**
-     * 根据role查privilege
+     * find by role id and privilege id.
      *
-     * @param roleId privilege主键
-     * @return 关联数据集
+     * @param roleId the pk of privilege.
+     * @return the result.
      */
     Optional<RolePrivileges> findByRoleIdAndPrivilegeId(Long roleId, Long privilegeId);
 
     /**
-     * 根据privilege查role
+     * find by privilege id.
      *
-     * @param privilegeId privilege主键
-     * @return 关联数据集
+     * @param privilegeId the pk of privilege.
+     * @return the result.
      */
     List<RolePrivileges> findAllByPrivilegeId(Long privilegeId);
 

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.AccessLog;
 import top.leafage.hypervisor.system.domain.vo.AccessLogVO;
@@ -68,6 +69,7 @@ public class AccessLogServiceImpl implements AccessLogService {
                 .orElseThrow(() -> new EntityNotFoundException("access log not found: " + id));
     }
 
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -77,6 +79,7 @@ public class AccessLogServiceImpl implements AccessLogService {
         accessLogRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public void clear() {
         accessLogRepository.deleteAll();

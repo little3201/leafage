@@ -30,9 +30,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     /**
      * 是否已存在
      *
-     * @param title 名称
+     * @param title name.
      * @return true-是，false-否
      */
     boolean existsByTitle(String title);
-
 }

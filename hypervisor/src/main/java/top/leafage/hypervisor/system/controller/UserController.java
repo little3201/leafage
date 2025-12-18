@@ -109,7 +109,7 @@ public class UserController {
     }
 
     /**
-     * enable/disable..
+     * enable.
      *
      * @param id the pk..
      * @return the result.

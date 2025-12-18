@@ -16,6 +16,7 @@
 package top.leafage.hypervisor.system.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.GroupMembers;
 import top.leafage.hypervisor.system.repository.GroupMembersRepository;
@@ -70,6 +71,7 @@ public class GroupMembersServiceImpl implements GroupMembersService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public List<GroupMembers> relation(Long groupId, Set<String> usernames) {
         Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
@@ -84,6 +86,7 @@ public class GroupMembersServiceImpl implements GroupMembersService {
         return groupMembersRepository.saveAllAndFlush(groupMembers);
     }
 
+    @Transactional
     @Override
     public void removeRelation(Long groupId, Set<String> usernames) {
         Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));

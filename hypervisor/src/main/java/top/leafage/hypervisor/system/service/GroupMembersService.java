@@ -30,7 +30,7 @@ public interface GroupMembersService {
     /**
      * 查询关联 user
      *
-     * @param groupId group主键
+     * @param groupId the pk of group.
      * @return 数据集
      */
     List<GroupMembers> members(Long groupId);
@@ -38,7 +38,7 @@ public interface GroupMembersService {
     /**
      * 查询关联 group
      *
-     * @param username 用户名
+     * @param username username.
      * @return 数据集
      */
     List<GroupMembers> groups(String username);
@@ -46,7 +46,7 @@ public interface GroupMembersService {
     /**
      * 保存group-members
      *
-     * @param groupId group主键
+     * @param groupId the pk of group.
      * @param users   user集合
      * @return 结果集
      */
@@ -55,7 +55,7 @@ public interface GroupMembersService {
     /**
      * 移除group-members关系
      *
-     * @param roleId    role主键
+     * @param roleId    the pk of role.
      * @param usernames username集合
      */
     void removeRelation(Long roleId, Set<String> usernames);

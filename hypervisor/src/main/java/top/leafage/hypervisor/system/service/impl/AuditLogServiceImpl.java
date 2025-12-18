@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.AuditLog;
 import top.leafage.hypervisor.system.domain.vo.AuditLogVO;
@@ -69,6 +70,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 .orElseThrow(() -> new EntityNotFoundException("audit log not found: " + id));
     }
 
+    @Transactional
     @Override
     public void remove(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

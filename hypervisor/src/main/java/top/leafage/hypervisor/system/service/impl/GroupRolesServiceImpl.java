@@ -16,6 +16,7 @@
 package top.leafage.hypervisor.system.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.GroupRoles;
 import top.leafage.hypervisor.system.repository.GroupRolesRepository;
@@ -61,6 +62,7 @@ public class GroupRolesServiceImpl implements GroupRolesService {
         return groupRolesRepository.findAllByRoleId(roleId);
     }
 
+    @Transactional
     @Override
     public List<GroupRoles> relation(Long groupId, Set<Long> roleIds) {
         Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));
@@ -73,6 +75,7 @@ public class GroupRolesServiceImpl implements GroupRolesService {
         return groupRolesRepository.saveAllAndFlush(groupRoles);
     }
 
+    @Transactional
     @Override
     public void removeRelation(Long groupId, Set<Long> roleIds) {
         Assert.notNull(groupId, String.format(_MUST_NOT_BE_NULL, "groupId"));

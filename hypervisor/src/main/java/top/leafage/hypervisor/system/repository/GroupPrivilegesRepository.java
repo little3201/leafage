@@ -32,24 +32,24 @@ public interface GroupPrivilegesRepository extends JpaRepository<GroupPrivileges
     /**
      * 根据group查privilege
      *
-     * @param groupId privilege主键
-     * @return 关联数据集
+     * @param groupId the pk of privilege.
+     * @return the result.
      */
     List<GroupPrivileges> findAllByGroupId(Long groupId);
 
     /**
      * 根据group查privilege
      *
-     * @param groupId privilege主键
-     * @return 关联数据集
+     * @param groupId the pk of privilege.
+     * @return the result.
      */
     Optional<GroupPrivileges> findByGroupIdAndPrivilegeId(Long groupId, Long privilegeId);
 
     /**
      * 根据privilege查group
      *
-     * @param privilegeId privilege主键
-     * @return 关联数据集
+     * @param privilegeId the pk of privilege.
+     * @return the result.
      */
     List<GroupPrivileges> findAllByPrivilegeId(Long privilegeId);
 

@@ -29,7 +29,7 @@ public interface RolePrivilegesService {
     /**
      * 查询关联privilege
      *
-     * @param roleId role主键
+     * @param roleId the pk of role.
      * @return 数据集
      */
     List<RolePrivileges> privileges(Long roleId);
@@ -45,7 +45,7 @@ public interface RolePrivilegesService {
     /**
      * 保存role-privilege关系
      *
-     * @param roleId      role主键
+     * @param roleId      the pk of role.
      * @param privilegeId privilege id
      * @param action      操作
      * @return 结果集
@@ -55,8 +55,8 @@ public interface RolePrivilegesService {
     /**
      * 移除role-privilege关系
      *
-     * @param roleId      role主键
-     * @param privilegeId privilege主键
+     * @param roleId      the pk of role.
+     * @param privilegeId the pk of privilege.
      * @param action      操作
      */
     void removeRelation(Long roleId, Long privilegeId, String action);

@@ -119,7 +119,7 @@ public class RegionController {
     }
 
     /**
-     * enable/disable..
+     * enable.
      *
      * @param id the pk..
      * @return the result.

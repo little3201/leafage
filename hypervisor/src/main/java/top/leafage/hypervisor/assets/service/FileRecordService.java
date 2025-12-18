@@ -27,9 +27,9 @@ import top.leafage.common.data.jpa.JpaCrudService;
 public interface FileRecordService extends JpaCrudService<Object, FileRecordVO> {
 
     /**
-     * 上传
+     * upload.
      *
-     * @param file 文件
+     * @param file the file.
      * @return the result.
      */
     FileRecordVO upload(MultipartFile file);

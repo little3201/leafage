@@ -16,6 +16,7 @@
 package top.leafage.hypervisor.system.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.hypervisor.system.domain.RoleMembers;
 import top.leafage.hypervisor.system.repository.RoleMembersRepository;
@@ -70,6 +71,7 @@ public class RoleMembersServiceImpl implements RoleMembersService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public List<RoleMembers> relation(Long roleId, Set<String> usernames) {
         Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));
@@ -84,6 +86,7 @@ public class RoleMembersServiceImpl implements RoleMembersService {
         return roleMembersRepository.saveAllAndFlush(roleMembers);
     }
 
+    @Transactional
     @Override
     public void removeRelation(Long roleId, Set<String> usernames) {
         Assert.notNull(roleId, String.format(_MUST_NOT_BE_NULL, "roleId"));

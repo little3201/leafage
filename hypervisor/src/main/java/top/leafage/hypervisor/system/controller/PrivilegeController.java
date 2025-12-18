@@ -122,7 +122,7 @@ public class PrivilegeController {
     }
 
     /**
-     * 启用、停用
+     * enable.
      *
      * @param id the pk.
      * @return 编辑后的信息，否则返回417状态码

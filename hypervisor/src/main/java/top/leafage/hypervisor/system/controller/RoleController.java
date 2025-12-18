@@ -132,7 +132,7 @@ public class RoleController {
     }
 
     /**
-     * enable/disable..
+     * enable.
      *
      * @param id the pk..
      * @return the result.
@@ -174,7 +174,7 @@ public class RoleController {
     /**
      * 删除 role-privilege关联
      *
-     * @param id        role主键
+     * @param id        the pk of role.
      * @param usernames username集合
      * @return 操作结果
      */

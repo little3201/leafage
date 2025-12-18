@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 import top.leafage.hypervisor.system.domain.RoleMembers;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * role members repository.
@@ -30,26 +29,18 @@ import java.util.Optional;
 public interface RoleMembersRepository extends JpaRepository<RoleMembers, Long> {
 
     /**
-     * 根据user主键ID查询
+     * find by username.
      *
-     * @param username 用户名
+     * @param username username.
      * @return 集合
      */
     List<RoleMembers> findAllByUsername(String username);
 
     /**
-     * 根据role查user
+     * find by role id.
      *
-     * @param roleId privilege主键
-     * @return 关联数据集
-     */
-    Optional<RoleMembers> findByRoleIdAndUsername(Long roleId, String username);
-
-    /**
-     * 根据role查询
-     *
-     * @param roleId role主键
-     * @return 关联数据集
+     * @param roleId the pk of role.
+     * @return the result.
      */
     List<RoleMembers> findAllByRoleId(Long roleId);
 

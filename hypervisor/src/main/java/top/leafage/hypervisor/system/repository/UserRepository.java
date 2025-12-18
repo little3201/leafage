@@ -19,7 +19,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import top.leafage.hypervisor.system.domain.User;
 
 /**
@@ -31,40 +30,38 @@ import top.leafage.hypervisor.system.domain.User;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
     /**
-     * 是否存在
+     * is exists.
      *
-     * @param username 用户名
-     * @return true-存在，false-否
+     * @param username username.
+     * @return if exists return true or false.
      */
     boolean existsByUsername(String username);
 
     /**
-     * 是否存在
+     * is exists.
      *
-     * @param email 用户名
-     * @return true-存在，false-否
+     * @param email username.
+     * @return if exists return true or false.
      */
     boolean existsByEmail(String email);
 
     /**
-     * Toggles the enabled status of a record by its ID.
+     * enable a record by pk.
      *
-     * @param id The ID of the record.
+     * @param id the pk.
      * @return result.
      */
-    @Transactional
     @Modifying
     @Query("UPDATE User t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
     int updateEnabledById(Long id);
 
     /**
-     * Toggles the accountNonLocked status of a record by its ID.
+     * update the accountNonLocked to true by pk.
      *
-     * @param id The ID of the record.
+     * @param id the pk.
      * @return result.
      */
-    @Transactional
     @Modifying
-    @Query("UPDATE User t SET t.accountNonLocked = CASE WHEN t.accountNonLocked = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE User t SET t.accountNonLocked = true WHERE t.id = :id")
     int updateAccountNonLockedById(Long id);
 }

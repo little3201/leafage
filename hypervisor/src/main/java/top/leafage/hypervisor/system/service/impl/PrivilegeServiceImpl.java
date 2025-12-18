@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import top.leafage.common.data.domain.TreeNode;
 import top.leafage.hypervisor.system.domain.Privilege;
@@ -149,13 +150,6 @@ public class PrivilegeServiceImpl implements PrivilegeService {
                 .toList();
     }
 
-    @Override
-    public Long countBySuperiorId(Long superiorId) {
-        Assert.notNull(superiorId, String.format(_MUST_NOT_BE_NULL, "superiorId"));
-
-        return privilegeRepository.countBySuperiorId(superiorId);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -171,6 +165,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public boolean enable(Long id) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
@@ -183,6 +178,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public PrivilegeVO modify(Long id, PrivilegeDTO dto) {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 import top.leafage.hypervisor.system.domain.GroupMembers;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * group members repository.
@@ -30,26 +29,18 @@ import java.util.Optional;
 public interface GroupMembersRepository extends JpaRepository<GroupMembers, Long> {
 
     /**
-     * 根据group查user
+     * find by group id.
      *
-     * @param groupId group主键
-     * @return 关联数据集
+     * @param groupId the pk of group.
+     * @return the result.
      */
     List<GroupMembers> findAllByGroupId(Long groupId);
 
     /**
-     * 根据group查user
+     * find by username.
      *
-     * @param groupId privilege主键
-     * @return 关联数据集
-     */
-    Optional<GroupMembers> findByGroupIdAndUsername(Long groupId, String username);
-
-    /**
-     * 根据user查group
-     *
-     * @param username 用户名
-     * @return 关联数据集
+     * @param username username.
+     * @return the result.
      */
     List<GroupMembers> findAllByUsername(String username);
 
