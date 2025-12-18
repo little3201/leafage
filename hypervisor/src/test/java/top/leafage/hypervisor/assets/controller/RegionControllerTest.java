@@ -32,8 +32,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
 import top.leafage.hypervisor.assets.domain.dto.RegionDTO;
-import top.leafage.hypervisor.assets.domain.vo.CommentVO;
-import top.leafage.hypervisor.assets.domain.vo.PostVO;
 import top.leafage.hypervisor.assets.domain.vo.RegionVO;
 import top.leafage.hypervisor.assets.service.RegionService;
 
@@ -72,11 +70,11 @@ class RegionControllerTest {
         dto = new RegionDTO();
         dto.setName("test");
         dto.setAreaCode("23234");
-        dto.setPostalCode(1212);
+        dto.setPostalCode("712000");
         dto.setSuperiorId(1L);
         dto.setDescription("description");
 
-        vo = new RegionVO(1L, "test", "029", 712000, "description");
+        vo = new RegionVO(1L, "test", "029", "712000", "description", true);
     }
 
     @Test

@@ -32,7 +32,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
 import top.leafage.common.data.domain.TreeNode;
-import top.leafage.hypervisor.system.controller.PrivilegeController;
 import top.leafage.hypervisor.system.domain.dto.PrivilegeDTO;
 import top.leafage.hypervisor.system.domain.vo.PrivilegeVO;
 import top.leafage.hypervisor.system.service.PrivilegeService;
@@ -76,7 +75,7 @@ class PrivilegeControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new PrivilegeVO(1L, "test", null, "test", "test", "#", "icon", Set.of("create,modify"), "description", 0);
+        vo = new PrivilegeVO(1L, "test", null, "test", "test", "#", "icon", Set.of("create,modify"), "description", true, 0);
 
         dto = new PrivilegeDTO();
         dto.setName("test");

@@ -64,6 +64,7 @@ class SchedulerLogServiceImplTest {
         entity = new SchedulerLog();
         entity.setName("test");
         entity.setStartTime(Instant.now());
+        entity.setStatus(SchedulerLog.ScheduleStatus.RUNNING);
         entity.setRecord("description");
     }
 
@@ -74,7 +75,7 @@ class SchedulerLogServiceImplTest {
         when(schedulerLogRepository.findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(),
                 any(Pageable.class))).thenReturn(page);
 
-        Page<SchedulerLogVO> voPage = schedulerLogService.retrieve(0, 2, "id", true, "test");
+        Page<SchedulerLogVO> voPage = schedulerLogService.retrieve(0, 2, "id", true, "name:eq:test");
         assertEquals(1, voPage.getTotalElements());
         assertEquals(1, voPage.getContent().size());
         verify(schedulerLogRepository).findAll(ArgumentMatchers.<Specification<SchedulerLog>>any(), any(Pageable.class));

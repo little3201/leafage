@@ -86,7 +86,7 @@ class AuditLogServiceImplTest {
 
         AuditLogVO vo = auditLogService.fetch(anyLong());
         assertNotNull(vo);
-        assertEquals("test", vo.operation());
+        assertEquals("test", vo.action());
         verify(auditLogRepository).findById(anyLong());
     }
 
