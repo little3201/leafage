@@ -1,12 +1,11 @@
 # Leafage
 
 <p align="center">
- <img src="https://img.shields.io/badge/Spring%20Boot-3.5.0-green.svg" alt="Downloads">
+ <img src="https://img.shields.io/badge/Spring%20Boot-4.0.0-green.svg" alt="Downloads">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=alert_status" alt="Quality Gate Status">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=code_smells" alt="code_smells">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=bugs" alt="bugs">
  <img src="https://sonarcloud.io/api/project_badges/measure?project=little3201_leafage&metric=ncloc" alt="lines of code"/>
-</p>
 
 ## 项目简介
 
@@ -31,8 +30,8 @@ leafage 是一个基于 Spring Boot 构建的通用后台管理系统，适用�
 - Spring Boot
 - Spring Security
 
-| 技术栈  | 分支    | 框架/库                      |
-| ------- | ------- | ---------------------------- |
+| 技术栈     | 分支      | 框架/库                         |
+|---------|---------|------------------------------|
 | webmvc  | develop | Spring data jpa              |
 |         |         | Spring cloud gateway webmvc  |
 | webflux | webflux | Spring data r2dbc            |
@@ -40,11 +39,11 @@ leafage 是一个基于 Spring Boot 构建的通用后台管理系统，适用�
 
 ### 2. 前端技术栈与分支
 
-| 技术栈 | 分支      | 框架/库      |
-| ------ | --------- | ------------ |
-| Vue    | develop   | Quasar       |
-| Vue    | develop-2 | Element Plus |
-| React  | react     | PrimeReact   |
+| 技术栈   | 分支        | 框架/库         |
+|-------|-----------|--------------|
+| Vue   | develop   | Quasar       |
+| Vue   | develop-2 | Element Plus |
+| React | react     | PrimeReact   |
 
 前端源码及详细文档请见 [@little3201/leafage-ui](https://github.com/little3201/leafage-ui)
 

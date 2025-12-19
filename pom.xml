@@ -20,24 +20,23 @@
     <parent>
         <groupId>top.leafage</groupId>
         <artifactId>leafage-starter-parent</artifactId>
-        <version>0.3.5</version>
+        <version>0.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>io.leafage</groupId>
     <artifactId>leafage</artifactId>
-    <version>0.1.1</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
 
     <name>leafage</name>
     <description>parent module of leafage</description>
 
     <properties>
-        <sonar.projectKey>little3201_leafage-basic</sonar.projectKey>
+        <sonar.projectKey>little3201_leafage</sonar.projectKey>
         <sonar.organization>little3201</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-        <leafage-common.version>0.3.5</leafage-common.version>
+        <leafage-common.version>0.4.0</leafage-common.version>
     </properties>
 
     <developers>
@@ -50,9 +49,7 @@
     <modules>
         <module>gateway</module>
         <module>auth</module>
-        <module>assets</module>
         <module>hypervisor</module>
-        <module>exploiter</module>
     </modules>
 
     <dependencyManagement>
@@ -71,14 +68,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
+
 </project>

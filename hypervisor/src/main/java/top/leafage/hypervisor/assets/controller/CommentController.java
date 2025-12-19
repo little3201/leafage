@@ -1,0 +1,105 @@
+/*
+ * Copyright (c) 2024-2025.  little3201.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package top.leafage.hypervisor.assets.controller;
+
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import top.leafage.hypervisor.assets.domain.dto.CommentDTO;
+import top.leafage.hypervisor.assets.domain.vo.CommentVO;
+import top.leafage.hypervisor.assets.service.CommentService;
+
+import java.util.List;
+
+/**
+ * comment controller.
+ *
+ * @author wq li
+ */
+@RestController
+@RequestMapping("/comments")
+public class CommentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
+    private final CommentService commentService;
+
+    /**
+     * Constructor for CommentController.
+     *
+     * @param commentService a {@link CommentService} object
+     */
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
+
+    /**
+     * 列表查询
+     *
+     * @param page       分页位置
+     * @param size       分页大小
+     * @param sortBy     a {@link String} object
+     * @param descending a boolean
+     * @return 查询到数据集，异常时返回204
+     */
+    @GetMapping
+    public ResponseEntity<Page<CommentVO>> retrieve(@RequestParam int page, @RequestParam int size,
+                                                    String sortBy, boolean descending, String filters) {
+        Page<CommentVO> voPage = commentService.retrieve(page, size, sortBy, descending, filters);
+        return ResponseEntity.ok(voPage);
+    }
+
+    /**
+     * 根据 posts id 查询
+     *
+     * @param id 帖子代码
+     * @return 关联的评论
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<List<CommentVO>> relation(@PathVariable Long id) {
+        List<CommentVO> voList = commentService.relation(id);
+        return ResponseEntity.ok(voList);
+    }
+
+
+    /**
+     * 根据id查询回复
+     *
+     * @param id 帖子代码
+     * @return 关联的评论
+     */
+    @GetMapping("/{id}/replies")
+    public ResponseEntity<List<CommentVO>> replies(@PathVariable Long id) {
+        List<CommentVO> voList = commentService.replies(id);
+        return ResponseEntity.ok(voList);
+    }
+
+    /**
+     * create.
+     *
+     * @param dto the request body.
+     * @return 添加后的信息，异常时返回417状态码
+     */
+    @PostMapping
+    public ResponseEntity<CommentVO> create(@Valid @RequestBody CommentDTO dto) {
+        CommentVO vo = commentService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
+    }
+
+}

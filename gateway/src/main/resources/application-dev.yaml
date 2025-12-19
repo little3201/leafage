@@ -1,26 +1,27 @@
 spring:
-  cloud:
-    gateway.server.webmvc:
-      routes:
-        - id: auth_route
-          uri: http://127.0.0.1:8761
-          predicates:
-            - Path=/userinfo,/oauth2/**,/connect/logout
-        - id: hypervisor_route
-          uri: http://127.0.0.1:8762
-          predicates:
-            - Path=/hypervisor/**
-          filters:
-            - StripPrefix=1
-        - id: exploiter_route
-          uri: http://127.0.0.1:8763
-          predicates:
-            - Path=/exploiter/**
-          filters:
-            - StripPrefix=1
-        - id: assets_route
-          uri: http://127.0.0.1:8764
-          predicates:
-            - Path=/assets/**
-          filters:
-            - StripPrefix=1
+  security:
+    oauth2:
+      client:
+        registration:
+          web-client-oidc:
+            provider: spring
+            client-id: web-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://127.0.0.1:8760/login/oauth2/code/{registrationId}"
+            scope: openid,profile
+            client-name: web-client-oidc
+          web-client-authorization-code:
+            provider: spring
+            client-id: web-client
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://127.0.0.1:8760/authorized"
+            scope: message.read,message.write
+            client-name: web-client-authorization-code
+        provider:
+          spring:
+            issuer-uri: http://localhost:8761
+
+app:
+  base-uri: http://127.0.0.1:5173
