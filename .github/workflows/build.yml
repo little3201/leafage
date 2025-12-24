@@ -10,23 +10,33 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ 'main' ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ 'main' ]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: Build and analyze
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'temurin'
-          cache: 'maven'
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+          cache: maven
+      - name: Verify and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify sonar:sonar -P sonar -Dsonar.sourceEncoding=UTF-8
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       - name: Update dependency graph

@@ -16,8 +16,6 @@ package top.leafage.hypervisor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
-import top.leafage.common.handler.GlobalExceptionHandler;
 
 
 /**
@@ -25,7 +23,6 @@ import top.leafage.common.handler.GlobalExceptionHandler;
  *
  * @author wq li
  */
-@Import(GlobalExceptionHandler.class)
 @SpringBootApplication
 public class HypervisorApplication {
 
