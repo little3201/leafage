@@ -83,10 +83,8 @@ mvn spring-boot:run
 
 ```
 leafage/
-├── assets/
 ├── auth/
 ├── gateway/
-├── exploiter/
 ├── hypervisor/
 └── README.md
 ```
