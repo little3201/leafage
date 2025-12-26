@@ -86,7 +86,7 @@ public class GroupController {
     /**
      * 查询树形数据
      *
-     * @return th result.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_groups')")
     @GetMapping("/tree")

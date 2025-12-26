@@ -74,7 +74,7 @@ public class RegionController {
      * fetch.
      *
      * @param id th pk.
-     * @return th result.
+     * @return the result.
      */
     @GetMapping("/{id}")
     public ResponseEntity<RegionVO> fetch(@PathVariable Long id) {

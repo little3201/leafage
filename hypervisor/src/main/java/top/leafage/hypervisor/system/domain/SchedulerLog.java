@@ -40,6 +40,7 @@ public class SchedulerLog extends JpaAbstractAuditable<@NonNull String, @NonNull
 
     private Instant nextExecuteTime;
 
+    @Column(columnDefinition = "text")
     private String record;
 
     @Enumerated(EnumType.STRING)

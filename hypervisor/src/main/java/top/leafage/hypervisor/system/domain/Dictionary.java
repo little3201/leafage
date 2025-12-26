@@ -35,10 +35,9 @@ import top.leafage.common.data.jpa.domain.JpaAbstractAuditable;
 public class Dictionary extends JpaAbstractAuditable<@NonNull String, @NonNull Long> {
 
     @NotBlank
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(name = "superior_id")
     private Long superiorId;
 
     private String description;

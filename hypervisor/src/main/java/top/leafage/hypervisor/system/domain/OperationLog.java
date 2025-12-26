@@ -42,6 +42,7 @@ public class OperationLog extends JpaAbstractAuditable<@NonNull String, @NonNull
 
     private String params;
 
+    @Column(columnDefinition = "text")
     private String body;
 
     @Column(columnDefinition = "inet")

@@ -76,7 +76,7 @@ public class FileController {
      * fetch.
      *
      * @param id th pk.
-     * @return th result.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files')")
     @GetMapping("/{id}")
@@ -102,7 +102,7 @@ public class FileController {
      * fetch.
      *
      * @param id th pk.
-     * @return th result.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:download')")
     @GetMapping("/{id}/download")

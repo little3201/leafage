@@ -73,7 +73,7 @@ public class PrivilegeController {
     /**
      * 查询树形数据
      *
-     * @return th result.
+     * @return the result.
      */
     @GetMapping("/tree")
     public ResponseEntity<List<TreeNode<Long>>> tree(Principal principal) {

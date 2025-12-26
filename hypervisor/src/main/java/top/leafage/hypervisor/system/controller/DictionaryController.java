@@ -73,7 +73,7 @@ public class DictionaryController {
      * subset.
      *
      * @param id th pk.
-     * @return th result.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{id}/subset")
@@ -86,7 +86,7 @@ public class DictionaryController {
      * fetch.
      *
      * @param id th pk.
-     * @return th result.
+     * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_dictionaries')")
     @GetMapping("/{id}")

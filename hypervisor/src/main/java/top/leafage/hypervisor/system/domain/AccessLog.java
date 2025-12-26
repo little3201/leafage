@@ -45,6 +45,7 @@ public class AccessLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lo
 
     private String params;
 
+    @Column(columnDefinition = "text")
     private String body;
 
     private Integer statusCode;

@@ -42,8 +42,10 @@ public class AuditLog extends JpaAbstractAuditable<@NonNull String, @NonNull Lon
 
     private Long targetId;
 
+    @Column(columnDefinition = "text")
     private String oldValue;
 
+    @Column(columnDefinition = "text")
     private String newValue;
 
     @Column(columnDefinition = "inet")

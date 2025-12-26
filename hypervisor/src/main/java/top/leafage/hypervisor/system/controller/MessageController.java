@@ -69,7 +69,7 @@ public class MessageController {
      * fetch.
      *
      * @param id the pk.
-     * @return th result.
+     * @return the result.
      */
     @GetMapping("/{id}")
     public ResponseEntity<MessageVO> fetch(@PathVariable Long id) {
