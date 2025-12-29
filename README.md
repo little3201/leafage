@@ -59,7 +59,7 @@ cd leafage
 
 ### 配置数据库
 
-1. 创建数据库（如 leafage），导入 `schema.sql`
+1. 创建数据库（如 leafage），导入 `scheme.sql`
 2. 修改 `application.yml` 配置数据库连接信息
 
 ### 启动项目

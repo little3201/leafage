@@ -22,6 +22,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import top.leafage.hypervisor.assets.domain.Region;
 
+import java.util.List;
+
 /**
  * region repository.
  *
@@ -37,6 +39,22 @@ public interface RegionRepository extends JpaRepository<Region, Long>, JpaSpecif
      * @return a boolean
      */
     boolean existsByName(String name);
+
+    /**
+     * find by superior id.
+     *
+     * @param superiorId the pk of superior.
+     * @return the result.
+     */
+    List<Region> findAllBySuperiorId(Long superiorId);
+
+    /**
+     * Counts the number of records by superior ID.
+     *
+     * @param superiorId The superior ID.
+     * @return The count of records.
+     */
+    long countBySuperiorId(Long superiorId);
 
     /**
      * enable a record by pk.

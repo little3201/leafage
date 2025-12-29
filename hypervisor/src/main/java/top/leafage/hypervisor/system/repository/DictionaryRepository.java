@@ -49,6 +49,14 @@ public interface DictionaryRepository extends JpaRepository<Dictionary, Long>, J
     List<Dictionary> findAllBySuperiorId(Long superiorId);
 
     /**
+     * Counts the number of records by superior ID.
+     *
+     * @param superiorId The superior ID.
+     * @return The count of records.
+     */
+    long countBySuperiorId(Long superiorId);
+
+    /**
      * enable a record by pk..
      *
      * @param id the pk.

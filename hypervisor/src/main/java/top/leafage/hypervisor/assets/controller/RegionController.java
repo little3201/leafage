@@ -28,6 +28,7 @@ import top.leafage.hypervisor.assets.domain.dto.RegionDTO;
 import top.leafage.hypervisor.assets.domain.vo.RegionVO;
 import top.leafage.hypervisor.assets.service.RegionService;
 import top.leafage.common.poi.ExcelReader;
+import top.leafage.hypervisor.system.domain.vo.DictionaryVO;
 
 import java.io.IOException;
 import java.util.List;
@@ -80,6 +81,19 @@ public class RegionController {
     public ResponseEntity<RegionVO> fetch(@PathVariable Long id) {
         RegionVO vo = regionService.fetch(id);
         return ResponseEntity.ok(vo);
+    }
+
+    /**
+     * subset.
+     *
+     * @param id th pk.
+     * @return the result.
+     */
+    @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_regions')")
+    @GetMapping("/{id}/subset")
+    public ResponseEntity<List<RegionVO>> subset(@PathVariable Long id) {
+        List<RegionVO> voList = regionService.subset(id);
+        return ResponseEntity.ok(voList);
     }
 
     /**

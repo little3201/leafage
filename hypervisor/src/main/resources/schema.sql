@@ -222,7 +222,7 @@ create table fields
     field_type         varchar(255),
     form_type          varchar(255),
     ts_type            varchar(255),
-    schema_id          bigint                                 not null,
+    scheme_id          bigint                                 not null,
     nullable           boolean,
     is_unique          boolean,
     queryable          boolean,
@@ -252,7 +252,7 @@ comment on column fields.form_type is '表单类型';
 
 comment on column fields.ts_type is 'ts类型';
 
-comment on column fields.schema_id is 'schema主键';
+comment on column fields.scheme_id is 'schema主键';
 
 comment on column fields.nullable is '是否可为空';
 
@@ -1020,7 +1020,7 @@ comment on column scheduler_logs.last_modified_date is '最后修改时间';
 alter table scheduler_logs
     owner to postgres;
 
-create table schemas
+create table schemes
 (
     id                 bigint generated always as identity
         primary key,
@@ -1037,29 +1037,29 @@ create table schemas
             references connections
 );
 
-comment on table schemas is 'schema配置表';
+comment on table schemes is 'schema配置表';
 
-comment on column schemas.id is '主键，自动生成';
+comment on column schemes.id is '主键，自动生成';
 
-comment on column schemas.name is '表名称';
+comment on column schemes.name is '表名称';
 
-comment on column schemas.package_name is '包名';
+comment on column schemes.package_name is '包名';
 
-comment on column schemas.prefix is '前缀';
+comment on column schemes.prefix is '前缀';
 
-comment on column schemas.enabled is '是否启用';
+comment on column schemes.enabled is '是否启用';
 
-comment on column schemas.created_by is '创建者';
+comment on column schemes.created_by is '创建者';
 
-comment on column schemas.created_date is '创建时间';
+comment on column schemes.created_date is '创建时间';
 
-comment on column schemas.last_modified_by is '最后修改者';
+comment on column schemes.last_modified_by is '最后修改者';
 
-comment on column schemas.last_modified_date is '最后修改时间';
+comment on column schemes.last_modified_date is '最后修改时间';
 
-comment on column schemas.connection_id is 'connection主键';
+comment on column schemes.connection_id is 'connection主键';
 
-alter table schemas
+alter table schemes
     owner to postgres;
 
 create table schema_samples
@@ -1067,19 +1067,19 @@ create table schema_samples
     id        bigint generated always as identity
         constraint schema_templates_pkey
             primary key,
-    schema_id bigint not null
+    scheme_id bigint not null
         constraint fk_shcemas_samples_schema_id
-            references schemas,
+            references schemes,
     sample_id bigint not null
         constraint fk_shcemas_samples_sample_id
             references samples
 );
 
-comment on table schema_samples is 'schema 样板关联表';
+comment on table schema_samples is 'scheme 样板关联表';
 
 comment on column schema_samples.id is '主键';
 
-comment on column schema_samples.schema_id is 'schema主键';
+comment on column schema_samples.scheme_id is 'schema主键';
 
 comment on column schema_samples.sample_id is 'sample主键';
 
