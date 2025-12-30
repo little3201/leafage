@@ -61,7 +61,7 @@ class CommentServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        entity = new Comment(1L, "test", 1L);
+        entity = new Comment(1L, 1L, "test");
     }
 
     @Test
@@ -79,16 +79,16 @@ class CommentServiceImplTest {
 
     @Test
     void relation() {
-        when(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).thenReturn(List.of(entity));
+        when(commentRepository.findAllByPostIdAndSuperiorIdIsNull(anyLong())).thenReturn(List.of(entity));
 
         List<CommentVO> voList = commentService.relation(1L);
         assertEquals(1, voList.size());
-        verify(commentRepository).findAllByPostIdAndReplierIsNull(anyLong());
+        verify(commentRepository).findAllByPostIdAndSuperiorIdIsNull(anyLong());
     }
 
     @Test
     void relation_empty() {
-        when(commentRepository.findAllByPostIdAndReplierIsNull(anyLong())).thenReturn(Collections.emptyList());
+        when(commentRepository.findAllByPostIdAndSuperiorIdIsNull(anyLong())).thenReturn(Collections.emptyList());
 
         List<CommentVO> voList = commentService.relation(anyLong());
         assertTrue(voList.isEmpty());
@@ -96,11 +96,11 @@ class CommentServiceImplTest {
 
     @Test
     void replies() {
-        when(commentRepository.findAllByReplier(anyLong())).thenReturn(List.of(entity));
+        when(commentRepository.findAllBySuperiorId(anyLong())).thenReturn(List.of(entity));
 
         List<CommentVO> voList = commentService.replies(anyLong());
         assertEquals(1, voList.size());
-        verify(commentRepository).findAllByReplier(anyLong());
+        verify(commentRepository).findAllBySuperiorId(anyLong());
     }
 
     @Test

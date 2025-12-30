@@ -29,17 +29,17 @@ public class CommentDTO {
     @NotNull
     private Long postId;
 
+    private Long superiorId;
+
     @NotBlank
     private String body;
-
-    private Long replier;
 
 
     public static Comment toEntity(CommentDTO dto) {
         return new Comment(
                 dto.getPostId(),
-                dto.getBody(),
-                dto.getReplier()
+                dto.getSuperiorId(),
+                dto.getBody()
         );
     }
 
@@ -51,19 +51,19 @@ public class CommentDTO {
         this.postId = postId;
     }
 
+    public Long getSuperiorId() {
+        return superiorId;
+    }
+
+    public void setSuperiorId(Long superiorId) {
+        this.superiorId = superiorId;
+    }
+
     public String getBody() {
         return body;
     }
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public Long getReplier() {
-        return replier;
-    }
-
-    public void setReplier(Long replier) {
-        this.replier = replier;
     }
 }

@@ -24,9 +24,9 @@ import top.leafage.hypervisor.assets.domain.Comment;
  */
 public record CommentVO(
         Long id,
+        Long superiorId,
         Long postId,
         String body,
-        Long replier,
         long count
 ) {
     public static CommentVO from(Comment entity) {
@@ -36,9 +36,9 @@ public record CommentVO(
     public static CommentVO from(Comment entity, long count) {
         return new CommentVO(
                 entity.getId(),
+                entity.getSuperiorId(),
                 entity.getPostId(),
                 entity.getBody(),
-                entity.getReplier(),
                 count
         );
     }

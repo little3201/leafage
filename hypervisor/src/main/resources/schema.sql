@@ -1280,7 +1280,7 @@ create table comments
     last_modified_date timestamp(6) with time zone,
     body               varchar(255),
     post_id            bigint not null,
-    replier            bigint
+    superior_id        bigint
 );
 
 alter table comments

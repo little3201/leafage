@@ -36,22 +36,22 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, JpaSpec
      * @param postId 帖子ID
      * @return 关联的数据
      */
-    List<Comment> findAllByPostIdAndReplierIsNull(Long postId);
+    List<Comment> findAllByPostIdAndSuperiorIdIsNull(Long postId);
 
     /**
-     * 根据replier查询
+     * 根据superior id查询
      *
-     * @param replier 回复信息
+     * @param superiorId 回复信息
      * @return 关联的数据
      */
-    List<Comment> findAllByReplier(Long replier);
+    List<Comment> findAllBySuperiorId(Long superiorId);
 
     /**
-     * 查询回复记录数
+     * 记录数
      *
-     * @param replier 回复id
+     * @param superiorId 回复id
      * @return 记录数
      */
-    long countByReplier(Long replier);
+    long countBySuperiorId(Long superiorId);
 
 }

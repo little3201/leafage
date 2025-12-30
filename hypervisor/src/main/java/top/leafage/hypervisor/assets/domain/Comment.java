@@ -36,18 +36,18 @@ public class Comment extends JpaAbstractAuditable<@NonNull String, @NonNull Long
     @Column(nullable = false)
     private Long postId;
 
-    private String body;
+    private Long superiorId;
 
-    private Long replier;
+    private String body;
 
 
     public Comment() {
     }
 
-    public Comment(Long postId, String body, Long replier) {
+    public Comment(Long postId, Long superiorId, String body) {
         this.postId = postId;
+        this.superiorId = superiorId;
         this.body = body;
-        this.replier = replier;
     }
 
     public Long getPostId() {
@@ -58,6 +58,14 @@ public class Comment extends JpaAbstractAuditable<@NonNull String, @NonNull Long
         this.postId = postId;
     }
 
+    public Long getSuperiorId() {
+        return superiorId;
+    }
+
+    public void setSuperiorId(Long replier) {
+        this.superiorId = replier;
+    }
+    
     public String getBody() {
         return body;
     }
@@ -66,11 +74,4 @@ public class Comment extends JpaAbstractAuditable<@NonNull String, @NonNull Long
         this.body = body;
     }
 
-    public Long getReplier() {
-        return replier;
-    }
-
-    public void setReplier(Long replier) {
-        this.replier = replier;
-    }
 }

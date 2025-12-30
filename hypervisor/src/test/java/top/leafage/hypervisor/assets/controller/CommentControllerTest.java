@@ -68,9 +68,9 @@ class CommentControllerTest {
         dto = new CommentDTO();
         dto.setPostId(1L);
         dto.setBody("body");
-        dto.setReplier(1L);
+        dto.setSuperiorId(1L);
 
-        vo = new CommentVO(1L, 2L, "test", 1L, 0);
+        vo = new CommentVO(1L, 2L, 1L, "test", 0);
     }
 
     @Test
