@@ -65,11 +65,8 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         return dictionaryRepository.findAll(spec, pageable)
                 .map(entity -> {
-                    if (entity.getId() != null) {
-                        long count = dictionaryRepository.countBySuperiorId(entity.getId());
-                        return DictionaryVO.from(entity, count);
-                    }
-                    return DictionaryVO.from(entity);
+                    long count = dictionaryRepository.countBySuperiorId(entity.getId());
+                    return DictionaryVO.from(entity, count);
                 });
     }
 
@@ -104,11 +101,8 @@ public class DictionaryServiceImpl implements DictionaryService {
 
         return dictionaryRepository.findAllBySuperiorId(id)
                 .stream().map(entity -> {
-                    if (entity.getId() != null) {
-                        long count = dictionaryRepository.countBySuperiorId(entity.getId());
-                        return DictionaryVO.from(entity, count);
-                    }
-                    return DictionaryVO.from(entity);
+                    long count = dictionaryRepository.countBySuperiorId(entity.getId());
+                    return DictionaryVO.from(entity, count);
                 })
                 .toList();
     }

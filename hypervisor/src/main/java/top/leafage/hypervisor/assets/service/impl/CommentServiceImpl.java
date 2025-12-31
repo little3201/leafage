@@ -60,11 +60,8 @@ public class CommentServiceImpl implements CommentService {
                 buildPredicate(filters, cb, root).orElse(null);
 
         return commentRepository.findAll(spec, pageable).map(entity -> {
-            if (entity.getId() != null) {
-                long count = commentRepository.countBySuperiorId(entity.getId());
-                return CommentVO.from(entity, count);
-            }
-            return CommentVO.from(entity);
+            long count = commentRepository.countBySuperiorId(entity.getId());
+            return CommentVO.from(entity, count);
         });
     }
 
@@ -86,11 +83,8 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentVO> replies(Long replier) {
         return commentRepository.findAllBySuperiorId(replier)
                 .stream().map(entity -> {
-                    if (entity.getId() != null) {
-                        long count = commentRepository.countBySuperiorId(entity.getId());
-                        return CommentVO.from(entity, count);
-                    }
-                    return CommentVO.from(entity);
+                    long count = commentRepository.countBySuperiorId(entity.getId());
+                    return CommentVO.from(entity, count);
                 }).toList();
     }
 

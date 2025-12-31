@@ -29,7 +29,6 @@ import top.leafage.hypervisor.assets.domain.dto.RegionDTO;
 import top.leafage.hypervisor.assets.domain.vo.RegionVO;
 import top.leafage.hypervisor.assets.repository.RegionRepository;
 import top.leafage.hypervisor.assets.service.RegionService;
-import top.leafage.hypervisor.system.domain.vo.DictionaryVO;
 
 import java.util.List;
 
@@ -66,11 +65,8 @@ public class RegionServiceImpl implements RegionService {
 
         return regionRepository.findAll(spec, pageable)
                 .map(entity -> {
-                    if (entity.getId() != null) {
-                        long count = regionRepository.countBySuperiorId(entity.getId());
-                        return RegionVO.from(entity, count);
-                    }
-                    return RegionVO.from(entity);
+                    long count = regionRepository.countBySuperiorId(entity.getId());
+                    return RegionVO.from(entity, count);
                 });
     }
 
@@ -105,11 +101,8 @@ public class RegionServiceImpl implements RegionService {
 
         return regionRepository.findAllBySuperiorId(id)
                 .stream().map(entity -> {
-                    if (entity.getId() != null) {
-                        long count = regionRepository.countBySuperiorId(entity.getId());
-                        return RegionVO.from(entity, count);
-                    }
-                    return RegionVO.from(entity);
+                    long count = regionRepository.countBySuperiorId(entity.getId());
+                    return RegionVO.from(entity, count);
                 })
                 .toList();
     }
