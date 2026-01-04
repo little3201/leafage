@@ -24,18 +24,20 @@ import static top.leafage.hypervisor.constants.FieldConstant.*;
  */
 public enum FieldTypeEnum {
 
-    INT2("int2", "Short", FORM_INPUT_NUMBER, TYPE_NUMBER),
-    INT4("int4", "Integer", FORM_INPUT_NUMBER, TYPE_NUMBER),
-    INT8("int8", "Long", FORM_SELECT, TYPE_NUMBER),
-    FLOAT4("float4", "Float", FORM_INPUT_NUMBER, TYPE_NUMBER),
-    FLOAT8("float8", "Double", FORM_INPUT_NUMBER, TYPE_NUMBER),
-    NUMERIC("numeric", "BigDecimal", FORM_INPUT_NUMBER, TYPE_NUMBER),
-    BOOL("bool", "Boolean", FORM_SWITCH, TYPE_BOOLEAN),
+    INT2("int2", JAVA_SHORT, FORM_INPUT_NUMBER, TYPE_NUMBER),
+    INT4("int4", JAVA_INTEGER, FORM_INPUT_NUMBER, TYPE_NUMBER),
+    INT8("int8", JAVA_LONG, FORM_SELECT, TYPE_NUMBER),
+    FLOAT4("float4", JAVA_FLOAT, FORM_INPUT_NUMBER, TYPE_NUMBER),
+    FLOAT8("float8", JAVA_DOUBLE, FORM_INPUT_NUMBER, TYPE_NUMBER),
+    NUMERIC("numeric", JAVA_BIGDECIMAL, FORM_INPUT_NUMBER, TYPE_NUMBER),
+    BOOL("bool", JAVA_BOOLEAN, FORM_SWITCH, TYPE_BOOLEAN),
     VARCHAR("varchar", JAVA_STRING, FORM_INPUT, TYPE_STRING),
+    INET("inet", JAVA_INETADDRESS, FORM_INPUT, TYPE_STRING),
     TEXT("text", JAVA_STRING, FORM_INPUT, TYPE_STRING),
-    DATE("date", "LocalDate", FORM_DATE_PICKER, TYPE_DATE),
-    TIME("time", "LocalTime", FORM_TIME_PICKER, TYPE_DATE),
-    TIMESTAMP("timestamp", "LocalDateTime", FORM_DATE_PICKER, TYPE_DATE),
+    DATE("date", JAVA_LOCALDATE, FORM_DATE_PICKER, TYPE_DATE),
+    TIME("time", JAVA_LOCALTIME, FORM_TIME_PICKER, TYPE_DATE),
+    TIMESTAMP("timestamp", JAVA_LOCALDATETIME, FORM_DATE_PICKER, TYPE_DATE),
+    TIMESTAMPTZ("timestamptz", JAVA_LOCALDATETIME, FORM_DATE_PICKER, TYPE_DATE),
     JSON("json", JAVA_STRING, FORM_INPUT, TYPE_STRING);
 
     private final String dbType;
@@ -50,13 +52,13 @@ public enum FieldTypeEnum {
         this.tsType = tsType;
     }
 
-    public static FieldTypeEnum getByDbType(String dbType) {
+    public static FieldTypeEnum fromDbType(String dbType) {
         for (FieldTypeEnum mapping : values()) {
             if (mapping.dbType.equalsIgnoreCase(dbType)) {
                 return mapping;
             }
         }
-        return null;
+        return VARCHAR;
     }
 
     public String getJavaType() {

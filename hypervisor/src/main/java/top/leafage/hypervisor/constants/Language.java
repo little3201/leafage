@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025.  little3201.
+ * Copyright (c) 2026.  little3201.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,24 @@
  * limitations under the License.
  */
 
-package top.leafage.hypervisor.exploiter.service;
-
-import top.leafage.common.data.jpa.JpaCrudService;
-import top.leafage.hypervisor.exploiter.domain.dto.SampleDTO;
-import top.leafage.hypervisor.exploiter.domain.vo.SampleVO;
+package top.leafage.hypervisor.constants;
 
 /**
- * sample service.
- *
- * @author wq li
+ * code language
  */
-public interface SampleService extends JpaCrudService<SampleDTO, SampleVO> {
+public enum Language {
+    JAVA,
+    YML,
+    XML,
+    SQL,
+    TS,
+    TSX,
+    JS,
+    JSX,
+    VUE,
+    REACT;
 
-    /**
-     * preview
-     *
-     * @param id the pk.
-     * @return code.
-     */
-    SampleVO preview(Long id);
+    public static Language of(String value) {
+        return valueOf(value.toUpperCase());
+    }
 }

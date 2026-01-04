@@ -15,25 +15,38 @@
 
 package top.leafage.hypervisor.constants;
 
-import java.util.List;
-
 public final class FieldConstant {
 
-    public static final List<String> metadata = List.of("id", "enabled", "created_by", "created_date", "last_modified_by", "last_modified_date");
     // 公共常量
     public static final String FORM_INPUT = "input";
     public static final String FORM_INPUT_NUMBER = "input-number";
+    public static final String FORM_TEXTAREA = "textarea";
     public static final String FORM_SELECT = "select";
     public static final String FORM_SWITCH = "switch";
     public static final String FORM_DATE_PICKER = "date-picker";
     public static final String FORM_TIME_PICKER = "time-picker";
+
     public static final String TYPE_NUMBER = "number";
     public static final String TYPE_STRING = "string";
     public static final String TYPE_BOOLEAN = "boolean";
     public static final String TYPE_DATE = "Date";
-    public static final String JAVA_STRING = "String";
 
+    public static final String JAVA_SHORT = "Short";
+    public static final String JAVA_INTEGER = "Integer";
+    public static final String JAVA_LONG = "Long";
+    public static final String JAVA_FLOAT = "Float";
+    public static final String JAVA_DOUBLE = "Double";
+    public static final String JAVA_BIGDECIMAL = "BigDecimal";
+    public static final String JAVA_STRING = "String";
+    public static final String JAVA_BOOLEAN = "Boolean";
+    public static final String JAVA_INETADDRESS = "InetAddress";
+    public static final String JAVA_LOCALDATE = "LocalDate";
+    public static final String JAVA_LOCALTIME = "LocalTime";
+    public static final String JAVA_LOCALDATETIME = "LocalDateTime";
+
+    // private construce
     private FieldConstant() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
 }
