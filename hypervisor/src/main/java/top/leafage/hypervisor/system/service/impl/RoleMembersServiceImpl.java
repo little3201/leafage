@@ -96,6 +96,6 @@ public class RoleMembersServiceImpl implements RoleMembersService {
         List<Long> filteredIds = roleMembers.stream()
                 .filter(roleMember -> usernames.contains(roleMember.getUsername()))
                 .map(RoleMembers::getId).toList();
-        roleMembersRepository.deleteAllByIdInBatch(filteredIds);
+        roleMembersRepository.deleteAllById(filteredIds);
     }
 }

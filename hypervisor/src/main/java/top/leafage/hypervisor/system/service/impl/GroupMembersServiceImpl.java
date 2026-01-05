@@ -96,6 +96,6 @@ public class GroupMembersServiceImpl implements GroupMembersService {
         List<Long> filteredIds = groupMembers.stream()
                 .filter(roleMember -> usernames.contains(roleMember.getUsername()))
                 .map(GroupMembers::getId).toList();
-        groupMembersRepository.deleteAllByIdInBatch(filteredIds);
+        groupMembersRepository.deleteAllById(filteredIds);
     }
 }

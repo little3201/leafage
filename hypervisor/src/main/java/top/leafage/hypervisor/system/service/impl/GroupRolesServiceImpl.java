@@ -85,6 +85,6 @@ public class GroupRolesServiceImpl implements GroupRolesService {
         List<Long> filteredIds = groupRoles.stream()
                 .filter(groupRole -> roleIds.contains(groupRole.getRoleId()))
                 .map(GroupRoles::getId).toList();
-        groupRolesRepository.deleteAllByIdInBatch(filteredIds);
+        groupRolesRepository.deleteAllById(filteredIds);
     }
 }
