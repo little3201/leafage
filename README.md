@@ -37,6 +37,8 @@ leafage 是一个基于 Spring Boot 构建的通用后台管理系统，适用�
 |         |         | Spring cloud gateway webmvc  |
 | webflux | webflux | Spring data r2dbc            |
 |         |         | Spring cloud gateway webflux |
+| webmvc  | jdbc    | Spring data jdbc             |
+|         |         | Spring cloud gateway webmvc  |
 
 ### 2. 前端技术栈与分支
 
