@@ -1,6 +1,0 @@
-spring:
-  r2dbc:
-    url: r2dbc:postgresql://postgres@localhost:5432
-    username: postgres
-    password: zx110119
-    name: leafage

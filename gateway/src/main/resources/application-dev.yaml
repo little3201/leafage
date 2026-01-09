@@ -12,15 +12,3 @@ spring:
             - Path=/hypervisor/**
           filters:
             - StripPrefix=1
-        - id: exploiter_route
-          uri: http://127.0.0.1:8763
-          predicates:
-            - Path=/exploiter/**
-          filters:
-            - StripPrefix=1
-        - id: assets_route
-          uri: http://127.0.0.1:8764
-          predicates:
-            - Path=/assets/**
-          filters:
-            - StripPrefix=1
