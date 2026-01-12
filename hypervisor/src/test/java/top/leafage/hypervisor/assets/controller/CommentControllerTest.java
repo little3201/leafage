@@ -110,7 +110,7 @@ class CommentControllerTest {
                 .bodyValue(dto)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.content").isEqualTo("test");
+                .expectBody().jsonPath("$.body").isEqualTo("test");
     }
 
     @Test

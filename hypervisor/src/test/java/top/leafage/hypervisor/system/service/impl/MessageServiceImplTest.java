@@ -97,7 +97,8 @@ class MessageServiceImplTest {
 
     @Test
     void create() {
-        given(this.messageRepository.save(any(Message.class))).willReturn(Mono.just(mock(Message.class)));
+        given(this.messageRepository.existsByTitle(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.messageRepository.save(any(Message.class))).willReturn(Mono.just(entity));
 
         StepVerifier.create(messageService.create(dto)).expectNextCount(1).verifyComplete();
     }

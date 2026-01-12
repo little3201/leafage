@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -63,8 +64,8 @@ class MessageControllerTest {
         vo = new MessageVO(1L, "test", "test", "admin", false);
 
         dto = new MessageDTO();
-        dto.setTitle("标题");
-        dto.setBody("这个是正文内容");
+        dto.setTitle("test");
+        dto.setBody("test");
         dto.setReceiver("test");
     }
 
@@ -84,7 +85,16 @@ class MessageControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(MessageVO.class);
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(1)
+                .jsonPath("$.content[0].id").isEqualTo(vo.id())  // 根据 GroupVO 的字段调整
+                // 其他分页字段断言
+                .jsonPath("$.totalElements").isEqualTo(1)
+                .jsonPath("$.totalPages").isEqualTo(1)
+                .jsonPath("$.number").isEqualTo(0)
+                .jsonPath("$.size").isEqualTo(2);
     }
 
     @Test
@@ -109,7 +119,7 @@ class MessageControllerTest {
         webTestClient.get().uri("/messages/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.title").isEqualTo("标题");
+                .expectBody().jsonPath("$.title").isEqualTo("test");
     }
 
     @Test
@@ -126,7 +136,7 @@ class MessageControllerTest {
         webTestClient.mutateWith(csrf()).post().uri("/messages").bodyValue(dto)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.title").isEqualTo("标题");
+                .expectBody().jsonPath("$.title").isEqualTo("test");
     }
 
     @Test

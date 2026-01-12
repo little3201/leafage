@@ -109,22 +109,25 @@ class RegionServiceImplTest {
 
     @Test
     void create() {
-        given(this.regionRepository.save(any(Region.class))).willReturn(Mono.just(mock(Region.class)));
+        given(this.regionRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.regionRepository.save(any(Region.class))).willReturn(Mono.just(entity));
 
-        StepVerifier.create(regionService.create(mock(RegionDTO.class))).expectNextCount(1).verifyComplete();
+        StepVerifier.create(regionService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.regionRepository.findById(anyLong())).willReturn(Mono.just(mock(Region.class)));
+        given(this.regionRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.regionRepository.findById(anyLong())).willReturn(Mono.just(entity));
 
-        given(this.regionRepository.save(any(Region.class))).willReturn(Mono.just(mock(Region.class)));
+        given(this.regionRepository.save(any(Region.class))).willReturn(Mono.just(entity));
 
         StepVerifier.create(regionService.modify(anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void remove() {
+        given(this.regionRepository.existsById(anyLong())).willReturn(Mono.just(Boolean.TRUE));
         given(this.regionRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
         StepVerifier.create(regionService.remove(anyLong())).verifyComplete();

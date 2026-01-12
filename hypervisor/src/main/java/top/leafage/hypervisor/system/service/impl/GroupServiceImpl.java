@@ -14,6 +14,7 @@
  */
 package top.leafage.hypervisor.system.service.impl;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -79,7 +80,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Flux<GroupVO> retrieve(List<Long> ids) {
+    public Flux<GroupVO> retrieve(@Nullable List<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return groupRepository.findAll().map(GroupVO::from);
         }

@@ -24,11 +24,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import top.leafage.hypervisor.system.controller.AccessLogController;
 import top.leafage.hypervisor.system.domain.vo.AccessLogVO;
 import top.leafage.hypervisor.system.service.AccessLogService;
 
@@ -75,7 +75,16 @@ class AccessLogControllerTest {
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(AccessLogVO.class);
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(1)
+                .jsonPath("$.content[0].id").isEqualTo(vo.id())  // 根据 GroupVO 的字段调整
+                // 其他分页字段断言
+                .jsonPath("$.totalElements").isEqualTo(1)
+                .jsonPath("$.totalPages").isEqualTo(1)
+                .jsonPath("$.number").isEqualTo(0)
+                .jsonPath("$.size").isEqualTo(2);
     }
 
     @Test
@@ -101,7 +110,7 @@ class AccessLogControllerTest {
         webTestClient.get().uri("/access-logs/{id}", 1L)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.params").isEqualTo("test");
+                .expectBody().jsonPath("$.url").isEqualTo("test");
     }
 
     @Test

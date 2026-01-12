@@ -15,6 +15,7 @@
 
 package top.leafage.hypervisor.system.service.impl;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -118,7 +119,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
      * {@inheritDoc}
      */
     @Override
-    public Flux<PrivilegeVO> retrieve(List<Long> ids) {
+    public Flux<PrivilegeVO> retrieve(@Nullable List<Long> ids) {
         Flux<Privilege> flux;
         if (CollectionUtils.isEmpty(ids)) {
             flux = privilegeRepository.findAll();

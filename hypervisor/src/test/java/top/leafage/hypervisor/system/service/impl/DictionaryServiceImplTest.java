@@ -102,22 +102,25 @@ class DictionaryServiceImplTest {
 
     @Test
     void create() {
-        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(mock(Dictionary.class)));
+        given(this.dictionaryRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(entity));
 
         StepVerifier.create(dictionaryService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.dictionaryRepository.findById(anyLong())).willReturn(Mono.just(mock(Dictionary.class)));
+        given(this.dictionaryRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.dictionaryRepository.findById(anyLong())).willReturn(Mono.just(entity));
 
-        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(mock(Dictionary.class)));
+        given(this.dictionaryRepository.save(any(Dictionary.class))).willReturn(Mono.just(entity));
 
         StepVerifier.create(dictionaryService.modify(anyLong(), dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void remove() {
+        given(this.dictionaryRepository.existsById(anyLong())).willReturn(Mono.just(Boolean.TRUE));
         given(this.dictionaryRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
         StepVerifier.create(dictionaryService.remove(anyLong())).verifyComplete();

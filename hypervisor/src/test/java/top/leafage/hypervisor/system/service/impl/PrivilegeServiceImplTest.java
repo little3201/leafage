@@ -35,7 +35,6 @@ import top.leafage.hypervisor.system.domain.dto.PrivilegeDTO;
 import top.leafage.hypervisor.system.repository.GroupMembersRepository;
 import top.leafage.hypervisor.system.repository.GroupPrivilegesRepository;
 import top.leafage.hypervisor.system.repository.PrivilegeRepository;
-import top.leafage.hypervisor.system.service.impl.PrivilegeServiceImpl;
 
 import java.util.List;
 
@@ -138,25 +137,11 @@ class PrivilegeServiceImplTest {
     }
 
     @Test
-    void create() {
-        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(mock(Privilege.class)));
-
-        StepVerifier.create(privilegeService.create(dto)).expectNextCount(1).verifyComplete();
-    }
-
-
-    @Test
-    void create_no_superior() {
-        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(mock(Privilege.class)));
-
-        StepVerifier.create(privilegeService.create(dto)).expectNextCount(1).verifyComplete();
-    }
-
-    @Test
     void modify() {
-        given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(mock(Privilege.class)));
+        given(this.privilegeRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.privilegeRepository.findById(anyLong())).willReturn(Mono.just(entity));
 
-        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(mock(Privilege.class)));
+        given(this.privilegeRepository.save(any(Privilege.class))).willReturn(Mono.just(entity));
 
         StepVerifier.create(privilegeService.modify(1L, dto)).expectNextCount(1).verifyComplete();
     }

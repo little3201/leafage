@@ -142,7 +142,7 @@ public class PostServiceImpl implements PostService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return postRepository.existsById(id)
                 .flatMap(exists -> {
-                    if (exists) {
+                    if (!exists) {
                         return Mono.error(new NoSuchElementException("post not found: " + id));
                     }
                     return postRepository.deleteById(id);

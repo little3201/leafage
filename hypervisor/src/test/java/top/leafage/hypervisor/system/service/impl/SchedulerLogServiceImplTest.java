@@ -86,7 +86,8 @@ class SchedulerLogServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Mono.just(mock(SchedulerLog.class)));
+        given(this.schedulerLogRepository.findById(anyLong())).willReturn(Mono.just(entity));
+
         StepVerifier.create(schedulerLogService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 

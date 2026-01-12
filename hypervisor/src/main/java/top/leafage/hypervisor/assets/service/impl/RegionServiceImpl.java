@@ -166,7 +166,7 @@ public class RegionServiceImpl implements RegionService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return regionRepository.existsById(id)
                 .flatMap(exists -> {
-                    if (exists) {
+                    if (!exists) {
                         return Mono.error(new NoSuchElementException("region not found: " + id));
                     }
                     return regionRepository.deleteById(id);

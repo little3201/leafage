@@ -50,9 +50,9 @@ public interface RegionRepository extends R2dbcRepository<Region, Long> {
     Flux<Region> findBySuperiorId(Long superiorId);
 
     /**
-     * Toggles the enabled status of a schema by its ID.
+     * Toggles the enabled status of a scheme by its ID.
      *
-     * @param id The ID of the schema.
+     * @param id The ID of the scheme.
      * @return 1 if the update was successful, 0 otherwise.
      */
     @Modifying

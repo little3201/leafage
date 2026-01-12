@@ -88,7 +88,8 @@ class UserServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.userRepository.findById(anyLong())).willReturn(Mono.just(mock(User.class)));
+        given(this.userRepository.findById(anyLong())).willReturn(Mono.just(entity));
+
         StepVerifier.create(userService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
 
@@ -108,16 +109,17 @@ class UserServiceImplTest {
 
     @Test
     void create() {
-        given(this.userRepository.save(any(User.class))).willReturn(Mono.just(mock(User.class)));
+        given(this.userRepository.existsByUsername(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.userRepository.save(any(User.class))).willReturn(Mono.just(entity));
 
-        StepVerifier.create(userService.create(mock(UserDTO.class))).expectNextCount(1).verifyComplete();
+        StepVerifier.create(userService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.userRepository.findById(anyLong())).willReturn(Mono.just(mock(User.class)));
-
-        given(this.userRepository.save(any(User.class))).willReturn(Mono.just(mock(User.class)));
+        given(this.userRepository.existsByUsername(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.userRepository.findById(anyLong())).willReturn(Mono.just(entity));
+        given(this.userRepository.save(any(User.class))).willReturn(Mono.just(entity));
 
 
         StepVerifier.create(userService.modify(anyLong(), dto)).expectNextCount(1).verifyComplete();
@@ -125,6 +127,7 @@ class UserServiceImplTest {
 
     @Test
     void remove() {
+        given(this.userRepository.existsById(anyLong())).willReturn(Mono.just(Boolean.TRUE));
         given(this.userRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
         StepVerifier.create(userService.remove(anyLong())).verifyComplete();

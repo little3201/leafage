@@ -110,16 +110,18 @@ class GroupServiceImplTest {
 
     @Test
     void create() {
-        given(this.groupRepository.save(any(Group.class))).willReturn(Mono.just(mock(Group.class)));
+        given(this.groupRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.groupRepository.save(any(Group.class))).willReturn(Mono.just(entity));
 
-        StepVerifier.create(groupService.create(mock(GroupDTO.class))).expectNextCount(1).verifyComplete();
+        StepVerifier.create(groupService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.groupRepository.findById(anyLong())).willReturn(Mono.just(mock(Group.class)));
+        given(this.groupRepository.existsByName(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.groupRepository.findById(anyLong())).willReturn(Mono.just(entity));
 
-        given(this.groupRepository.save(any(Group.class))).willReturn(Mono.just(mock(Group.class)));
+        given(this.groupRepository.save(any(Group.class))).willReturn(Mono.just(entity));
 
         StepVerifier.create(groupService.modify(anyLong(), dto)).expectNextCount(1).verifyComplete();
     }

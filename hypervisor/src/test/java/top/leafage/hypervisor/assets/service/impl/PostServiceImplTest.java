@@ -17,7 +17,6 @@
 
 package top.leafage.hypervisor.assets.service.impl;
 
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +33,7 @@ import top.leafage.hypervisor.assets.domain.Post;
 import top.leafage.hypervisor.assets.domain.dto.PostDTO;
 import top.leafage.hypervisor.assets.repository.PostRepository;
 
+import java.time.Instant;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -72,6 +72,7 @@ class PostServiceImplTest {
         entity.setTitle("标题");
         entity.setTags(Set.of("test"));
         entity.setSummary("内容信息");
+        entity.setPublishedAt(Instant.now());
     }
 
     @Test
@@ -95,7 +96,7 @@ class PostServiceImplTest {
 
     @Test
     void fetch() {
-        given(this.postRepository.findById(anyLong())).willReturn(Mono.just(mock(Post.class)));
+        given(this.postRepository.findById(anyLong())).willReturn(Mono.just(entity));
 
         StepVerifier.create(this.postsService.fetch(anyLong())).expectNextCount(1).verifyComplete();
     }
@@ -103,22 +104,25 @@ class PostServiceImplTest {
 
     @Test
     void create() {
-        given(this.postRepository.save(any(Post.class))).willReturn(Mono.just(mock(Post.class)));
+        given(this.postRepository.existsByTitle(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.postRepository.save(any(Post.class))).willReturn(Mono.just(entity));
 
-        StepVerifier.create(this.postsService.create(mock(PostDTO.class))).verifyComplete();
+        StepVerifier.create(this.postsService.create(dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void modify() {
-        given(this.postRepository.findById(anyLong())).willReturn(Mono.just(mock(Post.class)));
+        given(this.postRepository.existsByTitle(anyString())).willReturn(Mono.just(Boolean.FALSE));
+        given(this.postRepository.findById(anyLong())).willReturn(Mono.just(entity));
 
-        given(this.postRepository.save(any(Post.class))).willReturn(Mono.just(mock(Post.class)));
+        given(this.postRepository.save(any(Post.class))).willReturn(Mono.just(entity));
 
-        StepVerifier.create(this.postsService.modify(1L, dto)).verifyComplete();
+        StepVerifier.create(this.postsService.modify(1L, dto)).expectNextCount(1).verifyComplete();
     }
 
     @Test
     void remove() {
+        given(this.postRepository.existsById(anyLong())).willReturn(Mono.just(Boolean.TRUE));
         given(this.postRepository.deleteById(anyLong())).willReturn(Mono.empty());
 
         StepVerifier.create(postsService.remove(anyLong())).verifyComplete();

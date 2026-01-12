@@ -88,7 +88,16 @@ class UserControllerTest {
                         .queryParam("filters", "")
                         .build()).exchange()
                 .expectStatus().isOk()
-                .expectBodyList(PrivilegeVO.class);
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.content").isArray()
+                .jsonPath("$.content.length()").isEqualTo(1)
+                .jsonPath("$.content[0].id").isEqualTo(vo.id())  // 根据 GroupVO 的字段调整
+                // 其他分页字段断言
+                .jsonPath("$.totalElements").isEqualTo(1)
+                .jsonPath("$.totalPages").isEqualTo(1)
+                .jsonPath("$.number").isEqualTo(0)
+                .jsonPath("$.size").isEqualTo(2);
     }
 
     @Test

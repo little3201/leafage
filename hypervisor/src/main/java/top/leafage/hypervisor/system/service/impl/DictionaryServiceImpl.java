@@ -150,7 +150,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         Assert.notNull(id, ID_MUST_NOT_BE_NULL);
         return dictionaryRepository.existsById(id)
                 .flatMap(exists -> {
-                    if (exists) {
+                    if (!exists) {
                         return Mono.error(new NoSuchElementException("dictionary not found: " + id));
                     }
                     return dictionaryRepository.deleteById(id);
