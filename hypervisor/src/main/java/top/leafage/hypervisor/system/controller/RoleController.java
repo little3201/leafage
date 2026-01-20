@@ -134,7 +134,7 @@ public class RoleController {
     /**
      * enable.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_roles:enable')")

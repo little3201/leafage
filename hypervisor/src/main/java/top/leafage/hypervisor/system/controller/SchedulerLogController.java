@@ -58,7 +58,7 @@ public class SchedulerLogController {
     /**
      * Fetches a record by ID.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return The record data, or 204 status code if an error occurs.
      */
     @PreAuthorize("hasAuthority('SCOPE_scheduler_logs')")
@@ -71,7 +71,7 @@ public class SchedulerLogController {
     /**
      * Removes a record by ID.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return the result.
      */
     @PreAuthorize("hasAuthority('SCOPE_scheduler_logs:remove')")

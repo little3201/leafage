@@ -126,7 +126,7 @@ public class PostController {
     /**
      * enable.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_posts:enable')")

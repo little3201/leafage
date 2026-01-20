@@ -111,7 +111,7 @@ public class UserController {
     /**
      * enable.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:enable')")
@@ -124,7 +124,7 @@ public class UserController {
     /**
      * unlock.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_users:unlock')")

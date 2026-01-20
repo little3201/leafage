@@ -135,7 +135,7 @@ public class RegionController {
     /**
      * enable.
      *
-     * @param id the pk..
+     * @param id the pk.
      * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_regions:enable')")
