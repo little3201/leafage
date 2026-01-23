@@ -86,13 +86,13 @@ public class FileController {
     }
 
     /**
-     * create.
+     * upload.
      *
      * @param file the request body.
      * @return the result.
      */
     @PreAuthorize("hasRole('ADMIN') || hasAuthority('SCOPE_files:upload')")
-    @PostMapping
+    @PostMapping("/upload")
     public ResponseEntity<FileRecordVO> upload(MultipartFile file, Long superiorId) {
         FileRecordVO vo = fileRecordService.upload(file, superiorId);
         return ResponseEntity.ok(vo);
