@@ -39,6 +39,11 @@ public interface GroupRepository extends JpaRepository<Group, Long>, JpaSpecific
      */
     List<Group> findDisctinctByRolesContaining(Role role);
 
+    @EntityGraph(attributePaths = "roles")
+    List<Group> findDistinctByMembersUsernameAndEnabledTrue(String username);
+
+    List<Group> findAllBySuperiorIdInAndEnabledTrue(Collection<Long> superiorIds);
+
     /**
      * 查询 members
      *

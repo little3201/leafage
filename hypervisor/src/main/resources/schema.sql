@@ -1233,3 +1233,53 @@ comment on column users.full_name is '姓名';
 comment on column users.account_non_expired is '账号是否有效';
 comment on column users.credentials_non_expired is '密码是否有效';
 
+create table data_permissions
+(
+    id            bigint primary key not null,
+    resource      character varying(255) not null,
+    subject_type  character varying(255) not null,
+    subject_id    character varying(255) not null,
+    default_scope character varying(255) not null,
+    constraint uk_data_permissions_subject_resource unique (subject_type, subject_id, resource)
+);
+comment on table data_permissions is '数据权限策略表';
+comment on column data_permissions.resource is '资源编码，例如users';
+comment on column data_permissions.subject_type is '授权主体类型，例如ROLE_PRIVILEGE或GROUP_PRIVILEGE';
+comment on column data_permissions.subject_id is '授权主体标识';
+comment on column data_permissions.default_scope is '默认数据范围';
+
+create table data_permission_action_scopes
+(
+    data_permission_id bigint                 not null,
+    action             character varying(255) not null,
+    scope_type         character varying(255) not null,
+    primary key (data_permission_id, action),
+    constraint fk_data_permission_action_scopes_permission foreign key (data_permission_id)
+        references data_permissions (id)
+);
+comment on table data_permission_action_scopes is '数据权限动作范围覆盖表';
+
+create table data_permission_subjects
+(
+    data_permission_id bigint                 not null,
+    type               character varying(255) not null,
+    id                 character varying(255) not null,
+    primary key (data_permission_id, type, id),
+    constraint fk_data_permission_subjects_permission foreign key (data_permission_id)
+        references data_permissions (id)
+);
+comment on table data_permission_subjects is '自定义数据权限主体表';
+
+create table resource_subjects
+(
+    id           bigint primary key not null,
+    resource     character varying(255) not null,
+    resource_id  bigint                 not null,
+    subject_type character varying(255) not null,
+    subject_id   character varying(255) not null,
+    constraint uk_resource_subjects unique (resource, resource_id, subject_type, subject_id)
+);
+create index idx_resource_subjects_lookup
+    on resource_subjects (resource, subject_type, subject_id, resource_id);
+comment on table data_resource_subjects is '业务资源归属与共享主体表';
+

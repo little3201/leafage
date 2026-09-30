@@ -28,7 +28,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
-import top.leafage.hypervisor.assets.domain.vo.FileStatisticsVO;
+import top.leafage.hypervisor.docs.domain.vo.FileStatisticsVO;
 import top.leafage.hypervisor.files.domain.FileRecord;
 import top.leafage.hypervisor.files.domain.dto.FileRecordDTO;
 import top.leafage.hypervisor.files.domain.vo.FileRecordVO;

@@ -39,6 +39,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("SELECT t from User t WHERE t.username = ?#{ principal?.name }")
     Optional<User> findCurrentUser();
 
+    @EntityGraph(attributePaths = "roles")
+    @Query("SELECT t from User t WHERE t.username = ?#{ principal?.name }")
+    Optional<User> findCurrentUserWithRoles();
+
     /**
      * 查询
      *
