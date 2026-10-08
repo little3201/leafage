@@ -5,7 +5,7 @@ spring:
   application:
     name: hypervisor
   profiles:
-    active: prod
+    active: dev
 
   jpa:
     open-in-view: false

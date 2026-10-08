@@ -5,7 +5,7 @@ spring:
   application:
     name: gateway
   profiles:
-    active: prod
+    active: dev
 
   cloud:
     refresh:
