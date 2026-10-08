@@ -61,10 +61,6 @@
         </dependency>
         <dependency>
             <groupId>top.leafage</groupId>
-            <artifactId>common-data-permission</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>top.leafage</groupId>
             <artifactId>common-logging</artifactId>
         </dependency>
         <dependency>
