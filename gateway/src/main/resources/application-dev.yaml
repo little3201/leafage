@@ -1,0 +1,20 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          web-client:
+            provider: spring
+            client-id: web-client
+            client-secret: secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid,profile,email
+            client-name: web-client
+        provider:
+          spring:
+            issuer-uri: http://localhost:8761
+
+app:
+  base-uri: http://127.0.0.1:5173

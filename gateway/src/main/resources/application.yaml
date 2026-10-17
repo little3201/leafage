@@ -1,0 +1,39 @@
+server:
+  port: 8760
+
+spring:
+  application:
+    name: gateway
+  profiles:
+    active: dev
+
+  cloud:
+    refresh:
+      enabled: false
+
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: auth
+              uri: http://127.0.0.1:8761
+              predicates:
+                - Path=/userinfo
+              filters:
+                - TokenRelay=
+            - id: hypervisor
+              uri: http://127.0.0.1:8762
+              predicates:
+                - Path=/hypervisor/**
+              filters:
+                - StripPrefix=1
+                - TokenRelay=
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
