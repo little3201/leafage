@@ -4,6 +4,10 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://${AUTH_SERVER}
 
 logging:
   file:
