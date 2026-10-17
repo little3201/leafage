@@ -32,9 +32,11 @@
     <description>parent module of leafage</description>
 
     <properties>
-        <sonar.projectKey>little3201_leafage-basic</sonar.projectKey>
+        <sonar.projectKey>little3201_leafage</sonar.projectKey>
         <sonar.organization>little3201</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>**/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
 
         <leafage-common.version>0.4.3</leafage-common.version>
         <mybatis.version>3.5.19</mybatis.version>
@@ -49,8 +51,8 @@
     </developers>
 
     <modules>
-        <module>gateway</module>
         <module>auth</module>
+        <module>gateway</module>
         <module>hypervisor</module>
     </modules>
 
@@ -60,6 +62,8 @@
                 <groupId>top.leafage</groupId>
                 <artifactId>common-dependencies</artifactId>
                 <version>${leafage-common.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mybatis</groupId>
@@ -79,6 +83,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
