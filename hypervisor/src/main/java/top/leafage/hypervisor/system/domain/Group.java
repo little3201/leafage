@@ -17,7 +17,6 @@
 package top.leafage.hypervisor.system.domain;
 
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import top.leafage.common.data.jdbc.domain.AbstractAuditable;
@@ -28,14 +27,12 @@ import top.leafage.common.data.jdbc.domain.AbstractAuditable;
  * @author wq li
  */
 @Table(name = "groups")
-public class Group extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class Group extends AbstractAuditable<String, Long> {
 
     @Column(value = "group_name")
     private String name;
 
     private Long superiorId;
-
-    private String description;
 
     private boolean enabled = true;
 
@@ -43,10 +40,9 @@ public class Group extends AbstractAuditable<@NonNull String, @NonNull Long> {
     public Group() {
     }
 
-    public Group(String name, Long superiorId, String description) {
+    public Group(String name, Long superiorId) {
         this.name = name;
         this.superiorId = superiorId;
-        this.description = description;
     }
 
     public String getName() {
@@ -63,14 +59,6 @@ public class Group extends AbstractAuditable<@NonNull String, @NonNull Long> {
 
     public void setSuperiorId(Long superiorId) {
         this.superiorId = superiorId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public boolean isEnabled() {

@@ -29,7 +29,7 @@ import java.net.InetAddress;
  * @author wq li
  */
 @Table(name = "operation_logs")
-public class OperationLog extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class OperationLog extends AbstractAuditable<String, Long> {
 
     private String module;
 

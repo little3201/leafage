@@ -62,12 +62,12 @@ class SchedulerLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new SchedulerLogVO(1L, "test", Instant.now(), 232L, "RUNNING", Instant.now().plus(12, ChronoUnit.HOURS), "description");
+        vo = new SchedulerLogVO(1L, "test", Instant.now(), 232L, "RUNNING", Instant.now().plus(12, ChronoUnit.HOURS));
     }
 
     @Test
     void retrieve() {
-        Page<@NonNull SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<SchedulerLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(schedulerLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);

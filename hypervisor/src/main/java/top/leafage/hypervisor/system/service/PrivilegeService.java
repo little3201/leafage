@@ -37,7 +37,7 @@ public interface PrivilegeService extends JdbcCrudService<PrivilegeDTO, Privileg
      * @param username username
      * @return 树结构数据集
      */
-    List<TreeNode<@NonNull Long>> tree(String username);
+    List<TreeNode<Long>> tree(String username);
 
     /**
      * get subset

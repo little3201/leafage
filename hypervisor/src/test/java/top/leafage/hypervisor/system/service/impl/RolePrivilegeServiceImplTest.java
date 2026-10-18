@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import top.leafage.hypervisor.system.domain.GroupAuthorities;
 import top.leafage.hypervisor.system.domain.GroupRoles;
 import top.leafage.hypervisor.system.domain.Privilege;
@@ -80,7 +81,7 @@ class RolePrivilegeServiceImplTest {
         privilege.setName("name");
         privilege.setActions(Set.of("create"));
 
-        rolePrivilege = new RolePrivileges(1L, 1L, 1L, Set.of("test"));
+        rolePrivilege = new RolePrivileges(1L, 1L, Set.of("test"));
     }
 
     @Test
@@ -127,6 +128,7 @@ class RolePrivilegeServiceImplTest {
 
     @Test
     void removeRelation_empty_action() {
+        ReflectionTestUtils.setField(rolePrivilege, "id", 1L);
         when(rolePrivilegesRepository.findByRoleIdAndPrivilegeId(anyLong(), anyLong())).thenReturn(Optional.of(rolePrivilege));
         when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
         when(groupRolesRepository.findAllByRoleId(anyLong())).thenReturn(List.of(groupRoles));

@@ -30,7 +30,7 @@ import java.net.InetAddress;
  * @author wq li
  */
 @Table(name = "access_logs")
-public class AccessLog extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class AccessLog extends AbstractAuditable<String, Long> {
 
     private String url;
 

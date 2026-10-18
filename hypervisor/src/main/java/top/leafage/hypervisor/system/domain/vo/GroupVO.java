@@ -26,14 +26,12 @@ import top.leafage.hypervisor.system.domain.Group;
 public record GroupVO(
         Long id,
         String name,
-        String description,
         boolean enabled
 ) {
     public static GroupVO from(Group entity) {
         return new GroupVO(
                 entity.getId(),
                 entity.getName(),
-                entity.getDescription(),
                 entity.isEnabled()
         );
     }

@@ -66,7 +66,7 @@ class AuditLogControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull AuditLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<AuditLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(auditLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);

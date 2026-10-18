@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public Page<@NonNull UserVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<UserVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, User.class);
 

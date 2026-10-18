@@ -29,13 +29,12 @@ import top.leafage.common.data.jdbc.domain.AbstractAuditable;
  * @author wq li
  */
 @Table(name = "dictionaries")
-public class Dictionary extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class Dictionary extends AbstractAuditable<String, Long> {
 
     private String name;
 
     private Long superiorId;
 
-    private String description;
 
     private boolean enabled = true;
 
@@ -43,10 +42,9 @@ public class Dictionary extends AbstractAuditable<@NonNull String, @NonNull Long
     public Dictionary() {
     }
 
-    public Dictionary(String name, Long superiorId, String description) {
+    public Dictionary(String name, Long superiorId) {
         this.name = name;
         this.superiorId = superiorId;
-        this.description = description;
     }
 
     public String getName() {
@@ -65,13 +63,6 @@ public class Dictionary extends AbstractAuditable<@NonNull String, @NonNull Long
         this.superiorId = superiorId;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public boolean isEnabled() {
         return enabled;

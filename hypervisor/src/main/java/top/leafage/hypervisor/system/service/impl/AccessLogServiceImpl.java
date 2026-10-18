@@ -62,7 +62,7 @@ public class AccessLogServiceImpl implements AccessLogService {
      * {@inheritDoc}
      */
     @Override
-    public Page<@NonNull AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<AccessLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, AccessLog.class);
 

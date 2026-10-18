@@ -65,7 +65,7 @@ public class MessageServiceImpl implements MessageService {
      * {@inheritDoc}
      */
     @Override
-    public Page<@NonNull MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<MessageVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, Message.class);
 

@@ -62,7 +62,7 @@ public class OperationLogServiceImpl implements OperationLogService {
      * {@inheritDoc}
      */
     @Override
-    public Page<@NonNull OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<OperationLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, OperationLog.class);
 

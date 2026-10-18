@@ -67,7 +67,7 @@ class AccessLogControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull AccessLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<AccessLogVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(accessLogService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);

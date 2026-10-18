@@ -49,6 +49,7 @@ import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static top.leafage.hypervisor.ImportTestUtils.createMinimalXlsxBytes;
 
 /**
  * privilege controller test
@@ -77,12 +78,11 @@ class PrivilegeControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new PrivilegeVO(1L, "test", null, "test", "test", "#", "icon", Set.of("create,modify"), "description", true, 0);
+        vo = new PrivilegeVO(1L, "test", null, "test", "test", "#", "icon", Set.of("create,modify"), true, 0);
 
         dto = new PrivilegeDTO();
         dto.setName("test");
         dto.setRedirect("redirect");
-        dto.setDescription("description");
         dto.setPath("/test");
         dto.setIcon("icon");
         dto.setSuperiorId(1L);
@@ -90,7 +90,7 @@ class PrivilegeControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull PrivilegeVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<PrivilegeVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(privilegeService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -209,7 +209,7 @@ class PrivilegeControllerTest {
         when(privilegeService.createAll(anyList())).thenReturn(List.of(vo));
 
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", createMinimalXlsxBytes());
         assertThat(mvc.post().uri("/privileges/import").multipart().file(file).with(csrf().asHeader()))
                 .hasStatusOk()
                 .bodyJson()

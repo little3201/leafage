@@ -26,12 +26,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.relational.core.query.Query;
+import org.springframework.test.util.ReflectionTestUtils;
 import top.leafage.common.data.core.domain.TreeNode;
 import top.leafage.hypervisor.system.domain.Group;
 import top.leafage.hypervisor.system.domain.dto.GroupDTO;
 import top.leafage.hypervisor.system.domain.vo.GroupVO;
 import top.leafage.hypervisor.system.repository.GroupRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -68,9 +70,8 @@ class GroupServiceImplTest {
         dto = new GroupDTO();
         dto.setName("test");
         dto.setSuperiorId(1L);
-        dto.setDescription("description");
 
-        entity = new Group(1L, "test", null, "description");
+        entity = GroupDTO.toEntity(dto);
     }
 
     @Test
@@ -88,12 +89,23 @@ class GroupServiceImplTest {
 
     @Test
     void tree() {
-        Group child = new Group(2L, "test", 1L, "description");
+        ReflectionTestUtils.setField(entity, "id", 1L);
+        Group child = new Group("child", 1L);
+        ReflectionTestUtils.setField(child, "id", 2L);
         when(groupRepository.findAll()).thenReturn(List.of(entity, child));
 
         List<TreeNode<Long>> nodes = groupService.tree();
         assertEquals(1, nodes.size());
         assertEquals(1, nodes.getFirst().getChildren().size());
+        verify(groupRepository).findAll();
+    }
+
+    @Test
+    void tree_null() {
+        when(groupRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<TreeNode<Long>> nodes = groupService.tree();
+        assertEquals(0, nodes.size());
         verify(groupRepository).findAll();
     }
 

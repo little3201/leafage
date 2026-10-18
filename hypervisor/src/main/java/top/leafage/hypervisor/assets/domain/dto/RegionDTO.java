@@ -36,7 +36,6 @@ public class RegionDTO {
 
     private String postalCode;
 
-    private String description;
 
 
     public static Region toEntity(RegionDTO dto) {
@@ -44,8 +43,7 @@ public class RegionDTO {
                 dto.getName(),
                 dto.getSuperiorId(),
                 dto.getAreaCode(),
-                dto.getPostalCode(),
-                dto.getDescription()
+                dto.getPostalCode()
         );
     }
 
@@ -81,11 +79,4 @@ public class RegionDTO {
         this.postalCode = postalCode;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

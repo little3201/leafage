@@ -29,7 +29,7 @@ import java.util.Set;
  * @author wq li
  */
 @Table(name = "group_privileges")
-public class GroupPrivileges extends AbstractPersistable<@NonNull Long> {
+public class GroupPrivileges extends AbstractPersistable<Long> {
 
     private Long groupId;
 

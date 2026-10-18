@@ -27,7 +27,7 @@ import top.leafage.common.data.jdbc.domain.AbstractAuditable;
  * @author wq li
  */
 @Table(name = "users")
-public class User extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class User extends AbstractAuditable<String, Long> {
 
     private String username;
 

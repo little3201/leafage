@@ -27,20 +27,18 @@ import top.leafage.common.data.jdbc.domain.AbstractAuditable;
  * @author wq li
  */
 @Table(name = "roles")
-public class Role extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class Role extends AbstractAuditable<String, Long> {
 
     private String name;
 
-    private String description;
 
     private boolean enabled = true;
 
     public Role() {
     }
 
-    public Role(String name, String description) {
+    public Role(String name) {
         this.name = name;
-        this.description = description;
     }
 
     public String getName() {
@@ -51,13 +49,6 @@ public class Role extends AbstractAuditable<@NonNull String, @NonNull Long> {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public boolean isEnabled() {
         return enabled;

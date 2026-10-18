@@ -65,7 +65,7 @@ public class DictionaryServiceImpl implements DictionaryService {
      * {@inheritDoc}
      */
     @Override
-    public Page<@NonNull DictionaryVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<DictionaryVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, Dictionary.class);
         criteria = criteria.and("superiorId").isNull();

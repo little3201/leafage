@@ -67,7 +67,6 @@ class DictionaryServiceImplTest {
         dto = new DictionaryDTO();
         dto.setName("test");
         dto.setSuperiorId(1L);
-        dto.setDescription("description");
 
         entity = DictionaryDTO.toEntity(dto);
     }

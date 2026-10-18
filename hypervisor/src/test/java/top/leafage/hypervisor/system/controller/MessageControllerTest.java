@@ -79,7 +79,7 @@ class MessageControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull MessageVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<MessageVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(messageService.retrieve(anyInt(), anyInt(), eq("id"),
                 anyBoolean(), anyString())).thenReturn(voPage);

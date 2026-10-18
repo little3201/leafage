@@ -74,7 +74,7 @@ class FileControllerTest {
 
     @Test
     void retrieve() {
-        Page<@NonNull FileRecordVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<FileRecordVO> page = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(fileRecordService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).thenReturn(page);

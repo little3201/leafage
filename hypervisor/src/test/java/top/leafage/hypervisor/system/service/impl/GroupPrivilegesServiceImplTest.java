@@ -23,13 +23,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import top.leafage.hypervisor.system.domain.GroupAuthorities;
 import top.leafage.hypervisor.system.domain.GroupPrivileges;
 import top.leafage.hypervisor.system.domain.Privilege;
 import top.leafage.hypervisor.system.repository.GroupAuthoritiesRepository;
 import top.leafage.hypervisor.system.repository.GroupPrivilegesRepository;
 import top.leafage.hypervisor.system.repository.PrivilegeRepository;
-import top.leafage.hypervisor.system.service.impl.GroupPrivilegesServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -75,7 +75,7 @@ class GroupPrivilegesServiceImplTest {
 
         groupAuthority = new GroupAuthorities(1L, "test");
 
-        groupPrivileges = new GroupPrivileges(1L, 1L, 1L, Set.of("test"));
+        groupPrivileges = new GroupPrivileges(1L, 1L, Set.of("test"));
     }
 
     @Test
@@ -119,6 +119,7 @@ class GroupPrivilegesServiceImplTest {
 
     @Test
     void removeRelation_empty_action() {
+        ReflectionTestUtils.setField(groupPrivileges, "id", 1L);
         when(groupPrivilegesRepository.findByGroupIdAndPrivilegeId(anyLong(), anyLong())).thenReturn(Optional.of(groupPrivileges));
         when(privilegeRepository.findById(anyLong())).thenReturn(Optional.of(privilege));
 

@@ -27,7 +27,7 @@ import top.leafage.common.data.jdbc.domain.AbstractPersistable;
  * @author wq li
  */
 @Table(name = "role_members")
-public class RoleMembers extends AbstractPersistable<@NonNull Long> {
+public class RoleMembers extends AbstractPersistable<Long> {
 
     private Long roleId;
 

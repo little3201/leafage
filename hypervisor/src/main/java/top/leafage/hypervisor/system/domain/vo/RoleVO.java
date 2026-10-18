@@ -26,14 +26,12 @@ import top.leafage.hypervisor.system.domain.Role;
 public record RoleVO(
         Long id,
         String name,
-        String description,
         boolean enabled
 ) {
     public static RoleVO from(Role entity) {
         return new RoleVO(
                 entity.getId(),
                 entity.getName(),
-                entity.getDescription(),
                 entity.isEnabled()
         );
     }

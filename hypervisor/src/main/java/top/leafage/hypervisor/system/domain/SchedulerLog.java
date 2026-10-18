@@ -29,7 +29,7 @@ import java.time.Instant;
  * @author wq li
  */
 @Table(name = "scheduler_logs")
-public class SchedulerLog extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class SchedulerLog extends AbstractAuditable<String, Long> {
 
     private String name;
 

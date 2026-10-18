@@ -28,7 +28,7 @@ import java.util.Set;
  * @author wq li
  */
 @Table(name = "role_privileges")
-public class RolePrivileges extends AbstractPersistable<@NonNull Long> {
+public class RolePrivileges extends AbstractPersistable<Long> {
 
     private Long roleId;
 

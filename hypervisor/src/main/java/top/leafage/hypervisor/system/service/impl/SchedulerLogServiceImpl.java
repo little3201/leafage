@@ -55,7 +55,7 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
     }
 
     @Override
-    public Page<@NonNull SchedulerLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<SchedulerLogVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, SchedulerLog.class);
 

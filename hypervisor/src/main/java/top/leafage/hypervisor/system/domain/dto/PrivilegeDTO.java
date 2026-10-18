@@ -45,7 +45,6 @@ public class PrivilegeDTO {
 
     private Set<String> actions;
 
-    private String description;
 
 
     public static Privilege toEntity(PrivilegeDTO dto) {
@@ -56,8 +55,7 @@ public class PrivilegeDTO {
                 dto.getRedirect(),
                 dto.getComponent(),
                 dto.getIcon(),
-                dto.getActions(),
-                dto.getDescription()
+                dto.getActions()
         );
     }
 
@@ -117,11 +115,4 @@ public class PrivilegeDTO {
         this.actions = actions;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

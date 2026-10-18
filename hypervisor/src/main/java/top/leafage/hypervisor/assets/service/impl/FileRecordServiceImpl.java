@@ -61,7 +61,7 @@ public class FileRecordServiceImpl implements FileRecordService {
     }
 
     @Override
-    public Page<@NonNull FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<FileRecordVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, FileRecord.class);
         if (!StringUtils.hasText(filters) || !filters.contains("superiorId")) {

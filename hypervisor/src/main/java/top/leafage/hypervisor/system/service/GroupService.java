@@ -31,5 +31,5 @@ import java.util.List;
  */
 public interface GroupService extends JdbcCrudService<GroupDTO, GroupVO> {
 
-    List<TreeNode<@NonNull Long>> tree();
+    List<TreeNode<Long>> tree();
 }

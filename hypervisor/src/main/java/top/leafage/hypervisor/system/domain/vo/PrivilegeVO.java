@@ -34,7 +34,6 @@ public record PrivilegeVO(
         String component,
         String icon,
         Set<String> actions,
-        String description,
         boolean enabled,
         long count
 ) {
@@ -52,7 +51,6 @@ public record PrivilegeVO(
                 entity.getComponent(),
                 entity.getIcon(),
                 entity.getActions(),
-                entity.getDescription(),
                 entity.isEnabled(),
                 count
         );

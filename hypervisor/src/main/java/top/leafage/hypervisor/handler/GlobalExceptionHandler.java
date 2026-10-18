@@ -43,19 +43,19 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<@NonNull String> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         logger.error("Catch IllegalArgumentException: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<@NonNull String> handleNoSuchElementException(NoSuchElementException ex) {
+    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException ex) {
         logger.error("Catch NoSuchElementException: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<@NonNull Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         logger.error("Catch MethodArgumentNotValidException: {}", ex.getMessage(), ex);
         Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(errorField ->
@@ -64,13 +64,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<@NonNull String> handleAccessDeniedException(AccessDeniedException ex) {
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
         logger.error("Catch AccessDeniedException: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<@NonNull String> handleGenericException(RuntimeException ex) {
+    public ResponseEntity<String> handleGenericException(RuntimeException ex) {
         logger.error("Catch RuntimeException: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }

@@ -28,7 +28,7 @@ import top.leafage.common.data.jdbc.domain.AbstractAuditable;
  * @author wq li
  */
 @Table(name = "file_records")
-public class FileRecord extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class FileRecord extends AbstractAuditable<String, Long> {
 
     private Long superiorId;
 

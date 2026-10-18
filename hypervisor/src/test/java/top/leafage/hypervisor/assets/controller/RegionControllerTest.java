@@ -45,6 +45,7 @@ import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static top.leafage.hypervisor.ImportTestUtils.createMinimalXlsxBytes;
 
 /**
  * regions 接口测试
@@ -74,14 +75,13 @@ class RegionControllerTest {
         dto.setAreaCode("23234");
         dto.setPostalCode("712000");
         dto.setSuperiorId(1L);
-        dto.setDescription("description");
 
-        vo = new RegionVO(1L, 2L, "test", "029", "712000", "description", 2L, true);
+        vo = new RegionVO(1L, 2L, "test", "029", "712000", 2L, true);
     }
 
     @Test
     void retrieve() {
-        Page<@NonNull RegionVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<RegionVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         // 使用 eq() 准确匹配参数
         when(regionService.retrieve(anyInt(), anyInt(), anyString(),
@@ -208,7 +208,7 @@ class RegionControllerTest {
         when(regionService.createAll(anyList())).thenReturn(List.of(vo));
 
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", createMinimalXlsxBytes());
         assertThat(mvc.post().uri("/regions/import").multipart().file(file).with(csrf().asHeader()))
                 .hasStatusOk()
                 .bodyJson()

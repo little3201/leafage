@@ -28,7 +28,7 @@ import java.util.Set;
  * @author wq li
  */
 @Table(name = "privileges")
-public class Privilege extends AbstractAuditable<@NonNull String, @NonNull Long> {
+public class Privilege extends AbstractAuditable<String, Long> {
 
     private String name;
 
@@ -44,7 +44,6 @@ public class Privilege extends AbstractAuditable<@NonNull String, @NonNull Long>
 
     private Set<String> actions;
 
-    private String description;
 
     private boolean enabled = true;
 
@@ -52,7 +51,7 @@ public class Privilege extends AbstractAuditable<@NonNull String, @NonNull Long>
     public Privilege() {
     }
 
-    public Privilege(String name, Long superiorId, String path, String redirect, String component, String icon, Set<String> actions, String description) {
+    public Privilege(String name, Long superiorId, String path, String redirect, String component, String icon, Set<String> actions) {
         this.name = name;
         this.superiorId = superiorId;
         this.path = path;
@@ -60,7 +59,6 @@ public class Privilege extends AbstractAuditable<@NonNull String, @NonNull Long>
         this.component = component;
         this.icon = icon;
         this.actions = actions;
-        this.description = description;
     }
 
     public String getName() {
@@ -119,13 +117,6 @@ public class Privilege extends AbstractAuditable<@NonNull String, @NonNull Long>
         this.actions = actions;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public boolean isEnabled() {
         return enabled;

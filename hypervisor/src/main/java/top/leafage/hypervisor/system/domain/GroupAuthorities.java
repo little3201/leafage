@@ -27,7 +27,7 @@ import top.leafage.common.data.jdbc.domain.AbstractPersistable;
  * @author wq li
  */
 @Table(name = "group_authorities")
-public class GroupAuthorities extends AbstractPersistable<@NonNull Long> {
+public class GroupAuthorities extends AbstractPersistable<Long> {
 
     private Long groupId;
 

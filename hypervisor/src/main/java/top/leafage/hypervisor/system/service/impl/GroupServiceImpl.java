@@ -16,7 +16,6 @@
  */
 package top.leafage.hypervisor.system.service.impl;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -69,7 +68,7 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public Page<@NonNull GroupVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
+    public Page<GroupVO> retrieve(int page, int size, String sortBy, boolean descending, String filters) {
         Pageable pageable = pageable(page, size, sortBy, descending);
         Criteria criteria = buildCriteria(filters, Group.class);
 
@@ -83,7 +82,7 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public List<TreeNode<@NonNull Long>> tree() {
+    public List<TreeNode<Long>> tree() {
         List<Group> groups = groupRepository.findAll();
         if (CollectionUtils.isEmpty(groups)) {
             return Collections.emptyList();

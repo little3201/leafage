@@ -46,6 +46,7 @@ import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static top.leafage.hypervisor.ImportTestUtils.createMinimalXlsxBytes;
 
 /**
  * dictionary controller test
@@ -71,17 +72,16 @@ class DictionaryControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new DictionaryVO(1L, "test", null, "description", 2L, true);
+        vo = new DictionaryVO(1L, "test", null, 2L, true);
 
         dto = new DictionaryDTO();
         dto.setName("gender");
         dto.setSuperiorId(1L);
-        dto.setDescription("description");
     }
 
     @Test
     void retrieve() {
-        Page<@NonNull DictionaryVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
+        Page<DictionaryVO> voPage = new PageImpl<>(List.of(vo), mock(PageRequest.class), 2L);
 
         when(dictionaryService.retrieve(anyInt(), anyInt(), anyString(),
                 anyBoolean(), anyString())).thenReturn(voPage);
@@ -219,7 +219,7 @@ class DictionaryControllerTest {
         when(dictionaryService.createAll(anyList())).thenReturn(List.of(vo));
 
         MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", createMinimalXlsxBytes());
         assertThat(mvc.post().uri("/dictionaries/import").multipart().file(file).with(csrf().asHeader()))
                 .hasStatusOk()
                 .bodyJson()
