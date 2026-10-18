@@ -71,7 +71,7 @@ class GroupServiceImplTest {
         dto.setName("test");
         dto.setSuperiorId(1L);
 
-        entity = GroupDTO.toEntity(dto);
+        entity = new Group("test", null);
     }
 
     @Test
@@ -92,6 +92,7 @@ class GroupServiceImplTest {
         ReflectionTestUtils.setField(entity, "id", 1L);
         Group child = new Group("child", 1L);
         ReflectionTestUtils.setField(child, "id", 2L);
+
         when(groupRepository.findAll()).thenReturn(List.of(entity, child));
 
         List<TreeNode<Long>> nodes = groupService.tree();

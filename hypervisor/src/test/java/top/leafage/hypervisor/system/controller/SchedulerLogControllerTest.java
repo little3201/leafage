@@ -18,7 +18,6 @@
 package top.leafage.hypervisor.system.controller;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ class SchedulerLogControllerTest {
 
     @BeforeEach
     void setUp() {
-        vo = new SchedulerLogVO(1L, "test", Instant.now(), 232L, "RUNNING", Instant.now().plus(12, ChronoUnit.HOURS));
+        vo = new SchedulerLogVO(1L, "test", Instant.now(), 232L, "RUNNING", Instant.now().plus(12, ChronoUnit.HOURS), "");
     }
 
     @Test
