@@ -21,7 +21,7 @@ package top.leafage.hypervisor.system.domain;
 import jakarta.validation.constraints.NotBlank;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.data.domain.AbstractAuditable;
+import top.leafage.common.data.jdbc.domain.AbstractAuditable;
 
 /**
  * entity class for dictionary.

@@ -40,6 +40,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static org.springframework.data.relational.core.query.Query.query;
+import static top.leafage.hypervisor.constants.GlobalConstant.ID_MUST_NOT_BE_NULL;
 
 /**
  * file service impl.

@@ -17,7 +17,7 @@
 package top.leafage.hypervisor.system.service;
 
 import org.jspecify.annotations.NonNull;
-import top.leafage.common.data.domain.TreeNode;
+import top.leafage.common.data.core.domain.TreeNode;
 import top.leafage.common.data.jdbc.JdbcCrudService;
 import top.leafage.hypervisor.system.domain.dto.GroupDTO;
 import top.leafage.hypervisor.system.domain.vo.GroupVO;

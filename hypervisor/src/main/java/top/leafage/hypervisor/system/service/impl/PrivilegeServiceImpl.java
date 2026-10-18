@@ -26,7 +26,7 @@ import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import top.leafage.common.data.domain.TreeNode;
+import top.leafage.common.data.core.domain.TreeNode;
 import top.leafage.hypervisor.system.domain.Privilege;
 import top.leafage.hypervisor.system.domain.dto.PrivilegeDTO;
 import top.leafage.hypervisor.system.domain.vo.PrivilegeVO;
@@ -38,7 +38,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.relational.core.query.Query.query;
-import static top.leafage.common.data.converter.ModelToTreeNodeConverter.toTree;
+import static top.leafage.common.data.core.converter.ModelToTreeNodeConverter.toTree;
+import static top.leafage.hypervisor.constants.GlobalConstant.*;
 
 /**
  * privilege service impl.
@@ -96,7 +97,7 @@ public class PrivilegeServiceImpl implements PrivilegeService {
      * {@inheritDoc}
      */
     @Override
-    public List<TreeNode<@NonNull Long>> tree(String username) {
+    public List<TreeNode<Long>> tree(String username) {
         Assert.hasText(username, String.format(_MUST_NOT_BE_EMPTY, "username"));
 
         Map<Long, Set<String>> privilegeActionsMap = new HashMap<>();

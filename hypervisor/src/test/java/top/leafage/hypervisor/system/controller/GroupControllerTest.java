@@ -33,7 +33,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import tools.jackson.databind.ObjectMapper;
-import top.leafage.common.data.domain.TreeNode;
+import top.leafage.common.data.core.domain.TreeNode;
 import top.leafage.hypervisor.system.controller.GroupController;
 import top.leafage.hypervisor.system.domain.GroupMembers;
 import top.leafage.hypervisor.system.domain.GroupPrivileges;

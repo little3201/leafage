@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import top.leafage.common.data.domain.TreeNode;
+import top.leafage.common.data.core.domain.TreeNode;
 import top.leafage.hypervisor.system.domain.Group;
 import top.leafage.hypervisor.system.domain.dto.GroupDTO;
 import top.leafage.hypervisor.system.domain.vo.GroupVO;
@@ -39,7 +39,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.springframework.data.relational.core.query.Query.query;
-import static top.leafage.common.data.converter.ModelToTreeNodeConverter.toTree;
+import static top.leafage.common.data.core.converter.ModelToTreeNodeConverter.toTree;
+import static top.leafage.hypervisor.constants.GlobalConstant.ID_MUST_NOT_BE_NULL;
 
 
 /**

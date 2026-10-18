@@ -20,7 +20,7 @@ package top.leafage.hypervisor.system.domain;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.data.domain.AbstractAuditable;
+import top.leafage.common.data.jdbc.domain.AbstractAuditable;
 
 /**
  * entity class for group.
@@ -44,13 +44,6 @@ public class Group extends AbstractAuditable<@NonNull String, @NonNull Long> {
     }
 
     public Group(String name, Long superiorId, String description) {
-        this.name = name;
-        this.superiorId = superiorId;
-        this.description = description;
-    }
-
-    public Group(Long id, String name, Long superiorId, String description) {
-        this.setId(id);
         this.name = name;
         this.superiorId = superiorId;
         this.description = description;

@@ -18,7 +18,7 @@ package top.leafage.hypervisor.system.domain;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.data.domain.AbstractAuditable;
+import top.leafage.common.data.jdbc.domain.AbstractAuditable;
 
 import java.util.Set;
 

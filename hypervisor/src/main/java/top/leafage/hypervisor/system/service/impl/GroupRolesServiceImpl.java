@@ -27,8 +27,9 @@ import top.leafage.hypervisor.system.service.GroupRolesService;
 import java.util.List;
 import java.util.Set;
 
-import static top.leafage.common.data.Service._MUST_NOT_BE_EMPTY;
-import static top.leafage.common.data.Service._MUST_NOT_BE_NULL;
+import static top.leafage.hypervisor.constants.GlobalConstant._MUST_NOT_BE_EMPTY;
+import static top.leafage.hypervisor.constants.GlobalConstant._MUST_NOT_BE_NULL;
+
 
 
 /**

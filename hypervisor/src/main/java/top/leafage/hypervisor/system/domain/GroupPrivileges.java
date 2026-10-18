@@ -19,7 +19,7 @@ package top.leafage.hypervisor.system.domain;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Table;
-import top.leafage.common.data.domain.AbstractPersistable;
+import top.leafage.common.data.jdbc.domain.AbstractPersistable;
 
 import java.util.Set;
 
@@ -42,13 +42,6 @@ public class GroupPrivileges extends AbstractPersistable<@NonNull Long> {
     }
 
     public GroupPrivileges(Long groupId, Long privilegeId, Set<String> actions) {
-        this.groupId = groupId;
-        this.privilegeId = privilegeId;
-        this.actions = actions;
-    }
-
-    public GroupPrivileges(Long id, Long groupId, Long privilegeId, Set<String> actions) {
-        this.setId(id);
         this.groupId = groupId;
         this.privilegeId = privilegeId;
         this.actions = actions;
