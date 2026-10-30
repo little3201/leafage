@@ -45,6 +45,6 @@ public interface GroupRepository extends ListCrudRepository<Group, Long> {
      * @return result.
      */
     @Modifying
-    @Query("UPDATE Group t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE groups SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
     int updateEnabledById(Long id);
 }

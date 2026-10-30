@@ -96,6 +96,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.updateEnabledById(id) > 0;
     }
 
+    @Override
+    public UserVO fetch() {
+        return userRepository.findCurrentUser()
+                .map(user -> UserVO.from(user, false))
+                .orElse(null);
+    }
+
     @Transactional
     @Override
     public boolean unlock(Long id) {

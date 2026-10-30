@@ -14,7 +14,18 @@ spring:
             client-name: web-client
         provider:
           spring:
-            issuer-uri: http://localhost:8761
+            issuer-uri: http://192.168.0.111:8761
 
 app:
-  base-uri: http://127.0.0.1:5173
+  base-uri: http://192.168.0.111:5173
+
+logging:
+  level:
+    org.springframework.web.servlet.function.support: TRACE
+    org.springframework.web.servlet.handler: TRACE
+    org.springframework.cloud.gateway.server.mvc: TRACE
+server:
+  servlet:
+    session:
+      cookie:
+        name: GATEWAY_SESSION

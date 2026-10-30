@@ -83,6 +83,17 @@ public class UserController {
     }
 
     /**
+     * fetch me.
+     *
+     * @return the result.
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserVO> fetch() {
+        UserVO vo = userService.fetch();
+        return ResponseEntity.ok(vo);
+    }
+
+    /**
      * create.
      *
      * @param dto the request body.

@@ -63,10 +63,10 @@ class OperationLogServiceImplTest {
     void setUp() {
         entity = new OperationLog();
         entity.setModule("test");
-        entity.setBody("body");
+        entity.setResponse("body");
         entity.setParams("params");
         entity.setAction("test");
-        entity.setStatusCode(200);
+        entity.setStatus(200);
     }
 
     @Test

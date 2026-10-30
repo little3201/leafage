@@ -64,6 +64,6 @@ public interface PrivilegeRepository extends ListCrudRepository<Privilege, Long>
      * @return result.
      */
     @Modifying
-    @Query("UPDATE Privilege t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE privileges SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
     int updateEnabledById(Long id);
 }

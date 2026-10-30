@@ -4,3 +4,17 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://192.168.0.111:8761
+
+logging:
+  level:
+    org.springframework.security: trace
+server:
+  servlet:
+    session:
+      cookie:
+        name: AUTH_SESSION

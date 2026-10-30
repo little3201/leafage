@@ -27,6 +27,8 @@ import top.leafage.hypervisor.system.domain.vo.UserVO;
  */
 public interface UserService extends JdbcCrudService<UserDTO, UserVO> {
 
+    UserVO fetch();
+
     /**
      * Update accountNonLocked.
      *

@@ -46,6 +46,6 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
      * @return result.
      */
     @Modifying
-    @Query("UPDATE Role t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE roles SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
     int updateEnabledById(Long id);
 }

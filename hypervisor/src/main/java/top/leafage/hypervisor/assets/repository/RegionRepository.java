@@ -65,6 +65,6 @@ public interface RegionRepository extends CrudRepository<Region, Long> {
      * @return result.
      */
     @Modifying
-    @Query("UPDATE Region t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE Region SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
     int updateEnabledById(Long id);
 }

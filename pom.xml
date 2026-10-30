@@ -41,7 +41,7 @@
         </sonar.coverage.jacoco.xmlReportPaths>
 
         <leafage-common.version>0.4.3</leafage-common.version>
-        <mybatis.version>3.5.19</mybatis.version>
+        <mybatis.version>3.6.0</mybatis.version>
         <mybatis-spring.version>4.1.0</mybatis-spring.version>
     </properties>
 

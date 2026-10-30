@@ -65,6 +65,6 @@ public interface DictionaryRepository extends CrudRepository<Dictionary, Long> {
      * @return result.
      */
     @Modifying
-    @Query("UPDATE Dictionary t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE dictionaries SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
     int updateEnabledById(Long id);
 }

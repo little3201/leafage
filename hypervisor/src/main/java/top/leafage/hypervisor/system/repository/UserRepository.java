@@ -22,6 +22,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import top.leafage.hypervisor.system.domain.User;
 
+import java.util.Optional;
+
 /**
  * user repository.
  *
@@ -29,6 +31,9 @@ import top.leafage.hypervisor.system.domain.User;
  */
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
+
+    @Query("SELECT * from users WHERE username = ?#{principal?.name}")
+    Optional<User> findCurrentUser();
 
     /**
      * is exists.
@@ -53,7 +58,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @return result.
      */
     @Modifying
-    @Query("UPDATE User t SET t.enabled = CASE WHEN t.enabled = true THEN false ELSE true END WHERE t.id = :id")
+    @Query("UPDATE users SET enabled = CASE WHEN enabled = true THEN false ELSE true END WHERE id = :id")
     int updateEnabledById(Long id);
 
     /**
@@ -63,6 +68,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @return result.
      */
     @Modifying
-    @Query("UPDATE User t SET t.accountNonLocked = true WHERE t.id = :id")
+    @Query("UPDATE users SET account_non_locked = true WHERE id = :id")
     int updateAccountNonLockedById(Long id);
 }

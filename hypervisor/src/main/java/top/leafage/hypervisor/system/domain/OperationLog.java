@@ -17,11 +17,12 @@
 
 package top.leafage.hypervisor.system.domain;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.relational.core.mapping.Table;
 import top.leafage.common.data.jdbc.domain.AbstractAuditable;
+import top.leafage.common.logging.event.OperationLogEvent;
 
 import java.net.InetAddress;
+import java.util.Map;
 
 /**
  * entity class for operation log.
@@ -35,18 +36,31 @@ public class OperationLog extends AbstractAuditable<String, Long> {
 
     private String action;
 
-    private String params;
+    private Long targetId;
 
-    private String body;
+    private Map<String, Object> params;
 
-    private InetAddress ip;
+    private String response;
 
-    private String sessionId;
+    private OperationLogEvent.Status status;
 
-    private String userAgent;
+    private long duration;
 
-    private Integer statusCode;
+    private String message;
 
+    public OperationLog() {
+    }
+
+    public OperationLog(String module, String action, Long targetId, Map<String, Object> params, String response, OperationLogEvent.Status status, long duration, String message) {
+        this.module = module;
+        this.action = action;
+        this.targetId = targetId;
+        this.params = params;
+        this.response = response;
+        this.status = status;
+        this.duration = duration;
+        this.message = message;
+    }
 
     public String getModule() {
         return module;
@@ -64,51 +78,51 @@ public class OperationLog extends AbstractAuditable<String, Long> {
         this.action = action;
     }
 
-    public String getParams() {
+    public Map<String, Object> getParams() {
         return params;
     }
 
-    public void setParams(String params) {
+    public void setParams(Map<String, Object> params) {
         this.params = params;
     }
 
-    public String getBody() {
-        return body;
+    public String getResponse() {
+        return response;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setResponse(String response) {
+        this.response = response;
     }
 
-    public InetAddress getIp() {
-        return ip;
+    public Long getTargetId() {
+        return targetId;
     }
 
-    public void setIp(InetAddress ip) {
-        this.ip = ip;
+    public void setTargetId(Long targetId) {
+        this.targetId = targetId;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public OperationLogEvent.Status getStatus() {
+        return status;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setStatus(OperationLogEvent.Status status) {
+        this.status = status;
     }
 
-    public String getUserAgent() {
-        return userAgent;
+    public long getDuration() {
+        return duration;
     }
 
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
-    public Integer getStatusCode() {
-        return statusCode;
+    public String getMessage() {
+        return message;
     }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
