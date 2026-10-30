@@ -14,10 +14,10 @@ spring:
             client-name: web-client
         provider:
           spring:
-            issuer-uri: http://192.168.0.111:8761
+            issuer-uri: http://192.168.0.112:8761
 
 app:
-  base-uri: http://192.168.0.111:5173
+  base-uri: http://192.168.0.112:5173
 
 logging:
   level:

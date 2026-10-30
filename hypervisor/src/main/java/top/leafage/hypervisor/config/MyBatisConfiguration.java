@@ -35,7 +35,7 @@ import javax.sql.DataSource;
  */
 @Configuration(proxyBeanMethods = false)
 @Import(MyBatisJdbcConfiguration.class)
-@MapperScan(basePackages = "io.leafage.*.mapper")
+@MapperScan(basePackages = "top.leafage.**.mapper")
 public class MyBatisConfiguration {
 
     @Bean

@@ -8,7 +8,7 @@ spring:
   security:
     oauth2:
       authorizationserver:
-        issuer: http://192.168.0.111:8761
+        issuer: http://192.168.0.112:8761
 
 logging:
   level:

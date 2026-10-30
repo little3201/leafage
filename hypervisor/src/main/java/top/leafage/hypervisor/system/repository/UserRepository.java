@@ -32,7 +32,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    @Query("SELECT * from users WHERE username = ?#{principal?.name}")
+    @Query("SELECT * from users WHERE username = :#{principal?.name}")
     Optional<User> findCurrentUser();
 
     /**

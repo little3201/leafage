@@ -18,8 +18,11 @@ package top.leafage.hypervisor.system.domain;
 
 
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import top.leafage.common.data.jdbc.domain.AbstractAuditable;
+
+import java.util.Set;
 
 /**
  * entity class for role.
@@ -30,6 +33,9 @@ import top.leafage.common.data.jdbc.domain.AbstractAuditable;
 public class Role extends AbstractAuditable<String, Long> {
 
     private String name;
+
+    @MappedCollection(idColumn = "role_id")
+    private Set<Long> members;
 
 
     private boolean enabled = true;
@@ -49,6 +55,13 @@ public class Role extends AbstractAuditable<String, Long> {
         this.name = name;
     }
 
+    public Set<Long> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<Long> members) {
+        this.members = members;
+    }
 
     public boolean isEnabled() {
         return enabled;
