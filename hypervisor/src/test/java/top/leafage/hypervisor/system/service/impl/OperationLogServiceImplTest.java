@@ -26,10 +26,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.relational.core.query.Query;
+import top.leafage.common.logging.event.OperationLogEvent;
 import top.leafage.hypervisor.system.domain.OperationLog;
 import top.leafage.hypervisor.system.domain.vo.OperationLogVO;
 import top.leafage.hypervisor.system.repository.OperationLogRepository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -64,9 +66,9 @@ class OperationLogServiceImplTest {
         entity = new OperationLog();
         entity.setModule("test");
         entity.setResponse("body");
-        entity.setParams("params");
+        entity.setParams(new HashMap<>());
         entity.setAction("test");
-        entity.setStatus(200);
+        entity.setStatus(OperationLogEvent.Status.SUCCEED);
     }
 
     @Test
