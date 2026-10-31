@@ -9,12 +9,3 @@ spring:
     oauth2:
       authorizationserver:
         issuer: http://192.168.0.112:8761
-
-logging:
-  level:
-    org.springframework.security: trace
-server:
-  servlet:
-    session:
-      cookie:
-        name: AUTH_SESSION
