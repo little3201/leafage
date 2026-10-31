@@ -1,5 +1,9 @@
 server:
   port: 8761
+  servlet:
+    session:
+      cookie:
+        name: AUTH_SESSION
 
 spring:
   application:

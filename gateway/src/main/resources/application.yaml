@@ -1,5 +1,9 @@
 server:
   port: 8760
+  servlet:
+    session:
+      cookie:
+        name: GATEWAY_SESSION
 
 spring:
   application:
@@ -16,13 +20,13 @@ spring:
         webmvc:
           routes:
             - id: auth
-              uri: http://127.0.0.1:8761
+              uri: http://192.168.0.109:8761
               predicates:
                 - Path=/userinfo
               filters:
                 - TokenRelay=
             - id: hypervisor
-              uri: http://127.0.0.1:8762
+              uri: http://192.168.0.109:8762
               predicates:
                 - Path=/hypervisor/**
               filters:
